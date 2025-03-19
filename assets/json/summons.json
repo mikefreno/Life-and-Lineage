@@ -3,8 +3,8 @@
     "name": "flying skull",
     "beingType": "undead",
     "health": 20,
-    "attackPower": 5,
-    "energy": {
+    "baseStrength": 5,
+    "mana": {
       "maximum": 50,
       "regen": 5
     },
@@ -17,8 +17,8 @@
     "name": "skeleton",
     "beingType": "undead",
     "health": 40,
-    "attackPower": 5,
-    "energy": {
+    "baseStrength": 5,
+    "mana": {
       "maximum": 50,
       "regen": 5
     },
@@ -32,8 +32,8 @@
     "name": "zombie",
     "beingType": "undead",
     "health": 75,
-    "attackPower": 8,
-    "energy": {
+    "baseStrength": 8,
+    "mana": {
       "maximum": 50,
       "regen": 3
     },
@@ -47,8 +47,8 @@
     "name": "wraith",
     "beingType": "undead",
     "health": 60,
-    "attackPower": 15,
-    "energy": {
+    "baseStrength": 15,
+    "mana": {
       "maximum": 75,
       "regen": 8
     },
@@ -62,8 +62,8 @@
     "name": "death knight",
     "beingType": "undead",
     "health": 150,
-    "attackPower": 20,
-    "energy": {
+    "baseStrength": 20,
+    "mana": {
       "maximum": 100,
       "regen": 10
     },
@@ -78,8 +78,8 @@
     "name": "lich",
     "beingType": "undead",
     "health": 200,
-    "attackPower": 30,
-    "energy": {
+    "baseStrength": 30,
+    "mana": {
       "maximum": 150,
       "regen": 15
     },
@@ -95,8 +95,8 @@
     "beingType": "human",
     "sanity": 50,
     "health": 50,
-    "attackPower": 8,
-    "energy": {
+    "baseStrength": 8,
+    "mana": {
       "maximum": 50,
       "regen": 10
     },
@@ -112,8 +112,8 @@
     "beingType": "demi-human",
     "sanity": null,
     "health": 160,
-    "attackPower": 15,
-    "energy": {
+    "baseStrength": 15,
+    "mana": {
       "maximum": 50,
       "regen": 10
     },
@@ -127,8 +127,8 @@
     "name": "raven",
     "beingType": "beast",
     "health": 50,
-    "attackPower": 2,
-    "energy": {
+    "baseStrength": 2,
+    "mana": {
       "maximum": 50,
       "regen": 5
     },
@@ -142,8 +142,8 @@
     "name": "wolf",
     "beingType": "beast",
     "health": 100,
-    "attackPower": 8,
-    "energy": {
+    "baseStrength": 8,
+    "mana": {
       "maximum": 50,
       "regen": 10
     },
@@ -156,8 +156,8 @@
     "name": "bear",
     "beingType": "beast",
     "health": 200,
-    "attackPower": 10,
-    "energy": {
+    "baseStrength": 10,
+    "mana": {
       "maximum": 50,
       "regen": 3
     },
@@ -171,8 +171,8 @@
     "name": "dragon welp",
     "beingType": "draconic",
     "health": 350,
-    "attackPower": 15,
-    "energy": {
+    "baseStrength": 15,
+    "mana": {
       "maximum": 100,
       "regen": 15
     },
@@ -187,8 +187,8 @@
     "name": "griffon",
     "beingType": "beast",
     "health": 500,
-    "attackPower": 25,
-    "energy": {
+    "baseStrength": 25,
+    "mana": {
       "maximum": 100,
       "regen": 10
     },
@@ -203,8 +203,8 @@
     "name": "dragon",
     "beingType": "draconic",
     "health": 1000,
-    "attackPower": 30,
-    "energy": {
+    "baseStrength": 30,
+    "mana": {
       "maximum": 100,
       "regen": 10
     },

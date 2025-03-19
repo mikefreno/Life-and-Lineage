@@ -462,15 +462,6 @@ export const getAnimatedSpriteForNPC = (character: Character) => {
   }
 };
 
-const getNPCAsEnemyStats = () => {
-  const health = getRandomInt(75, 200);
-  const energy = getRandomInt(20, 60);
-  const attackPower = getRandomInt(10, 15);
-  const regen = getRandomInt(3, 5);
-
-  return { health, energy, attackPower, regen };
-};
-
 export const calculateAdjustedFrameRate = (
   frames: number,
   maxDuration: number = MAX_ANIMATION_DURATION,

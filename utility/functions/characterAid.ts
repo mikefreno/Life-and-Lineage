@@ -1,4 +1,9 @@
-import { flipCoin, getRandomName, getRandomPersonality } from "./misc";
+import {
+  flipCoin,
+  getNPCBaseCombatStats,
+  getRandomName,
+  getRandomPersonality,
+} from "./misc";
 import jobs from "../../assets/json/jobs.json";
 import names from "../../assets/json/names.json";
 import { Element, PlayerClassOptions } from "../types";
@@ -112,6 +117,7 @@ export function createParent(
   const job = getRandomJobTitle();
   const personality = getRandomPersonality();
   const parent = new Character({
+    beingType: "human",
     firstName: firstName,
     lastName: lastName,
     personality,
@@ -120,6 +126,7 @@ export function createParent(
     affection: 85,
     birthdate: root.time.generateBirthDateInRange(32, 55),
     root,
+    ...getNPCBaseCombatStats(),
   });
   root.characterStore.addCharacter(parent);
   return parent;

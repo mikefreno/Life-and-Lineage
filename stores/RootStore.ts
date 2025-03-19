@@ -55,6 +55,8 @@ export class RootStore {
 
   constructor() {
     this.uiStore = new UIStore({ root: this });
+    this.time = new TimeStore({ root: this });
+    this.uiStore.markStoreAsLoaded("time");
 
     this.enemyStore = new EnemyStore({ root: this });
     this.uiStore.markStoreAsLoaded("enemy");
@@ -69,9 +71,6 @@ export class RootStore {
     this.playerAnimationStore = new PlayerAnimationStore({ root: this });
 
     this.uiStore.markStoreAsLoaded("player");
-
-    this.time = new TimeStore({ root: this });
-    this.uiStore.markStoreAsLoaded("time");
 
     this.dungeonStore = new DungeonStore({ root: this });
     this.uiStore.markStoreAsLoaded("dungeon");

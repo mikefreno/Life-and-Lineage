@@ -91,7 +91,7 @@ export const StringToDamageType: Record<string, DamageType> = {
 };
 
 export function parseDamageTypeObject(
-  data: { [key: string]: number } | undefined,
+  data: { [key: string]: number } | undefined | null,
 ): {
   [key in DamageType]?: number;
 } {

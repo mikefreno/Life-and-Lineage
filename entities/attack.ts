@@ -115,14 +115,8 @@ export class Attack {
       const newBuff = createBuff({
         buffName: buffString,
         attackPower: this.damage().total,
-        maxHealth:
-          "nonConditionalMaxHealth" in this.user // done due to different attributes on different classes
-            ? this.user.nonConditionalMaxHealth
-            : this.user.baseHealth,
-        maxSanity:
-          "nonConditionalMaxHealth" in this.user
-            ? this.user.nonConditionalMaxSanity
-            : this.user.baseSanity,
+        maxHealth: this.user.nonConditionalMaxHealth,
+        maxSanity: this.user.nonConditionalMaxSanity,
         applierNameString: this.userNameReference,
         applierID: this.user.id,
       });

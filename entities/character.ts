@@ -516,33 +516,11 @@ export class PlayerCharacter extends Character {
     // observable are state that is for mutated attributes, computed are for `get`s and
     // actions are methods to be tracked that manipulate any attributes, needed in strict mode
     makeObservable(this, {
-      baseSanity: observable,
-      currentSanity: observable,
-      maxSanity: computed,
-      nonConditionalMaxSanity: computed,
-      restoreSanity: action,
-      damageSanity: action,
-      changeBaseSanity: action,
-
-      baseMana: observable,
-      currentMana: observable,
-      maxMana: computed,
-      restoreMana: action,
-      nonConditionalMaxMana: computed,
-      useMana: action,
-
-      baseManaRegen: observable,
-      totalManaRegen: computed,
-      nonConditionalManaRegen: computed,
-      regenMana: action,
-
-      magicPower: computed,
-
       addSkillPoint: action,
       removeSkillPoint: action,
-      allocatedSkillPoints: observable,
       unAllocatedSkillPoints: observable,
       setUnAllocatedSkillPoints: action,
+      totalAllocatedPoints: computed,
 
       gold: observable,
       spendGold: action,
@@ -573,10 +551,6 @@ export class PlayerCharacter extends Character {
       useArrow: action,
       pass: action,
 
-      isStunned: computed,
-      addCondition: action,
-      removeCondition: action,
-
       jobs: observable.deep,
       getCurrentJobAndExperience: action,
       incrementQualificationProgress: action,
@@ -587,7 +561,6 @@ export class PlayerCharacter extends Character {
       getSpecifiedQualificationProgress: action,
       gainProficiency: action,
 
-      conditions: observable,
       investments: observable,
       adopt: action,
 
@@ -794,6 +767,17 @@ export class PlayerCharacter extends Character {
       }
       this.addSkillPoint({ amount });
     }
+  }
+
+  get totalAllocatedPoints() {
+    return (
+      this.allocatedSkillPoints![Attribute.health] +
+      this.allocatedSkillPoints![Attribute.mana] +
+      this.allocatedSkillPoints![Attribute.sanity] +
+      this.allocatedSkillPoints![Attribute.strength] +
+      this.allocatedSkillPoints![Attribute.intelligence] +
+      this.allocatedSkillPoints![Attribute.dexterity]
+    );
   }
 
   public setUnAllocatedSkillPoints(points: number) {
@@ -1897,6 +1881,9 @@ export class PlayerCharacter extends Character {
   static fromJSON(json: any): PlayerCharacter {
     const player = new PlayerCharacter({
       id: json.id,
+      beingType: "human",
+      baseResistanceTable: {},
+      baseDamageTable: {},
       firstName: json.firstName,
       lastName: json.lastName,
       sex: json.sex,

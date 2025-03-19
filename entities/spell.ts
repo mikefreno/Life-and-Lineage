@@ -4,8 +4,8 @@ import {
   DamageType,
   Element,
   MasteryLevel,
+  parseDamageTypeObject,
   PlayerAnimationSet,
-  StringToDamageType,
   StringToElement,
   StringToMastery,
 } from "../utility/types";
@@ -52,8 +52,8 @@ export class Spell {
   proficiencyNeeded: MasteryLevel | null;
   duration: number;
   manaCost: number;
-  damageByType: { [key in DamageType]?: number };
-  selfDamageByType: { [key in DamageType]?: number };
+  damage: { [key in DamageType]?: number };
+  selfDamage: { [key in DamageType]?: number };
   flatSanityDamage: number;
   buffs: string[];
   debuffs: { name: string; chance: number }[];
@@ -81,25 +81,10 @@ export class Spell {
       : null;
     this.manaCost = manaCost;
     this.duration = duration ?? 1;
-    
-    this.damageByType = {};
-    this.selfDamageByType = {};
-    
-    if (effects.damage) {
-      Object.entries(effects.damage).forEach(([key, value]) => {
-        const damageType = StringToDamageType[key.toLowerCase()];
-        if (damageType !== undefined && value !== undefined) {
-          this.damageByType[damageType] = value;
-        }else{
-          throw new Error(`invalid damage type: ${key} on ${this.name}`)
-        }
-      });
-    }
-    
-    if (effects.selfDamage) {
-      Object.entries(effects.selfDamage).forEach(([key, value]) => {
-    }
-    
+
+    this.damage = parseDamageTypeObject(effects.damage);
+    this.selfDamage = parseDamageTypeObject(effects.selfDamage);
+
     this.flatSanityDamage = effects.sanityDamage ?? 0;
     this.buffs = effects.buffs ?? [];
     this.debuffs = effects.debuffs ?? [];
@@ -107,22 +92,30 @@ export class Spell {
     this.rangerPet = effects.pet;
     this.animation = animation;
   }
-  
- get totalRawDamage(): number {
-    return Object.values(this.damageByType).reduce((sum, damage) => sum + (damage || 0), 0);
+
+  get totalRawDamage(): number {
+    return Object.values(this.damage).reduce(
+      (sum, damage) => sum + (damage || 0),
+      0,
+    );
   }
 
   get totalRawSelfDamage(): number {
-    return Object.values(this.selfDamageByType).reduce((sum, damage) => sum + (damage || 0), 0);
+    return Object.values(this.selfDamage).reduce(
+      (sum, damage) => sum + (damage || 0),
+      0,
+    );
   }
 
   public baseDamage(user: PlayerCharacter) {
     if (this.totalRawDamage > 0) {
       if (this.usesWeapon) {
         if (
-          user.equipment.mainHand.itemClass === this.usesWeapon //title case aligns with ItemClassType
+          user.equipment?.mainHand.itemClass === this.usesWeapon //title case aligns with ItemClassType
         ) {
-          return this.totalRawDamage + user.magicPower + (user.totalDamage ?? 0);
+          return (
+            this.totalRawDamage + user.magicPower + (user.totalDamage ?? 0)
+          );
         } else return 0;
       }
       return this.totalRawDamage + user.magicPower;
@@ -164,8 +157,15 @@ export class Spell {
     return { val: true };
   }
 
-  public calcPostResistanceDamage({target, user, damageType}:{target: PlayerCharacter | Enemy | Minion, user: PlayerCharacter, damageType: DamageType}){
-  }
+  public calcPostResistanceDamage({
+    target,
+    user,
+    damageType,
+  }: {
+    target: PlayerCharacter | Enemy | Minion;
+    user: PlayerCharacter;
+    damageType: DamageType;
+  }) {}
 
   public use({
     targets,
@@ -272,8 +272,7 @@ export class Spell {
     }
 
     user.gainProficiency(this);
-    const selfDamageCalc = 
-    user.damageHealth({
+    const selfDamageCalc = user.damageHealth({
       damage: this.selfDamage * bloodMult,
       attackerId: user.id,
     });

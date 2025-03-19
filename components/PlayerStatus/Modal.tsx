@@ -57,7 +57,7 @@ export const PlayerStatusModal = observer(() => {
   }, [respeccing]);
 
   useEffect(() => {
-    if (playerState?.getTotalAllocatedPoints() == 0) {
+    if (playerState?.totalAllocatedPoints == 0) {
       setRespeccing(false);
     }
   }, [playerState?.unAllocatedSkillPoints]);
@@ -210,7 +210,7 @@ export const PlayerStatusModal = observer(() => {
             {playerState.unAllocatedSkillPoints} unallocated skill points
           </Text>
         )}
-        {playerState.getTotalAllocatedPoints() > 0 && (
+        {playerState.totalAllocatedPoints > 0 && (
           <View
             style={{
               position: "absolute",
