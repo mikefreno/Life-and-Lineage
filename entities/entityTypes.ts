@@ -49,8 +49,8 @@ export interface BeingOptions {
   baseHealth: number;
   currentHealth?: number;
 
-  baseDamageTable: { [key in string]?: number };
-  baseResistanceTable: { [key in string]?: number };
+  baseDamageTable: { [key: string]: number };
+  baseResistanceTable: { [key: string]: number };
 
   deathdate?: { year: number; week: number };
   alive?: boolean;

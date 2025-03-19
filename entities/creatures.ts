@@ -567,8 +567,8 @@ export class Enemy extends Creature {
       currentHealth: minionObj.health,
       baseHealth: minionObj.health,
       currentMana: minionObj.energy?.maximum,
-      baseMana: minionObj.energy?.maximum,
-      baseManaRegen: minionObj.energy?.regen,
+      baseMana: minionObj.mana?.maximum,
+      baseManaRegen: minionObj.mana?.regen,
       attackStrings: minionObj.attackStrings,
       turnsLeftAlive: minionObj.turns,
       baseStrength: minionObj.baseStrength,
@@ -620,10 +620,14 @@ export class Enemy extends Creature {
       baseHealth: json.baseHealth,
       currentSanity: json.currentSanity,
       baseSanity: json.baseSanity,
-      attackPower: json.attackPower,
-      currentEnergy: json.currentEnergy,
-      baseEnergy: json.baseEnergy,
-      energyRegen: json.energyRegen,
+      currentMana: json.currentMana,
+      baseMana: json.baseMana,
+      baseManaRegen: json.baseManaRegen,
+      baseDamageTable: json.baseDamageTable,
+      baseResistanceTable: json.baseResistanceTable,
+      baseStrength: json.baseStrength,
+      baseIntelligence: json.baseIntelligence,
+      baseDexterity: json.baseDexterity,
       minions: json.minions
         ? json.minions.map((minion: any) => Minion.fromJSON(minion))
         : [],
@@ -636,15 +640,6 @@ export class Enemy extends Creature {
       drops: json.drops,
       storyDrops: json.storyDrops,
       goldDropRange: json.goldDropRange,
-      basePhysicalDamage: json.basePhysicalDamage,
-      baseFireDamage: json.baseFireDamage,
-      baseColdDamage: json.baseColdDamage,
-      baseLightningDamage: json.baseLightningDamage,
-      basePoisonDamage: json.basePoisonDamage,
-      baseFireResistance: json.baseFireResistance,
-      baseColdResistance: json.baseColdResistance,
-      baseLightningResistance: json.baseLightningResistance,
-      basePoisonResistance: json.basePoisonResistance,
       phases: json.phases || [],
       root: json.root,
     });
@@ -663,9 +658,7 @@ export class Minion extends Creature {
   private parent: Enemy | PlayerCharacter | null;
 
   constructor({ turnsLeftAlive, parent, ...props }: MinionOptions) {
-    super({
-      ...props,
-    });
+    super(props);
     this.turnsLeftAlive = turnsLeftAlive;
     this.parent = parent;
 
@@ -721,25 +714,21 @@ export class Minion extends Creature {
       baseHealth: json.baseHealth,
       currentSanity: json.currentSanity,
       baseSanity: json.baseSanity,
-      attackPower: json.attackPower,
-      currentEnergy: json.currentEnergy,
-      baseEnergy: json.baseEnergy,
-      energyRegen: json.manaRegen,
+      currentMana: json.currentMana,
+      baseMana: json.baseMana,
+      baseManaRegen: json.baseManaRegen,
+      baseDamageTable: json.baseDamageTable,
+      baseResistanceTable: json.baseResistanceTable,
+      baseStrength: json.baseStrength,
+      baseIntelligence: json.baseIntelligence,
+      baseDexterity: json.baseDexterity,
       turnsLeftAlive: json.turnsLeftAlive,
       attackStrings: json.attackStrings,
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],
-      basePhysicalDamage: json.basePhysicalDamage,
-      baseFireDamage: json.baseFireDamage,
-      baseColdDamage: json.baseColdDamage,
-      baseLightningDamage: json.baseLightningDamage,
-      basePoisonDamage: json.basePoisonDamage,
-      baseFireResistance: json.baseFireResistance,
-      baseColdResistance: json.baseColdResistance,
-      baseLightningResistance: json.baseLightningResistance,
-      basePoisonResistance: json.basePoisonResistance,
       parent: json.parent,
+      root: json.root,
     });
     return minion;
   }

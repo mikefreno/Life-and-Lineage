@@ -40,6 +40,8 @@ import {
   damageReduction,
   getRandomName,
   getRandomPersonality,
+  getAnimatedSpriteForNPC,
+  getNPCBaseCombatStats,
 } from "../utility/functions/misc";
 import { Spell } from "./spell";
 import storyItems from "../assets/json/items/storyItems.json";
@@ -48,7 +50,7 @@ import { stringify } from "flatted";
 import { throttle } from "lodash";
 import type { RootStore } from "../stores/RootStore";
 import { Being } from "./being";
-import { CharacterOptions } from "./entityTypes";
+import { CharacterOptions, PlayerCharacterOptions } from "./entityTypes";
 
 export interface JobData {
   title: string;
@@ -101,7 +103,7 @@ export class Character extends Being {
     knownCharacterIds,
     ...props
   }: CharacterOptions) {
-    super({ ...props });
+    super(props);
 
     this.firstName = firstName;
     this.lastName = lastName;
@@ -174,6 +176,16 @@ export class Character extends Being {
       () => {
         if (this.root?.characterStore) {
           this.root.characterStore.saveCharacter(this);
+        }
+      },
+    );
+
+    reaction(
+      () => this.age,
+      () => {
+        const sprite = getAnimatedSpriteForNPC(this);
+        if (this.sprite !== sprite) {
+          runInAction(() => (this.sprite = sprite));
         }
       },
     );
@@ -373,12 +385,14 @@ export class Character extends Being {
     const sex = Math.random() > 0.5 ? "male" : "female";
 
     const baby = new Character({
+      beingType: "human",
       firstName: getRandomName(sex).firstName,
       lastName: this.lastName,
       sex,
       personality: getRandomPersonality(),
       birthdate: currentDate,
       root: this.root,
+      ...getNPCBaseCombatStats(),
     });
 
     return baby;
@@ -387,6 +401,7 @@ export class Character extends Being {
   static fromJSON(json: any): Character {
     const character = new Character({
       id: json.id,
+      beingType: "human",
       firstName: json.firstName,
       lastName: json.lastName,
       sex: json.sex,
@@ -405,6 +420,7 @@ export class Character extends Being {
       isPregnant: json.isPregnant,
       knownCharacterIds: json.knownCharacterIds ?? [],
       root: json.root,
+      ...getNPCBaseCombatStats(),
     });
     return character;
   }
@@ -462,7 +478,11 @@ export class PlayerCharacter extends Character {
     jobs,
     ...props
   }: PlayerCharacterOptions) {
-    super({ ...props, isPlayerCharacter: true });
+    super({
+      isPlayerCharacter: true,
+      personality: null,
+      ...props,
+    });
     this.playerClass = PlayerClassOptions[playerClass];
     this.blessing = blessing;
 
@@ -769,7 +789,7 @@ export class PlayerCharacter extends Character {
       if (this.currentMana! > this.maxMana) {
         this.currentMana = this.maxMana;
       }
-      if (this.currentSanity! > this.maxSanity) {
+      if (this.currentSanity! > this.maxSanity!) {
         this.currentSanity = this.maxSanity;
       }
       this.addSkillPoint({ amount });
@@ -962,7 +982,7 @@ export class PlayerCharacter extends Character {
     return {
       health: this.currentHealth / this.maxHealth,
       mana: this.currentMana! / this.maxMana,
-      sanity: this.currentSanity! / this.maxSanity,
+      sanity: this.currentSanity! / this.maxSanity!,
     };
   }
 
@@ -977,7 +997,7 @@ export class PlayerCharacter extends Character {
   }) {
     this.currentHealth = Math.round(this.maxHealth * health);
     this.currentMana = Math.round(this.maxMana * mana);
-    this.currentSanity = Math.round(this.maxSanity * sanity);
+    this.currentSanity = Math.round(this.maxSanity! * sanity);
   }
 
   public equippedCheck(item: Item) {
@@ -1213,7 +1233,7 @@ export class PlayerCharacter extends Character {
     sanityCost: number,
     goldCost: number,
   ) {
-    if (this.currentSanity! - sanityCost > -this.maxSanity) {
+    if (this.currentSanity! - sanityCost > -this.maxSanity!) {
       let foundQual = false;
       this.qualificationProgress.forEach((qual) => {
         if (qual.name == name) {
@@ -1582,8 +1602,8 @@ export class PlayerCharacter extends Character {
       currentHealth: minionObj.health,
       baseHealth: minionObj.health,
       currentMana: minionObj.energy?.maximum,
-      baseMana: minionObj.energy?.maximum,
-      baseManaRegen: minionObj.energy?.regen,
+      baseMana: minionObj.mana?.maximum,
+      baseManaRegen: minionObj.mana?.regen,
       attackStrings: minionObj.attackStrings,
       turnsLeftAlive: minionObj.turns,
       baseStrength: minionObj.baseStrength,
@@ -1755,9 +1775,9 @@ export class PlayerCharacter extends Character {
       creatureSpecies: minionObj.name,
       currentHealth: minionObj.health,
       baseHealth: minionObj.health,
-      currentMana: minionObj.energy?.maximum,
-      baseMana: minionObj.energy?.maximum,
-      baseManaRegen: minionObj.energy?.regen,
+      currentMana: minionObj.mana?.maximum,
+      baseMana: minionObj.mana?.maximum,
+      baseManaRegen: minionObj.mana?.regen,
       attackStrings: minionObj.attackStrings,
       turnsLeftAlive: minionObj.turns,
       baseStrength: minionObj.baseStrength,

@@ -20,7 +20,12 @@ import melee from "../../assets/json/items/melee.json";
 import wands from "../../assets/json/items/wands.json";
 import storyItems from "../../assets/json/items/storyItems.json";
 import names from "../../assets/json/names.json";
-import { ItemClassType, Personality, PlayerClassOptions } from "../types";
+import {
+  DamageType,
+  ItemClassType,
+  Personality,
+  PlayerClassOptions,
+} from "../types";
 import {
   CommonActions,
   NavigationProp,
@@ -430,36 +435,20 @@ export function checkReleasePosition({
   handleSnapBack();
 }
 
-export const generateEnemyFromNPC = (character: Character) => {
-  const { health, energy, attackPower, regen } = getNPCAsEnemyStats();
-  const sprite = getAnimatedSpriteForNPC(character);
-  return new Enemy({
-    beingType: "human",
-    creatureSpecies: character.fullName,
-    currentHealth: health,
-    baseHealth: health,
-    energyRegen: regen,
-    currentEnergy: energy,
-    baseEnergy: energy,
-    drops: [
-      {
-        item: "dagger",
-        itemType: "melee" as ItemClassType,
-        chance: 0.75,
-      },
-    ],
-    goldDropRange: {
-      minimum: 250,
-      maximum: 1000,
-    },
-    sprite,
-    attackPower,
-    attackStrings: ["stab"],
-    animationStrings: { stab: "attack_1" },
-  });
+export const getNPCBaseCombatStats = () => {
+  return {
+    baseMana: 100,
+    baseManaRegen: 5,
+    baseHealth: 100,
+    baseDamageTable: { [DamageType.PHYSICAL]: 5 },
+    baseIntelligence: 5,
+    baseDexterity: 5,
+    baseStrength: 10,
+    baseResistanceTable: { [DamageType.PHYSICAL]: 10, [DamageType.HOLY]: 15 },
+  };
 };
 
-const getAnimatedSpriteForNPC = (character: Character) => {
+export const getAnimatedSpriteForNPC = (character: Character) => {
   if (character.sex == "male") {
     if (character.age > 50) {
       return "npc_man_old";

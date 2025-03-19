@@ -109,24 +109,27 @@ export class Being {
           }
         : null;
 
-    this.equipment = props.equipment ?? {
-      mainHand: new Item({
-        rarity: Rarity.NORMAL,
-        prefix: null,
-        suffix: null,
-        name: "unarmored",
-        slot: "one-hand",
-        stats: { [Modifier.PhysicalDamage]: 1 },
-        baseValue: 0,
-        itemClass: ItemClassType.Melee,
-        attacks: ["punch"],
-        root: props.root,
-      }),
-      offHand: null,
-      head: null,
-      body: null,
-      quiver: null,
-    };
+    this.equipment =
+      props.equipment ?? props.isPlayerCharacter
+        ? {
+            mainHand: new Item({
+              rarity: Rarity.NORMAL,
+              prefix: null,
+              suffix: null,
+              name: "unarmored",
+              slot: "one-hand",
+              stats: { [Modifier.PhysicalDamage]: 1 },
+              baseValue: 0,
+              itemClass: ItemClassType.Melee,
+              attacks: ["punch"],
+              root: props.root,
+            }),
+            offHand: null,
+            head: null,
+            body: null,
+            quiver: null,
+          }
+        : null;
 
     this.root = props.root;
 
@@ -803,5 +806,35 @@ export class Being {
   get isStunned() {
     const isStunned = getConditionEffectsOnMisc(this.conditions).isStunned;
     return isStunned;
+  }
+
+  public static fromJSON(json: any): Being {
+    return new Being({
+      id: json.id,
+      beingType: json.beingType,
+      sprite: json.sprite,
+      currentHealth: json.currentHealth,
+      baseHealth: json.baseHealth,
+      currentSanity: json.currentSanity,
+      baseSanity: json.baseSanity,
+      baseMana: json.baseMana,
+      currentMana: json.currentMana,
+      baseManaRegen: json.baseManaRegen,
+      baseStrength: json.baseStrength,
+      baseIntelligence: json.baseIntelligence,
+      baseDexterity: json.baseDexterity,
+      baseArmor: json.baseArmor,
+      baseResistanceTable: json.baseResistanceTable,
+      attackStrings: json.attackStrings,
+      baseDamageTable: json.baseDamageTable,
+      alive: json.alive,
+      deathdate: json.deathdate,
+      allocatedSkillPoints: json.allocatedSkillPoints,
+      equipment: json.equipment,
+      conditions: json.conditions
+        ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
+        : [],
+      root: json.root,
+    });
   }
 }
