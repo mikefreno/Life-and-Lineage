@@ -9,6 +9,7 @@ import {
   rollD20,
   getItemJSONMap,
   getClassSpecificBookList,
+  getNPCBaseCombatStats,
 } from "../utility/functions/misc";
 import { ItemClassType, MerchantType, Personality } from "../utility/types";
 import { RootStore } from "../stores/RootStore";
@@ -399,6 +400,7 @@ export function generateShopKeeper(archetype: string, root: RootStore) {
   const personality = shopObj!.possiblePersonalities[randIdx];
 
   const newChar = new Character({
+    beingType: "human",
     sex: sex,
     firstName: name.firstName,
     lastName: name.lastName,
@@ -406,6 +408,7 @@ export function generateShopKeeper(archetype: string, root: RootStore) {
     personality: personality as Personality,
     job: job,
     root,
+    ...getNPCBaseCombatStats(),
   });
   return newChar;
 }

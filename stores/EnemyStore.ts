@@ -2,14 +2,24 @@ import { parse, stringify } from "flatted";
 import { Enemy } from "@/entities/creatures";
 import { storage } from "@/utility/functions/storage";
 import { RootStore } from "@/stores/RootStore";
-import { action, computed, makeObservable, observable, reaction } from "mobx";
+import {
+  action,
+  computed,
+  makeObservable,
+  observable,
+  reaction,
+  runInAction,
+} from "mobx";
 import { EnemyAnimationStore } from "@/stores/EnemyAnimationStore";
 import enemiesJSON from "@/assets/json/enemy.json";
 import { BeingType, ItemClassType } from "@/utility/types";
 import { EnemyImageKeyOption } from "@/utility/enemyHelpers";
+import { Being } from "@/entities/being";
+import { Character } from "@/entities/character";
+import { getAnimatedSpriteForNPC } from "@/utility/functions/misc";
 
 export default class EnemyStore {
-  enemies: Enemy[];
+  enemies: Being[];
   animationStoreMap: Map<string, EnemyAnimationStore>;
   root: RootStore;
   midpointUpdater: number = 0;
@@ -131,10 +141,15 @@ export default class EnemyStore {
   //}
   //}
 
-  public addToEnemyList(enemy: Enemy) {
+  public addToEnemyList(enemy: Being) {
     if (!enemy.sprite) {
-      throw new Error(`No sprite on ${enemy}`);
+      if (enemy instanceof Character) {
+        runInAction(() => (enemy.sprite = getAnimatedSpriteForNPC(enemy)));
+      } else {
+        throw new Error(`No sprite on ${enemy}`);
+      }
     }
+
     this.enemies.push(enemy);
     this.animationStoreMap.set(
       enemy.id,
@@ -182,7 +197,7 @@ export default class EnemyStore {
     return this.animationStoreMap.get(enemyId);
   }
 
-  public saveEnemy = (enemy: Enemy) => {
+  public saveEnemy = (enemy: Being) => {
     const str = this.enemies.map((enemy) => enemy.id);
 
     storage.set("enemyIDs", stringify(str));

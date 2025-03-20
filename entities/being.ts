@@ -10,7 +10,14 @@ import {
 import { Condition } from "./conditions";
 import * as Crypto from "expo-crypto";
 import { ThreatTable } from "./threatTable";
-import { action, computed, makeObservable, observable } from "mobx";
+import {
+  action,
+  computed,
+  makeObservable,
+  observable,
+  reaction,
+  runInAction,
+} from "mobx";
 import { RootStore } from "@/stores/RootStore";
 import { EnemyImageKeyOption } from "@/utility/enemyHelpers";
 import { Item } from "./item";
@@ -69,11 +76,12 @@ export class Being {
   constructor(props: BeingOptions) {
     this.id = props.id ?? Crypto.randomUUID(); // Assign a random UUID if id is not provided
     this.beingType = props.beingType;
+
+    this.baseHealth = props.baseHealth;
     this.currentHealth = props.currentHealth ?? props.baseHealth;
-    this.currentSanity = props.currentSanity ?? null; // Initialize sanity to null if not provided
 
     this.baseSanity = props.baseSanity ?? null; // Initialize baseSanity to null if not provided
-    this.baseHealth = props.baseHealth;
+    this.currentSanity = props.currentSanity ?? this.baseSanity;
 
     this.baseMana = props.baseMana ?? 0;
     this.currentMana = props.currentMana ?? this.baseMana;
@@ -154,6 +162,7 @@ export class Being {
       addCondition: action,
       removeCondition: action,
       conditionTicker: action,
+      removeDebuffs: action,
 
       changeBaseSanity: action,
       useMana: action,
@@ -197,10 +206,40 @@ export class Being {
       blockChance: computed,
       physicalDamage: computed,
       isStunned: computed,
+      isSilenced: computed,
       totalHealthRegen: computed,
       totalManaRegen: computed,
       nonConditionalManaRegen: computed,
     });
+
+    reaction(
+      () => this.maxMana,
+      () => {
+        if (this.maxMana < this.currentMana) {
+          runInAction(() => (this.currentMana = this.maxMana));
+        }
+      },
+    );
+    reaction(
+      () => this.maxSanity,
+      () => {
+        if (
+          this.maxSanity &&
+          this.currentSanity !== null &&
+          this.maxSanity < this.currentSanity
+        ) {
+          runInAction(() => (this.currentSanity = this.maxSanity));
+        }
+      },
+    );
+    reaction(
+      () => this.maxHealth,
+      () => {
+        if (this.maxHealth < this.currentHealth) {
+          runInAction(() => (this.currentHealth = this.maxHealth));
+        }
+      },
+    );
   }
 
   //----------------------------------PlayerCharacter Specific----------------------------------//
@@ -383,12 +422,10 @@ export class Being {
   }
 
   public restoreMana(amount: number) {
-    if (this.currentMana) {
-      if (this.currentMana + amount < this.maxMana) {
-        this.currentMana += amount;
-      } else {
-        this.currentMana = this.maxMana;
-      }
+    if (this.currentMana + amount < this.maxMana) {
+      this.currentMana += amount;
+    } else {
+      this.currentMana = this.maxMana;
     }
   }
 
@@ -777,13 +814,25 @@ export class Being {
    */
   public addCondition(condition?: Condition | null) {
     if (condition) {
-      condition.on = this;
       this.conditions.push(condition);
     }
   }
 
   public removeCondition(condition: Condition) {
-    this.conditions = this.conditions.filter((cond) => cond !== condition);
+    this.conditions = this.conditions.filter(
+      (cond) => cond.id !== condition.id,
+    );
+  }
+
+  public removeDebuffs(amount: number) {
+    const debuffArray = this.conditions.filter(
+      (condition) =>
+        condition.style == "debuff" && condition.placedby !== "age",
+    );
+    for (let i = 0; i < amount && debuffArray.length > 0; i++) {
+      debuffArray.shift();
+    }
+    this.conditions = debuffArray;
   }
 
   /**
@@ -806,6 +855,12 @@ export class Being {
   get isStunned() {
     const isStunned = getConditionEffectsOnMisc(this.conditions).isStunned;
     return isStunned;
+  }
+
+  get isSilenced() {
+    return this.conditions.some((condition) =>
+      condition.effect.includes("silenced"),
+    );
   }
 
   public static fromJSON(json: any): Being {

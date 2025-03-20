@@ -9,9 +9,10 @@ import {
   runInAction,
 } from "mobx";
 import { throttle } from "lodash";
-import { Character, PlayerCharacter } from "@/entities/character";
+import { Character } from "@/entities/character";
 import {
   flipCoin,
+  getNPCBaseCombatStats,
   getRandomName,
   getRandomPersonality,
 } from "@/utility/functions/misc";
@@ -127,12 +128,14 @@ export class CharacterStore {
     const randomPersonality = getRandomPersonality();
 
     const child = new Character({
+      beingType: "human",
       sex: sex,
       firstName: name.firstName,
       lastName: name.lastName,
       birthdate: birthdate,
       personality: randomPersonality,
       root: this.root,
+      ...getNPCBaseCombatStats(),
     });
     this.independentChildren.push(child);
     this.characterSave(child);
@@ -158,7 +161,6 @@ export class CharacterStore {
   private hydrateCharacters(root: RootStore) {
     const storedCharacterIds = storage.getString("characterIDs");
     const storedIndependentChildIds = storage.getString("independentChildIDs");
-    const storedPlayerId = storage.getString("playerID");
 
     const characters: Character[] = [];
     const independentChildren: Character[] = [];

@@ -32,6 +32,8 @@ interface DungeonLevelOptions {
     itemType: ItemClassType;
     chance: number;
   }[];
+  isActivity?: boolean;
+  nameOverride?: string;
 }
 
 interface DungeonInstanceOptions {
@@ -167,6 +169,8 @@ export class DungeonLevel {
     itemType: ItemClassType;
     chance: number;
   }[];
+  isActivity: boolean;
+  nameOverride?: string;
 
   constructor({
     level,
@@ -180,6 +184,8 @@ export class DungeonLevel {
     parallaxOverride,
     dungeonStore,
     levelDrops,
+    isActivity,
+    nameOverride,
   }: DungeonLevelOptions) {
     this.level = level;
     this.bossEncounter = bossEncounter;
@@ -202,6 +208,8 @@ export class DungeonLevel {
     this.parallaxOverride = parallaxOverride ?? null;
     this.dungeonStore = dungeonStore;
     this.levelDrops = levelDrops ?? [];
+    this.nameOverride = nameOverride;
+    this.isActivity = isActivity ?? false;
 
     makeObservable(this, {
       unlocked: observable,
@@ -355,6 +363,8 @@ export class DungeonLevel {
       parent: json.parent,
       dungeonStore: json.dungeonStore,
       levelDrops: json.levelDrops,
+      isActivity: json.isActivity,
+      nameOverride: json.nameOverride,
     });
     return level;
   }

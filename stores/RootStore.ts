@@ -16,11 +16,13 @@ import { CharacterStore } from "@/stores/CharacterStore";
 import { TutorialStore } from "@/stores/TutorialStore";
 import { Condition } from "@/entities/conditions";
 import sanityDebuffs from "@/assets/json/sanityDebuffs.json";
+import debilitations from "@/assets/json/debilitations.json";
 import { ConditionObjectType, EffectOptions } from "@/utility/types";
 import { StashStore } from "@/stores/StashStore";
 import { SaveStore } from "@/stores/SaveStore";
 import { AudioStore } from "@/stores/AudioStore";
 import { PlayerAnimationStore } from "@/stores/PlayerAnimationStore";
+import { flipCoin } from "@/utility/functions/misc";
 
 export class RootStore {
   playerState: PlayerCharacter | null;
@@ -128,6 +130,7 @@ export class RootStore {
     if (this.playerState.currentSanity! < 0) {
       this.generateLowSanityDebuff();
     }
+    this.oldAgeDebuffRoll();
 
     this.playerState.gameTurnHandler();
     this.checkForBirths();
@@ -237,12 +240,51 @@ export class RootStore {
     });
   }
 
-  // TODO: Add old age corralate
   private generateLowSanityDebuff() {
     if (Math.random() < 0.75) return;
 
     const debuffObj = this.getRandomSanityDebuff();
-    const debuff = this.createDebuffFromObject(debuffObj);
+    const debuff = this.createDebuffFromObject(debuffObj, "low sanity");
+    this.playerState?.addCondition(debuff);
+  }
+
+  private oldAgeDebuffRoll() {
+    if (!this.playerState) return;
+    const ageBasedModifier =
+      this.playerState.age < 30
+        ? 0
+        : this.playerState.age < 45
+        ? 0.01 // once every 100 turns
+        : this.playerState.age < 55
+        ? 0.02 // once every 50 turns
+        : this.playerState.age < 65
+        ? 0.04 // once every 25 turns
+        : this.playerState.age < 75
+        ? 0.1 // once every 10 turns
+        : this.playerState.age < 85
+        ? 0.2 // once every 5 turns
+        : 0.5; // every other turn
+    if (Math.random() < 1 - ageBasedModifier) return;
+    const debilitation = flipCoin() === "Heads";
+    if (debilitation) {
+      //only 1 per type
+      const currentDebiliationNames = this.playerState?.debilitations.map(
+        (deb) => deb.name,
+      );
+      const availible = debilitations.filter(
+        (cond) => !currentDebiliationNames.includes(cond.name),
+      );
+      if (availible.length > 0) {
+        const obj = availible[
+          Math.floor(Math.random() * availible.length)
+        ] as ConditionObjectType;
+        const debuff = this.createDebuffFromObject(obj, "old age");
+        this.playerState?.addDebilitation(debuff);
+        return;
+      }
+    }
+    const debuffObj = this.getRandomSanityDebuff();
+    const debuff = this.createDebuffFromObject(debuffObj, "old age");
     this.playerState?.addCondition(debuff);
   }
 
@@ -252,7 +294,10 @@ export class RootStore {
     ] as ConditionObjectType;
   }
 
-  private createDebuffFromObject(debuffObj: ConditionObjectType): Condition {
+  private createDebuffFromObject(
+    debuffObj: ConditionObjectType,
+    placedby: "low sanity" | "old age",
+  ): Condition {
     const healthMultiplier = this.playerState?.nonConditionalMaxHealth;
     const sanityMultiplier = this.playerState?.nonConditionalMaxSanity;
 
@@ -276,11 +321,11 @@ export class RootStore {
       sanityDamage,
       effectStyle: debuffObj.effectStyle,
       effectMagnitude: debuffObj.effectAmount,
-      placedby: "low sanity",
+      placedby: placedby,
       icon: debuffObj.icon,
       aura: debuffObj.aura,
-      placedbyID: "low sanity",
-      on: null,
+      placedbyID: placedby,
+      on: this.playerState!,
     });
   }
 

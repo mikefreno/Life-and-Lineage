@@ -14,19 +14,13 @@ import { useRootStore } from "@/hooks/stores";
 import { calculateRenderScaling, useStyles } from "@/hooks/styles";
 import { observer } from "mobx-react-lite";
 import { runInAction } from "mobx";
-import { Enemy, Minion } from "@/entities/creatures";
 import { useHeaderHeight } from "@react-navigation/elements";
 import Colors from "@/constants/Colors";
 import { useReanimatedAnimations } from "@/hooks/animation";
+import { Being } from "@/entities/being";
 
 export const AnimatedSprite = observer(
-  ({
-    enemy,
-    glow,
-  }: {
-    enemy: Enemy | Minion | undefined;
-    glow?: SharedValue<number>;
-  }) => {
+  ({ enemy, glow }: { enemy: Being; glow?: SharedValue<number> }) => {
     const spriteContainerRef = useRef<View>(null);
     const headerHeight = useHeaderHeight();
     const measurementAttempts = useRef(0);

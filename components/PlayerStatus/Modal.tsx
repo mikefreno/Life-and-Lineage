@@ -14,6 +14,7 @@ import { Coins, RotateArrow } from "@/assets/icons/SVGIcons";
 import { useVibration } from "@/hooks/generic";
 import {
   DetailedViewConditionRender,
+  DetailedViewDebilitationsRender,
   RenderPrimaryStatsBlock,
   RenderSecondaryStatsBlock,
   StatCategory,
@@ -164,6 +165,7 @@ export const PlayerStatusModal = observer(() => {
     <GenericModal
       isVisibleCondition={uiStore.detailedStatusViewShowing}
       backFunction={() => uiStore.setDetailedStatusViewShowing(false)}
+      scrollEnabled={playerState.debilitations.length > 0}
       size={100}
     >
       <View
@@ -281,7 +283,7 @@ export const PlayerStatusModal = observer(() => {
             vibration={vibration}
           />
         </ScrollView>
-        {playerState.equipmentStats.size > 0 ? (
+        {playerState.equipmentStats!.size > 0 ? (
           <View style={{ paddingVertical: 4 }}>
             <GenericStrikeAround>Equipment Stats</GenericStrikeAround>
             <View
@@ -317,6 +319,14 @@ export const PlayerStatusModal = observer(() => {
           <View>
             <GenericStrikeAround>Conditions</GenericStrikeAround>
             <DetailedViewConditionRender />
+          </View>
+        ) : null}
+        {playerState.debilitations.length > 0 ? (
+          <View>
+            <GenericStrikeAround
+              style={{ textAlign: "center" }}
+            >{`Debilitations\n(due to old age)`}</GenericStrikeAround>
+            <DetailedViewDebilitationsRender />
           </View>
         ) : null}
       </View>

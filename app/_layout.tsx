@@ -212,7 +212,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
     const isDead =
       rootStore.atDeathScreen ||
       playerState.currentHealth <= 0 ||
-      playerState.currentSanity <= -playerState.maxSanity;
+      playerState.currentSanity! <= -playerState.maxSanity!;
 
     if (isDead && pathname !== "/DeathScreen") {
       router.replace("/DeathScreen");
@@ -255,7 +255,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
       const isDead =
         rootStore.atDeathScreen ||
         playerState.currentHealth <= 0 ||
-        playerState.currentSanity <= -playerState.maxSanity;
+        playerState.currentSanity! <= -playerState.maxSanity!;
 
       if (
         isDead &&
@@ -450,13 +450,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                 headerBackground: () => (
                   <BlurView
                     blurReductionFactor={12}
-                    tint={
-                      Platform.OS == "android"
-                        ? uiStore.colorScheme == "light"
-                          ? "light"
-                          : "dark"
-                        : "default"
-                    }
+                    tint={uiStore.colorScheme}
                     intensity={50}
                     style={StyleSheet.absoluteFill}
                   />
@@ -481,13 +475,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                 headerBackground: () => (
                   <BlurView
                     blurReductionFactor={12}
-                    tint={
-                      Platform.OS == "android"
-                        ? uiStore.colorScheme == "light"
-                          ? "light"
-                          : "dark"
-                        : "default"
-                    }
+                    tint={uiStore.colorScheme}
                     intensity={100}
                     style={StyleSheet.absoluteFill}
                   />
@@ -509,7 +497,11 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                   fontSize: normalize(22),
                 },
                 headerBackground: () => (
-                  <BlurView intensity={100} style={StyleSheet.absoluteFill} />
+                  <BlurView
+                    intensity={100}
+                    style={StyleSheet.absoluteFill}
+                    tint={uiStore.colorScheme}
+                  />
                 ),
               }}
             />
@@ -528,7 +520,11 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                   fontSize: normalize(22),
                 },
                 headerBackground: () => (
-                  <BlurView intensity={100} style={StyleSheet.absoluteFill} />
+                  <BlurView
+                    intensity={100}
+                    style={StyleSheet.absoluteFill}
+                    tint={uiStore.colorScheme}
+                  />
                 ),
               }}
             />
@@ -548,7 +544,11 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                   fontSize: normalize(22),
                 },
                 headerBackground: () => (
-                  <BlurView intensity={100} style={StyleSheet.absoluteFill} />
+                  <BlurView
+                    intensity={100}
+                    style={StyleSheet.absoluteFill}
+                    tint={uiStore.colorScheme}
+                  />
                 ),
               }}
             />
@@ -561,7 +561,11 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                 },
                 headerTransparent: true,
                 headerBackground: () => (
-                  <BlurView intensity={50} style={StyleSheet.absoluteFill} />
+                  <BlurView
+                    intensity={50}
+                    style={StyleSheet.absoluteFill}
+                    tint={uiStore.colorScheme}
+                  />
                 ),
                 headerLeft: () => (
                   <Pressable
@@ -585,13 +589,14 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                   </Pressable>
                 ),
                 headerRight: () => <AudioToggleButton />,
-                title:
-                  dungeonStore.currentInstance?.name.toLowerCase() ===
-                  "training grounds"
-                    ? "Training Grounds"
-                    : `${toTitleCase(
-                        dungeonStore.currentInstance?.name as string,
-                      )} Level ${dungeonStore.currentLevel?.level}`,
+                title: dungeonStore.currentLevel?.nameOverride
+                  ? dungeonStore.currentLevel?.nameOverride
+                  : dungeonStore.currentInstance?.name.toLowerCase() ===
+                    "training grounds"
+                  ? "Training Grounds"
+                  : `${toTitleCase(
+                      dungeonStore.currentInstance?.name as string,
+                    )} Level ${dungeonStore.currentLevel?.level}`,
               }}
             />
             <Stack.Screen

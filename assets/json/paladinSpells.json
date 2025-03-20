@@ -52,7 +52,7 @@
       "buffs": null,
       "debuffs": [
         {
-          "name": "blinded",
+          "name": "blind",
           "chance": 0.25
         }
       ]
@@ -179,7 +179,7 @@
       "buffs": null,
       "debuffs": [
         {
-          "name": "blinded",
+          "name": "blind",
           "chance": 0.5
         }
       ]

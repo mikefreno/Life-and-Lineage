@@ -805,21 +805,6 @@
     "icon": "blank"
   },
   {
-    "name": "blinded",
-    "style": "debuff",
-    "turns": 3,
-    "effect": [
-      "accuracy reduction"
-    ],
-    "effectStyle": [
-      "multiplier"
-    ],
-    "effectAmount": [
-      0.20
-    ],
-    "icon": "blind"
-  },
-  {
     "name": "weakened",
     "style": "debuff",
     "turns": 3,

@@ -461,6 +461,8 @@ export class PlayerCharacter extends Character {
 
   investments: Investment[];
 
+  debilitations: Condition[]; // debuffs due to old age
+
   constructor({
     playerClass,
     blessing,
@@ -476,6 +478,7 @@ export class PlayerCharacter extends Character {
     unAllocatedSkillPoints,
     keyItems,
     jobs,
+    debilitations,
     ...props
   }: PlayerCharacterOptions) {
     super({
@@ -508,8 +511,10 @@ export class PlayerCharacter extends Character {
 
     this.baseInventory = baseInventory ?? [];
     this.keyItems = keyItems ?? [];
+    this.debilitations = debilitations ?? [];
 
     this.investments = investments ?? [];
+
     __DEV__ && this.setupDevActions();
 
     // this is where we set what is to be watched for mutation by mobX.
@@ -560,7 +565,9 @@ export class PlayerCharacter extends Character {
       performLabor: action,
       getSpecifiedQualificationProgress: action,
       gainProficiency: action,
+      addDebilitation: action,
 
+      debilitations: observable,
       investments: observable,
       adopt: action,
 
@@ -701,16 +708,34 @@ export class PlayerCharacter extends Character {
       }
     }
 
-    // affection ticker
-    const updateAffection = (character: Character, rate: number) => {
-      if (character.affection > 0) {
-        character.updateAffection(-rate);
-      }
+    for (let i = this.debilitations.length - 1; i >= 0; i--) {
+      this.debilitations[i].tick(this);
+    }
+
+    const decayRates = new Map<string, number>([
+      ["parent", 0.025],
+      ["partner", 0.05],
+      ["child", 0.075],
+      ["other", 0.1],
+    ]);
+
+    const getRelationshipType = (character: Character): string => {
+      if (this.parents.some((parent) => parent.id === character.id))
+        return "parent";
+      if (this.partners.some((partner) => partner.id === character.id))
+        return "partner";
+      if (this.children.some((child) => child.id === character.id))
+        return "child";
+      return "other";
     };
 
-    this.parents.forEach((parent) => updateAffection(parent, 0.1));
-    this.partners.forEach((partner) => updateAffection(partner, 0.15));
-    this.children.forEach((child) => updateAffection(child, 0.15));
+    this.knownCharacters.forEach((character) => {
+      if (character.affection > 0) {
+        const relationshipType = getRelationshipType(character);
+        const decayRate = decayRates.get(relationshipType) || 0.1;
+        character.updateAffection(-decayRate);
+      }
+    });
 
     // investment ticker
     for (let i = 0; i < this.investments.length; i++) {
@@ -1524,39 +1549,8 @@ export class PlayerCharacter extends Character {
     this.children.push(child);
   }
   //----------------------------------Conditions----------------------------------//
-  public addCondition(condition?: Condition | null) {
-    if (condition) {
-      condition.on = this;
-      this.conditions.push(condition);
-    }
-  }
-  public removeCondition(condition: Condition) {
-    this.conditions = this.conditions.filter(
-      (cond) => cond.id !== condition.id,
-    );
-  }
-
-  get isStunned() {
-    return this.conditions.some((condition) =>
-      condition.effect.includes("stun"),
-    );
-  }
-
-  public isSilenced() {
-    return this.conditions.some((condition) =>
-      condition.effect.includes("silenced"),
-    );
-  }
-
-  public removeDebuffs(amount: number) {
-    const debuffArray = this.conditions.filter(
-      (condition) =>
-        condition.style == "debuff" && condition.placedby !== "age",
-    );
-    for (let i = 0; i < amount && debuffArray.length > 0; i++) {
-      debuffArray.shift();
-    }
-    this.conditions = debuffArray;
+  public addDebilitation(debuff: Condition) {
+    this.debilitations.push(debuff);
   }
   //----------------------------------Mage Only-----------------------------------//
   //----------------------------------Paladin Only---------------------------------//
@@ -1564,6 +1558,7 @@ export class PlayerCharacter extends Character {
   get isInStealth() {
     return !!this.conditions.find((cond) => cond.effect.includes("stealth"));
   }
+
   public exitStealth() {
     const filtered: Condition[] = [];
     this.conditions.forEach((cond) => {
@@ -1585,7 +1580,7 @@ export class PlayerCharacter extends Character {
       creatureSpecies: minionObj.name,
       currentHealth: minionObj.health,
       baseHealth: minionObj.health,
-      currentMana: minionObj.energy?.maximum,
+      currentMana: minionObj.mana?.maximum,
       baseMana: minionObj.mana?.maximum,
       baseManaRegen: minionObj.mana?.regen,
       attackStrings: minionObj.attackStrings,
@@ -1931,6 +1926,11 @@ export class PlayerCharacter extends Character {
       },
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
+        : [],
+      debilitations: json.debilitations
+        ? json.debilitations.map((condition: any) =>
+            Condition.fromJSON(condition),
+          )
         : [],
       investments: json.investments
         ? json.investments.map((investment: any) =>

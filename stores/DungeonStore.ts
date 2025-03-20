@@ -24,13 +24,16 @@ import {
   getBoundingBox,
 } from "@/utility/functions/dungeon";
 import { Dimensions } from "react-native";
-import { generateEnemyFromNPC, wait } from "@/utility/functions/misc";
+import { wait } from "@/utility/functions/misc";
 import { ParallaxOptions } from "@/components/DungeonComponents/Parallax";
-import { Character } from "@/entities/character";
 
 export class DungeonStore {
   root: RootStore;
   dungeonInstances: DungeonInstance[];
+
+  // ethereal instance/level that is higher priority
+  activityInstance: DungeonInstance | undefined;
+  activityLevel: DungeonLevel | undefined;
 
   currentInstance: DungeonInstance | undefined;
   currentLevel: DungeonLevel | undefined;
@@ -55,33 +58,36 @@ export class DungeonStore {
     this.root = root;
     this.dungeonInstances = this.hydrateDungeonState();
 
-    const currentDungeonHydration = this.hydrateCurrentDungeonState();
-    if (!currentDungeonHydration) {
-      this.clearDungeonState();
-    } else {
-      const {
-        currentInstance,
-        currentLevel,
-        currentMap,
-        currentMapDimensions,
-        currentPosition,
-        currentSpecialEncounter,
-        inCombat,
-        inSpecialRoom,
-        fightingBoss,
-        logs,
-      } = currentDungeonHydration;
+    const activityHydration = this.hydrateActivityState();
+    if (!activityHydration) {
+      const currentDungeonHydration = this.hydrateCurrentDungeonState();
+      if (!currentDungeonHydration) {
+        this.clearDungeonState();
+      } else {
+        const {
+          currentInstance,
+          currentLevel,
+          currentMap,
+          currentMapDimensions,
+          currentPosition,
+          currentSpecialEncounter,
+          inCombat,
+          inSpecialRoom,
+          fightingBoss,
+          logs,
+        } = currentDungeonHydration;
 
-      this.currentInstance = currentInstance;
-      this.currentLevel = currentLevel;
-      this.currentMap = currentMap;
-      this.currentMapDimensions = currentMapDimensions;
-      this.currentPosition = currentPosition;
-      this.currentSpecialEncounter = currentSpecialEncounter;
-      this.inCombat = inCombat;
-      this.inSpecialRoom = inSpecialRoom;
-      this.fightingBoss = fightingBoss;
-      this.logs = logs;
+        this.currentInstance = currentInstance;
+        this.currentLevel = currentLevel;
+        this.currentMap = currentMap;
+        this.currentMapDimensions = currentMapDimensions;
+        this.currentPosition = currentPosition;
+        this.currentSpecialEncounter = currentSpecialEncounter;
+        this.inCombat = inCombat;
+        this.inSpecialRoom = inSpecialRoom;
+        this.fightingBoss = fightingBoss;
+        this.logs = logs;
+      }
     }
 
     makeObservable(this, {
@@ -94,6 +100,7 @@ export class DungeonStore {
       currentInstance: observable,
       currentSpecialEncounter: observable,
       setCurrentSpecialEncounter: action,
+      hydrateActivityState: action,
       fightingBoss: observable,
       logs: observable,
       movementQueued: observable,
@@ -246,10 +253,24 @@ export class DungeonStore {
     this.fightingBoss = state;
   }
 
-  public async setUpDungeon(
+  setUpActivity(
+    activityInstance: DungeonInstance,
+    activityDungeon: DungeonLevel,
+  ) {
+    this.root.saveStore.createCheckpoint(true);
+
+    this.activityInstance = activityInstance;
+    this.activityLevel = activityDungeon;
+    this.saveActivityState();
+
+    this.setUpDungeon(activityInstance, activityDungeon, true);
+    this.saveActivityState();
+  }
+
+  public setUpDungeon(
     instance: string | DungeonInstance,
     level: string | DungeonLevel,
-    isActivityEncounter: boolean = false,
+    isActivityEncounter: boolean,
   ) {
     this.root.saveStore.createCheckpoint(true);
     if (instance instanceof DungeonInstance && level instanceof DungeonLevel) {
@@ -397,6 +418,9 @@ export class DungeonStore {
     if (!this.currentLevel) {
       throw new Error("No dungeon level set!");
     }
+    if (this.currentLevel.isActivity) {
+      return;
+    }
 
     const enemies = isBossFight
       ? this.currentLevel.generateBossEncounter
@@ -481,6 +505,167 @@ export class DungeonStore {
     return dungeonInstances.length > 0
       ? dungeonInstances
       : this.getInitDungeonState();
+  }
+
+  saveActivityState() {
+    if (!this.activityInstance || !this.activityLevel) return;
+
+    storage.set(
+      "activityInstance",
+      stringify({
+        ...this.activityInstance,
+        dungeonStore: null,
+        levels: this.activityInstance.levels.map((level) => ({
+          ...level,
+          dungeonStore: null,
+          parent: null,
+        })),
+      }),
+    );
+
+    storage.set(
+      "activityLevel",
+      stringify({
+        ...this.activityLevel,
+        dungeonStore: null,
+        parent: null,
+      }),
+    );
+
+    if (this.currentMap) {
+      const serializedMap = this.currentMap.map((tile) => ({
+        ...tile,
+        specialEncounter: tile.specialEncounter
+          ? {
+              name: tile.specialEncounter.name,
+              scaler: tile.specialEncounter.scaler,
+              countChances: tile.specialEncounter.countChances,
+              activated: tile.specialEncounter.activated,
+              parentLevel: null,
+            }
+          : undefined,
+      }));
+      storage.set("activityMap", stringify(serializedMap));
+    }
+
+    if (this.currentPosition) {
+      storage.set(
+        "activityPosition",
+        stringify({
+          x: this.currentPosition.x,
+          y: this.currentPosition.y,
+        }),
+      );
+    }
+
+    if (this.currentMapDimensions) {
+      storage.set(
+        "activityMapDimensions",
+        stringify(this.currentMapDimensions),
+      );
+    }
+
+    storage.set("activityActive", true);
+  }
+
+  hydrateActivityState() {
+    try {
+      const activityActive = storage.getBoolean("activityActive");
+      if (!activityActive) return false;
+
+      const activityInstanceStr = storage.getString("activityInstance");
+      const activityLevelStr = storage.getString("activityLevel");
+      const activityMapStr = storage.getString("activityMap");
+      const activityPositionStr = storage.getString("activityPosition");
+      const activityMapDimensionsStr = storage.getString(
+        "activityMapDimensions",
+      );
+
+      if (
+        !activityInstanceStr ||
+        !activityLevelStr ||
+        !activityMapStr ||
+        !activityPositionStr ||
+        !activityMapDimensionsStr
+      ) {
+        return false;
+      }
+
+      const activityInstanceData = parse(activityInstanceStr);
+      this.activityInstance = DungeonInstance.fromJSON({
+        ...activityInstanceData,
+        dungeonStore: this,
+      });
+
+      const activityLevelData = parse(activityLevelStr);
+      this.activityLevel = DungeonLevel.fromJSON({
+        ...activityLevelData,
+        dungeonStore: this,
+        parent: this.activityInstance,
+      });
+
+      // Update the instance with the correct level reference
+      this.activityInstance.setLevels([this.activityLevel]);
+
+      const activityMap: Tile[] = parse(activityMapStr).map((tile: any) => {
+        const baseTile = {
+          x: tile.x,
+          y: tile.y,
+          clearedRoom: Boolean(tile.clearedRoom),
+          isBossRoom: Boolean(tile.isBossRoom),
+        };
+
+        if (tile.specialEncounter) {
+          return {
+            ...baseTile,
+            specialEncounter: SpecialEncounter.fromJSON({
+              ...tile.specialEncounter,
+              parent: this.activityLevel,
+            }),
+          };
+        }
+
+        return baseTile;
+      });
+
+      const activityMapDimensions = parse(activityMapDimensionsStr);
+      const activityPositionData = parse(activityPositionStr);
+
+      let activityPosition = activityMap.find(
+        (tile) =>
+          tile.x === activityPositionData.x &&
+          tile.y === activityPositionData.y,
+      );
+
+      if (!activityPosition) {
+        activityPosition = activityMap[0];
+      }
+
+      // Set current state to activity state
+      this.currentInstance = this.activityInstance;
+      this.currentLevel = this.activityLevel;
+      this.currentMap = activityMap;
+      this.currentMapDimensions = activityMapDimensions;
+      this.currentPosition = activityPosition;
+      this.inCombat = true;
+
+      return true;
+    } catch (error) {
+      console.error("Error hydrating activity state:", error);
+      return false;
+    }
+  }
+
+  clearPersistedActivity() {
+    storage.delete("activityActive");
+    storage.delete("activityInstance");
+    storage.delete("activityLevel");
+    storage.delete("activityMap");
+    storage.delete("activityPosition");
+    storage.delete("activityMapDimensions");
+
+    this.activityInstance = undefined;
+    this.activityLevel = undefined;
   }
 
   hydrateCurrentDungeonState() {
@@ -630,14 +815,6 @@ export class DungeonStore {
 
     return [trainingGrounds, nearbyCave];
   }
-
-  setUpAssault(character: Character) {
-    const characterAsEnemy = generateEnemyFromNPC(character);
-  }
-
-  //setActivityName(name: string) {
-  //this.activityInstance.name = name.replaceAll("%20", " ");
-  //}
 
   initActivityDungeon(background: ParallaxOptions) {
     const activityInstance = new DungeonInstance({

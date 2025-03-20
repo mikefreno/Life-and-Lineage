@@ -92,7 +92,8 @@ const DungeonLevelScreen = observer(() => {
       uiStore.dungeonSetter();
     }
     if (
-      dungeonStore.currentInstance?.name.toLowerCase() == "training grounds"
+      dungeonStore.currentInstance?.name.toLowerCase() == "training grounds" ||
+      dungeonStore.currentLevel?.isActivity
     ) {
       dungeonStore.setEncounter(false);
       dungeonStore.setInCombat(true);

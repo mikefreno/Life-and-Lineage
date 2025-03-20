@@ -6,7 +6,7 @@ import { Text } from "../Themed";
 import FadeOutNode from "../FadeOutNode";
 import { useEffect, useMemo, useState } from "react";
 import { observer } from "mobx-react-lite";
-import type { Enemy } from "../../entities/creatures";
+import { Creature, Enemy } from "../../entities/creatures";
 import { useRootStore } from "../../hooks/stores";
 import { AnimatedSprite } from "../AnimatedSprite";
 import {
@@ -21,6 +21,8 @@ import {
   withSequence,
   withTiming,
 } from "react-native-reanimated";
+import { type Being } from "@/entities/being";
+import { Character } from "@/entities/character";
 
 const EnemyHealthChangePopUp = ({
   healthDiff,
@@ -44,7 +46,7 @@ const EnemyHealthChangePopUp = ({
   );
 };
 
-const EnemyConditions = ({ enemy }: { enemy: Enemy }) => {
+const EnemyConditions = ({ enemy }: { enemy: Being }) => {
   const { uiStore } = useRootStore();
   const simplifiedConditions = useMemo(() => {
     const condMap = new Map();
@@ -146,7 +148,7 @@ const DungeonEnemyDisplay = observer(() => {
   );
 });
 
-const EnemyDisplay = observer(({ enemy }: { enemy: Enemy }) => {
+const EnemyDisplay = observer(({ enemy }: { enemy: Being }) => {
   const styles = useStyles();
   const [healthState, setHealthState] = useState({
     id: enemy.id,
@@ -155,6 +157,15 @@ const EnemyDisplay = observer(({ enemy }: { enemy: Enemy }) => {
     showing: false,
   });
   const glowValue = useSharedValue(0);
+
+  const enemyName = useMemo(() => {
+    if (enemy instanceof Creature) {
+      return enemy.creatureSpecies;
+    } else if (enemy instanceof Character) {
+      return enemy.fullName;
+    }
+    throw new Error(`invalid enemy instance: ${enemy.beingType}`);
+  }, [enemy]);
 
   useEffect(() => {
     if (healthState.id !== enemy.id) {
@@ -200,18 +211,14 @@ const EnemyDisplay = observer(({ enemy }: { enemy: Enemy }) => {
             }}
             numberOfLines={2}
           >
-            {enemy.creatureSpecies.toLowerCase().includes("generic npc")
-              ? ""
-              : toTitleCase(enemy.creatureSpecies).replace(" ", "\n")}
+            {toTitleCase(enemyName).replace(" ", "\n")}
           </Text>
           <ProgressBar
             value={enemy.currentHealth >= 0 ? enemy.currentHealth : 0}
             maxValue={enemy.maxHealth}
             filledColor="#ef4444"
             unfilledColor="#fee2e2"
-            displayNumber={
-              enemy.creatureSpecies.toLowerCase() == "training dummy"
-            }
+            displayNumber={enemyName.toLowerCase() == "training dummy"}
             removeAtZero={true}
             containerStyle={{ width: "90%" }}
           />
@@ -228,7 +235,7 @@ const EnemyDisplay = observer(({ enemy }: { enemy: Enemy }) => {
         </View>
         <AnimatedSprite enemy={enemy} glow={glowValue} />
       </View>
-      {enemy.minions.length > 0 ? (
+      {enemy instanceof Enemy && enemy.minions.length > 0 ? (
         <View style={styles.mx4}>
           <GenericStrikeAround>
             <Text style={{ fontSize: 14 }}>Enemy Minions</Text>

@@ -443,6 +443,116 @@ export const ConditionRenderer = observer(() => {
   }
 });
 
+export const DetailedViewDebilitationsRender = observer(() => {
+  const { playerState, uiStore } = useRootStore();
+  const styles = useStyles();
+  const conditionScrollViewRef = useRef<ScrollView>(null);
+  const [currentConditionPage, setCurrentConditionPage] = useState(0);
+  const vibration = useVibration();
+
+  if (!playerState || playerState.debilitations.length === 0) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text style={styles["text-lg"]}>No active debilitations</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View
+      style={{
+        flex: 1,
+        paddingHorizontal: 0,
+        marginHorizontal: "-2%",
+      }}
+    >
+      <ScrollView
+        ref={conditionScrollViewRef}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{
+          alignItems: "center",
+        }}
+        onScroll={(event) => {
+          const contentOffsetX = event.nativeEvent.contentOffset.x;
+          const pageIndex = Math.round(
+            contentOffsetX / uiStore.dimensions.width,
+          );
+          setCurrentConditionPage(pageIndex);
+        }}
+        scrollEventThrottle={16}
+      >
+        {Array.from({
+          length: Math.ceil(playerState.debilitations.length / 2),
+        }).map((_, pageIndex) => (
+          <View
+            key={`page-${pageIndex}`}
+            style={{
+              width: uiStore.dimensions.width * 0.9,
+              paddingHorizontal: uiStore.dimensions.width * 0.025,
+              flexDirection: uiStore.isLandscape ? "row" : "column",
+              justifyContent: "flex-start",
+              alignItems: "center",
+            }}
+          >
+            {playerState.debilitations[pageIndex * 2] && (
+              <ConditionCard
+                condition={playerState.debilitations[pageIndex * 2]}
+                isDebilitation={true}
+              />
+            )}
+            {playerState.debilitations[pageIndex * 2 + 1] && (
+              <ConditionCard
+                condition={playerState.debilitations[pageIndex * 2 + 1]}
+                isDebilitation={true}
+              />
+            )}
+          </View>
+        ))}
+      </ScrollView>
+
+      {playerState.debilitations.length > 2 && (
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+          }}
+        >
+          {Array.from({
+            length: Math.ceil(playerState.debilitations.length / 2),
+          }).map((_, index) => (
+            <Pressable
+              onPress={() => {
+                vibration({ style: "light" });
+                conditionScrollViewRef.current?.scrollTo({
+                  x: index * uiStore.dimensions.width * 0.9,
+                  animated: true,
+                });
+              }}
+              key={`indicator-${index}`}
+              style={{
+                width: normalize(14),
+                height: normalize(14),
+                borderRadius: 9999,
+                backgroundColor:
+                  currentConditionPage === index
+                    ? uiStore.colorScheme === "dark"
+                      ? "#ffffff"
+                      : "#27272a"
+                    : uiStore.colorScheme === "dark"
+                    ? "rgba(255,255,255,0.3)"
+                    : "rgba(0,0,0,0.3)",
+                marginHorizontal: normalize(12),
+              }}
+            />
+          ))}
+        </View>
+      )}
+    </View>
+  );
+});
+
 export const DetailedViewConditionRender = observer(() => {
   const { playerState, uiStore } = useRootStore();
   const styles = useStyles();
@@ -551,12 +661,23 @@ export const DetailedViewConditionRender = observer(() => {
   );
 });
 
-const ConditionCard = ({ condition }: { condition: Condition }) => {
+const ConditionCard = ({
+  condition,
+  isDebilitation,
+}: {
+  condition: Condition;
+  isDebilitation?: boolean;
+}) => {
   const { uiStore } = useRootStore();
   const styles = useStyles();
 
   return (
-    <View style={styles.detailedConditionCard}>
+    <View
+      style={[
+        styles.detailedConditionCard,
+        isDebilitation ? { backgroundColor: "#991b1b80" } : {},
+      ]}
+    >
       <View style={styles.rowBetween}>
         <Text
           style={{
@@ -582,11 +703,35 @@ const ConditionCard = ({ condition }: { condition: Condition }) => {
               }}
               resizeMode="contain"
             />
-            <Text> {condition.turns} </Text>
-            <ClockIcon
-              width={uiStore.iconSizeSmall}
-              height={uiStore.iconSizeSmall}
-            />
+            {!condition.aura ? (
+              <>
+                <Text> {condition.turns} </Text>
+                <ClockIcon
+                  width={uiStore.iconSizeSmall}
+                  height={uiStore.iconSizeSmall}
+                />
+              </>
+            ) : isDebilitation ? (
+              <Text
+                style={{
+                  fontStyle: "italic",
+                  paddingLeft: 2,
+                  letterSpacing: 2,
+                }}
+              >
+                Permanent
+              </Text>
+            ) : (
+              <Text
+                style={{
+                  fontStyle: "italic",
+                  paddingLeft: 2,
+                  letterSpacing: 2,
+                }}
+              >
+                Aura
+              </Text>
+            )}
           </View>
           {!!condition.getHealthDamage() && (
             <View style={styles.rowCenter}>

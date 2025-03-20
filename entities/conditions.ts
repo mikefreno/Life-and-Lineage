@@ -1,8 +1,6 @@
 import { action, makeObservable, observable, reaction } from "mobx";
 import * as Crypto from "expo-crypto";
 import { ConditionType, EffectOptions, EffectStyle } from "@/utility/types";
-import type { PlayerCharacter } from "@/entities/character";
-import type { Creature, Enemy, Minion } from "@/entities/creatures";
 import { Being } from "./being";
 
 /**
@@ -17,7 +15,7 @@ export class Condition {
   readonly style: "debuff" | "buff";
   turns: number;
   trapSetupTime: number | undefined;
-  // No idea if auras work at current
+  // TODO No idea if auras work at current
   readonly aura: boolean;
   readonly placedby: string;
   readonly placedbyID: string;
@@ -27,7 +25,6 @@ export class Condition {
   readonly effectStyle: EffectStyle[];
   readonly effectMagnitude: number[];
   readonly icon: string;
-  on: Being;
 
   constructor({
     name,
@@ -44,7 +41,6 @@ export class Condition {
     id,
     aura,
     icon,
-    on,
   }: ConditionType) {
     this.id = id ?? Crypto.randomUUID();
     this.name = name;
@@ -60,22 +56,12 @@ export class Condition {
     this.placedbyID = placedbyID;
     this.aura = aura ?? false;
     this.icon = icon;
-    this.on = on;
 
     makeObservable(this, {
       turns: observable,
       tick: action,
       destroyTrap: action,
     });
-
-    reaction(
-      () => [this.turns],
-      () => {
-        if (this.turns <= 0) {
-          this.on?.removeCondition(this);
-        }
-      },
-    );
   }
 
   private cachedHealthDamage: number | null = null;
@@ -270,11 +256,12 @@ export class Condition {
       placedby: json.placedby,
       aura: json.aura,
       placedbyID: json.placedByID,
-      on: null,
+      on: json.on,
     });
     return condition;
   }
 }
+
 const conditionIconMap: { [key: string]: any } = {
   anger: require("@/assets/images/conditions/anger.png"),
   blank: require("@/assets/images/conditions/blank.png"),

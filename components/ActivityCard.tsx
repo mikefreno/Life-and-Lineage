@@ -25,7 +25,7 @@ import type { Character } from "@/entities/character";
 import { useStyles } from "@/hooks/styles";
 import { DungeonLevel } from "@/entities/dungeon";
 import { AnimatedSprite } from "@/components/AnimatedSprite";
-import { EnemyImageMap } from "@/utility/enemyHelpers";
+import { Enemy } from "@/entities/creatures";
 
 interface ActivityCardProps {
   activity: Activity;
@@ -43,6 +43,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
   const [dateDestination, setDateDestination] = useState<string>("");
   const styles = useStyles();
   const router = useRouter();
+  const [enemyObjects, setEnemyObjects] = useState<Enemy[] | null>();
 
   function activityRoller(outcomes: { [key: string]: number }) {
     const keys = Object.keys(outcomes);
@@ -201,11 +202,18 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
       dungeonStore: root.dungeonStore,
       specialEncounters: [],
       parent: activityInstance,
+      isActivity: true,
+      nameOverride: outcome.dungeonTitle,
     });
+
+    const enemyObj = activityDungeon.generateNormalEncounter;
+    setEnemyObjects(enemyObj);
+    root.enemyStore.clearEnemyList();
+    enemyObj.forEach((enemy) => root.enemyStore.addToEnemyList(enemy));
 
     activityInstance.setLevels([activityDungeon]);
 
-    root.dungeonStore.setUpDungeon(activityInstance, activityDungeon, true);
+    root.dungeonStore.setUpActivity(activityInstance, activityDungeon);
     root.dungeonStore.setEncounter(false);
   }
 
@@ -273,6 +281,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
     if (!playerState) return;
     playerState.spendGold(gold);
     setBadOutcome(null);
+    setEnemyObjects(null);
     root.enemyStore.clearEnemyList();
     root.dungeonStore.clearDungeonState();
     wait(350).then(() => setBadOutcome(null));
@@ -380,13 +389,11 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
                     height: uiStore.dimensions.height * 0.45,
                     alignItems: "center",
                     justifyContent: "center",
-                    ...styles.debugBorder,
                   }}
                 >
-                  <AnimatedSprite
-                    spriteSet={EnemyImageMap[badOutCome.fight.enemies[0].image]}
-                    currentAnimationState="idle"
-                  />
+                  {enemyObjects?.map((enemy) => (
+                    <AnimatedSprite enemy={enemy} key={enemy.id} />
+                  ))}
                 </View>
                 {badOutCome.buyOff &&
                   playerState &&

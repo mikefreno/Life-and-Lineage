@@ -11,6 +11,7 @@ import { savePlayer } from "../../entities/character";
 import { observer } from "mobx-react-lite";
 import { useStyles } from "../../hooks/styles";
 import { calculateFleeChance, fleeRoll } from "../../utility/functions/dungeon";
+import { Enemy } from "@/entities/creatures";
 
 const FleeModal = observer(() => {
   const vibration = useVibration();
@@ -33,7 +34,8 @@ const FleeModal = observer(() => {
     try {
       const canFlee =
         enemyStore.enemies.length === 0 ||
-        enemyStore.enemies[0].creatureSpecies === "training dummy" ||
+        (enemyStore.enemies[0] instanceof Enemy &&
+          enemyStore.enemies[0].creatureSpecies === "training dummy") ||
         !dungeonStore.inCombat ||
         fleeRoll(playerState, dungeonStore);
 
@@ -54,6 +56,9 @@ const FleeModal = observer(() => {
 
       vibration({ style: "light" });
       dungeonStore.setFleeModalShowing(false);
+      if (dungeonStore.currentLevel?.isActivity) {
+        dungeonStore.clearPersistedActivity();
+      }
 
       uiStore.incrementLoadingStep();
 

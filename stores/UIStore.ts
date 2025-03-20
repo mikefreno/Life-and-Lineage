@@ -502,11 +502,11 @@ export default class UIStore {
     this.systemColorScheme = colorScheme;
   }
 
-  get colorScheme(): "light" | "dark" {
+  get colorScheme() {
     if (this.preferedColorScheme === "system") {
       return this.systemColorScheme;
     } else {
-      return this.preferedColorScheme as "light" | "dark";
+      return this.preferedColorScheme;
     }
   }
 

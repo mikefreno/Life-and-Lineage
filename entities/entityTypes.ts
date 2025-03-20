@@ -104,6 +104,7 @@ export interface PlayerCharacterBase extends BaseCharacterOptions {
   rangerPet?: Minion;
   investments?: Investment[];
   unAllocatedSkillPoints?: number;
+  debilitations?: Condition[];
 }
 
 export type MageCharacter = PlayerCharacterBase & {

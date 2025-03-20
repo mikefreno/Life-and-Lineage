@@ -2,9 +2,9 @@ import { observer } from "mobx-react-lite";
 import { View } from "react-native";
 import { Text } from "./Themed";
 import GenericModal from "./GenericModal";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CharacterImage } from "./CharacterImage";
-import { wait } from "../utility/functions/misc";
+import { toTitleCase, wait } from "../utility/functions/misc";
 import ProgressBar from "./ProgressBar";
 import GenericFlatButton from "./GenericFlatButton";
 import GenericStrikeAround from "./GenericStrikeAround";
@@ -12,10 +12,11 @@ import GenericRaisedButton from "./GenericRaisedButton";
 import { useRouter } from "expo-router";
 import { AffectionIcon } from "../assets/icons/SVGIcons";
 import { Character } from "../entities/character";
-import { useRootStore } from "../hooks/stores";
+import { usePlayerStore, useRootStore } from "../hooks/stores";
 import { useVibration } from "../hooks/generic";
 import { flex, useStyles } from "../hooks/styles";
 import React from "react";
+import { DungeonLevel } from "@/entities/dungeon";
 
 interface CharacterInteractionModal {
   character: Character | null;
@@ -44,14 +45,37 @@ export const CharacterInteractionModal = observer(
     const [pregnancyMessage, setPregnancyMessage] = useState<string | null>(
       null,
     );
+    const [dateRequestResult, setDateRequestResult] = useState<
+      "success" | "failure" | null
+    >(null);
 
     const router = useRouter();
     const vibration = useVibration();
 
     function setFight() {
       if (character && playerState) {
-        root.gameTick();
-        //TODO: Setup dungeon level and instance
+        const activityInstance =
+          root.dungeonStore.initActivityDungeon("AutumnForest");
+
+        const activityDungeon = new DungeonLevel({
+          level: 0,
+          bossEncounter: [],
+          normalEncounters: [],
+          tiles: 1,
+          bossDefeated: true,
+          unlocked: true,
+          dungeonStore: root.dungeonStore,
+          specialEncounters: [],
+          parent: activityInstance,
+          isActivity: true,
+          nameOverride: "Assault",
+        });
+        activityInstance.setLevels([activityDungeon]);
+        root.enemyStore.clearEnemyList();
+        root.enemyStore.addToEnemyList(character);
+
+        root.dungeonStore.setUpActivity(activityInstance, activityDungeon);
+        root.dungeonStore.setEncounter(false);
         closeFunction();
         wait(500).then(() => {
           router.dismissAll();
@@ -73,15 +97,15 @@ export const CharacterInteractionModal = observer(
           );
           setTimeout(() => setPregnancyMessage(null), 3000);
         }
-
-        root.gameTick();
       }
     }
 
     return (
       <GenericModal
         isVisibleCondition={character != null && secondaryRequirement}
-        backdropCloses={backdropCloses}
+        backdropCloses={
+          showAssaultWarning || dateRequestResult ? false : backdropCloses
+        }
         backFunction={closeFunction}
         size={100}
         scrollEnabled={true}
@@ -92,7 +116,20 @@ export const CharacterInteractionModal = observer(
               {character.fullName}
             </Text>
             <CharacterImage character={character} />
-            {!showAssaultWarning ? (
+            {showAssaultWarning ? (
+              <AssaultWarningSection
+                character={character}
+                setFight={setFight}
+                setShowAssaultWarning={setShowAssaultWarning}
+                vibration={vibration}
+              />
+            ) : dateRequestResult ? (
+              <DatingRequestResultSection
+                dateRequestResult={dateRequestResult}
+                clear={() => setDateRequestResult(null)}
+                firstName={character.firstName}
+              />
+            ) : (
               <View>
                 <View style={{ alignItems: "center" }}>
                   <Text>{character.age} years old</Text>
@@ -122,149 +159,16 @@ export const CharacterInteractionModal = observer(
                   </View>
                 </View>
                 {playerState?.isKnownCharacter(character) ? (
-                  <>
-                    <GenericStrikeAround>Interactions</GenericStrikeAround>
-                    <View style={[flex.rowEvenly, { marginTop: 8 }]}>
-                      <GenericFlatButton
-                        disabled={!character.dateAvailable}
-                        onPress={() => {
-                          vibration({ style: "light" });
-                          root.gameTick();
-                          character.setDateCooldownStart();
-                          character.updateAffection(5);
-                        }}
-                      >
-                        Chat
-                      </GenericFlatButton>
-                      <GenericFlatButton
-                        disabled={!character.dateAvailable}
-                        onPress={() => {
-                          vibration({ style: "light" });
-                          showGiftModal();
-                        }}
-                      >
-                        Give a Gift
-                      </GenericFlatButton>
-                    </View>
-                    <View style={{ paddingTop: 8 }}>
-                      {character.age >= 18 &&
-                        playerState.canDate({
-                          character,
-                          characterAge: character.age,
-                        }) &&
-                        (playerState.partners.find((partner) =>
-                          partner.equals(character),
-                        ) ? (
-                          character.sex !== playerState.sex ? (
-                            <>
-                              <GenericFlatButton
-                                disabled={!character.dateAvailable}
-                                onPress={() => {
-                                  vibration({ style: "light" });
-                                  attemptPregnancy(character);
-                                }}
-                              >
-                                Try for a Baby
-                              </GenericFlatButton>
-                              <GenericFlatButton
-                                disabled={!character.dateAvailable}
-                                onPress={() => {
-                                  vibration({ style: "light" });
-                                  showAdoptionModal(character.fullName);
-                                }}
-                                style={{ marginTop: 8 }}
-                              >
-                                Suggest Adoption
-                              </GenericFlatButton>
-                            </>
-                          ) : (
-                            <GenericFlatButton
-                              disabled={!character.dateAvailable}
-                              onPress={() => {
-                                vibration({ style: "light" });
-                                showAdoptionModal(character.fullName);
-                              }}
-                            >
-                              Suggest Adoption
-                            </GenericFlatButton>
-                          )
-                        ) : (
-                          <GenericFlatButton
-                            disabled={!character.dateAvailable}
-                            onPress={() => {
-                              vibration({ style: "light" });
-                              character.setDateCooldownStart();
-                              playerState.askForPartner(character);
-                              root.gameTick();
-                            }}
-                          >
-                            Start Dating?
-                          </GenericFlatButton>
-                        ))}
-                    </View>
-                    {!playerState.characterIsChild({ character }) && (
-                      <>
-                        <View style={[flex.rowEvenly, { marginTop: 8 }]}>
-                          <GenericFlatButton
-                            disabled={!character.dateAvailable}
-                            onPress={() => {
-                              vibration({ style: "light" });
-                              character.setDateCooldownStart();
-                              character.updateAffection(-10);
-                              root.gameTick();
-                            }}
-                          >
-                            Spit in Face
-                          </GenericFlatButton>
-                        </View>
-                        {character.affection > -25 && (
-                          <View style={[flex.rowEvenly, { marginTop: 8 }]}>
-                            <GenericFlatButton
-                              onPress={() => {
-                                vibration({
-                                  style: "warning",
-                                  essential: true,
-                                });
-                                setShowAssaultWarning(true);
-                              }}
-                            >
-                              Assault
-                            </GenericFlatButton>
-                          </View>
-                        )}
-                      </>
-                    )}
-                  </>
+                  <KnownCharacterInteractions
+                    character={character}
+                    showGiftModal={showGiftModal}
+                    attemptPregnancy={attemptPregnancy}
+                    showAdoptionModal={showAdoptionModal}
+                    setDateRequestResult={setDateRequestResult}
+                    setShowAssaultWarning={setShowAssaultWarning}
+                  />
                 ) : (
-                  <>
-                    <GenericStrikeAround>Greetings</GenericStrikeAround>
-                    <View style={[flex.rowEvenly, { marginTop: 8 }]}>
-                      <GenericFlatButton
-                        onPress={() => {
-                          vibration({ style: "light" });
-                          character.updateAffection(5);
-                          if (playerState) {
-                            playerState.addKnownCharacter(character);
-                            root.gameTick();
-                          }
-                        }}
-                      >
-                        Friendly
-                      </GenericFlatButton>
-                      <GenericFlatButton
-                        onPress={() => {
-                          vibration({ style: "light" });
-                          character.updateAffection(-5);
-                          if (playerState) {
-                            playerState.addKnownCharacter(character);
-                            root.gameTick();
-                          }
-                        }}
-                      >
-                        Aggressive
-                      </GenericFlatButton>
-                    </View>
-                  </>
+                  <FirstMeetingInteractions character={character} />
                 )}
                 <View style={{ marginTop: 8 }}>
                   <GenericFlatButton onPress={closeFunction}>
@@ -272,52 +176,291 @@ export const CharacterInteractionModal = observer(
                   </GenericFlatButton>
                 </View>
               </View>
-            ) : (
-              <View>
-                <Text
-                  style={{
-                    textAlign: "center",
-                    color: "#ef4444",
-                    ...styles["text-2xl"],
-                  }}
-                >
-                  Warning:{" "}
-                </Text>
-                <Text style={{ textAlign: "center", ...styles["text-lg"] }}>
-                  Are you certain you want to do that? You will start a fight{" "}
-                  <Text style={{ color: "#ef4444" }}>
-                    that could end in {character.fullName}'s death.
-                  </Text>
-                </Text>
-                <View style={[flex.rowEvenly, { marginTop: 8 }]}>
-                  <View style={{ marginVertical: "auto" }}>
-                    <GenericFlatButton
-                      backgroundColor={"#450a0a"}
-                      textColor={"#a1a1aa"}
-                      onPress={() => {
-                        vibration({ style: "warning", essential: true });
-                        setFight();
-                      }}
-                    >
-                      I'm sure.
-                    </GenericFlatButton>
-                  </View>
-                  <GenericRaisedButton
-                    backgroundColor={"#3b82f6"}
-                    disableTopLevelStyling
-                    onPress={() => {
-                      vibration({ style: "light" });
-                      setShowAssaultWarning(false);
-                    }}
-                  >
-                    Take me back!
-                  </GenericRaisedButton>
-                </View>
-              </View>
             )}
           </>
         )}
       </GenericModal>
+    );
+  },
+);
+
+const AssaultWarningSection = React.memo(
+  ({
+    character,
+    setFight,
+    setShowAssaultWarning,
+    vibration,
+  }: {
+    character: Character;
+    setFight: () => void;
+    setShowAssaultWarning: React.Dispatch<React.SetStateAction<boolean>>;
+    vibration: ({
+      style,
+      essential,
+    }: {
+      style: "light" | "medium" | "heavy" | "success" | "warning" | "error";
+      essential?: boolean;
+    }) => void;
+  }) => {
+    const styles = useStyles();
+    return (
+      <View>
+        <Text
+          style={{
+            textAlign: "center",
+            color: "#ef4444",
+            ...styles["text-2xl"],
+          }}
+        >
+          Warning:{" "}
+        </Text>
+        <Text style={{ textAlign: "center", ...styles["text-lg"] }}>
+          Are you certain you want to do that? You will start a fight{" "}
+          <Text style={{ color: "#ef4444" }}>
+            that could end in {character.fullName}'s death.
+          </Text>
+        </Text>
+        <View style={[flex.rowEvenly, { marginTop: 8 }]}>
+          <View style={{ marginVertical: "auto" }}>
+            <GenericFlatButton
+              backgroundColor={"#450a0a"}
+              textColor={"#a1a1aa"}
+              onPress={() => {
+                vibration({ style: "warning", essential: true });
+                setFight();
+              }}
+            >
+              I'm sure.
+            </GenericFlatButton>
+          </View>
+          <GenericRaisedButton
+            backgroundColor={"#3b82f6"}
+            disableTopLevelStyling
+            onPress={() => {
+              vibration({ style: "light" });
+              setShowAssaultWarning(false);
+            }}
+          >
+            Take me back!
+          </GenericRaisedButton>
+        </View>
+      </View>
+    );
+  },
+);
+
+const DatingRequestResultSection = ({
+  dateRequestResult,
+  clear,
+  firstName,
+}: {
+  dateRequestResult: "success" | "failure";
+  clear: () => void;
+  firstName: string;
+}) => {
+  const styles = useStyles();
+  if (dateRequestResult === "failure") {
+    return (
+      <View>
+        <Text style={{ ...styles["text-3xl"], textAlign: "center" }}>
+          REJECTED!
+        </Text>
+        <Text style={{ ...styles["text-lg"], textAlign: "center" }}>
+          That's tough, {toTitleCase(firstName)} is more likely to say yes if
+          you have a better relationship.
+        </Text>
+        <GenericFlatButton onPress={clear}>Back</GenericFlatButton>
+      </View>
+    );
+  } else {
+    return (
+      <View>
+        <Text style={{ ...styles["text-3xl"], textAlign: "center" }}>
+          They said yes!
+        </Text>
+        <Text style={{ ...styles["text-lg"], textAlign: "center" }}>
+          Where will this relationship lead...?
+        </Text>
+        <GenericFlatButton onPress={clear}>Back</GenericFlatButton>
+      </View>
+    );
+  }
+};
+
+const KnownCharacterInteractions = observer(
+  ({
+    character,
+    showGiftModal,
+    attemptPregnancy,
+    showAdoptionModal,
+    setDateRequestResult,
+    setShowAssaultWarning,
+  }: {
+    character: Character;
+    showGiftModal: () => void;
+    attemptPregnancy: (char: Character) => void;
+    showAdoptionModal: (name: string) => void;
+    setDateRequestResult: React.Dispatch<
+      React.SetStateAction<"success" | "failure" | null>
+    >;
+    setShowAssaultWarning: React.Dispatch<React.SetStateAction<boolean>>;
+  }) => {
+    const vibration = useVibration();
+    const playerState = usePlayerStore();
+    return (
+      <>
+        <GenericStrikeAround>Interactions</GenericStrikeAround>
+        <View style={[flex.rowEvenly, { marginTop: 8 }]}>
+          <GenericFlatButton
+            disabled={!character.dateAvailable}
+            onPress={() => {
+              vibration({ style: "light" });
+              character.setDateCooldownStart();
+              character.updateAffection(5);
+            }}
+          >
+            Chat
+          </GenericFlatButton>
+          {/*TODO*/}
+          {__DEV__ && (
+            <GenericFlatButton
+              disabled={!character.dateAvailable}
+              onPress={() => {
+                vibration({ style: "light" });
+                showGiftModal();
+              }}
+            >
+              Give a Gift
+            </GenericFlatButton>
+          )}
+        </View>
+        <View style={{ paddingTop: 8 }}>
+          {character.age >= 18 &&
+            playerState.canDate({
+              character,
+              characterAge: character.age,
+            }) &&
+            (playerState.partners.find((partner) =>
+              partner.equals(character),
+            ) ? (
+              character.sex !== playerState.sex ? (
+                <>
+                  <GenericFlatButton
+                    disabled={!character.dateAvailable}
+                    onPress={() => {
+                      vibration({ style: "light" });
+                      attemptPregnancy(character);
+                    }}
+                  >
+                    Try for a Baby
+                  </GenericFlatButton>
+                  <GenericFlatButton
+                    disabled={!character.dateAvailable}
+                    onPress={() => {
+                      vibration({ style: "light" });
+                      showAdoptionModal(character.fullName);
+                    }}
+                    style={{ marginTop: 8 }}
+                  >
+                    Suggest Adoption
+                  </GenericFlatButton>
+                </>
+              ) : (
+                <GenericFlatButton
+                  disabled={!character.dateAvailable}
+                  onPress={() => {
+                    vibration({ style: "light" });
+                    showAdoptionModal(character.fullName);
+                  }}
+                >
+                  Suggest Adoption
+                </GenericFlatButton>
+              )
+            ) : (
+              <GenericFlatButton
+                disabled={!character.dateAvailable}
+                onPress={() => {
+                  vibration({ style: "light" });
+                  character.setDateCooldownStart();
+                  const res = playerState.askForPartner(character);
+                  setDateRequestResult(res === true ? "success" : "failure");
+                }}
+              >
+                Start Dating?
+              </GenericFlatButton>
+            ))}
+        </View>
+        {!playerState.characterIsChild({ character }) && (
+          <>
+            <View style={[flex.rowEvenly, { marginTop: 8 }]}>
+              <GenericFlatButton
+                disabled={!character.dateAvailable}
+                onPress={() => {
+                  vibration({ style: "light" });
+                  character.setDateCooldownStart();
+                  character.updateAffection(-5);
+                }}
+              >
+                Spit in Face
+              </GenericFlatButton>
+            </View>
+            {character.affection <= -25 && (
+              <View style={[flex.rowEvenly, { marginTop: 8 }]}>
+                <GenericFlatButton
+                  onPress={() => {
+                    vibration({
+                      style: "warning",
+                      essential: true,
+                    });
+                    setShowAssaultWarning(true);
+                  }}
+                >
+                  Assault
+                </GenericFlatButton>
+              </View>
+            )}
+          </>
+        )}
+      </>
+    );
+  },
+);
+
+const FirstMeetingInteractions = observer(
+  ({ character }: { character: Character }) => {
+    const vibration = useVibration();
+    const playerState = usePlayerStore();
+
+    return (
+      <>
+        <GenericStrikeAround>Greetings</GenericStrikeAround>
+        <View style={[flex.rowEvenly, { marginTop: 8 }]}>
+          <GenericFlatButton
+            onPress={() => {
+              vibration({ style: "light" });
+              character.updateAffection(5);
+              if (playerState) {
+                playerState.addKnownCharacter(character);
+                playerState.root.gameTick();
+              }
+            }}
+          >
+            Friendly
+          </GenericFlatButton>
+          <GenericFlatButton
+            onPress={() => {
+              vibration({ style: "light" });
+              character.updateAffection(-5);
+              if (playerState) {
+                playerState.addKnownCharacter(character);
+                playerState.root.gameTick();
+              }
+            }}
+          >
+            Aggressive
+          </GenericFlatButton>
+        </View>
+      </>
     );
   },
 );
