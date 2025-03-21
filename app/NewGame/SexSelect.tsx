@@ -1,19 +1,19 @@
 import React from "react";
 import { useRouter } from "expo-router";
-import { TutorialOption } from "../../utility/types";
-import TutorialModal from "../../components/TutorialModal";
-import { useRootStore } from "../../hooks/stores";
-import { useVibration } from "../../hooks/generic";
+import { TutorialOption } from "@/utility/types";
+import TutorialModal from "@/components/TutorialModal";
+import { useRootStore } from "@/hooks/stores";
+import { useVibration } from "@/hooks/generic";
 import { useIsFocused } from "@react-navigation/native";
 import { useState } from "react";
 import { Pressable, View } from "react-native";
-import { Text } from "../../components/Themed";
-import { playerClassColors } from "../../constants/Colors";
-import { toTitleCase } from "../../utility/functions/misc";
+import { Text } from "@/components/Themed";
+import { playerClassColors } from "@/constants/Colors";
+import { toTitleCase } from "@/utility/functions/misc";
 import { Foundation } from "@expo/vector-icons";
-import { useNewGameStore } from "./_layout";
-import { tw, tw_base, useStyles } from "../../hooks/styles";
-import GenericFlatButton from "../../components/GenericFlatButton";
+import { useNewGameStore } from "@/app/NewGame/_layout";
+import { tw, tw_base, useStyles } from "@/hooks/styles";
+import GenericFlatButton from "@/components/GenericFlatButton";
 import NewGameMetaControls from "@/components/NewGameMetaControls";
 
 export default function SetSex() {

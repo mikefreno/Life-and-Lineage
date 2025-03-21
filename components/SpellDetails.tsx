@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { View } from "react-native";
 import { toTitleCase } from "../utility/functions/misc";
 import { Text } from "./Themed";
@@ -6,19 +6,29 @@ import {
   BeastMasteryIcon,
   ClockIcon,
   Energy,
+  Fire,
   HealthIcon,
+  Holy,
+  Lightning,
   NecromancerSkull,
+  Pestilence,
+  Raw,
+  Regen,
+  Sword,
+  Winter,
 } from "../assets/icons/SVGIcons";
 import BlessingDisplay from "./BlessingsDisplay";
 import { elementalColorMap } from "../constants/Colors";
-import { Element } from "../utility/types";
-import type { Spell } from "../entities/spell";
+import { DamageType, Element } from "../utility/types";
 import { useRootStore } from "../hooks/stores";
 import { normalize, useStyles } from "../hooks/styles";
 import GenericStrikeAround from "./GenericStrikeAround";
+import { Attack } from "@/entities/attack";
 
-export default function SpellDetails({ spell }: { spell: Spell }) {
-  const { playerState, uiStore } = useRootStore();
+export default function SpellDetails({ spell }: { spell: Attack }) {
+  if (spell.element === null) return;
+
+  const { uiStore } = useRootStore();
   const styles = useStyles();
 
   return (
@@ -41,7 +51,7 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
       >
         <View
           style={{
-            width: "25%",
+            minWidth: "20%",
             marginVertical: "auto",
             ...styles.itemsCenter,
           }}
@@ -60,14 +70,14 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
         </View>
         <View
           style={{
-            width: "40%",
+            flex: 1,
             marginVertical: "auto",
             ...styles.itemsCenter,
           }}
         >
-          {spell.duration > 1 ? (
+          {spell.maxTurnsActive > 1 ? (
             <View style={styles.rowCenter}>
-              <Text>{spell.duration}</Text>
+              <Text>{spell.maxTurnsActive}</Text>
               <ClockIcon
                 color={uiStore.colorScheme == "dark" ? "#f4f4f5" : "#18181b"}
                 width={uiStore.iconSizeSmall}
@@ -76,17 +86,13 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
               />
             </View>
           ) : null}
-          {spell.baseDamage(playerState!) > 0 ? (
-            <View style={[styles.rowCenter, { alignItems: "center" }]}>
-              <Text>{spell.baseDamage(playerState!)}</Text>
-              <HealthIcon
-                width={uiStore.iconSizeSmall}
-                height={uiStore.iconSizeSmall}
-                style={{ marginLeft: 6 }}
-              />
-            </View>
+          {spell.displayDamage.cumulative > 0 ? (
+            <SplitDamageRender
+              damageMap={spell.displayDamage.map}
+              title={"Damage"}
+            />
           ) : null}
-          {spell.usesWeapon && !spell.userHasRequiredWeapon(playerState!) && (
+          {spell.usesWeapon && spell.userHasRequiredWeapon && (
             <Text style={styles.textCenter}>
               Requires: {toTitleCase(spell.usesWeapon)}
             </Text>
@@ -94,18 +100,9 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
           {spell.selfDamage ? (
             <View style={styles.rowCenter}>
               <View style={styles.rowCenter}>
-                {spell.selfDamage > 0 ? (
+                {spell.selfDamage.cumulative > 0 ? (
                   <>
-                    <Text>{spell.selfDamage} Self</Text>
-                    <HealthIcon
-                      width={normalize(14)}
-                      height={normalize(14)}
-                      style={{ marginLeft: 6 }}
-                    />
-                  </>
-                ) : spell.selfDamage < 0 ? (
-                  <>
-                    <Text>Heal {spell.selfDamage * -1}</Text>
+                    <Text>{spell.selfDamage.cumulative} Self</Text>
                     <HealthIcon
                       width={normalize(14)}
                       height={normalize(14)}
@@ -116,7 +113,23 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
               </View>
             </View>
           ) : null}
-          {spell.summons?.map((summon, idx) => (
+          {spell.baseHealing ? (
+            <View style={styles.rowCenter}>
+              <View style={styles.rowCenter}>
+                {spell.selfDamage.cumulative > 0 ? (
+                  <>
+                    <Text>{spell.baseHealing} Self</Text>
+                    <HealthIcon
+                      width={normalize(14)}
+                      height={normalize(14)}
+                      style={{ marginLeft: 6 }}
+                    />
+                  </>
+                ) : null}
+              </View>
+            </View>
+          ) : null}
+          {spell.summonNames?.map((summon, idx) => (
             <View key={summon + idx} style={styles.rowCenter}>
               <Text>{toTitleCase(summon)}</Text>
               <NecromancerSkull
@@ -127,10 +140,10 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
               />
             </View>
           ))}
-          {spell.rangerPet ? (
+          {spell.rangerPetName ? (
             <View style={[styles.rowCenter, { alignItems: "center" }]}>
               <Text style={styles["text-md"]}>
-                {toTitleCase(spell.rangerPet)}
+                {toTitleCase(spell.rangerPetName)}
               </Text>
               <BeastMasteryIcon
                 width={uiStore.iconSizeSmall}
@@ -139,24 +152,24 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
               />
             </View>
           ) : null}
-          {spell.buffs.length > 0 ? (
+          {spell.buffNames && spell.buffNames.length > 0 ? (
             <>
               <GenericStrikeAround style={styles["text-md"]}>
                 Buffs
               </GenericStrikeAround>
-              {spell.buffs?.map((buff, idx) => (
+              {spell.buffNames.map((buff, idx) => (
                 <Text style={styles.textCenter} key={buff + idx}>
                   {toTitleCase(buff)}
                 </Text>
               ))}
             </>
           ) : null}
-          {spell.buffs.length > 0 ? (
+          {spell.debuffNames && spell.debuffNames.length > 0 ? (
             <>
               <GenericStrikeAround style={styles["text-md"]}>
                 Debuffs
               </GenericStrikeAround>
-              {spell.debuffs?.map((debuff, idx) => (
+              {spell.debuffNames.map((debuff, idx) => (
                 <Text style={styles.textCenter} key={debuff.name + idx}>
                   {toTitleCase(debuff.name)} - {debuff.chance * 100}%
                 </Text>
@@ -164,7 +177,13 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
             </>
           ) : null}
         </View>
-        <View style={{ marginVertical: "auto" }}>
+        <View
+          style={{
+            marginVertical: "auto",
+            minWidth: "20%",
+            alignItems: "center",
+          }}
+        >
           <BlessingDisplay
             blessing={spell.element}
             colorScheme={uiStore.colorScheme}
@@ -175,3 +194,65 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
     </View>
   );
 }
+
+const SplitDamageRender = ({
+  damageMap,
+  title,
+}: {
+  damageMap: { [key in DamageType]?: number };
+  title: string;
+}) => {
+  const styles = useStyles();
+  const { uiStore } = useRootStore();
+
+  const DamageTypeUtils: Record<DamageType, ReactNode> = {
+    [DamageType.PHYSICAL]: (
+      <Sword height={uiStore.iconSizeSmall} width={uiStore.iconSizeSmall} />
+    ),
+    [DamageType.X]: (
+      <Fire height={uiStore.iconSizeSmall} width={uiStore.iconSizeSmall} />
+    ),
+    [DamageType.FIRE]: (
+      <Winter height={uiStore.iconSizeSmall} width={uiStore.iconSizeSmall} />
+    ),
+    [DamageType.LIGHTNING]: (
+      <Lightning height={uiStore.iconSizeSmall} width={uiStore.iconSizeSmall} />
+    ),
+    [DamageType.POISON]: (
+      <Pestilence
+        height={uiStore.iconSizeSmall}
+        width={uiStore.iconSizeSmall}
+      />
+    ),
+    [DamageType.HOLY]: (
+      <Holy height={uiStore.iconSizeSmall} width={uiStore.iconSizeSmall} />
+    ),
+    [DamageType.MAGIC]: (
+      <Regen height={uiStore.iconSizeSmall} width={uiStore.iconSizeSmall} />
+    ),
+    [DamageType.RAW]: (
+      <Raw height={uiStore.iconSizeSmall} width={uiStore.iconSizeSmall} />
+    ),
+  };
+
+  const activeDamageTypes = Object.entries(damageMap)
+    .filter(([_, value]) => value && value > 0)
+    .map(([key]) => parseInt(key) as DamageType);
+
+  return (
+    <View style={{ width: "100%" }}>
+      <GenericStrikeAround style={{ paddingBottom: 4 }}>
+        <Text style={styles["text-sm"]}>{title}</Text>
+      </GenericStrikeAround>
+      {activeDamageTypes.map((damageType) => (
+        <View
+          key={damageType}
+          style={[styles.rowCenter, { alignItems: "center" }]}
+        >
+          <Text style={{ paddingRight: 4 }}>{damageMap[damageType]}</Text>
+          {DamageTypeUtils[damageType]}
+        </View>
+      ))}
+    </View>
+  );
+};

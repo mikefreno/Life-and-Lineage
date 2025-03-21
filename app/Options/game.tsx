@@ -1,17 +1,17 @@
 import React from "react";
-import { Text } from "../../components/Themed";
+import { Text } from "@/components/Themed";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { toTitleCase, wait } from "../../utility/functions/misc";
+import { toTitleCase, wait } from "@/utility/functions/misc";
 import { Pressable, ScrollView, Switch, View } from "react-native";
-import GenericRaisedButton from "../../components/GenericRaisedButton";
-import GenericStrikeAround from "../../components/GenericStrikeAround";
-import GenericModal from "../../components/GenericModal";
-import D20DieAnimation from "../../components/DieRollAnim";
-import { useVibration } from "../../hooks/generic";
-import { useRootStore } from "../../hooks/stores";
-import CheckpointModal from "../../components/CheckpointModal";
-import { useStyles } from "../../hooks/styles";
+import GenericRaisedButton from "@/components/GenericRaisedButton";
+import GenericStrikeAround from "@/components/GenericStrikeAround";
+import GenericModal from "@/components/GenericModal";
+import D20DieAnimation from "@/components/DieRollAnim";
+import { useVibration } from "@/hooks/generic";
+import { useRootStore } from "@/hooks/stores";
+import CheckpointModal from "@/components/CheckpointModal";
+import { useStyles } from "@/hooks/styles";
 import GenericFlatButton from "@/components/GenericFlatButton";
 
 const healthWarningOptions: Record<number, string> = {

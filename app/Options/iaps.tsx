@@ -1,8 +1,8 @@
 import { View } from "react-native";
-import { Text } from "../../components/Themed";
-import GenericAnimatedPressable from "../../components/GenericAnimatedButton";
-import { useRootStore } from "../../hooks/stores";
-import { tw_base, useStyles } from "../../hooks/styles";
+import { Text } from "@/components/Themed";
+import GenericAnimatedPressable from "@/components/GenericAnimatedButton";
+import { useRootStore } from "@/hooks/stores";
+import { tw_base, useStyles } from "@/hooks/styles";
 
 export default function InAppPurchasePage() {
   const { uiStore } = useRootStore();

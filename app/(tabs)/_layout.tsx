@@ -166,7 +166,7 @@ const TabLayout = observer(() => {
                     fontFamily: "PixelifySans",
                     ...styles["text-sm"],
                     color: props.color,
-                    marginTop: normalize(2), // Add a small margin to separate from icon
+                    paddingTop: normalize(2),
                   }}
                 >
                   {props.children}

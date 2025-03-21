@@ -4,31 +4,31 @@ import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { Platform, Pressable, View, StyleSheet } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
-import { Text } from "../components/Themed";
+import { Text } from "@/components/Themed";
 import * as Sentry from "@sentry/react-native";
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import { toTitleCase, wait } from "../utility/functions/misc";
+import { toTitleCase, wait } from "@/utility/functions/misc";
 import { SystemBars } from "react-native-edge-to-edge";
-import { DarkTheme, LightTheme } from "../constants/Colors";
+import { DarkTheme, LightTheme } from "@/constants/Colors";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { useRootStore } from "../hooks/stores";
-import { ProjectedImage } from "../components/Draggable";
-import { AppProvider } from "../providers/AppData";
+import { useRootStore } from "@/hooks/stores";
+import { ProjectedImage } from "@/components/Draggable";
+import { AppProvider } from "@/providers/AppData";
 import { ThemeProvider } from "@react-navigation/native";
-import FleeModal from "../components/DungeonComponents/FleeModal";
-import { DungeonProvider } from "../providers/DungeonData";
-import { ErrorBoundary } from "../components/ErrorBoundary";
-import { LoadingBoundary } from "../components/LoadingBoundary";
-import { Character, PlayerCharacter } from "../entities/character";
-import { RootStore } from "../stores/RootStore";
-import { DungeonStore } from "../stores/DungeonStore";
-import GenericModal from "../components/GenericModal";
-import { CharacterImage } from "../components/CharacterImage";
-import GenericFlatButton from "../components/GenericFlatButton";
-import { normalize, useStyles } from "../hooks/styles";
+import FleeModal from "@/components/DungeonComponents/FleeModal";
+import { DungeonProvider } from "@/providers/DungeonData";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { LoadingBoundary } from "@/components/LoadingBoundary";
+import { Character, PlayerCharacter } from "@/entities/character";
+import { RootStore } from "@/stores/RootStore";
+import { DungeonStore } from "@/stores/DungeonStore";
+import GenericModal from "@/components/GenericModal";
+import { CharacterImage } from "@/components/CharacterImage";
+import GenericFlatButton from "@/components/GenericFlatButton";
+import { normalize, useStyles } from "@/hooks/styles";
 import { DevControls } from "@/components/DevControls";
 import BoundsVisualizer from "@/components/BoundsVisualizer";
 import {

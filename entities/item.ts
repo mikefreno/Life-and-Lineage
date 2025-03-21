@@ -15,7 +15,6 @@ import {
   Rarity,
   stringToModifier,
 } from "../utility/types";
-import { Spell } from "./spell";
 import { Attack } from "./attack";
 import attackObjects from "../assets/json/playerAttacks.json";
 import { action, computed, makeObservable, observable } from "mobx";
@@ -219,7 +218,7 @@ export class Item {
         this.requirements.strength &&
         this.requirements.strength >
           this.root.playerState.baseStrength +
-            this.root.playerState.allocatedSkillPoints[Attribute.strength]
+            this.root.playerState.allocatedSkillPoints![Attribute.strength]
       ) {
         return false;
       }
@@ -227,7 +226,7 @@ export class Item {
         this.requirements.intelligence &&
         this.requirements.intelligence >
           this.root.playerState.baseIntelligence +
-            this.root.playerState.allocatedSkillPoints[Attribute.intelligence]
+            this.root.playerState.allocatedSkillPoints![Attribute.intelligence]
       ) {
         return false;
       }
@@ -235,7 +234,7 @@ export class Item {
         this.requirements.dexterity &&
         this.requirements.dexterity >
           this.root.playerState.baseDexterity +
-            this.root.playerState.allocatedSkillPoints[Attribute.dexterity]
+            this.root.playerState.allocatedSkillPoints![Attribute.dexterity]
       ) {
         return false;
       }
@@ -244,9 +243,10 @@ export class Item {
     return true;
   }
 
+  //TODO
   get providedSpells() {
     if (this.itemClass == ItemClassType.Wand) {
-      const builtSpells: Spell[] = [];
+      const builtSpells: Attack[] = [];
       const combinedSpellJson = [
         ...mageSpells,
         ...necroSpells,
@@ -257,7 +257,7 @@ export class Item {
         const found = combinedSpellJson.find((obj) => obj.name == attackString);
         if (found && this.root.playerState) {
           builtSpells.push(
-            new Spell({
+            new Attack({
               ...found,
               proficiencyNeeded: "novice",
             }),
@@ -307,7 +307,7 @@ export class Item {
 
   get attachedSpell() {
     if (this.itemClass == ItemClassType.Book) {
-      let spell: any;
+      let spell;
       let bookObj: any;
       switch (this.root.playerState?.playerClass) {
         case PlayerClassOptions.mage:
@@ -316,7 +316,7 @@ export class Item {
             (mageSpell) => bookObj?.teaches == mageSpell.name,
           );
           if (spell) {
-            return new Spell({ ...spell });
+            return new Attack({ ...spell, user: this.root.playerState });
           }
         case PlayerClassOptions.necromancer:
           bookObj = necroBooks.find((book) => book.name == this.name);
@@ -324,7 +324,7 @@ export class Item {
             (necroSpell) => bookObj?.teaches == necroSpell.name,
           );
           if (spell) {
-            return new Spell({ ...spell });
+            return new Attack({ ...spell, user: this.root.playerState });
           }
         case PlayerClassOptions.ranger:
           bookObj = rangerBooks.find((book) => book.name == this.name);
@@ -332,7 +332,7 @@ export class Item {
             (paladinSpell) => bookObj?.teaches == paladinSpell.name,
           );
           if (spell) {
-            return new Spell({ ...spell });
+            return new Attack({ ...spell, user: this.root.playerState });
           }
         case PlayerClassOptions.paladin:
           bookObj = paladinBooks.find((book) => book.name == this.name);
@@ -340,7 +340,7 @@ export class Item {
             (paladinSpell) => bookObj?.teaches == paladinSpell.name,
           );
           if (spell) {
-            return new Spell({ ...spell });
+            return new Attack({ ...spell, user: this.root.playerState });
           }
       }
     }
@@ -461,19 +461,19 @@ export class Item {
       throw new Error(`Missing player on item! ${this.name}`);
 
     if (
-      this.root.playerState.equipment.mainHand.name.toLowerCase() ===
+      this.root.playerState.equipment?.mainHand.name.toLowerCase() ===
       "unarmored"
     ) {
       throw new Error("Can't apply poison to bare hands!");
     }
 
     if ("condition" in effect) {
-      this.root.playerState.equipment.mainHand.activePoison = effect.condition;
+      this.root.playerState.equipment!.mainHand.activePoison = effect.condition;
       return;
     }
 
     const amt = this.calculateEffectAmount(effect.amount);
-    this.root.playerState.equipment.mainHand.activePoison = {
+    this.root.playerState.equipment!.mainHand.activePoison = {
       effect: effect.stat,
       amount: amt,
     };

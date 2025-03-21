@@ -2,7 +2,7 @@ import React from "react";
 import { Href, Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { Pressable, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import Colors from "../../../constants/Colors";
+import Colors from "@/constants/Colors";
 import {
   CombatCodex,
   DungeonCodex,
@@ -11,7 +11,7 @@ import {
   MagicCodex,
   PlayerCodex,
   RelationshipsCodex,
-} from "../../../components/CodexPages";
+} from "@/components/CodexPages";
 import {
   AirCodex,
   ArcaneCodex,
@@ -31,10 +31,10 @@ import {
   SummoningCodex,
   VengeanceCodex,
   WaterCodex,
-} from "../../../components/CodexSecondaries";
-import { toTitleCase } from "../../../utility/functions/misc";
+} from "@/components/CodexSecondaries";
+import { toTitleCase } from "@/utility/functions/misc";
 import { useEffect, useState } from "react";
-import { useRootStore } from "../../../hooks/stores";
+import { useRootStore } from "@/hooks/stores";
 
 const CategoryMap: { [key: string]: React.JSX.Element } = {
   Combat: <CombatCodex />,

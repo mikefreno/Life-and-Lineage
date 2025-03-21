@@ -5,7 +5,7 @@ import {
   Pressable,
   Text as RNText,
 } from "react-native";
-import { useVibration } from "../../hooks/generic";
+import { useVibration } from "@/hooks/generic";
 import { normalize, useStyles } from "@/hooks/styles";
 import { useRootStore } from "@/hooks/stores";
 

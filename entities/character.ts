@@ -42,8 +42,8 @@ import {
   getRandomPersonality,
   getAnimatedSpriteForNPC,
   getNPCBaseCombatStats,
+  getRandomInt,
 } from "../utility/functions/misc";
-import { Spell } from "./spell";
 import storyItems from "../assets/json/items/storyItems.json";
 import { storage } from "../utility/functions/storage";
 import { stringify } from "flatted";
@@ -51,6 +51,7 @@ import { throttle } from "lodash";
 import type { RootStore } from "../stores/RootStore";
 import { Being } from "./being";
 import { CharacterOptions, PlayerCharacterOptions } from "./entityTypes";
+import { Attack } from "./attack";
 
 export interface JobData {
   title: string;
@@ -157,6 +158,7 @@ export class Character extends Being {
       partners: computed,
       knownCharacters: computed,
       fullName: computed,
+      nameReference: computed,
     });
 
     reaction(
@@ -279,6 +281,10 @@ export class Character extends Being {
     return `${this.firstName} ${this.lastName}`;
   }
 
+  get nameReference() {
+    return this.fullName;
+  }
+
   /**
    * Adds a qualification to the character's qualifications list.
    * @param qual - The qualification to add.
@@ -396,6 +402,18 @@ export class Character extends Being {
     });
 
     return baby;
+  }
+
+  /**
+   * To comply with `Creature`
+   */
+  getDrops(): {
+    itemDrops: Item[];
+    gold: number;
+    storyDrops: Item[];
+  } {
+    const gold = Math.round(getRandomInt(300, 500));
+    return { itemDrops: [], storyDrops: [], gold };
   }
 
   static fromJSON(json: any): Character {
@@ -1314,11 +1332,11 @@ export class PlayerCharacter extends Character {
       spellList = rangerSpells;
     } else spellList = mageSpells;
 
-    let spells: Spell[] = [];
+    let spells: Attack[] = [];
     this.knownSpells.forEach((spell) => {
       const found = spellList.find((spellObj) => spell == spellObj.name);
       if (found) {
-        const spell = new Spell({ ...found });
+        const spell = new Attack({ ...found });
         spells.push(spell);
       }
     });
@@ -1613,8 +1631,8 @@ export class PlayerCharacter extends Character {
   /**
    *
    */
-  public hasEnoughBloodOrbs(spell: Spell) {
-    const bloodOrbsNeeded = spell.buffs.filter(
+  public hasEnoughBloodOrbs(spell: Attack) {
+    const bloodOrbsNeeded = spell.buffStrings.filter(
       (buff) => buff == "consume blood orb",
     ).length;
     if (bloodOrbsNeeded > this.bloodOrbCount) {
@@ -1686,7 +1704,7 @@ export class PlayerCharacter extends Character {
 
   //----------------------------------Magical Combat----------------------------------//
 
-  public gainProficiency(chosenSpell: Spell) {
+  public gainProficiency(chosenSpell: Attack) {
     let currentProficiencies = this.magicProficiencies;
     const newProficiencies = currentProficiencies.map((prof) => {
       if (prof.school === chosenSpell.element) {
@@ -1718,7 +1736,9 @@ export class PlayerCharacter extends Character {
     }
   }
 
-  private experienceGainSteps(chosenSpell: Spell) {
+  private experienceGainSteps(chosenSpell: Attack) {
+    if (!chosenSpell.element) return;
+
     if (
       (this.currentMasteryLevel(chosenSpell.element) as MasteryLevel) <
       MasteryLevel.Legend

@@ -68,6 +68,7 @@ export enum DamageType {
   POISON,
   HOLY,
   MAGIC,
+  RAW,
 }
 
 export const DamageTypeToString: Record<DamageType, string> = {
@@ -78,6 +79,7 @@ export const DamageTypeToString: Record<DamageType, string> = {
   [DamageType.POISON]: "poison",
   [DamageType.HOLY]: "holy",
   [DamageType.MAGIC]: "magic",
+  [DamageType.RAW]: "raw",
 };
 
 export const StringToDamageType: Record<string, DamageType> = {
@@ -88,29 +90,46 @@ export const StringToDamageType: Record<string, DamageType> = {
   poison: DamageType.POISON,
   holy: DamageType.HOLY,
   magic: DamageType.MAGIC,
+  raw: DamageType.RAW,
 };
 
 export function parseDamageTypeObject(
-  data: { [key: string]: number } | undefined | null,
+  data: { [key: string]: number | undefined } | undefined | null,
 ): {
   [key in DamageType]?: number;
 } {
   if (!data) return {};
   const returnObject: { [key in DamageType]?: number } = {};
+
   Object.entries(data).forEach(([key, value]) => {
     let damageType: DamageType | undefined;
 
     if (!isNaN(Number(key))) {
       damageType = Number(key) as DamageType;
     } else {
-      damageType = StringToDamageType[key.toLowerCase()];
+      const lowerKey = key.toLowerCase();
+      damageType = StringToDamageType[lowerKey];
+
+      if (damageType === undefined) {
+        const matchingKey = Object.keys(StringToDamageType).find(
+          (k) => k.toLowerCase() === lowerKey,
+        );
+        if (matchingKey) {
+          damageType = StringToDamageType[matchingKey];
+        }
+      }
     }
     if (damageType !== undefined && value !== undefined) {
       returnObject[damageType] = value;
-    } else {
-      throw new Error(`invalid damage type: ${key})`);
+    } else if (damageType === undefined) {
+      console.warn(
+        `Warning: Unrecognized damage type: "${key}". Available types: ${Object.keys(
+          StringToDamageType,
+        ).join(", ")}`,
+      );
     }
   });
+
   return returnObject;
 }
 
@@ -417,7 +436,7 @@ export enum AttackUse {
   miss,
   block,
   stunned,
-  lowEnergy,
+  lowMana,
 }
 
 export type Activity = {

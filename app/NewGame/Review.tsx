@@ -1,18 +1,18 @@
-import { Text } from "../../components/Themed";
+import { Text } from "@/components/Themed";
 import { Pressable, View } from "react-native";
 import { useNavigation } from "expo-router";
-import clearHistory, { toTitleCase, wait } from "../../utility/functions/misc";
+import clearHistory, { toTitleCase, wait } from "@/utility/functions/misc";
 import {
   createPlayerCharacter,
   getStartingBaseStats,
-} from "../../utility/functions/characterAid";
-import { Element, ElementToString } from "../../utility/types";
-import { elementalColorMap, playerClassColors } from "../../constants/Colors";
-import GenericFlatButton from "../../components/GenericFlatButton";
-import { useVibration } from "../../hooks/generic";
-import { useRootStore } from "../../hooks/stores";
-import { useNewGameStore } from "./_layout";
-import { tw_base, useStyles } from "../../hooks/styles";
+} from "@/utility/functions/characterAid";
+import { Element, ElementToString } from "@/utility/types";
+import { elementalColorMap, playerClassColors } from "@/constants/Colors";
+import GenericFlatButton from "@/components/GenericFlatButton";
+import { useVibration } from "@/hooks/generic";
+import { useRootStore } from "@/hooks/stores";
+import { useNewGameStore } from "@/app/NewGame/_layout";
+import { tw_base, useStyles } from "@/hooks/styles";
 import {
   DexterityIcon,
   Energy,
@@ -23,7 +23,7 @@ import {
   SquareMinus,
   SquarePlus,
   StrengthIcon,
-} from "../../assets/icons/SVGIcons";
+} from "@/assets/icons/SVGIcons";
 import { useState } from "react";
 import NewGameMetaControls from "@/components/NewGameMetaControls";
 import React from "react";
@@ -181,18 +181,33 @@ export function StatAllocation({
   interface StatRowProps {
     stat: StatKey;
     icon: JSX.Element;
+    name: string;
     value: number;
   }
 
-  const StatRow = ({ stat, icon, value }: StatRowProps) => (
+  const StatRow = ({ stat, icon, value, name }: StatRowProps) => (
     <View style={styles.statRow}>
       <View style={styles.rowItemsCenter}>
         {icon}
-        <Text style={[{ marginLeft: 8 }, styles["text-md"]]}>
+        <Text style={[{ marginHorizontal: 4 }, styles["text-md"]]}>
           {value}
           {stats[stat] !== baseStats[stat]
             ? `(+${stats[stat] - baseStats[stat]})`
             : ""}
+        </Text>
+      </View>
+      <View
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 0,
+        }}
+      >
+        <Text style={[styles["text-sm"], { textAlign: "center" }]}>
+          ({name})
         </Text>
       </View>
       <View style={[styles.rowItemsCenter, { gap: 16 }]}>
@@ -201,6 +216,7 @@ export function StatAllocation({
             vibration({ style: "light", essential: true });
             handleDecrement(stat);
           }}
+          style={{ zIndex: 999 }}
           disabled={stats[stat] <= baseStats[stat]}
         >
           <SquareMinus
@@ -214,6 +230,7 @@ export function StatAllocation({
             vibration({ style: "light", essential: true });
             handleIncrement(stat);
           }}
+          style={{ zIndex: 999 }}
           disabled={remainingPoints <= 0}
         >
           <SquarePlus
@@ -245,6 +262,7 @@ export function StatAllocation({
 
       <StatRow
         stat="baseHealth"
+        name="Health"
         icon={
           <HealthIcon
             height={uiStore.iconSizeLarge}
@@ -255,6 +273,7 @@ export function StatAllocation({
       />
       <StatRow
         stat="baseMana"
+        name="Mana"
         icon={
           <Energy
             height={uiStore.iconSizeLarge}
@@ -265,6 +284,7 @@ export function StatAllocation({
       />
       <StatRow
         stat="baseSanity"
+        name="Sanity"
         icon={
           <Sanity
             height={uiStore.iconSizeLarge}
@@ -275,6 +295,7 @@ export function StatAllocation({
       />
       <StatRow
         stat="baseStrength"
+        name="Strength"
         icon={
           <StrengthIcon
             height={uiStore.iconSizeLarge}
@@ -285,6 +306,7 @@ export function StatAllocation({
       />
       <StatRow
         stat="baseIntelligence"
+        name="Intelligence"
         icon={
           <IntelligenceIcon
             height={uiStore.iconSizeLarge}
@@ -295,6 +317,7 @@ export function StatAllocation({
       />
       <StatRow
         stat="baseDexterity"
+        name="Dexterity"
         icon={
           <DexterityIcon
             height={uiStore.iconSizeLarge}
@@ -305,6 +328,7 @@ export function StatAllocation({
       />
       <StatRow
         stat="baseManaRegen"
+        name="Mana Regen"
         icon={
           <Regen height={uiStore.iconSizeLarge} width={uiStore.iconSizeLarge} />
         }

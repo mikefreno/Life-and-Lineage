@@ -1,29 +1,29 @@
-import { Text, ThemedView } from "../components/Themed";
+import { Text, ThemedView } from "@/components/Themed";
 import { Pressable, View, ScrollView } from "react-native";
-import { AccelerationCurves, toTitleCase } from "../utility/functions/misc";
-import ProgressBar from "../components/ProgressBar";
-import SpellDetails from "../components/SpellDetails";
-import GenericRaisedButton from "../components/GenericRaisedButton";
+import { AccelerationCurves, toTitleCase } from "@/utility/functions/misc";
+import ProgressBar from "@/components/ProgressBar";
+import SpellDetails from "@/components/SpellDetails";
+import GenericRaisedButton from "@/components/GenericRaisedButton";
 import { Image } from "expo-image";
 import {
   Element,
   ElementToString,
   ItemClassType,
   MasteryToString,
-} from "../utility/types";
-import GenericModal from "../components/GenericModal";
-import { elementalColorMap } from "../constants/Colors";
+} from "@/utility/types";
+import GenericModal from "@/components/GenericModal";
+import { elementalColorMap } from "@/constants/Colors";
 import { useCallback, useEffect, useState, useMemo } from "react";
 import { useIsFocused } from "@react-navigation/native";
-import { useRootStore } from "../hooks/stores";
-import { useAcceleratedAction, useVibration } from "../hooks/generic";
-import type { Item } from "../entities/item";
-import type { Spell } from "../entities/spell";
+import { useRootStore } from "@/hooks/stores";
+import { useAcceleratedAction, useVibration } from "@/hooks/generic";
+import type { Item } from "@/entities/item";
 import React from "react";
-import { radius, useStyles } from "../hooks/styles";
+import { radius, useStyles } from "@/hooks/styles";
 import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 import { observer } from "mobx-react-lite";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { Attack } from "@/entities/attack";
 
 interface SpellStudyingState {
   bookName: string;
@@ -74,7 +74,7 @@ const LearningSpellScreen = observer(() => {
   const vibration = useVibration();
 
   const [selectedBook, setSelectedBook] = useState<Item | null>(null);
-  const [selectedBookSpell, setSelectedBookSpell] = useState<Spell | null>(
+  const [selectedBookSpell, setSelectedBookSpell] = useState<Attack | null>(
     null,
   );
   const [showMasteryLevelTooLow, setShowMasteryLevelTooLow] =
@@ -116,7 +116,11 @@ const LearningSpellScreen = observer(() => {
   >(playerState?.learningSpells);
 
   const bookLabel = useCallback(() => {
-    if (playerState && selectedBookSpell) {
+    if (
+      playerState &&
+      selectedBookSpell &&
+      selectedBookSpell.proficiencyNeeded
+    ) {
       return `${
         MasteryToString[selectedBookSpell.proficiencyNeeded]
       } level book`;
@@ -191,6 +195,8 @@ const LearningSpellScreen = observer(() => {
             onPress={() => {
               if (
                 playerState &&
+                selectedBookSpell.proficiencyNeeded &&
+                selectedBookSpell.element &&
                 selectedBookSpell.proficiencyNeeded <=
                   playerState.currentMasteryLevel(selectedBookSpell.element)
               ) {

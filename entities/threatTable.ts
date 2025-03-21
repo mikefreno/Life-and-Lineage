@@ -1,5 +1,4 @@
-import type { PlayerCharacter } from "./character";
-import type { Enemy, Minion } from "./creatures";
+import { Being } from "./being";
 
 export class ThreatTable {
   private baseThreatPoints: Map<string, number>;
@@ -19,9 +18,9 @@ export class ThreatTable {
   }
 
   public getHighestThreatTargets(
-    targets: (PlayerCharacter | Minion | Enemy)[],
+    targets: Being[],
     numTargets: number,
-  ): (PlayerCharacter | Minion | Enemy)[] {
+  ): Being[] {
     if (!targets.length) {
       throw new Error("No targets provided");
     }
@@ -62,7 +61,7 @@ export class ThreatTable {
   }
 
   public totalThreatPoints(
-    target: PlayerCharacter | Minion | Enemy,
+    target: Being,
     highestHP: number,
     highestAttackPower: number,
   ): number {

@@ -1,7 +1,7 @@
 import { Tabs } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { type GestureResponderEvent, Pressable } from "react-native";
-import { useVibration } from "../../hooks/generic";
+import { useVibration } from "@/hooks/generic";
 import { normalize } from "@/hooks/styles";
 
 export default function AuthRoutesLayout() {

@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
-import { Text, ThemedView } from "../components/Themed";
-import { wait } from "../utility/functions/misc";
-import { CharacterImage } from "../components/CharacterImage";
+import React from "react";
+import { Text, ThemedView } from "@/components/Themed";
+import { wait } from "@/utility/functions/misc";
+import { CharacterImage } from "@/components/CharacterImage";
 import { useState } from "react";
-import ProgressBar from "../components/ProgressBar";
-import { CharacterInteractionModal } from "../components/CharacterInteractionModal";
+import ProgressBar from "@/components/ProgressBar";
+import { CharacterInteractionModal } from "@/components/CharacterInteractionModal";
 import {
   FlatList,
   Platform,
@@ -13,17 +13,17 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import GiftModal from "../components/GiftModal";
-import { AffectionIcon } from "../assets/icons/SVGIcons";
-import GenericModal from "../components/GenericModal";
+import GiftModal from "@/components/GiftModal";
+import { AffectionIcon } from "@/assets/icons/SVGIcons";
+import GenericModal from "@/components/GenericModal";
 import { Stack } from "expo-router";
 import { FontAwesome6 } from "@expo/vector-icons";
-import GenericRaisedButton from "../components/GenericRaisedButton";
+import GenericRaisedButton from "@/components/GenericRaisedButton";
 import { observer } from "mobx-react-lite";
-import GenericStrikeAround from "../components/GenericStrikeAround";
-import { useRootStore } from "../hooks/stores";
-import type { Character } from "../entities/character";
-import { flex, normalize, tw_base, useStyles } from "../hooks/styles";
+import GenericStrikeAround from "@/components/GenericStrikeAround";
+import { useRootStore } from "@/hooks/stores";
+import type { Character } from "@/entities/character";
+import { flex, normalize, tw_base, useStyles } from "@/hooks/styles";
 import TutorialModal from "@/components/TutorialModal";
 import { useIsFocused } from "@react-navigation/native";
 import { TutorialOption } from "@/utility/types";

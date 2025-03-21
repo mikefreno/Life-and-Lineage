@@ -7,7 +7,6 @@ import {
   Platform,
   TouchableWithoutFeedback,
   ScrollView,
-  LayoutAnimation,
 } from "react-native";
 import { toTitleCase } from "@/utility/functions/misc";
 import { useEffect, useState } from "react";
@@ -19,7 +18,6 @@ import { Energy, Regen } from "@/assets/icons/SVGIcons";
 import { elementalColorMap } from "@/constants/Colors";
 import { useCombatState, useLootState } from "@/providers/DungeonData";
 import { Attack } from "@/entities/attack";
-import { Spell } from "@/entities/spell";
 import { useCombatActions } from "@/hooks/combat";
 import { Item } from "@/entities/item";
 import { usePouch, useVibration } from "@/hooks/generic";
@@ -33,6 +31,7 @@ import { tw, useStyles } from "@/hooks/styles";
 import { Enemy } from "@/entities/creatures";
 import GenericRaisedButton from "@/components/GenericRaisedButton";
 import { runInAction } from "mobx";
+import { Being } from "@/entities/being";
 
 const BattleTab = observer(
   ({
@@ -40,9 +39,7 @@ const BattleTab = observer(
   }: {
     battleTab: "attacksOrNavigation" | "equipment" | "log";
   }) => {
-    const [attackDetails, setAttackDetails] = useState<Attack | Spell | null>(
-      null,
-    );
+    const [attackDetails, setAttackDetails] = useState<Attack | null>(null);
     const [attackDetailsShowing, setAttackDetailsShowing] =
       useState<boolean>(false);
 
@@ -55,7 +52,8 @@ const BattleTab = observer(
     const { draggableClassStore } = useDraggableStore();
     const { setShowTargetSelection } = useCombatState();
 
-    const [combinedData, setCombinedData] = useState<(Attack | Spell)[]>([]);
+    const [combinedData, setCombinedData] = useState<Attack[]>([]);
+
     const [hiddenDisplayItem, setHiddenDisplayItem] = useState<{
       item: Item[];
       position: {
@@ -124,27 +122,30 @@ const BattleTab = observer(
       }
     }, [battleTab]);
 
-    const attackHandler = (attackOrSpell: Attack | Spell) => {
+    const attackHandler = (attack: Attack) => {
       if (enemyStore.enemies.length > 0) {
         vibration({ style: "light" });
-        const enoughForDualToHitAll =
-          enemyStore.enemies.length > 1 ||
-          enemyStore.enemies[0].minions.length > 0;
+        let possibleTargets = enemyStore.enemies;
+        enemyStore.enemies.forEach((enemy) => {
+          if (enemy instanceof Enemy) {
+            enemy.minions.forEach((minion) => minion as Being);
+          }
+        });
 
         const attackHitsAllTargets =
-          attackOrSpell.attackStyle == "area" ||
-          (attackOrSpell.attackStyle == "dual" && enoughForDualToHitAll) ||
-          enemyStore.enemies.length === 1;
+          attack.targets === "area" ||
+          (attack.targets === "dual" && possibleTargets.length <= 2) ||
+          (attack.targets === "single" && possibleTargets.length === 1);
 
         if (!attackHitsAllTargets) {
           setShowTargetSelection({
             showing: true,
-            chosenAttack: attackOrSpell,
+            chosenAttack: attack,
           });
         } else {
           useAttack({
-            target: enemyStore.enemies[0],
-            attackOrSpell,
+            targets: possibleTargets,
+            attack,
           });
         }
       }
@@ -155,11 +156,11 @@ const BattleTab = observer(
         <GenericModal
           isVisibleCondition={attackDetailsShowing}
           backFunction={() => setAttackDetailsShowing(false)}
-          size={attackDetails instanceof Spell ? 100 : undefined}
+          size={attackDetails && attackDetails.element ? 100 : undefined}
         >
           {attackDetails && (
             <View style={{ alignItems: "center" }}>
-              {attackDetails instanceof Spell ? (
+              {attackDetails && attackDetails.element ? (
                 <SpellDetails spell={attackDetails} />
               ) : (
                 attackDetails.AttackRender(styles)
@@ -259,8 +260,8 @@ const BattleTab = observer(
                   persistentScrollbar
                   contentContainerStyle={{ paddingHorizontal: "2%" }}
                   renderItem={({ item, index }) => (
-                    <AttackOrSpellItem
-                      attackOrSpell={item}
+                    <AttackItem
+                      attack={item}
                       isLast={index == combinedData.length - 1}
                       setAttackDetails={setAttackDetails}
                       attackHandler={attackHandler}
@@ -364,19 +365,19 @@ const BattleTab = observer(
 
 export default BattleTab;
 
-const AttackOrSpellItem = observer(
+const AttackItem = observer(
   ({
-    attackOrSpell,
+    attack,
     isLast,
     attackHandler,
     pass,
     vibration,
     setAttackDetails,
   }: {
-    attackOrSpell: Attack | Spell;
+    attack: Attack;
     isLast: boolean;
-    setAttackDetails: (val: Attack | Spell) => void;
-    attackHandler: (val: Attack | Spell) => void;
+    setAttackDetails: (val: Attack) => void;
+    attackHandler: (val: Attack) => void;
     pass: ({ voluntary }: { voluntary?: boolean }) => void;
     vibration: ({
       style,
@@ -396,8 +397,8 @@ const AttackOrSpellItem = observer(
     }
 
     const canUse = useMemo(
-      () => attackOrSpell.canBeUsed(playerState),
-      [attackOrSpell, playerState.currentMana, playerState.isStunned],
+      () => attack.canBeUsed,
+      [attack, playerState.currentMana, playerState.isStunned],
     );
 
     const isDisabled = useMemo(
@@ -406,8 +407,8 @@ const AttackOrSpellItem = observer(
     );
 
     const handlePress = useCallback(() => {
-      attackHandler(attackOrSpell);
-    }, [attackHandler, attackOrSpell]);
+      attackHandler(attack);
+    }, [attackHandler, attack]);
 
     const handlePassPress = useCallback(() => {
       vibration({ style: "light" });
@@ -415,10 +416,10 @@ const AttackOrSpellItem = observer(
     }, [pass, vibration]);
 
     const handleDetailsPress = useCallback(() => {
-      setAttackDetails(attackOrSpell);
-    }, [setAttackDetails, attackOrSpell]);
+      setAttackDetails(attack);
+    }, [setAttackDetails, attack]);
 
-    const isSpell = attackOrSpell instanceof Spell;
+    const isSpell = !!attack.element;
 
     const buttonText = useMemo(() => {
       if (playerState.isStunned) return "Stunned!";
@@ -427,14 +428,14 @@ const AttackOrSpellItem = observer(
     }, [isSpell, canUse, playerState.isStunned]);
 
     const backgroundColor = useMemo(() => {
-      if (isSpell) return elementalColorMap[attackOrSpell.element].dark;
+      if (isSpell) return elementalColorMap[attack.element].dark;
       return uiStore.colorScheme === "light" ? "#d4d4d8" : "#27272a";
-    }, [isSpell, attackOrSpell, uiStore.colorScheme]);
+    }, [isSpell, attack, uiStore.colorScheme]);
 
     const textColor = useMemo(() => {
-      if (isSpell) return elementalColorMap[attackOrSpell.element].dark;
+      if (isSpell) return elementalColorMap[attack.element].dark;
       return uiStore.colorScheme === "dark" ? "#fafafa" : "#09090b";
-    }, [isSpell, attackOrSpell, uiStore.colorScheme]);
+    }, [isSpell, attack, uiStore.colorScheme]);
 
     return (
       <>
@@ -442,28 +443,28 @@ const AttackOrSpellItem = observer(
           style={[
             styles.attackCardBase,
             isSpell && {
-              backgroundColor: elementalColorMap[attackOrSpell.element].light,
+              backgroundColor: elementalColorMap[attack.element].light,
             },
           ]}
         >
           <View style={styles.columnCenter}>
             <Pressable onPress={handleDetailsPress}>
               <Text style={[styles["text-xl"], { color: textColor }]}>
-                {toTitleCase(attackOrSpell.name)}
+                {toTitleCase(attack.name)}
               </Text>
-              {!isSpell && attackOrSpell.baseHitChance ? (
+              {!isSpell && attack.baseHitChance ? (
                 <Text style={styles["text-lg"]}>{`${
-                  attackOrSpell.baseHitChance * 100
+                  attack.baseHitChance * 100
                 }% hit chance`}</Text>
               ) : (
                 isSpell && (
                   <View style={{ flexDirection: "row" }}>
                     <Text
                       style={{
-                        color: elementalColorMap[attackOrSpell.element].dark,
+                        color: elementalColorMap[attack.element].dark,
                       }}
                     >
-                      {attackOrSpell.manaCost}
+                      {attack.manaCost}
                     </Text>
                     <View style={{ marginVertical: "auto", paddingLeft: 4 }}>
                       <Energy

@@ -40,7 +40,6 @@ function ErrorRender() {
         }}
       >
         <Text style={{ textAlign: "center" }}>Something went wrong.</Text>
-
         <View
           style={{
             width: "100%",

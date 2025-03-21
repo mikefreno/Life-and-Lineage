@@ -1,10 +1,10 @@
 import React, { ReactNode } from "react";
 import { FlatList, View, ViewStyle } from "react-native";
 import { Link } from "expo-router";
-import SpellDetails from "./SpellDetails";
-import { Element, ElementToString, PlayerClassOptions } from "../utility/types";
-import { ClassDescriptionMap, DescriptionMap } from "../utility/descriptions";
-import { elementalColorMap, playerClassColors } from "../constants/Colors";
+import SpellDetails from "@/components/SpellDetails";
+import { Element, ElementToString, PlayerClassOptions } from "@/utility/types";
+import { ClassDescriptionMap, DescriptionMap } from "@/utility/descriptions";
+import { elementalColorMap, playerClassColors } from "@/constants/Colors";
 import { Text } from "./Themed";
 
 // Import spell data
@@ -19,9 +19,9 @@ import {
   RangerIcon,
   WizardHat,
 } from "../assets/icons/SVGIcons";
-import { Spell } from "../entities/spell";
 import { useRootStore } from "../hooks/stores";
 import { useStyles } from "../hooks/styles";
+import { Attack } from "@/entities/attack";
 
 const ClassCodex = ({
   classOption,
@@ -55,7 +55,7 @@ const ClassCodex = ({
           >
             <Text
               style={{
-                ...styles["2xl"],
+                ...styles["text-2xl"],
                 color:
                   uiStore.colorScheme == "dark"
                     ? school == Element.assassination
@@ -75,7 +75,7 @@ const ClassCodex = ({
         ))}
         <Text
           style={[
-            styles["2xl"],
+            styles["text-2xl"],
             styles.py4,
             {
               color: playerClassColors[classOption],
@@ -90,7 +90,7 @@ const ClassCodex = ({
 
   const renderItem = ({ item }) => (
     <View style={[styles.py2, styles.mxAuto]}>
-      <SpellDetails spell={new Spell({ ...item })} />
+      <SpellDetails spell={new Attack({ ...item })} />
     </View>
   );
 
@@ -130,7 +130,7 @@ const ElementCodex = ({
         <Text
           style={{
             color: elementalColorMap[element].dark,
-            ...styles["2xl"],
+            ...styles["text-2xl"],
             ...styles.py4,
           }}
         >
@@ -142,7 +142,7 @@ const ElementCodex = ({
 
   const renderItem = ({ item }) => (
     <View style={[styles.py2, styles.mxAuto]}>
-      <SpellDetails spell={new Spell({ ...item })} />
+      <SpellDetails spell={new Attack({ ...item })} />
     </View>
   );
 

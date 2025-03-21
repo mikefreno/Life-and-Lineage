@@ -1,26 +1,26 @@
 import React from "react";
 import { Pressable, ScrollView, View } from "react-native";
-import { Text, ThemedView } from "../../components/Themed";
+import { Text, ThemedView } from "@/components/Themed";
 import { useLayoutEffect, useState } from "react";
-import TutorialModal from "../../components/TutorialModal";
+import TutorialModal from "@/components/TutorialModal";
 import {
   NecromancerSkull,
   PaladinHammer,
   RangerIcon,
   WizardHat,
-} from "../../assets/icons/SVGIcons";
-import { PlayerClassOptions, TutorialOption } from "../../utility/types";
-import { ClassDescriptionMap } from "../../utility/descriptions";
-import GenericModal from "../../components/GenericModal";
-import { wait } from "../../utility/functions/misc";
+} from "@/assets/icons/SVGIcons";
+import { PlayerClassOptions, TutorialOption } from "@/utility/types";
+import { ClassDescriptionMap } from "@/utility/descriptions";
+import GenericModal from "@/components/GenericModal";
+import { wait } from "@/utility/functions/misc";
 import { observer } from "mobx-react-lite";
 import { useIsFocused } from "@react-navigation/native";
-import { useVibration } from "../../hooks/generic";
-import { useRootStore } from "../../hooks/stores";
-import { useNewGameStore } from "./_layout";
-import GenericFlatButton from "../../components/GenericFlatButton";
+import { useVibration } from "@/hooks/generic";
+import { useRootStore } from "@/hooks/stores";
+import { useNewGameStore } from "@/app/NewGame/_layout";
+import GenericFlatButton from "@/components/GenericFlatButton";
 import { useRouter } from "expo-router";
-import { tw_base, useStyles } from "../../hooks/styles";
+import { tw_base, useStyles } from "@/hooks/styles";
 import NewGameMetaControls from "@/components/NewGameMetaControls";
 
 const SetClassScreen = observer(() => {

@@ -138,9 +138,9 @@ const PlayerStatusForSecondary = observer(() => {
                   />
                 </View>
                 <ProgressBar
-                  value={playerState.currentSanity}
-                  minValue={-playerState.maxSanity}
-                  maxValue={playerState.maxSanity}
+                  value={playerState.currentSanity!}
+                  minValue={-playerState.maxSanity!}
+                  maxValue={playerState.maxSanity!}
                   filledColor="#c084fc"
                   unfilledColor="#e9d5ff"
                 />

@@ -1,20 +1,20 @@
 import React from "react";
-import LaborTask from "../../components/LaborTask";
+import LaborTask from "@/components/LaborTask";
 import { View, ScrollView } from "react-native";
 import { useMemo, useState } from "react";
-import { toTitleCase } from "../../utility/functions/misc";
+import { toTitleCase } from "@/utility/functions/misc";
 import { useRouter } from "expo-router";
 import { useIsFocused } from "@react-navigation/native";
-import TutorialModal from "../../components/TutorialModal";
+import TutorialModal from "@/components/TutorialModal";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { TutorialOption } from "../../utility/types";
+import { TutorialOption } from "@/utility/types";
 import { observer } from "mobx-react-lite";
-import { Text } from "../../components/Themed";
-import GenericModal from "../../components/GenericModal";
-import { useVibration } from "../../hooks/generic";
-import { useRootStore } from "../../hooks/stores";
-import GenericFlatButton from "../../components/GenericFlatButton";
-import { useStyles } from "../../hooks/styles";
+import { Text } from "@/components/Themed";
+import GenericModal from "@/components/GenericModal";
+import { useVibration } from "@/hooks/generic";
+import { useRootStore } from "@/hooks/stores";
+import { useStyles } from "@/hooks/styles";
+import GenericFlatButton from "@/components/GenericFlatButton";
 
 const LaborScreen = observer(() => {
   const { playerState, uiStore } = useRootStore();

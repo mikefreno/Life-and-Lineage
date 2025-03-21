@@ -7,15 +7,14 @@ import {
   Platform,
   ScrollView,
 } from "react-native";
-import { Text } from "../../components/Themed";
+import { Text } from "@/components/Themed";
 import { useRouter } from "expo-router";
-import { toTitleCase } from "../../utility/functions/misc";
-import { useHeaderHeight } from "@react-navigation/elements";
-import { playerClassColors } from "../../constants/Colors";
-import { useNewGameStore } from "./_layout";
-import { useRootStore } from "../../hooks/stores";
-import { tw_base, useStyles } from "../../hooks/styles";
-import GenericFlatButton from "../../components/GenericFlatButton";
+import { toTitleCase } from "@/utility/functions/misc";
+import { playerClassColors } from "@/constants/Colors";
+import { useNewGameStore } from "@/app/NewGame/_layout";
+import { useRootStore } from "@/hooks/stores";
+import { tw_base, useStyles } from "@/hooks/styles";
+import GenericFlatButton from "@/components/GenericFlatButton";
 import NewGameMetaControls from "@/components/NewGameMetaControls";
 import { useVibration } from "@/hooks/generic";
 
@@ -25,7 +24,7 @@ export default function SetName() {
   const isDark = uiStore.colorScheme === "dark";
   const { classSelection, firstName, lastName, setFirstName, setLastName } =
     useNewGameStore();
-  const headerHeight = useHeaderHeight();
+
   const vibration = useVibration();
   const router = useRouter();
 

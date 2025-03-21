@@ -3,7 +3,7 @@
     "name": "Lineage",
     "slug": "life-and-lineage",
     "version": "0.8.8",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "assets/images/icon.png",
     "scheme": "lineageapp",
     "userInterfaceStyle": "automatic",
@@ -95,3 +95,4 @@
     "owner": "mikefrenodev"
   }
 }
+

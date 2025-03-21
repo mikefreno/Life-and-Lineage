@@ -1,12 +1,12 @@
 import { ScrollView, TextInput, TouchableOpacity, View } from "react-native";
-import { Text } from "../../../components/Themed";
+import { Text } from "@/components/Themed";
 import { useEffect, useState } from "react";
-import CodexCategory from "../../../components/CodexCategory";
+import CodexCategory from "@/components/CodexCategory";
 import { useRouter } from "expo-router";
-import ThemedCard from "../../../components/ThemedCard";
-import { CodexEntry, searchCodex } from "../../../utility/functions/codex";
-import { useRootStore } from "../../../hooks/stores";
-import { useStyles } from "../../../hooks/styles";
+import ThemedCard from "@/components/ThemedCard";
+import { CodexEntry, searchCodex } from "@/utility/functions/codex";
+import { useRootStore } from "@/hooks/stores";
+import { useStyles } from "@/hooks/styles";
 
 const categories = [
   "Player",

@@ -941,7 +941,7 @@ export const ColorAndPlatformDependantBlur = observer(
         if (
           playerState.currentHealth / playerState.maxHealth <=
             uiStore.healthWarning &&
-          playerState.currentSanity <= 0
+          playerState.currentSanity! <= 0
         ) {
           setShowingWarningPulse("both");
         } else if (
@@ -949,7 +949,7 @@ export const ColorAndPlatformDependantBlur = observer(
           uiStore.healthWarning
         ) {
           setShowingWarningPulse("health");
-        } else if (playerState.currentSanity <= 0) {
+        } else if (playerState.currentSanity! <= 0) {
           setShowingWarningPulse("sanity");
         } else {
           setShowingWarningPulse(null);
@@ -1047,7 +1047,6 @@ export const ColorAndPlatformDependantBlur = observer(
                 backgroundColor: showingWarningPulse
                   ? healthOrSanityWarning()
                   : healthOrSanityFlash(),
-                paddingBottom: 4,
               }}
             >
               {children}
@@ -1077,7 +1076,6 @@ export const ColorAndPlatformDependantBlur = observer(
                 backgroundColor: showingWarningPulse
                   ? healthOrSanityWarning()
                   : healthOrSanityFlash(),
-                paddingBottom: 4,
                 borderRadius: 12,
               }}
             >
@@ -1128,7 +1126,6 @@ export const ColorAndPlatformDependantBlur = observer(
           style={{
             zIndex: 10,
             overflow: "hidden",
-            paddingBottom: 24,
             backgroundColor:
               Platform.OS !== "ios"
                 ? uiStore.colorScheme === "dark"

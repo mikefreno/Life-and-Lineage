@@ -6,18 +6,15 @@
     "target": "single",
     "type": "offense",
     "manaCost": 10,
-    "effects": {
-      "damage": {
-        "fire": 15
-      },
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "burn",
-          "chance": 0.25
-        }
-      ]
+    "damageTable": {
+      "fire": 15
     },
+    "debuffs": [
+      {
+        "name": "burn",
+        "chance": 0.25
+      }
+    ],
     "animation": {
       "sprite": "fireMissile",
       "style": "missile",
@@ -33,16 +30,15 @@
     "type": "offense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 20,
-    "effects": {
-      "damage": 25,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "burn",
-          "chance": 0.25
-        }
-      ]
+    "damageTable": {
+      "fire": 25
     },
+    "debuffs": [
+      {
+        "name": "burn",
+        "chance": 0.25
+      }
+    ],
     "animation": {
       "sprite": "fireSlash",
       "style": "static",
@@ -57,16 +53,15 @@
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 50,
-    "effects": {
-      "damage": 25,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "burn",
-          "chance": 1.0
-        }
-      ]
+    "damageTable": {
+      "fire": 25
     },
+    "debuffs": [
+      {
+        "name": "burn",
+        "chance": 1.0
+      }
+    ],
     "animation": {
       "sprite": "flameDust",
       "style": "static",
@@ -81,16 +76,15 @@
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 75,
-    "effects": {
-      "damage": 60,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "burn",
-          "chance": 0.25
-        }
-      ]
+    "damageTable": {
+      "fire": 60
     },
+    "debuffs": [
+      {
+        "name": "burn",
+        "chance": 0.25
+      }
+    ],
     "animation": {
       "sprite": "fireMissile",
       "style": "missile",
@@ -106,19 +100,17 @@
     "type": "defense",
     "proficiencyNeeded": "expert",
     "manaCost": 100,
-    "duration": 3,
-    "effects": {
-      "damage": null,
-      "buffs": [
-        "projectile suppression"
-      ],
-      "debuffs": [
-        {
-          "name": "burn",
-          "chance": 0.5
-        }
-      ]
-    },
+    "maxTurnsActive": 3,
+    "damageTable": {},
+    "buffs": [
+      "projectile suppression"
+    ],
+    "debuffs": [
+      {
+        "name": "burn",
+        "chance": 0.5
+      }
+    ],
     "animation": {
       "sprite": "flameWall",
       "style": "static",
@@ -133,17 +125,16 @@
     "type": "offense",
     "proficiencyNeeded": "master",
     "manaCost": 250,
-    "duration": 5,
-    "effects": {
-      "damage": 50,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "burn",
-          "chance": 0.25
-        }
-      ]
+    "maxTurnsActive": 5,
+    "damageTable": {
+      "fire": 50
     },
+    "debuffs": [
+      {
+        "name": "burn",
+        "chance": 0.25
+      }
+    ],
     "animation": {
       "sprite": "fireRain",
       "style": "static",
@@ -157,16 +148,15 @@
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 600,
-    "effects": {
-      "damage": 275,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "severe burn",
-          "chance": 0.75
-        }
-      ]
+    "damageTable": {
+      "fire": 275
     },
+    "debuffs": [
+      {
+        "name": "severe burn",
+        "chance": 0.75
+      }
+    ],
     "animation": {
       "sprite": "dragonBreath",
       "style": "static",
@@ -181,16 +171,15 @@
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 800,
-    "effects": {
-      "damage": 400,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "severe burn",
-          "chance": 1.0
-        }
-      ]
+    "damageTable": {
+      "fire": 400
     },
+    "debuffs": [
+      {
+        "name": "severe burn",
+        "chance": 1.0
+      }
+    ],
     "animation": {
       "sprite": "fireBeam",
       "style": "span",
@@ -205,16 +194,15 @@
     "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 10,
-    "effects": {
-      "damage": 10,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "chill",
-          "chance": 0.5
-        }
-      ]
+    "damageTable": {
+      "cold": 10
     },
+    "debuffs": [
+      {
+        "name": "chill",
+        "chance": 0.5
+      }
+    ],
     "animation": {
       "sprite": "iceBlock",
       "style": "static",
@@ -229,10 +217,8 @@
     "type": "offense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 20,
-    "effects": {
-      "damage": 30,
-      "buffs": null,
-      "debuffs": null
+    "damageTable": {
+      "physical": 30
     },
     "animation": {
       "sprite": "ambiguousSparks",
@@ -248,12 +234,8 @@
     "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 50,
-    "effects": {
-      "damage": null,
-      "selfDamage": -35,
-      "buffs": null,
-      "debuffs": null
-    },
+    "damageTable": {},
+    "baseHealing": 35,
     "animation": {
       "sprite": "splash",
       "style": "static",
@@ -267,20 +249,19 @@
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 100,
-    "effects": {
-      "damage": 40,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "chill",
-          "chance": 1.0
-        },
-        {
-          "name": "chill",
-          "chance": 1.0
-        }
-      ]
+    "damageTable": {
+      "cold": 40
     },
+    "debuffs": [
+      {
+        "name": "chill",
+        "chance": 1.0
+      },
+      {
+        "name": "chill",
+        "chance": 1.0
+      }
+    ],
     "animation": {
       "sprite": "coldSmoke",
       "style": "span",
@@ -294,16 +275,17 @@
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 125,
-    "effects": {
-      "damage": 60,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "burn",
-          "chance": 0.5
-        }
-      ]
+    "damageTable": {
+      "fire": 60
     },
+    "damage": 60,
+    "buffs": null,
+    "debuffs": [
+      {
+        "name": "burn",
+        "chance": 0.5
+      }
+    ],
     "animation": {
       "sprite": "steam",
       "style": "span",
@@ -319,24 +301,24 @@
     "type": "offense",
     "proficiencyNeeded": "expert",
     "manaCost": 200,
-    "effects": {
-      "damage": 100,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "chill",
-          "chance": 0.75
-        },
-        {
-          "name": "chill",
-          "chance": 0.75
-        },
-        {
-          "name": "chill",
-          "chance": 0.75
-        }
-      ]
+    "damageTable": {
+      "cold": 100
     },
+    "buffs": null,
+    "debuffs": [
+      {
+        "name": "chill",
+        "chance": 0.75
+      },
+      {
+        "name": "chill",
+        "chance": 0.75
+      },
+      {
+        "name": "chill",
+        "chance": 0.75
+      }
+    ],
     "animation": {
       "sprite": "iceSpike",
       "style": "static",
@@ -350,13 +332,11 @@
     "target": "area",
     "type": "defense",
     "manaCost": 200,
-    "effects": {
-      "damage": null,
-      "buffs": [
-        "lasting heal"
-      ],
-      "debuffs": null
-    },
+    "damageTable": {},
+    "buffs": [
+      "lasting heal"
+    ],
+    "debuffs": null,
     "animation": {
       "sprite": "rainCall",
       "style": "static",
@@ -370,17 +350,16 @@
     "type": "offense",
     "proficiencyNeeded": "master",
     "manaCost": 300,
-    "duration": 5,
-    "effects": {
-      "damage": 50,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "chill",
-          "chance": 0.75
-        }
-      ]
+    "maxTurnsActive": 5,
+    "damageTable": {
+      "cold": 50
     },
+    "debuffs": [
+      {
+        "name": "chill",
+        "chance": 0.75
+      }
+    ],
     "animation": {
       "sprite": "iceOrb",
       "style": "static",
@@ -396,10 +375,8 @@
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 600,
-    "effects": {
-      "damage": 400,
-      "buffs": null,
-      "debuffs": null
+    "damageTable": {
+      "physical": 400
     },
     "animation": {
       "sprite": "torrent",
@@ -414,29 +391,28 @@
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 700,
-    "duration": 2,
-    "effects": {
-      "damage": 100,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "chill",
-          "chance": 0.75
-        },
-        {
-          "name": "chill",
-          "chance": 0.75
-        },
-        {
-          "name": "bleed",
-          "chance": 0.75
-        },
-        {
-          "name": "bleed",
-          "chance": 0.75
-        }
-      ]
+    "maxTurnsActive": 2,
+    "damageTable": {
+      "cold": 150
     },
+    "debuffs": [
+      {
+        "name": "chill",
+        "chance": 0.75
+      },
+      {
+        "name": "chill",
+        "chance": 0.75
+      },
+      {
+        "name": "bleed",
+        "chance": 0.75
+      },
+      {
+        "name": "bleed",
+        "chance": 0.75
+      }
+    ],
     "animation": {
       "sprite": "massSpikes",
       "style": "static",
@@ -452,10 +428,8 @@
     "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 15,
-    "effects": {
-      "damage": 18,
-      "buffs": null,
-      "debuffs": null
+    "damageTable": {
+      "physical": 18
     },
     "animation": {
       "sprite": "puft",
@@ -471,16 +445,15 @@
     "type": "offense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 25,
-    "effects": {
-      "damage": 25,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "shocked",
-          "chance": 0.5
-        }
-      ]
+    "damageTable": {
+      "lightning": 25
     },
+    "debuffs": [
+      {
+        "name": "shocked",
+        "chance": 0.5
+      }
+    ],
     "animation": {
       "sprite": "sparks",
       "style": "static",
@@ -495,20 +468,19 @@
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 75,
-    "effects": {
-      "damage": 50,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "shocked",
-          "chance": 0.5
-        },
-        {
-          "name": "shocked",
-          "chance": 0.5
-        }
-      ]
+    "damageTable": {
+      "lightning": 50
     },
+    "debuffs": [
+      {
+        "name": "shocked",
+        "chance": 0.5
+      },
+      {
+        "name": "shocked",
+        "chance": 0.5
+      }
+    ],
     "animation": {
       "sprite": "lightning",
       "style": "static",
@@ -522,20 +494,19 @@
     "type": "offense",
     "proficiencyNeeded": "expert",
     "manaCost": 75,
-    "effects": {
-      "damage": 50,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "shocked",
-          "chance": 0.75
-        },
-        {
-          "name": "stun",
-          "chance": 0.5
-        }
-      ]
+    "damageTable": {
+      "lightning": 50
     },
+    "debuffs": [
+      {
+        "name": "shocked",
+        "chance": 0.75
+      },
+      {
+        "name": "stun",
+        "chance": 0.5
+      }
+    ],
     "animation": {
       "sprite": "thunderClap",
       "style": "static",
@@ -550,20 +521,19 @@
     "type": "offense",
     "proficiencyNeeded": "expert",
     "manaCost": 105,
-    "effects": {
-      "damage": 50,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "shocked",
-          "chance": 0.75
-        },
-        {
-          "name": "stun",
-          "chance": 0.5
-        }
-      ]
+    "damageTable": {
+      "lightning": 70
     },
+    "debuffs": [
+      {
+        "name": "shocked",
+        "chance": 0.75
+      },
+      {
+        "name": "stun",
+        "chance": 0.5
+      }
+    ],
     "animation": {
       "sprite": "lightningRay",
       "style": "span",
@@ -578,20 +548,19 @@
     "type": "offense",
     "proficiencyNeeded": "master",
     "manaCost": 100,
-    "effects": {
-      "damage": 75,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "bleed",
-          "chance": 0.75
-        },
-        {
-          "name": "bleed",
-          "chance": 0.75
-        }
-      ]
+    "damageTable": {
+      "physical": 100
     },
+    "debuffs": [
+      {
+        "name": "bleed",
+        "chance": 0.75
+      },
+      {
+        "name": "bleed",
+        "chance": 0.75
+      }
+    ],
     "animation": {
       "sprite": "windBlades",
       "style": "static",
@@ -606,14 +575,11 @@
     "type": "defense",
     "proficiencyNeeded": "master",
     "manaCost": 125,
-    "effects": {
-      "damage": null,
-      "buffs": [
-        "hard to see",
-        "damaging to hit"
-      ],
-      "debuffs": null
-    },
+    "damageTable": {},
+    "buffs": [
+      "hard to see",
+      "damaging to hit"
+    ],
     "animation": {
       "sprite": "groundSlash",
       "style": "static",
@@ -627,12 +593,10 @@
     "target": "area",
     "type": "offense",
     "proficiencyNeeded": "legend",
-    "duration": 3,
+    "maxTurnsActive": 3,
     "manaCost": 500,
-    "effects": {
-      "damage": 125,
-      "buffs": null,
-      "debuffs": null
+    "damageTable": {
+      "physical": 100
     },
     "animation": {
       "sprite": "tornado",
@@ -647,18 +611,17 @@
     "target": "single",
     "type": "offense",
     "proficiencyNeeded": "legend",
-    "duration": 5,
+    "maxTurnsActive": 5,
     "manaCost": 1250,
-    "effects": {
-      "damage": 125,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "stun",
-          "chance": 0.75
-        }
-      ]
+    "damageTable": {
+      "physical": 125
     },
+    "debuffs": [
+      {
+        "name": "stun",
+        "chance": 0.75
+      }
+    ],
     "animation": {
       "sprite": "suffocate",
       "style": "static",
@@ -673,16 +636,16 @@
     "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 10,
-    "effects": {
-      "damage": 10,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "stun",
-          "chance": 0.10
-        }
-      ]
+    "damageTable": {
+      "physical": 5,
+      "raw": 5
     },
+    "debuffs": [
+      {
+        "name": "stun",
+        "chance": 0.10
+      }
+    ],
     "animation": {
       "sprite": "rockDrop",
       "style": "static",
@@ -696,13 +659,10 @@
     "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 20,
-    "effects": {
-      "damage": null,
-      "buffs": [
-        "stone hands"
-      ],
-      "debuffs": null
-    },
+    "buffs": [
+      "stone hands"
+    ],
+    "debuffs": null,
     "animation": {
       "glow": "#77484C20",
       "position": "self"
@@ -714,18 +674,18 @@
     "target": "area",
     "type": "offense",
     "proficiencyNeeded": "adept",
-    "duration": 3,
+    "maxTurnsActive": 3,
     "manaCost": 40,
-    "effects": {
-      "damage": 10,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "stun",
-          "chance": 0.25
-        }
-      ]
+    "damageTable": {
+      "physical": 5,
+      "raw": 5
     },
+    "debuffs": [
+      {
+        "name": "stun",
+        "chance": 0.25
+      }
+    ],
     "animation": {
       "sprite": "rocksDropper",
       "style": "static",
@@ -739,13 +699,9 @@
     "type": "defense",
     "proficiencyNeeded": "adept",
     "manaCost": 60,
-    "effects": {
-      "damage": null,
-      "buffs": [
-        "rock armor"
-      ],
-      "debuffs": null
-    },
+    "buffs": [
+      "rock armor"
+    ],
     "animation": {
       "glow": "#77484C20",
       "position": "self"
@@ -758,10 +714,9 @@
     "type": "offense",
     "proficiencyNeeded": "expert",
     "manaCost": 120,
-    "effects": {
-      "damage": 120,
-      "buffs": null,
-      "debuffs": null
+    "damageTable": {
+      "physical": 90,
+      "raw": 40
     },
     "animation": {
       "sprite": "fallingSpikes",
@@ -776,15 +731,11 @@
     "target": "area",
     "type": "defense",
     "proficiencyNeeded": "master",
-    "duration": 5,
+    "maxTurnsActive": 5,
     "manaCost": 120,
-    "effects": {
-      "damage": null,
-      "buffs": [
-        "projectile negation"
-      ],
-      "debuffs": null
-    },
+    "buffs": [
+      "projectile negation"
+    ],
     "animation": {
       "sprite": "rockWall",
       "style": "static",
@@ -798,16 +749,16 @@
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 650,
-    "effects": {
-      "damage": 175,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "heavy stun",
-          "chance": 1.0
-        }
-      ]
+    "damageTable": {
+      "physical": 120,
+      "raw": 75
     },
+    "debuffs": [
+      {
+        "name": "heavy stun",
+        "chance": 1.0
+      }
+    ],
     "animation": {
       "glow": "#77484895",
       "position": "field",
@@ -825,16 +776,16 @@
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 1200,
-    "effects": {
-      "damage": 400,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "heavy stun",
-          "chance": 1.0
-        }
-      ]
+    "damageTable": {
+      "physical": 330,
+      "raw": 100
     },
+    "debuffs": [
+      {
+        "name": "heavy stun",
+        "chance": 1.0
+      }
+    ],
     "animation": {
       "sprite": "rockCollider",
       "style": "static",

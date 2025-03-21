@@ -1,7 +1,7 @@
 import React from "react";
 import { useRouter } from "expo-router";
-import { Text, ThemedScrollView } from "../components/Themed";
-import { CharacterImage } from "../components/CharacterImage";
+import { Text, ThemedScrollView } from "@/components/Themed";
+import { CharacterImage } from "@/components/CharacterImage";
 import {
   Pressable,
   View,
@@ -13,19 +13,19 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useIsFocused } from "@react-navigation/native";
 import { observer } from "mobx-react-lite";
-import TutorialModal from "../components/TutorialModal";
+import TutorialModal from "@/components/TutorialModal";
 import { useHeaderHeight } from "@react-navigation/elements";
-import InventoryRender from "../components/InventoryRender";
-import { StatsDisplay } from "../components/StatsDisplay";
-import { Coins } from "../assets/icons/SVGIcons";
-import { MerchantType, TutorialOption } from "../utility/types";
-import ProgressBar from "../components/ProgressBar";
-import { shopColors } from "../constants/Colors";
-import { InventoryItem } from "../components/Draggable";
-import { useDraggableStore, useRootStore } from "../hooks/stores";
-import { useVibration } from "../hooks/generic";
-import type { Item } from "../entities/item";
-import { flex, shadows, tw, useStyles } from "../hooks/styles";
+import InventoryRender from "@/components/InventoryRender";
+import { StatsDisplay } from "@/components/StatsDisplay";
+import { Coins } from "@/assets/icons/SVGIcons";
+import { MerchantType, TutorialOption } from "@/utility/types";
+import ProgressBar from "@/components/ProgressBar";
+import { shopColors } from "@/constants/Colors";
+import { InventoryItem } from "@/components/Draggable";
+import { useDraggableStore, useRootStore } from "@/hooks/stores";
+import { useVibration } from "@/hooks/generic";
+import type { Item } from "@/entities/item";
+import { flex, normalize, shadows, tw, useStyles } from "@/hooks/styles";
 import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 import GenericFlatButton from "@/components/GenericFlatButton";
 
@@ -242,18 +242,16 @@ const ShopInteriorScreen = observer(() => {
         }}
       />
       <View
-        style={{ flex: 1, paddingBottom: uiStore.playerStatusHeightSecondary }}
+        style={{
+          flex: 1,
+          paddingBottom: uiStore.playerStatusHeightSecondary,
+        }}
       >
         <TouchableWithoutFeedback onPress={() => setDisplayItem(null)}>
           <View style={[flex.columnBetween, { flex: 1 }]}>
-            <View
-              style={[
-                flex.rowEvenly,
-                { flex: 1, height: "100%", paddingBottom: 8 },
-              ]}
-            >
+            <View style={[flex.rowEvenly, { flex: 1, height: "100%" }]}>
               <View style={[flex.columnCenter, styles.shopKeeperSection]}>
-                <View style={{ maxHeight: "70%", width: "100%" }}>
+                <View style={{ maxHeight: "90%", width: "100%" }}>
                   <CharacterImage
                     character={shopsStore.currentShop.shopKeeper}
                   />
@@ -325,10 +323,24 @@ const ShopInteriorScreen = observer(() => {
                 </ThemedScrollView>
               </View>
             </View>
-            <GenericFlatButton onPress={sellAllJunk}>
+            <GenericFlatButton
+              style={{ marginVertical: 4 }}
+              onPress={sellAllJunk}
+              childrenWhenDisabled={"No junk to sell"}
+              innerStyle={{
+                paddingVertical: normalize(2),
+                paddingHorizontal: 4,
+                borderRadius: 8,
+              }}
+              disabled={
+                playerState.baseInventory.filter(
+                  (item) => item.itemClass === "junk",
+                ).length === 0
+              }
+            >
               Sell all junk
             </GenericFlatButton>
-            <View style={{ flex: 1 }} collapsable={false}>
+            <View style={{ flex: 1, width: "100%" }} collapsable={false}>
               <InventoryRender
                 screen="shop"
                 displayItem={displayItem}

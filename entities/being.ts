@@ -28,6 +28,7 @@ import {
   getMagnitude,
 } from "@/utility/functions/conditions";
 import { BeingOptions } from "./entityTypes";
+import { Attack } from "./attack";
 
 export class Being {
   readonly id: string;
@@ -167,6 +168,9 @@ export class Being {
       changeBaseSanity: action,
       useMana: action,
 
+      damageTypeCalculation: action,
+      calculateAttackDamage: action,
+
       maxHealth: computed,
       maxMana: computed,
       maxSanity: computed,
@@ -180,6 +184,9 @@ export class Being {
       poisonResistance: computed,
       holyResistance: computed,
       magicResistance: computed,
+
+      physicalDamageReduction: computed,
+      physicalDamage: computed,
 
       fireDamage: computed,
       coldDamage: computed,
@@ -204,7 +211,6 @@ export class Being {
       totalArmor: computed,
       dodgeChance: computed,
       blockChance: computed,
-      physicalDamage: computed,
       isStunned: computed,
       isSilenced: computed,
       totalHealthRegen: computed,
@@ -587,7 +593,7 @@ export class Being {
     return baseArmor + addedArmor;
   }
 
-  public getPhysicalDamageReduction() {
+  get physicalDamageReduction() {
     const { armorMult, armorFlat } = getConditionEffectsOnDefenses(
       this.conditions,
     );
@@ -806,7 +812,6 @@ export class Being {
       ) + this.magicPower
     );
   }
-
   //---------------------------Conditions---------------------------//
   /**
    * Adds a condition to the creature's list of conditions. Sets the `on` property.
@@ -861,6 +866,88 @@ export class Being {
     return this.conditions.some((condition) =>
       condition.effect.includes("silenced"),
     );
+  }
+
+  //--------------------Combat-------------------//
+  public damageTypeCalculation(
+    type: DamageType,
+    attackDamage: number,
+    target?: Being,
+  ) {
+    if (target) {
+      switch (type) {
+        case DamageType.PHYSICAL:
+          return (
+            (this.physicalDamage + attackDamage) * 1 -
+            target.physicalDamageReduction
+          );
+        case DamageType.FIRE:
+          return (this.fireDamage + attackDamage) * 1 - target.fireResistance;
+        case DamageType.COLD:
+          return (this.coldDamage + attackDamage) * 1 - target.coldResistance;
+        case DamageType.LIGHTNING:
+          return (
+            (this.lightningDamage + attackDamage) * 1 -
+            target.lightningResistance
+          );
+        case DamageType.POISON:
+          return (
+            (this.poisonDamage + attackDamage) * 1 - target.poisonResistance
+          );
+        case DamageType.HOLY:
+          return (this.holyDamage + attackDamage) * 1 - target.holyResistance;
+        case DamageType.MAGIC:
+          return (this.magicDamage + attackDamage) * 1 - target.magicResistance;
+        case DamageType.RAW:
+          return attackDamage;
+      }
+    } else {
+      switch (type) {
+        case DamageType.PHYSICAL:
+          return this.physicalDamage + attackDamage;
+        case DamageType.FIRE:
+          return this.fireDamage + attackDamage;
+        case DamageType.COLD:
+          return this.coldDamage + attackDamage;
+        case DamageType.LIGHTNING:
+          return this.lightningDamage + attackDamage;
+        case DamageType.POISON:
+          return this.poisonDamage + attackDamage;
+        case DamageType.HOLY:
+          return this.holyDamage + attackDamage;
+        case DamageType.MAGIC:
+          return this.magicDamage + attackDamage;
+        case DamageType.RAW:
+          return attackDamage;
+      }
+    }
+  }
+
+  public calculateAttackDamage(
+    baseDamageMap: { [key in DamageType]?: number } | null,
+    target?: Being,
+  ) {
+    let cumulativeDamage = 0;
+    let damageMap: { [key in DamageType]?: number } = {};
+
+    if (!baseDamageMap) {
+      return { cumulativeDamage, damageMap };
+    }
+
+    Object.entries(baseDamageMap).forEach(([typeKey, amount]) => {
+      if (amount && amount > 0) {
+        const damageType = parseInt(typeKey) as DamageType;
+        const calculatedDamage = this.damageTypeCalculation(
+          damageType,
+          amount,
+          target,
+        );
+        damageMap[damageType] = calculatedDamage;
+        cumulativeDamage += Math.max(0, calculatedDamage);
+      }
+    });
+
+    return { cumulativeDamage, damageMap };
   }
 
   public static fromJSON(json: any): Being {

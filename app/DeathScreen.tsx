@@ -1,35 +1,35 @@
 import React from "react";
 import { Pressable, ScrollView, View } from "react-native";
-import { Text, ThemedView } from "../components/Themed";
-import deathMessages from "../assets/json/deathMessages.json";
+import { Text, ThemedView } from "@/components/Themed";
+import deathMessages from "@/assets/json/deathMessages.json";
 import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
-import { CharacterImage } from "../components/CharacterImage";
-import { wait } from "../utility/functions/misc";
-import GenericModal from "../components/GenericModal";
-import GenericFlatButton from "../components/GenericFlatButton";
-import { Element, ElementToString, PlayerClassOptions } from "../utility/types";
+import { CharacterImage } from "@/components/CharacterImage";
+import { wait } from "@/utility/functions/misc";
+import GenericModal from "@/components/GenericModal";
+import GenericFlatButton from "@/components/GenericFlatButton";
+import { Element, ElementToString, PlayerClassOptions } from "@/utility/types";
 import {
   NecromancerSkull,
   PaladinHammer,
   RangerIcon,
   WizardHat,
-} from "../assets/icons/SVGIcons";
-import BlessingDisplay from "../components/BlessingsDisplay";
+} from "@/assets/icons/SVGIcons";
+import BlessingDisplay from "@/components/BlessingsDisplay";
 import { Entypo } from "@expo/vector-icons";
-import Colors, { elementalColorMap } from "../constants/Colors";
-import { getStartingBaseStats } from "../utility/functions/characterAid";
+import Colors, { elementalColorMap } from "@/constants/Colors";
+import { getStartingBaseStats } from "@/utility/functions/characterAid";
 import {
   savePlayer,
   type Character,
   PlayerCharacter,
-} from "../entities/character";
-import { useRootStore } from "../hooks/stores";
-import { useVibration } from "../hooks/generic";
-import { Item } from "../entities/item";
+} from "@/entities/character";
+import { useRootStore } from "@/hooks/stores";
+import { useVibration } from "@/hooks/generic";
+import { Item } from "@/entities/item";
 import { useHeaderHeight } from "@react-navigation/elements";
-import CheckpointModal from "../components/CheckpointModal";
-import { flex, tw, useStyles } from "../hooks/styles";
+import CheckpointModal from "@/components/CheckpointModal";
+import { flex, tw, useStyles } from "@/hooks/styles";
 import { observer } from "mobx-react-lite";
 
 const DeathScreen = observer(() => {

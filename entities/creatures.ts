@@ -38,7 +38,7 @@ import {
   parseDamageTypeObject,
 } from "../utility/types";
 import { getRandomInt, toTitleCase } from "../utility/functions/misc";
-import { Attack } from "./attack";
+import { Attack, PerTargetUse } from "./attack";
 import { PlayerCharacter } from "./character";
 import { AttackUse } from "../utility/types";
 import { AnimationOptions } from "../utility/enemyHelpers";
@@ -66,7 +66,12 @@ export class Creature extends Being {
       id: observable,
       creatureSpecies: observable,
       attacks: computed,
+      nameReference: computed,
     });
+  }
+
+  get nameReference() {
+    return this.creatureSpecies;
   }
 
   /**
@@ -82,31 +87,10 @@ export class Creature extends Being {
         throw new Error(
           `No matching attack found for ${attackName} in creating a ${this.creatureSpecies}`,
         ); // name should be set before this
-      const {
-        name,
-        energyCost,
-        hitChance,
-        targets,
-        damageMult,
-        flatHealthDamage,
-        flatSanityDamage,
-        buffs,
-        debuffs,
-        summons,
-      } = foundAttack;
-
       const builtAttack = new Attack({
-        name,
-        energyCost,
-        hitChance,
-        targets: targets as "single" | "area" | "dual",
-        damageMult,
-        flatHealthDamage,
-        flatSanityDamage,
-        buffs,
-        debuffs,
-        summons,
-        user: this as unknown as Enemy | Minion,
+        ...foundAttack,
+        targets: foundAttack.targets as "area" | "single" | "dual",
+        user: this,
       });
       builtAttacks.push(builtAttack);
     });
@@ -138,38 +122,26 @@ export class Creature extends Being {
    * @param {PlayerCharacter | Minion | Enemy} params.target - The target to attack.
    * @returns {Object} - An object indicating the result of the turn, including the chosen attack.
    */
-  protected _takeTurn({ target }: { target: PlayerCharacter | Enemy[] }): {
-    attack?: Attack;
-    result: {
-      target: Enemy | PlayerCharacter | Minion;
-      result: AttackUse;
-      debuffs?: Condition[];
-      healed?: number;
-      damages?: {
-        physical: number;
-        fire: number;
-        cold: number;
-        lightning: number;
-        poison: number;
-        total: number;
-        sanity?: number;
-      };
-    }[];
-    buffs?: Condition[];
-    logString: string;
+  protected _takeTurn({ targets }: { targets: Being[] }): {
+    attack: Attack | null;
+    targetResults:
+      | {
+          target: Being;
+          use: PerTargetUse;
+        }[]
+      | null;
+    buffs: Condition[] | null;
+    log: string;
   } {
     const execute = this.conditions.find((cond) => cond.name == "execute");
     if (execute) {
       this.damageHealth({ attackerId: execute.placedbyID, damage: 9999 });
       this.endTurn();
       return {
-        result: Array.isArray(target)
-          ? target.map((enemy) => ({
-              target: enemy,
-              result: AttackUse.stunned,
-            }))
-          : [{ target: target, result: AttackUse.stunned }],
-        logString: `${toTitleCase(this.creatureSpecies)} was executed!`,
+        attack: null,
+        targetResults: null,
+        buffs: null,
+        log: `${toTitleCase(this.creatureSpecies)} was executed!`,
       };
     }
     if (this.isStunned) {
@@ -181,31 +153,27 @@ export class Creature extends Being {
       });
       this.endTurn();
       return {
-        result: Array.isArray(target)
-          ? target.map((enemy) => ({
-              target: enemy,
-              result: AttackUse.stunned,
-            }))
-          : [{ target: target, result: AttackUse.stunned }],
-        logString: `${toTitleCase(this.creatureSpecies)} was stunned!`,
+        attack: null,
+        buffs: null,
+        targetResults: targets.map((enemy) => ({
+          target: enemy,
+          use: { result: AttackUse.stunned },
+        })),
+        log: `${toTitleCase(this.creatureSpecies)} was stunned!`,
       };
     }
-    const targets = Array.isArray(target) ? target : [target];
-    const allTargets = targets.reduce(
-      (acc: (PlayerCharacter | Enemy | Minion)[], currentTarget) => {
-        acc.push(currentTarget);
-        if (currentTarget instanceof PlayerCharacter) {
-          acc.push(...(currentTarget.minionsAndPets || []));
-        } else {
-          acc.push(...(currentTarget.minions || []));
-        }
-        return acc;
-      },
-      [],
-    );
+    const allTargets = targets.reduce((acc: Being[], currentTarget) => {
+      acc.push(currentTarget);
+      if (currentTarget instanceof PlayerCharacter) {
+        acc.push(...(currentTarget.minionsAndPets || []));
+      } else if (currentTarget instanceof Enemy) {
+        acc.push(...(currentTarget.minions || []));
+      }
+      return acc;
+    }, []);
 
     const availableAttacks = this.attacks.filter(
-      (attack) => !this.currentMana || this.currentMana >= attack.energyCost,
+      (attack) => !this.currentMana || this.currentMana >= attack.manaCost,
     );
     if (availableAttacks.length > 0) {
       const { attack, numTargets } = this.chooseAttack(
@@ -218,19 +186,19 @@ export class Creature extends Being {
         numTargets,
       );
 
-      const res = attack.use({ targets: bestTargets });
+      const res = attack.use(bestTargets);
       this.endTurn();
       return { ...res, attack };
     } else {
       this.endTurn();
       return {
-        result: Array.isArray(target)
-          ? target.map((enemy) => ({
-              target: enemy,
-              result: AttackUse.lowEnergy,
-            }))
-          : [{ target: target, result: AttackUse.lowEnergy }],
-        logString: `${toTitleCase(this.creatureSpecies)} passed (low energy)!`,
+        attack: null,
+        buffs: null,
+        targetResults: targets.map((enemy) => ({
+          target: enemy,
+          use: { result: AttackUse.lowMana },
+        })),
+        log: `${toTitleCase(this.creatureSpecies)} passed (low energy)!`,
       };
     }
   }
@@ -240,22 +208,22 @@ export class Creature extends Being {
     numberOfPotentialTargets: number,
   ): { attack: Attack; numTargets: number } {
     const scoredAttacks = availableAttacks.map((attack) => {
-      const damage = attack.damage();
+      const damage = attack.displayDamage;
       const numTargets =
-        attack.attackStyle === "area"
+        attack.targets === "area"
           ? numberOfPotentialTargets
-          : attack.attackStyle === "dual"
+          : attack.targets === "dual"
           ? numberOfPotentialTargets > 1
             ? 2
             : 1
           : 1;
-      const totalDamage = damage.total * numTargets;
-      const heal = attack.buffs.filter((buff) => buff.effect.includes("heal"));
-      const nonHealBuffCount = attack.buffs.filter(
-        (buff) => !buff.effect.includes("heal"),
-      ).length;
-      const debuffCount = attack.debuffStrings.length;
-      const summonCount = attack.summons.length;
+      const totalDamage = damage.cumulative * numTargets;
+      const heal = attack.buffs?.filter((buff) => buff.effect.includes("heal"));
+      const nonHealBuffCount =
+        attack.buffs?.filter((buff) => !buff.effect.includes("heal")).length ??
+        0;
+      const debuffCount = attack.debuffNames?.length ?? 0;
+      const summonCount = attack.summonNames?.length ?? 0;
       const healthPercentage = this.currentHealth / this.baseHealth;
 
       // Calculate the priority score
@@ -321,7 +289,9 @@ export class Enemy extends Creature {
   private phases: Phase[];
   currentPhase: number;
   gotDrops: boolean;
+
   animationStrings: { [key: string]: AnimationOptions };
+
   drops: {
     item: string;
     itemType: ItemClassType;
@@ -448,7 +418,7 @@ export class Enemy extends Creature {
    * @returns {Object} - An object indicating the result of the turn, including the chosen attack.
    */
   public takeTurn({ player }: { player: PlayerCharacter }) {
-    return this._takeTurn({ target: player }); //this is done as a way to easily add additional effects, note this function in Minion
+    return this._takeTurn({ targets: [player] }); //this is done as a way to easily add additional effects, note this function in Minion
   }
 
   /**
@@ -566,7 +536,7 @@ export class Enemy extends Creature {
       creatureSpecies: minionObj.name,
       currentHealth: minionObj.health,
       baseHealth: minionObj.health,
-      currentMana: minionObj.energy?.maximum,
+      currentMana: minionObj.mana?.maximum,
       baseMana: minionObj.mana?.maximum,
       baseManaRegen: minionObj.mana?.regen,
       attackStrings: minionObj.attackStrings,
@@ -684,7 +654,7 @@ export class Minion extends Creature {
    * @returns {Object} - An object indicating the result of the turn, including the chosen attack.
    * @throws {Error} If the minion's lifespan has reached zero.
    */
-  public takeTurn({ target }: { target: PlayerCharacter | Enemy[] }) {
+  public takeTurn({ targets }: { targets: Being[] }) {
     if (this.turnsLeftAlive > 0) {
       if (
         !(
@@ -694,7 +664,7 @@ export class Minion extends Creature {
       ) {
         this.turnsLeftAlive--;
       }
-      return this._takeTurn({ target });
+      return this._takeTurn({ targets });
     } else {
       throw new Error("Minion not properly removed!");
     }

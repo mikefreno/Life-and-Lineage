@@ -1,8 +1,8 @@
 import { observer } from "mobx-react-lite";
-import { useRootStore } from "../../hooks/stores";
-import { useStyles } from "../../hooks/styles";
-import { Text } from "../../components/Themed";
-import GenericStrikeAround from "../../components/GenericStrikeAround";
+import { useRootStore } from "@/hooks/stores";
+import { useStyles } from "@/hooks/styles";
+import { Text } from "@/components/Themed";
+import GenericStrikeAround from "@/components/GenericStrikeAround";
 import { View, Switch, ScrollView } from "react-native";
 import Slider from "@react-native-community/slider";
 

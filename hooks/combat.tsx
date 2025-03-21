@@ -3,51 +3,45 @@ import { AttackUse, TutorialOption } from "../utility/types";
 import { toTitleCase, wait } from "../utility/functions/misc";
 import { useLootState, useTutorialState } from "../providers/DungeonData";
 import { useRootStore } from "./stores";
-import { Enemy, Minion } from "../entities/creatures";
-import { PlayerCharacter } from "../entities/character";
-import { Attack } from "../entities/attack";
+import { Creature, Enemy, Minion } from "../entities/creatures";
+import { Character, PlayerCharacter } from "../entities/character";
+import { Attack, PerTargetUse } from "../entities/attack";
 import { useIsFocused } from "@react-navigation/native";
-import { Spell } from "../entities/spell";
 import { AnimationOptions } from "@/utility/enemyHelpers";
 import { type Condition } from "@/entities/conditions";
+import { Being } from "@/entities/being";
 
 const attackHandler = ({
   attackResults,
   user,
 }: {
   attackResults: {
-    attack?: Attack;
-    result: {
-      target: Enemy | PlayerCharacter | Minion;
-      result: AttackUse;
-      debuffs?: Condition[];
-      healed?: number;
-      damages?: {
-        physical: number;
-        fire: number;
-        cold: number;
-        lightning: number;
-        poison: number;
-        total: number;
-        sanity?: number;
-      };
-    }[];
-    buffs?: Condition[];
-    logString: string;
+    attack: Attack | null;
+    targetResults:
+      | {
+          target: Being;
+          use: PerTargetUse;
+        }[]
+      | null;
+    buffs: Condition[] | null;
+    log: string;
   };
-  user: PlayerCharacter | Enemy | Minion;
+  user: Being;
 }) => {
   if (attackResults.buffs) {
     attackResults.buffs.forEach((buff) => user.addCondition(buff));
   }
-  for (const res of attackResults.result) {
-    res.target.damageHealth({
-      damage: res.damages?.total ?? 0,
-      attackerId: user.id,
-    });
-    res.target.damageSanity(res.damages?.sanity);
-    if (res.debuffs) {
-      res.debuffs.forEach((debuff) => res.target.addCondition(debuff));
+  if (!attackResults.targetResults) return;
+  for (const res of attackResults.targetResults) {
+    if ("damages" in res.use && res.use.damages) {
+      res.target.damageHealth({
+        damage: res.use.damages.total,
+        attackerId: user.id,
+      });
+      res.target.damageSanity(res.use.damages.sanity);
+      if (res.use.debuffs) {
+        res.use.debuffs.forEach((debuff) => res.target.addCondition(debuff));
+      }
     }
   }
 };
@@ -66,21 +60,22 @@ export const useEnemyManagement = () => {
     useTutorialState();
 
   const enemyDeathHandler = useCallback(
-    (enemy: Enemy) => {
-      if (!playerState) return false;
+    (enemy: Being) => {
+      if (!playerState || enemy instanceof Minion) return false;
 
       if (
         enemy.currentHealth <= 0 ||
         (enemy.currentSanity && enemy.currentSanity <= 0)
       ) {
         dungeonStore.addLog(
-          `You defeated the ${toTitleCase(enemy.creatureSpecies)}`,
+          `You defeated ${enemy instanceof Creature ? "the" : ""} ${toTitleCase(
+            ((enemy as Creature) || Character).nameReference,
+          )}`,
         );
 
-        const { itemDrops, storyDrops, gold } = enemy.getDrops(
-          playerState,
-          dungeonStore.fightingBoss,
-        );
+        const { itemDrops, storyDrops, gold } = (
+          enemy as Enemy | Character
+        ).getDrops(playerState, dungeonStore.fightingBoss);
 
         wait(500).then(() => {
           if (itemDrops) {
@@ -130,9 +125,9 @@ export const useEnemyManagement = () => {
 
     suppliedMinions.forEach((minion, index) => {
       wait(1000 * index).then(() => {
-        const results = minion.takeTurn({ target: playerState });
+        const results = minion.takeTurn({ target: [playerState] });
         attackHandler({ attackResults: results, user: minion });
-        dungeonStore.addLog("(minion) " + results.logString);
+        dungeonStore.addLog("(minion) " + results.log);
       });
     });
   };
@@ -141,14 +136,15 @@ export const useEnemyManagement = () => {
     enemyStore.enemies.forEach((enemy, index) => {
       wait(1000 * index).then(() => {
         if (!enemyDeathHandler(enemy)) {
-          const enemyAttackRes = enemy.takeTurn({ player: playerState! });
+          const enemyAttackRes = (enemy as Enemy).takeTurn({
+            player: playerState!,
+          });
           const animStore = enemyStore.getAnimationStore(enemy.id);
           let animationForAttack: AnimationOptions = "attack_1";
           if (enemyAttackRes.attack && enemyAttackRes.attack.name) {
             animationForAttack =
-              (enemy.animationStrings[
-                enemyAttackRes.attack.name
-              ] as AnimationOptions) ?? "attack_1";
+              (enemyAttackRes.attack.animation as AnimationOptions | null) ??
+              "attack_1";
           }
 
           setTimeout(
@@ -181,9 +177,10 @@ export const useEnemyManagement = () => {
               case AttackUse.stunned:
                 animStore?.setTextString("STUNNED!");
                 break;
-              case AttackUse.lowEnergy:
+              case AttackUse.lowMana:
                 animStore?.setTextString(
-                  enemy.creatureSpecies !== "training dummy"
+                  (enemy as Enemy | Character).nameReference !==
+                    "training dummy"
                     ? "EXHAUSTED!"
                     : "*STARE*",
                 );
@@ -191,7 +188,7 @@ export const useEnemyManagement = () => {
             }
           }
 
-          dungeonStore.addLog(enemyAttackRes.logString);
+          dungeonStore.addLog(enemyAttackRes.log);
 
           enemyMinionsTurn(enemy.minions, enemy, playerState!);
 
@@ -218,11 +215,12 @@ export const useCombatActions = () => {
 
       minions?.forEach(async (minion, idx) => {
         await wait(1000 * idx);
-        const result = minion.takeTurn({ target: enemyStore.enemies });
+        const result = minion.takeTurn({ targets: enemyStore.enemies });
         attackHandler({ attackResults: result, user: minion });
-        for (const res of result.result) {
+        if (!result.targetResults) return;
+        for (const res of result.targetResults) {
           const animStore = enemyStore.getAnimationStore(res.target.id);
-          switch (res.result) {
+          switch (res.use.result) {
             case AttackUse.success:
               animStore?.addToAnimationQueue("hurt");
               break;
@@ -234,11 +232,11 @@ export const useCombatActions = () => {
               break;
             case AttackUse.stunned:
               break;
-            case AttackUse.lowEnergy:
+            case AttackUse.lowMana:
               break;
           }
         }
-        dungeonStore.addLog(`(minion) ${result.logString}`);
+        dungeonStore.addLog(`(minion) ${result.log}`);
       });
       callback();
     },
@@ -246,64 +244,44 @@ export const useCombatActions = () => {
   );
 
   const handleAttackResult = useCallback(
-    (attackOrSpell: Attack | Spell, targets: (Enemy | Minion)[]) => {
-      if (attackOrSpell instanceof Attack) {
-        const { result, logString, buffs } = attackOrSpell.use({ targets });
-
-        buffs?.forEach((buff) => playerState?.addCondition(buff));
-        for (const res of result) {
-          const animStore = enemyStore.getAnimationStore(res.target.id);
-          switch (res.result) {
-            case AttackUse.success:
-              if ((res.damages?.total ?? 0) >= res.target.currentHealth) {
-                animStore?.addToAnimationQueue("death");
-              } else {
-                animStore?.addToAnimationQueue("hurt");
-              }
-              res.target.damageHealth({
-                damage: res.damages?.total ?? 0,
-                attackerId: attackOrSpell.user.id,
-              });
-              res.target.damageSanity(res.damages?.sanity);
-              break;
-            case AttackUse.miss:
-              animStore?.addToAnimationQueue("dodge");
-              playerAnimationStore.setTextString("MISS!");
-              break;
-            case AttackUse.block:
-              animStore?.addToAnimationQueue("block");
-              playerAnimationStore.setTextString("BLOCKED!");
-              break;
-            case AttackUse.stunned:
-              //should not enter, if the player is stunned, they shouldn't be able to attack
-              console.error("Player attack use returned stunned fail");
-              break;
-            case AttackUse.lowEnergy:
-              //should not enter, blocked if mana is low
-              console.error("Player attack use returned lowEnergy fail");
-              break;
-          }
-        }
-        return logString;
-      }
-
-      const { logString, targetResults, buffs } = attackOrSpell.use({
-        targets,
-        user: playerState!,
-      });
+    (attack: Attack, targets: Being[]) => {
+      const { targetResults, log, buffs } = attack.use(targets);
 
       buffs?.forEach((buff) => playerState?.addCondition(buff));
-
       for (const res of targetResults) {
-        res.target.damageHealth({
-          damage: res.damage ?? 0,
-          attackerId: playerState!.id,
-        });
-        res.target.damageSanity(res.damage);
-        res.debuffs.forEach((debuff) => res.target.addCondition(debuff));
+        const animStore = enemyStore.getAnimationStore(res.target.id);
+        switch (res.use.result) {
+          case AttackUse.success:
+            if ((res.use.damages?.total ?? 0) >= res.target.currentHealth) {
+              animStore?.addToAnimationQueue("death");
+            } else {
+              animStore?.addToAnimationQueue("hurt");
+            }
+            res.target.damageHealth({
+              damage: res.use.damages?.total ?? 0,
+              attackerId: attack.user.id,
+            });
+            res.target.damageSanity(res.use.damages?.sanity);
+            break;
+          case AttackUse.miss:
+            animStore?.addToAnimationQueue("dodge");
+            playerAnimationStore.setTextString("MISS!");
+            break;
+          case AttackUse.block:
+            animStore?.addToAnimationQueue("block");
+            playerAnimationStore.setTextString("BLOCKED!");
+            break;
+          case AttackUse.stunned:
+            //should not enter, if the player is stunned, they shouldn't be able to attack
+            console.error("Player attack use returned stunned fail");
+            break;
+          case AttackUse.lowMana:
+            //should not enter, blocked if mana is low
+            console.error("Player attack use returned lowEnergy fail");
+            break;
+        }
       }
-
-      return logString;
+      return log;
     },
     [playerState],
   );
@@ -326,23 +304,22 @@ export const useCombatActions = () => {
   );
 
   const useAttack = useCallback(
-    ({
-      attackOrSpell,
-      target,
-    }: {
-      attackOrSpell: Attack | Spell;
-      target: Enemy | Minion;
-    }) => {
+    ({ attack, targets }: { attack: Attack; targets: Being[] }) => {
       if (!playerState || !isFocused) return;
 
       const continueAttackFlow = () => {
-        const logString = handleAttackResult(attackOrSpell, [target]);
+        const logString = handleAttackResult(attack, targets);
         dungeonStore.addLog(logString);
 
-        const targetEnemy = enemyStore.enemies.find((e) => e.id === target.id);
-        if (targetEnemy && targetEnemy.currentHealth <= 0) {
-          enemyDeathHandler(targetEnemy);
-        }
+        // skip in case of killed enemy
+        targets.forEach((target) => {
+          if (
+            target.currentHealth <= 0 &&
+            (target instanceof Enemy || target instanceof Character)
+          ) {
+            enemyDeathHandler(target);
+          }
+        });
 
         setTimeout(() => {
           playerMinionsTurn(() => {
@@ -355,9 +332,18 @@ export const useCombatActions = () => {
         }, 500);
       };
 
-      if (attackOrSpell.animation) {
+      if (attack.animation && typeof attack.animation !== "string") {
+        // gather target ids, sans minions
+        const targetIDs: string[] = [];
+        targets.forEach((target) => {
+          if (target instanceof Enemy || target instanceof Character) {
+            // minions have their own death handler
+            targetIDs.push(target.id);
+          }
+        });
+
         playerAnimationStore
-          .setAnimation({ set: attackOrSpell.animation, enemyIDs: [target.id] })
+          .setAnimation({ set: attack.animation, enemyIDs: targetIDs })
           .then(() => {
             continueAttackFlow();
           });

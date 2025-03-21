@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Text } from "../../components/Themed";
+import { Text } from "@/components/Themed";
 import {
   Pressable,
   ScrollView,
@@ -12,17 +12,17 @@ import {
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { useIsFocused } from "@react-navigation/native";
-import TutorialModal from "../../components/TutorialModal";
-import { toTitleCase, wait } from "../../utility/functions/misc";
+import TutorialModal from "@/components/TutorialModal";
+import { toTitleCase, wait } from "@/utility/functions/misc";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { observer } from "mobx-react-lite";
-import ThemedCard from "../../components/ThemedCard";
-import { TutorialOption } from "../../utility/types";
-import PlatformDependantBlurView from "../../components/PlatformDependantBlurView";
-import { useVibration } from "../../hooks/generic";
-import type { DungeonInstance } from "../../entities/dungeon";
-import { useRootStore } from "../../hooks/stores";
-import { flex, tw_base, useStyles } from "../../hooks/styles";
+import ThemedCard from "@/components/ThemedCard";
+import { TutorialOption } from "@/utility/types";
+import PlatformDependantBlurView from "@/components/PlatformDependantBlurView";
+import { useVibration } from "@/hooks/generic";
+import type { DungeonInstance } from "@/entities/dungeon";
+import { useRootStore } from "@/hooks/stores";
+import { flex, tw_base, useStyles } from "@/hooks/styles";
 import GenericFlatButton from "@/components/GenericFlatButton";
 import Colors from "@/constants/Colors";
 import { AntDesign } from "@expo/vector-icons";

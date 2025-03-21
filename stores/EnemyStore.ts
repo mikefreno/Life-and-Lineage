@@ -158,7 +158,7 @@ export default class EnemyStore {
     this.saveEnemy(enemy);
   }
 
-  public removeEnemy(enemy: Enemy) {
+  public removeEnemy(enemy: Being) {
     this.animationStoreMap.delete(enemy.id);
     this.enemies = this.enemies.filter((e) => e.id !== enemy.id);
     this.clearPersistedEnemy(enemy.id);

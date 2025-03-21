@@ -1,26 +1,26 @@
 import React from "react";
 import { Pressable, ScrollView, View } from "react-native";
-import { Text } from "../../components/Themed";
+import { Text } from "@/components/Themed";
 import { useState } from "react";
 import { useRouter } from "expo-router";
-import TutorialModal from "../../components/TutorialModal";
-import { DescriptionMap } from "../../utility/descriptions";
+import TutorialModal from "@/components/TutorialModal";
+import { DescriptionMap } from "@/utility/descriptions";
 import {
   Element,
   ElementToString,
   PlayerClassOptions,
   TutorialOption,
-} from "../../utility/types";
+} from "@/utility/types";
 
-import BlessingDisplay from "../../components/BlessingsDisplay";
-import { toTitleCase } from "../../utility/functions/misc";
-import { elementalColorMap, playerClassColors } from "../../constants/Colors";
+import BlessingDisplay from "@/components/BlessingsDisplay";
+import { toTitleCase } from "@/utility/functions/misc";
+import { elementalColorMap, playerClassColors } from "@/constants/Colors";
 import { useIsFocused } from "@react-navigation/native";
-import { useVibration } from "../../hooks/generic";
-import { useRootStore } from "../../hooks/stores";
-import { useNewGameStore } from "./_layout";
-import { tw_base, useStyles } from "../../hooks/styles";
-import GenericFlatButton from "../../components/GenericFlatButton";
+import { useVibration } from "@/hooks/generic";
+import { useRootStore } from "@/hooks/stores";
+import { useNewGameStore } from "@/app/NewGame/_layout";
+import { tw_base, useStyles } from "@/hooks/styles";
+import GenericFlatButton from "@/components/GenericFlatButton";
 import NewGameMetaControls from "@/components/NewGameMetaControls";
 
 export default function SetBlessing() {

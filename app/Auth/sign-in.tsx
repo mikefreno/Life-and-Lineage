@@ -8,23 +8,18 @@ import {
   View,
 } from "react-native";
 import { useState } from "react";
-import GenericRaisedButton from "../../components/GenericRaisedButton";
+import GenericRaisedButton from "@/components/GenericRaisedButton";
 import { useRouter } from "expo-router";
 import { observer } from "mobx-react-lite";
-import { API_BASE_URL } from "../../config/config";
+import { API_BASE_URL } from "@/config/config";
 import * as AppleAuthentication from "expo-apple-authentication";
-import { GoogleIcon } from "../../assets/icons/SVGIcons";
-import D20DieAnimation from "../../components/DieRollAnim";
-import { ThemedView, Text } from "../../components/Themed";
+import { GoogleIcon } from "@/assets/icons/SVGIcons";
+import D20DieAnimation from "@/components/DieRollAnim";
+import { ThemedView, Text } from "@/components/Themed";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { wait } from "../../utility/functions/misc";
-import { useRootStore } from "../../hooks/stores";
-import {
-  normalize,
-  normalizeLineHeight,
-  tw,
-  useStyles,
-} from "../../hooks/styles";
+import { wait } from "@/utility/functions/misc";
+import { useRootStore } from "@/hooks/stores";
+import { normalize, normalizeLineHeight, tw, useStyles } from "@/hooks/styles";
 import React from "react";
 import { runInAction } from "mobx";
 import Colors from "@/constants/Colors";

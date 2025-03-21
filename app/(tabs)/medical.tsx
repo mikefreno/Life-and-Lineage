@@ -1,17 +1,17 @@
 import React from "react";
-import healthOptions from "../../assets/json/medicalOptions/healthOptions.json";
-import manaOptions from "../../assets/json/medicalOptions/manaOptions.json";
-import sanityOptions from "../../assets/json/medicalOptions/sanityOptions.json";
-import otherOptions from "../../assets/json/medicalOptions/otherOptions.json";
-import MedicalOption from "../../components/MedicalOptions";
+import healthOptions from "@/assets/json/medicalOptions/healthOptions.json";
+import manaOptions from "@/assets/json/medicalOptions/manaOptions.json";
+import sanityOptions from "@/assets/json/medicalOptions/sanityOptions.json";
+import otherOptions from "@/assets/json/medicalOptions/otherOptions.json";
+import MedicalOption from "@/components/MedicalOptions";
 import { useIsFocused } from "@react-navigation/native";
-import TutorialModal from "../../components/TutorialModal";
+import TutorialModal from "@/components/TutorialModal";
 import { ScrollView, View } from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
-import GenericStrikeAround from "../../components/GenericStrikeAround";
-import { TutorialOption } from "../../utility/types";
+import GenericStrikeAround from "@/components/GenericStrikeAround";
+import { TutorialOption } from "@/utility/types";
 import { observer } from "mobx-react-lite";
-import { useRootStore } from "../../hooks/stores";
+import { useRootStore } from "@/hooks/stores";
 
 const MedicalScreen = observer(() => {
   const isFocused = useIsFocused();
