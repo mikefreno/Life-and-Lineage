@@ -6,7 +6,7 @@ import { useRootStore } from "@/hooks/stores";
 import { useVibration } from "@/hooks/generic";
 import { useIsFocused } from "@react-navigation/native";
 import { useState } from "react";
-import { Pressable, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { Text } from "@/components/Themed";
 import { playerClassColors } from "@/constants/Colors";
 import { toTitleCase } from "@/utility/functions/misc";
@@ -46,105 +46,107 @@ export default function SetSex() {
           body: "However, if you have a child, you can live on through the child, retaining much of what has been achieved in your previous life.",
         }}
       />
-      <View style={styles.newGameContainer}>
-        <Text style={[tw.px2, styles.newGameHeader]}>
-          Set the sex of your{" "}
-          <Text
-            style={[
-              styles.newGameHeader,
-              { color: playerClassColors[classSelection] },
-            ]}
-          >
-            {toTitleCase(classSelection)}
+      <ScrollView>
+        <View style={styles.newGameContainer}>
+          <Text style={[tw.px2, styles.newGameHeader]}>
+            Set the sex of your{" "}
+            <Text
+              style={[
+                styles.newGameHeader,
+                { color: playerClassColors[classSelection] },
+              ]}
+            >
+              {toTitleCase(classSelection)}
+            </Text>
           </Text>
-        </Text>
-        <View style={styles.sexSelectionRow}>
-          <Pressable
-            onPress={() => {
-              setSex("male");
-              vibration({ style: "light" });
-            }}
-            style={{ width: "50%" }}
-            accessibilityRole="button"
-            accessibilityLabel="Select Male"
-          >
-            {({ pressed }) => (
-              <View
-                style={[
-                  styles.sexOption,
-                  pressed || sex == "male"
-                    ? {
-                        borderRadius: 8,
-                        borderColor: uiStore.isDark ? "#fafafa" : "#27272a",
-                      }
-                    : { borderColor: "transparent" },
-                ]}
-              >
-                <View style={{ marginHorizontal: "auto" }}>
-                  <Foundation
-                    name="male-symbol"
-                    size={90}
-                    color={playerClassColors[classSelection]}
-                  />
+          <View style={styles.sexSelectionRow}>
+            <Pressable
+              onPress={() => {
+                setSex("male");
+                vibration({ style: "light" });
+              }}
+              style={{ width: "50%" }}
+              accessibilityRole="button"
+              accessibilityLabel="Select Male"
+            >
+              {({ pressed }) => (
+                <View
+                  style={[
+                    styles.sexOption,
+                    pressed || sex == "male"
+                      ? {
+                          borderRadius: 8,
+                          borderColor: uiStore.isDark ? "#fafafa" : "#27272a",
+                        }
+                      : { borderColor: "transparent" },
+                  ]}
+                >
+                  <View style={{ marginHorizontal: "auto" }}>
+                    <Foundation
+                      name="male-symbol"
+                      size={90}
+                      color={playerClassColors[classSelection]}
+                    />
+                  </View>
+                  <Text style={{ textAlign: "center", ...styles["text-lg"] }}>
+                    Male
+                  </Text>
                 </View>
-                <Text style={{ textAlign: "center", ...styles["text-lg"] }}>
-                  Male
-                </Text>
-              </View>
-            )}
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              setSex("female");
-              vibration({ style: "light" });
-            }}
-            style={{
-              width: "50%",
-              marginHorizontal: "auto",
-            }}
-            accessibilityRole="button"
-            accessibilityLabel="Select Female"
-          >
-            {({ pressed }) => (
-              <View
-                style={[
-                  styles.sexOption,
-                  pressed || sex == "female"
-                    ? {
-                        borderRadius: 8,
-                        borderColor: uiStore.isDark ? "#fafafa" : "#27272a",
-                      }
-                    : { borderColor: "transparent" },
-                ]}
-              >
-                <View style={{ marginHorizontal: "auto" }}>
-                  <Foundation
-                    name="female-symbol"
-                    size={90}
-                    color={playerClassColors[classSelection]}
-                  />
+              )}
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                setSex("female");
+                vibration({ style: "light" });
+              }}
+              style={{
+                width: "50%",
+                marginHorizontal: "auto",
+              }}
+              accessibilityRole="button"
+              accessibilityLabel="Select Female"
+            >
+              {({ pressed }) => (
+                <View
+                  style={[
+                    styles.sexOption,
+                    pressed || sex == "female"
+                      ? {
+                          borderRadius: 8,
+                          borderColor: uiStore.isDark ? "#fafafa" : "#27272a",
+                        }
+                      : { borderColor: "transparent" },
+                  ]}
+                >
+                  <View style={{ marginHorizontal: "auto" }}>
+                    <Foundation
+                      name="female-symbol"
+                      size={90}
+                      color={playerClassColors[classSelection]}
+                    />
+                  </View>
+                  <Text style={{ textAlign: "center", ...styles["text-lg"] }}>
+                    Female
+                  </Text>
                 </View>
-                <Text style={{ textAlign: "center", ...styles["text-lg"] }}>
-                  Female
-                </Text>
-              </View>
-            )}
-          </Pressable>
+              )}
+            </Pressable>
+          </View>
+          <GenericFlatButton
+            onPress={() => {
+              vibration({ style: "light" });
+              router.push("/NewGame/NameSelect");
+            }}
+            accessibilityRole="link"
+            accessibilityLabel="Next"
+            disabled={!sex}
+            childrenWhenDisabled={"Select sex to continue"}
+            style={{ marginTop: tw_base[3] }}
+          >
+            Next
+          </GenericFlatButton>
         </View>
-        <GenericFlatButton
-          onPress={() => {
-            vibration({ style: "light" });
-            router.push("/NewGame/NameSelect");
-          }}
-          accessibilityRole="link"
-          accessibilityLabel="Next"
-          disabled={!sex}
-          childrenWhenDisabled={"Select sex to continue"}
-          style={{ marginTop: tw_base[3] }}
-        >
-          Next
-        </GenericFlatButton>
-      </View>
+      </ScrollView>
       <NewGameMetaControls
         forceShowTutorial={() => setForceShowTutorial(true)}
       />

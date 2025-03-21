@@ -26,7 +26,7 @@ export default function BattleTabControls({
   const attacksOrNavigationStyle = useMemo(
     () => ({
       width: "33.333%" as DimensionValue,
-      paddingVertical: normalize(12),
+      paddingVertical: normalize(10),
       ...getBackgroundColor("attacksOrNavigation"),
     }),
     [battleTab, getBackgroundColor],
@@ -35,7 +35,7 @@ export default function BattleTabControls({
   const equipmentStyle = useMemo(
     () => ({
       width: "33.333%" as DimensionValue,
-      paddingVertical: normalize(12),
+      paddingVertical: normalize(10),
       ...getBackgroundColor("equipment"),
     }),
     [battleTab, getBackgroundColor],
@@ -44,7 +44,7 @@ export default function BattleTabControls({
   const logStyle = useMemo(
     () => ({
       width: "33.333%" as DimensionValue,
-      paddingVertical: normalize(12),
+      paddingVertical: normalize(10),
       ...getBackgroundColor("log"),
     }),
     [battleTab, getBackgroundColor],

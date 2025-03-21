@@ -1,5 +1,5 @@
 import { Text } from "@/components/Themed";
-import { Pressable, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { useNavigation } from "expo-router";
 import clearHistory, { toTitleCase, wait } from "@/utility/functions/misc";
 import {
@@ -72,7 +72,7 @@ export default function NewGameReview() {
 
   if (blessingSelection !== undefined && classSelection !== undefined) {
     return (
-      <>
+      <ScrollView>
         <View style={styles.newGameContainer}>
           <Text style={styles.newGameHeader}>
             {`${firstName} ${lastName} the `}
@@ -112,7 +112,7 @@ export default function NewGameReview() {
           </GenericFlatButton>
         </View>
         <NewGameMetaControls />
-      </>
+      </ScrollView>
     );
   }
 }

@@ -23,7 +23,7 @@ import { observer } from "mobx-react-lite";
 import GenericStrikeAround from "@/components/GenericStrikeAround";
 import { useRootStore } from "@/hooks/stores";
 import type { Character } from "@/entities/character";
-import { flex, normalize, tw_base, useStyles } from "@/hooks/styles";
+import { flex, normalize, tw_base, useStyles } from "../hooks/styles";
 import TutorialModal from "@/components/TutorialModal";
 import { useIsFocused } from "@react-navigation/native";
 import { TutorialOption } from "@/utility/types";

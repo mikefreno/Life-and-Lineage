@@ -75,7 +75,15 @@ const ShopsScreen = observer(() => {
               justifyContent: "center",
             }}
           >
-            <CharacterImage character={shop.shopKeeper} />
+            <View
+              style={{
+                width: uiStore.dimensions.lesser * 0.4,
+                height: uiStore.dimensions.lesser * 0.4,
+                alignSelf: "center",
+              }}
+            >
+              <CharacterImage character={shop.shopKeeper} />
+            </View>
             <Text
               style={[
                 styles["text-lg"],

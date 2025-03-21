@@ -107,7 +107,7 @@ const InventoryRender = observer(
         itemSize,
         slotPositions,
       };
-    }, [draggableClassStore.inventoryBounds]);
+    }, [draggableClassStore.inventoryBounds, uiStore.dimensions]);
 
     useEffect(() => {
       Platform.OS === "ios" &&
@@ -124,7 +124,7 @@ const InventoryRender = observer(
         setTimeout(
           () =>
             runInAction(() => (uiStore.storeLoadingStatus["inventory"] = true)),
-          100,
+          50,
         );
       }
     }, [

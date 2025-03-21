@@ -115,7 +115,15 @@ export const CharacterInteractionModal = observer(
             <Text style={{ textAlign: "center", ...styles["text-xl"] }}>
               {character.fullName}
             </Text>
-            <CharacterImage character={character} />
+            <View
+              style={{
+                width: uiStore.dimensions.lesser * 0.3,
+                height: uiStore.dimensions.lesser * 0.3,
+                alignSelf: "center",
+              }}
+            >
+              <CharacterImage character={character} />
+            </View>
             {showAssaultWarning ? (
               <AssaultWarningSection
                 character={character}

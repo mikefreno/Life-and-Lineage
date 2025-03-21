@@ -819,6 +819,7 @@ export function StatsDisplay({
             left: animatedLeft,
             top: animatedTop,
             opacity: animatedOpacity,
+            zIndex: 9999,
             transform: [{ scale: animatedScale }, { perspective: 1000 }],
           },
         ]}

@@ -16,7 +16,7 @@ import { PlayerStatusModal } from "./Modal";
 
 const PlayerStatusForSecondary = observer(() => {
   const root = useRootStore();
-  const { playerState, uiStore } = root;
+  const { playerState, uiStore, dungeonStore } = root;
   const styles = useStyles();
 
   const vibration = useVibration();
@@ -44,38 +44,46 @@ const PlayerStatusForSecondary = observer(() => {
               paddingHorizontal: 8,
             }}
           >
-            <View
-              style={{
-                height: uiStore.expansionPadding,
-                ...styles.rowCenter,
-              }}
-            >
-              <View style={[styles.rowCenter, { alignItems: "center" }]}>
-                <Text>{playerState.readableGold}</Text>
-                <ChangePopUp
-                  popUp={"gold"}
-                  change={statChanges.gold}
-                  animationCycler={animationCycler}
-                  colorScheme={uiStore.colorScheme}
-                />
-                <Coins
-                  width={uiStore.iconSizeSmall}
-                  height={uiStore.iconSizeSmall}
-                  style={{ marginLeft: 6 }}
-                />
-              </View>
-              {playerState.unAllocatedSkillPoints > 0 && (
-                <View style={{ paddingHorizontal: 4, marginVertical: "auto" }}>
-                  <SquarePlus
-                    height={uiStore.iconSizeSmall}
+            {!(
+              uiStore.dimensions.height < 500 &&
+              uiStore.isLandscape &&
+              dungeonStore.isInDungeon
+            ) && (
+              <View
+                style={{
+                  height: uiStore.expansionPadding,
+                  ...styles.rowCenter,
+                }}
+              >
+                <View style={[styles.rowCenter, { alignItems: "center" }]}>
+                  <Text>{playerState.readableGold}</Text>
+                  <ChangePopUp
+                    popUp={"gold"}
+                    change={statChanges.gold}
+                    animationCycler={animationCycler}
+                    colorScheme={uiStore.colorScheme}
+                  />
+                  <Coins
                     width={uiStore.iconSizeSmall}
+                    height={uiStore.iconSizeSmall}
+                    style={{ marginLeft: 6 }}
                   />
                 </View>
-              )}
-              <View>
-                <ConditionRenderer />
+                {playerState.unAllocatedSkillPoints > 0 && (
+                  <View
+                    style={{ paddingHorizontal: 4, marginVertical: "auto" }}
+                  >
+                    <SquarePlus
+                      height={uiStore.iconSizeSmall}
+                      width={uiStore.iconSizeSmall}
+                    />
+                  </View>
+                )}
+                <View>
+                  <ConditionRenderer />
+                </View>
               </View>
-            </View>
+            )}
             <View style={styles.statsRow}>
               <View
                 style={{

@@ -39,24 +39,9 @@ export default function EquipmentDisplay({
   const styles = useStyles();
 
   if (playerState) {
-    return (
-      <View
-        style={{
-          paddingVertical: normalize(8),
-          zIndex: 10,
-          flexDirection: "row",
-          justifyContent: "space-evenly",
-          width: "70%",
-          alignSelf: "center",
-        }}
-      >
-        <View style={styles.columnCenter}>
-          <View
-            style={{
-              height: uiStore.itemBlockSize + normalizeLineHeight(20), // size of an EquipmentSlot
-              width: uiStore.itemBlockSize,
-            }}
-          />
+    if (uiStore.dimensions.height < 400 && uiStore.isLandscape) {
+      return (
+        <View style={styles.rowEvenly}>
           <EquipmentSlot
             slot={"Main-Hand"}
             playerState={playerState}
@@ -65,8 +50,6 @@ export default function EquipmentDisplay({
             setDisplayItem={setDisplayItem}
             inventoryBounds={draggableClassStore.inventoryBounds}
           />
-        </View>
-        <View style={styles.columnBetween}>
           <EquipmentSlot
             slot="Head"
             playerState={playerState}
@@ -75,29 +58,14 @@ export default function EquipmentDisplay({
             setDisplayItem={setDisplayItem}
             inventoryBounds={draggableClassStore.inventoryBounds}
           />
-
-          <View style={{ paddingTop: "30%" }}>
-            <EquipmentSlot
-              slot={"Body"}
-              playerState={playerState}
-              uiStore={uiStore}
-              draggableClassStore={draggableClassStore}
-              setDisplayItem={setDisplayItem}
-              inventoryBounds={draggableClassStore.inventoryBounds}
-            />
-          </View>
-        </View>
-        <View style={styles.columnCenter}>
-          <View style={{ marginRight: "-50%" }}>
-            <EquipmentSlot
-              slot="Quiver"
-              playerState={playerState}
-              uiStore={uiStore}
-              draggableClassStore={draggableClassStore}
-              setDisplayItem={setDisplayItem}
-              inventoryBounds={draggableClassStore.inventoryBounds}
-            />
-          </View>
+          <EquipmentSlot
+            slot={"Body"}
+            playerState={playerState}
+            uiStore={uiStore}
+            draggableClassStore={draggableClassStore}
+            setDisplayItem={setDisplayItem}
+            inventoryBounds={draggableClassStore.inventoryBounds}
+          />
           <EquipmentSlot
             slot={"Off-Hand"}
             playerState={playerState}
@@ -106,9 +74,88 @@ export default function EquipmentDisplay({
             setDisplayItem={setDisplayItem}
             inventoryBounds={draggableClassStore.inventoryBounds}
           />
+          <EquipmentSlot
+            slot="Quiver"
+            playerState={playerState}
+            uiStore={uiStore}
+            draggableClassStore={draggableClassStore}
+            setDisplayItem={setDisplayItem}
+            inventoryBounds={draggableClassStore.inventoryBounds}
+          />
         </View>
-      </View>
-    );
+      );
+    } else {
+      return (
+        <View
+          style={{
+            paddingVertical: normalize(8),
+            zIndex: 10,
+            flexDirection: "row",
+            justifyContent: "space-evenly",
+            width: "70%",
+            alignSelf: "center",
+          }}
+        >
+          <View style={styles.columnCenter}>
+            <View
+              style={{
+                height: uiStore.itemBlockSize + normalizeLineHeight(20), // size of an EquipmentSlot
+                width: uiStore.itemBlockSize,
+              }}
+            />
+            <EquipmentSlot
+              slot={"Main-Hand"}
+              playerState={playerState}
+              uiStore={uiStore}
+              draggableClassStore={draggableClassStore}
+              setDisplayItem={setDisplayItem}
+              inventoryBounds={draggableClassStore.inventoryBounds}
+            />
+          </View>
+          <View style={styles.columnBetween}>
+            <EquipmentSlot
+              slot="Head"
+              playerState={playerState}
+              uiStore={uiStore}
+              draggableClassStore={draggableClassStore}
+              setDisplayItem={setDisplayItem}
+              inventoryBounds={draggableClassStore.inventoryBounds}
+            />
+
+            <View style={{ paddingTop: "30%" }}>
+              <EquipmentSlot
+                slot={"Body"}
+                playerState={playerState}
+                uiStore={uiStore}
+                draggableClassStore={draggableClassStore}
+                setDisplayItem={setDisplayItem}
+                inventoryBounds={draggableClassStore.inventoryBounds}
+              />
+            </View>
+          </View>
+          <View style={styles.columnCenter}>
+            <View style={{ marginRight: "-50%" }}>
+              <EquipmentSlot
+                slot="Quiver"
+                playerState={playerState}
+                uiStore={uiStore}
+                draggableClassStore={draggableClassStore}
+                setDisplayItem={setDisplayItem}
+                inventoryBounds={draggableClassStore.inventoryBounds}
+              />
+            </View>
+            <EquipmentSlot
+              slot={"Off-Hand"}
+              playerState={playerState}
+              uiStore={uiStore}
+              draggableClassStore={draggableClassStore}
+              setDisplayItem={setDisplayItem}
+              inventoryBounds={draggableClassStore.inventoryBounds}
+            />
+          </View>
+        </View>
+      );
+    }
   }
 }
 

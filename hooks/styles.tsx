@@ -872,7 +872,6 @@ export const useStyles = () => {
     } as const,
     greetingContainer: {
       ...tw.p2,
-      marginTop: -48,
       ...radius.lg,
       ...raisedAbsolutePosition,
       borderColor: theme.tint,
@@ -884,11 +883,6 @@ export const useStyles = () => {
       ...radius.xl,
       ...border,
       borderColor: theme.border,
-    } as const,
-    shopKeeperSection: {
-      ...tw.py4,
-      ...tw.px1,
-      width: "33%",
     } as const,
     shopsInventoryContainer: {
       flex: 1,
@@ -1042,7 +1036,6 @@ export const useStyles = () => {
     } as const,
     // ---- Activity Card ---- //
     activityCard: {
-      margin: 8,
       borderRadius: 12,
       shadowColor: "#000",
       shadowOffset: {

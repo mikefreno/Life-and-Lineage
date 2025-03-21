@@ -473,44 +473,46 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           </View>
         </View>
       </GenericModal>
-      <ThemedView style={styles.activityCard}>
-        <View style={styles.activityCardInner}>
-          <View style={styles.rowBetween}>
-            <Text style={[styles["text-xl"], styles.bold, { width: "75%" }]}>
-              {toTitleCase(activity.name)}
-            </Text>
-            <View style={styles.rowCenter}>
-              <Text style={[styles["text-xl"], styles.bold]}>
-                {activity.cost == 0 ? "free" : activity.cost}{" "}
+      <View style={{ padding: 8 }}>
+        <ThemedView style={styles.activityCard}>
+          <View style={styles.activityCardInner}>
+            <View style={styles.rowBetween}>
+              <Text style={[styles["text-xl"], styles.bold, { width: "75%" }]}>
+                {toTitleCase(activity.name)}
               </Text>
-              {activity.cost !== 0 && (
-                <Coins
-                  height={uiStore.iconSizeSmall}
-                  width={uiStore.iconSizeSmall}
-                />
+              <View style={styles.rowCenter}>
+                <Text style={[styles["text-xl"], styles.bold]}>
+                  {activity.cost == 0 ? "free" : activity.cost}{" "}
+                </Text>
+                {activity.cost !== 0 && (
+                  <Coins
+                    height={uiStore.iconSizeSmall}
+                    width={uiStore.iconSizeSmall}
+                  />
+                )}
+              </View>
+            </View>
+            <View style={{ flexDirection: "row" }}>
+              {activity.alone && (
+                <GenericRaisedButton
+                  disabled={!!playerState && playerState.gold < activity.cost}
+                  onPress={visit}
+                >
+                  Visit Alone
+                </GenericRaisedButton>
+              )}
+              {activity.date && (
+                <GenericRaisedButton
+                  disabled={playerState?.getAllAdultCharacters().length == 0}
+                  onPress={() => dateSelect(activity.name)}
+                >
+                  Go on Date
+                </GenericRaisedButton>
               )}
             </View>
           </View>
-          <View style={{ flexDirection: "row" }}>
-            {activity.alone && (
-              <GenericRaisedButton
-                disabled={!!playerState && playerState.gold < activity.cost}
-                onPress={visit}
-              >
-                Visit Alone
-              </GenericRaisedButton>
-            )}
-            {activity.date && (
-              <GenericRaisedButton
-                disabled={playerState?.getAllAdultCharacters().length == 0}
-                onPress={() => dateSelect(activity.name)}
-              >
-                Go on Date
-              </GenericRaisedButton>
-            )}
-          </View>
-        </View>
-      </ThemedView>
+        </ThemedView>
+      </View>
     </>
   );
 });

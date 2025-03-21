@@ -698,6 +698,24 @@ export const Parallax = observer(
       return null;
     }, [plainReduceMotion, renderEffects]);
 
+    const containerStyle = useMemo(() => {
+      const expansionChange = !(
+        uiStore.dimensions.height < 500 && uiStore.isLandscape
+      )
+        ? uiStore.expansionPadding
+        : 0;
+      return {
+        paddingTop: header,
+        flex: 1,
+        paddingBottom:
+          (uiStore.playerStatusCompactHeight ?? 0) + expansionChange,
+      };
+    }, [
+      uiStore.isLandscape,
+      uiStore.dimensions,
+      uiStore.playerStatusCompactHeight,
+    ]);
+
     return (
       <View style={[{ flex: 1 }, style]}>
         <View
@@ -713,15 +731,7 @@ export const Parallax = observer(
           {backgroundContent}
           {effectsContent}
         </View>
-        <View
-          style={{
-            paddingTop: header,
-            flex: 1,
-            paddingBottom: uiStore.playerStatusHeightSecondary,
-          }}
-        >
-          {children}
-        </View>
+        <View style={containerStyle}>{children}</View>
       </View>
     );
   },

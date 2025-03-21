@@ -18,11 +18,7 @@ import {
 import { storage } from "@/utility/functions/storage";
 import { Character } from "@/entities/character";
 import * as Device from "expo-device";
-import {
-  normalize,
-  normalizeForText,
-  normalizeLineHeight,
-} from "@/hooks/styles";
+import { normalize, normalizeForText } from "@/hooks/styles";
 import { EdgeInsets } from "react-native-safe-area-context";
 
 export const LOADING_TIPS: string[] = [
@@ -80,7 +76,7 @@ export default class UIStore {
   progressIncrementing: boolean = false;
 
   iconSizeXL = normalize(28);
-  tabHeightBase = normalize(28) + normalizeForText(12) + normalize(3) + 8;
+  tabHeightBase = normalize(28) + normalizeForText(12) + normalize(3) + 4;
 
   expansionPadding = normalize(24);
   iconSizeLarge = normalize(22);

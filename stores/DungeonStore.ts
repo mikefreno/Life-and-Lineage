@@ -267,12 +267,13 @@ export class DungeonStore {
     this.saveActivityState();
   }
 
-  public setUpDungeon(
+  public async setUpDungeon(
     instance: string | DungeonInstance,
     level: string | DungeonLevel,
     isActivityEncounter: boolean,
-  ) {
+  ): Promise<void> {
     this.root.saveStore.createCheckpoint(true);
+
     if (instance instanceof DungeonInstance && level instanceof DungeonLevel) {
       this.currentInstance = instance;
       this.currentLevel = level;
@@ -288,6 +289,7 @@ export class DungeonStore {
         this.currentLevel = found;
       }
     }
+
     if (!this.currentLevel) {
       throw new Error("Failed to set up dungeon: No valid level found");
     }
@@ -305,12 +307,15 @@ export class DungeonStore {
       specials,
       isActivityEncounter,
     });
+
     this.currentMapDimensions = getBoundingBox(this.currentMap, TILE_SIZE);
     this.currentPosition = this.currentMap[0];
 
     if (isActivityEncounter) {
       this.inCombat = true;
     }
+
+    return Promise.resolve();
   }
 
   private updateCurrentPosition(tile: Tile) {

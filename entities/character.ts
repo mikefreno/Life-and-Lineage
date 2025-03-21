@@ -1632,9 +1632,9 @@ export class PlayerCharacter extends Character {
    *
    */
   public hasEnoughBloodOrbs(spell: Attack) {
-    const bloodOrbsNeeded = spell.buffStrings.filter(
-      (buff) => buff == "consume blood orb",
-    ).length;
+    const bloodOrbsNeeded =
+      spell.buffNames?.filter((buff) => buff == "consume blood orb").length ??
+      0;
     if (bloodOrbsNeeded > this.bloodOrbCount) {
       return false;
     }

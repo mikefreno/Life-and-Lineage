@@ -30,7 +30,7 @@ const JobTraining = () => {
         }}
       />
       <ScrollView
-        style={{
+        contentContainerStyle={{
           paddingTop: header,
           paddingBottom: uiStore.playerStatusHeightSecondary,
         }}

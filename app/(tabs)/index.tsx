@@ -82,6 +82,7 @@ const HomeScreen = observer(() => {
       paddingBottom: uiStore.compactRoutePadding,
     };
   }, [
+    header,
     root.pathname,
     uiStore.playerStatusExpandedOnAllRoutes,
     uiStore.playerStatusCompactHeight,
@@ -148,7 +149,7 @@ const HomeScreen = observer(() => {
                 style={{
                   textAlign: "center",
                   color: isDark ? "white" : "black",
-                  ...styles["text-xl"],
+                  ...styles["text-lg"],
                 }}
               >
                 {`You are\n${playerState.age} years old`}
@@ -172,8 +173,8 @@ const HomeScreen = observer(() => {
               style={[styles.stashButton, { paddingBottom: normalize(4) }]}
             >
               <Image
-                source={require("../../assets/images/icons/Chest.png")}
-                style={{ width: normalize(48), height: normalize(48) }}
+                source={require("@/assets/images/icons/Chest.png")}
+                style={{ width: normalize(40), height: normalize(40) }}
               />
             </Pressable>
             <InventoryRender
