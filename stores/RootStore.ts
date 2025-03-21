@@ -113,6 +113,7 @@ export class RootStore {
       clearDeathScreen: action,
       addDevAction: action,
       removeDevAction: action,
+      clearAllData: action,
     });
   }
 
@@ -365,5 +366,14 @@ export class RootStore {
     this.enemyStore.clearEnemyList();
     this.dungeonStore.clearDungeonState();
     this.uiStore.clearDungeonColor();
+  }
+
+  clearAllData() {
+    if (__DEV__) {
+      const keys = storage.getAllKeys();
+      for (const key of keys) {
+        storage.delete(key);
+      }
+    }
   }
 }

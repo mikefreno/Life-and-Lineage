@@ -36,6 +36,7 @@ interface GenericRaisedButtonProps {
   disableTopLevelStyling?: boolean;
   style?: StyleProp<ViewStyle>;
   buttonStyle?: StyleProp<ViewStyle>;
+  height?: number | string;
 }
 
 const GenericRaisedButton = ({
@@ -55,6 +56,7 @@ const GenericRaisedButton = ({
   disableTopLevelStyling = false,
   style,
   buttonStyle,
+  height,
 }: GenericRaisedButtonProps) => {
   const vibration = useVibration();
 
@@ -107,32 +109,46 @@ const GenericRaisedButton = ({
     const baseStyles = !disableTopLevelStyling
       ? {
           marginHorizontal: "auto",
-          marginBottom: 8,
-          marginTop: 16,
+          paddingBottom: 8,
+          paddingTop: 16,
+          height: height, // Apply height constraint to container if provided
+          justifyContent: height ? "center" : undefined, // Center content vertically if height is provided
         }
+      : height
+      ? { height, justifyContent: "center" }
       : {};
     return [baseStyles, style];
-  }, [disableTopLevelStyling, style]);
+  }, [disableTopLevelStyling, style, height]);
 
   const dynamicButtonStyle = React.useMemo(() => {
-    if (!disabled) {
-      return {
-        shadowColor: uiStore.colorScheme === "light" ? "black" : "white",
-        elevation: 2,
-        backgroundColor:
-          backgroundColor ||
-          (uiStore.colorScheme === "light" ? "white" : "#71717a"),
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-      };
-    }
-    return {
+    const baseStyle = {
+      shadowColor: uiStore.colorScheme === "light" ? "black" : "white",
+      elevation: 2,
       backgroundColor:
         backgroundColor ||
-        (uiStore.colorScheme === "light" ? "#fafafa" : "#3f3f46"),
-      opacity: 0.5,
+        (uiStore.colorScheme === "light" ? "white" : "#71717a"),
+      shadowOpacity: 0.1,
+      shadowRadius: 5,
+      // If height is provided, ensure the button fills the container height
+      height: height ? "100%" : undefined,
+      justifyContent: "center", // Center content vertically
+      alignItems: "center", // Center content horizontally
     };
-  }, [uiStore.colorScheme, disabled, backgroundColor]);
+
+    if (disabled) {
+      return {
+        ...baseStyle,
+        backgroundColor:
+          backgroundColor ||
+          (uiStore.colorScheme === "light" ? "#fafafa" : "#3f3f46"),
+        opacity: 0.5,
+        elevation: 0,
+        shadowOpacity: 0,
+      };
+    }
+
+    return baseStyle;
+  }, [uiStore.colorScheme, disabled, backgroundColor, height]);
 
   const currentText =
     typeof children === "string"
@@ -170,6 +186,9 @@ const GenericRaisedButton = ({
             borderRadius: 12,
             paddingHorizontal: normalize(20),
             paddingVertical: normalize(12),
+            flexDirection: "row", // Ensure text components are in a row
+            justifyContent: "center", // Center content horizontally
+            alignItems: "center", // Center content vertically
           },
           buttonStyle,
           dynamicButtonStyle,

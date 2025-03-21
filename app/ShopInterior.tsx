@@ -17,7 +17,7 @@ import TutorialModal from "@/components/TutorialModal";
 import { useHeaderHeight } from "@react-navigation/elements";
 import InventoryRender from "@/components/InventoryRender";
 import { StatsDisplay } from "@/components/StatsDisplay";
-import { Coins } from "@/assets/icons/SVGIcons";
+import { AffectionIcon, Coins } from "@/assets/icons/SVGIcons";
 import { MerchantType, TutorialOption } from "@/utility/types";
 import ProgressBar from "@/components/ProgressBar";
 import { shopColors } from "@/constants/Colors";
@@ -245,6 +245,7 @@ const ShopInteriorScreen = observer(() => {
         }}
       />
       <CharacterInteractionModal
+        backdropCloses={true}
         secondaryRequirement={showingInteractionModal}
         character={shopsStore.currentShop.shopKeeper}
         closeFunction={() => setShowingInteractionModal(false)}
@@ -253,19 +254,22 @@ const ShopInteriorScreen = observer(() => {
         <View
           style={[
             flex.columnBetween,
-            { flex: 1, paddingBottom: uiStore.playerStatusHeightSecondary },
+            {
+              flex: 1,
+              paddingBottom: uiStore.playerStatusHeightSecondary,
+            },
           ]}
         >
           <View style={[flex.rowEvenly, { height: "40%" }]}>
-            <View style={[flex.columnEvenly, { width: "33%", height: "100%" }]}>
+            <View style={[flex.columnEvenly, { width: "40%", height: "100%" }]}>
               <Pressable
                 onLongPress={() => {
                   vibration({ style: "light" });
                   setShowingInteractionModal(true);
                 }}
                 style={{
-                  height: uiStore.dimensions.lesser / 3.5,
-                  width: uiStore.dimensions.lesser / 3.5,
+                  height: uiStore.dimensions.lesser / 4,
+                  width: uiStore.dimensions.lesser / 4,
                 }}
               >
                 <CharacterImage character={shopsStore.currentShop.shopKeeper} />
@@ -289,12 +293,25 @@ const ShopInteriorScreen = observer(() => {
                   />
                 </View>
               </View>
-              <View style={{ paddingHorizontal: 2, width: "100%" }}>
-                <ProgressBar
-                  value={shopsStore.currentShop.shopKeeper.affection}
-                  maxValue={100}
-                  filledColor="#ef4444"
-                  unfilledColor="#fca5a5"
+              <View style={styles.affectionContainer}>
+                <View
+                  style={{
+                    width: "75%",
+                    justifyContent: "center",
+                    paddingRight: 4,
+                  }}
+                >
+                  <ProgressBar
+                    value={shopsStore.currentShop.shopKeeper.affection}
+                    minValue={-100}
+                    maxValue={100}
+                    filledColor="#dc2626"
+                    unfilledColor="#fca5a5"
+                  />
+                </View>
+                <AffectionIcon
+                  height={uiStore.iconSizeSmall}
+                  width={uiStore.iconSizeSmall}
                 />
               </View>
               <GreetingComponent greeting={greeting} />

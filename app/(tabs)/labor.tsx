@@ -13,8 +13,8 @@ import { Text } from "@/components/Themed";
 import GenericModal from "@/components/GenericModal";
 import { useVibration } from "@/hooks/generic";
 import { useRootStore } from "@/hooks/stores";
-import { useStyles } from "@/hooks/styles";
 import GenericFlatButton from "@/components/GenericFlatButton";
+import { useStyles } from "@/hooks/styles";
 
 const LaborScreen = observer(() => {
   const { playerState, uiStore } = useRootStore();

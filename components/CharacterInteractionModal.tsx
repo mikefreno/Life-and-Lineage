@@ -323,6 +323,7 @@ const KnownCharacterInteractions = observer(
             disabled={!character.dateAvailable}
             onPress={() => {
               vibration({ style: "light" });
+              playerState.root.gameTick();
               character.setDateCooldownStart();
               character.updateAffection(5);
             }}
@@ -357,6 +358,7 @@ const KnownCharacterInteractions = observer(
                     disabled={!character.dateAvailable}
                     onPress={() => {
                       vibration({ style: "light" });
+                      playerState.root.gameTick();
                       attemptPregnancy(character);
                     }}
                   >
@@ -389,6 +391,7 @@ const KnownCharacterInteractions = observer(
                 disabled={!character.dateAvailable}
                 onPress={() => {
                   vibration({ style: "light" });
+                  playerState.root.gameTick();
                   character.setDateCooldownStart();
                   const res = playerState.askForPartner(character);
                   setDateRequestResult(res === true ? "success" : "failure");
@@ -405,6 +408,7 @@ const KnownCharacterInteractions = observer(
                 disabled={!character.dateAvailable}
                 onPress={() => {
                   vibration({ style: "light" });
+                  playerState.root.gameTick();
                   character.setDateCooldownStart();
                   character.updateAffection(-5);
                 }}
@@ -446,11 +450,10 @@ const FirstMeetingInteractions = observer(
           <GenericFlatButton
             onPress={() => {
               vibration({ style: "light" });
+              playerState.root.gameTick();
+              playerState.setDateCooldownStart();
+              playerState.addKnownCharacter(character);
               character.updateAffection(5);
-              if (playerState) {
-                playerState.addKnownCharacter(character);
-                playerState.root.gameTick();
-              }
             }}
           >
             Friendly
@@ -458,11 +461,10 @@ const FirstMeetingInteractions = observer(
           <GenericFlatButton
             onPress={() => {
               vibration({ style: "light" });
+              playerState.root.gameTick();
+              playerState.setDateCooldownStart();
+              playerState.addKnownCharacter(character);
               character.updateAffection(-5);
-              if (playerState) {
-                playerState.addKnownCharacter(character);
-                playerState.root.gameTick();
-              }
             }}
           >
             Aggressive

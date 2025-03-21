@@ -8,8 +8,8 @@ export function CharacterImage({ character }: { character: Character }) {
       style={{
         height: "100%",
         width: "100%",
-        objectFit: "scale-down",
       }}
+      contentFit={"contain"}
       source={getCharacterImage(
         character.age,
         (toTitleCase(character.sex) as "Male") || "Female",

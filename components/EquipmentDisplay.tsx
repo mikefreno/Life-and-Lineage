@@ -39,7 +39,7 @@ export default function EquipmentDisplay({
   const styles = useStyles();
 
   if (playerState) {
-    if (uiStore.dimensions.height < 400 && uiStore.isLandscape) {
+    if (uiStore.dimensions.height < 500 && uiStore.isLandscape) {
       return (
         <View style={styles.rowEvenly}>
           <EquipmentSlot
@@ -193,6 +193,7 @@ const EquipmentSlot = observer(
     const styles = useStyles();
     const slotKey = slot.toLowerCase();
     const isFocused = useIsFocused();
+    if (!playerState.equipment) return;
 
     if (playerState) {
       switch (slot) {

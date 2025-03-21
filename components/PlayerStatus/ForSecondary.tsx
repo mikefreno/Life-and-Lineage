@@ -16,7 +16,7 @@ import { PlayerStatusModal } from "./Modal";
 
 const PlayerStatusForSecondary = observer(() => {
   const root = useRootStore();
-  const { playerState, uiStore, dungeonStore } = root;
+  const { playerState, uiStore } = root;
   const styles = useStyles();
 
   const vibration = useVibration();
@@ -30,60 +30,51 @@ const PlayerStatusForSecondary = observer(() => {
   return (
     <>
       <PlayerStatusModal />
-      <Pressable
-        onPress={() => {
-          vibration({ style: "light" });
-          uiStore.setDetailedStatusViewShowing(true);
-        }}
-        style={{ position: "absolute", bottom: 0, width: "100%" }}
-      >
-        <ColorAndPlatformDependantBlur home={false}>
+      <ColorAndPlatformDependantBlur home={false}>
+        <Pressable
+          onPress={() => {
+            vibration({ style: "light" });
+            uiStore.setDetailedStatusViewShowing(true);
+          }}
+        >
           <View
             style={{
               flex: 1,
               paddingHorizontal: 8,
             }}
           >
-            {!(
-              uiStore.dimensions.height < 500 &&
-              uiStore.isLandscape &&
-              dungeonStore.isInDungeon
-            ) && (
-              <View
-                style={{
-                  height: uiStore.expansionPadding,
-                  ...styles.rowCenter,
-                }}
-              >
-                <View style={[styles.rowCenter, { alignItems: "center" }]}>
-                  <Text>{playerState.readableGold}</Text>
-                  <ChangePopUp
-                    popUp={"gold"}
-                    change={statChanges.gold}
-                    animationCycler={animationCycler}
-                    colorScheme={uiStore.colorScheme}
-                  />
-                  <Coins
-                    width={uiStore.iconSizeSmall}
-                    height={uiStore.iconSizeSmall}
-                    style={{ marginLeft: 6 }}
-                  />
-                </View>
-                {playerState.unAllocatedSkillPoints > 0 && (
-                  <View
-                    style={{ paddingHorizontal: 4, marginVertical: "auto" }}
-                  >
-                    <SquarePlus
-                      height={uiStore.iconSizeSmall}
-                      width={uiStore.iconSizeSmall}
-                    />
-                  </View>
-                )}
-                <View>
-                  <ConditionRenderer />
-                </View>
+            <View
+              style={{
+                height: uiStore.expansionPadding,
+                ...styles.rowCenter,
+              }}
+            >
+              <View style={[styles.rowCenter, { alignItems: "center" }]}>
+                <Text>{playerState.readableGold}</Text>
+                <ChangePopUp
+                  popUp={"gold"}
+                  change={statChanges.gold}
+                  animationCycler={animationCycler}
+                  colorScheme={uiStore.colorScheme}
+                />
+                <Coins
+                  width={uiStore.iconSizeSmall}
+                  height={uiStore.iconSizeSmall}
+                  style={{ marginLeft: 6 }}
+                />
               </View>
-            )}
+              {playerState.unAllocatedSkillPoints > 0 && (
+                <View style={{ paddingHorizontal: 4, marginVertical: "auto" }}>
+                  <SquarePlus
+                    height={uiStore.iconSizeSmall}
+                    width={uiStore.iconSizeSmall}
+                  />
+                </View>
+              )}
+              <View>
+                <ConditionRenderer />
+              </View>
+            </View>
             <View style={styles.statsRow}>
               <View
                 style={{
@@ -155,8 +146,8 @@ const PlayerStatusForSecondary = observer(() => {
               </View>
             </View>
           </View>
-        </ColorAndPlatformDependantBlur>
-      </Pressable>
+        </Pressable>
+      </ColorAndPlatformDependantBlur>
     </>
   );
 });

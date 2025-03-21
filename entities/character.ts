@@ -301,10 +301,6 @@ export class Character extends Being {
     this.job = job;
   }
 
-  /**
-   * Sets the start date of the cooldown period for the character.
-   * @param date - The date string in ISO format.
-   */
   public setDateCooldownStart(): void {
     this.dateCooldownStart = this.root.time.currentDate;
   }

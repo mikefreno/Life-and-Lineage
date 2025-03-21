@@ -186,7 +186,6 @@ const TabLayout = observer(() => {
               height: uiStore.iconSizeXL,
             },
             tabBarItemStyle: {
-              // This centers the content in the available space
               height: tabBarLayout.contentHeight,
               justifyContent: "center",
               paddingTop: 0,

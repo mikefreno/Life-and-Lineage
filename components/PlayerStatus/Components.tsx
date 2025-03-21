@@ -1090,9 +1090,7 @@ export const ColorAndPlatformDependantBlur = observer(
       return (
         <View
           style={{
-            zIndex: 10,
-            overflow: "hidden",
-            paddingBottom: uiStore.insets?.bottom,
+            zIndex: 999,
             backgroundColor:
               Platform.OS !== "ios"
                 ? uiStore.colorScheme === "dark"
@@ -1104,6 +1102,10 @@ export const ColorAndPlatformDependantBlur = observer(
             shadowOpacity: 0.25,
             shadowRadius: 3.84,
             elevation: 5,
+            position: "absolute",
+            paddingBottom: (uiStore.insets?.bottom ?? 0) / 2,
+            bottom: 0,
+            width: "100%",
           }}
         >
           <Animated.View
@@ -1124,8 +1126,7 @@ export const ColorAndPlatformDependantBlur = observer(
           intensity={Platform.OS === "ios" ? 100 : 0}
           tint={uiStore.colorScheme}
           style={{
-            zIndex: 10,
-            overflow: "hidden",
+            zIndex: 999,
             backgroundColor:
               Platform.OS !== "ios"
                 ? uiStore.colorScheme === "dark"
@@ -1137,6 +1138,10 @@ export const ColorAndPlatformDependantBlur = observer(
             shadowOpacity: 0.25,
             shadowRadius: 3.84,
             elevation: 5,
+            position: "absolute",
+            paddingBottom: (uiStore.insets?.bottom ?? 0) / 2,
+            bottom: 0,
+            width: "100%",
           }}
         >
           <Animated.View

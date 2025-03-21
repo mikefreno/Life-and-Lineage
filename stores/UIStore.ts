@@ -111,6 +111,7 @@ export default class UIStore {
   };
 
   showDevDebugUI: boolean = false;
+
   insets: {
     top: number;
     right: number;
@@ -313,7 +314,7 @@ export default class UIStore {
   }
 
   get playerStatusHeightSecondary() {
-    return this.playerStatusHeight + (this.insets?.bottom ?? 0);
+    return this.playerStatusHeight + (this.insets?.bottom ?? 0) / 2;
   }
 
   get bottomBarHeight() {
@@ -556,16 +557,17 @@ export default class UIStore {
 
     if (this.dimensions.width === this.dimensions.lesser) {
       blockSize = Math.min(
-        this.dimensions.height / 5,
-        this.dimensions.width / 8,
+        this.dimensions.height / 5.5,
+        this.dimensions.width / 7.5,
       );
     } else {
       blockSize = this.dimensions.width / 14;
     }
-    return (
-      blockSize *
-      (this.root.dungeonStore && this.root.dungeonStore.isInDungeon ? 0.9 : 1.0)
-    );
+    const dungeonAdjustment = this.root.dungeonStore.isInDungeon ? 0.9 : 1.0;
+    const landScapeAdjustment =
+      this.isLandscape && this.dimensions.lesser < 500 ? 0.8 : 1.0;
+
+    return blockSize * dungeonAdjustment * landScapeAdjustment;
   }
 
   hydrateUISettings(): {

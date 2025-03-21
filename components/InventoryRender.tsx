@@ -107,7 +107,11 @@ const InventoryRender = observer(
         itemSize,
         slotPositions,
       };
-    }, [draggableClassStore.inventoryBounds, uiStore.dimensions]);
+    }, [
+      draggableClassStore.inventoryBounds,
+      uiStore.dimensions,
+      uiStore.playerStatusExpandedOnAllRoutes,
+    ]);
 
     useEffect(() => {
       Platform.OS === "ios" &&
@@ -357,7 +361,6 @@ const InventoryRender = observer(
             : screen === "shop"
             ? {
                 zIndex: 10,
-                marginLeft: -8,
               }
             : null,
         ]}

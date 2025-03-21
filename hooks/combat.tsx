@@ -10,6 +10,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { AnimationOptions } from "@/utility/enemyHelpers";
 import { type Condition } from "@/entities/conditions";
 import { Being } from "@/entities/being";
+import { result } from "lodash";
 
 const attackHandler = ({
   attackResults,
@@ -125,7 +126,7 @@ export const useEnemyManagement = () => {
 
     suppliedMinions.forEach((minion, index) => {
       wait(1000 * index).then(() => {
-        const results = minion.takeTurn({ target: [playerState] });
+        const results = minion.takeTurn({ targets: [playerState] });
         attackHandler({ attackResults: results, user: minion });
         dungeonStore.addLog("(minion) " + results.log);
       });
@@ -257,6 +258,7 @@ export const useCombatActions = () => {
             } else {
               animStore?.addToAnimationQueue("hurt");
             }
+            console.log(res.use);
             res.target.damageHealth({
               damage: res.use.damages?.total ?? 0,
               attackerId: attack.user.id,

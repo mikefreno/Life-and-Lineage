@@ -269,7 +269,13 @@ const DungeonLevelScreen = observer(() => {
             <DungeonMapRender />
           )}
           <LinearGradientBlur style={styles.dungeonBlur} />
-          <View ref={mainBodyRef} style={{ flex: 1, maxHeight: "45%" }}>
+          <View
+            ref={mainBodyRef}
+            style={{
+              flex: 1,
+              maxHeight: uiStore.dimensions.height < 500 ? "50%" : "45%",
+            }}
+          >
             <View
               style={{
                 position: "absolute",
@@ -296,8 +302,8 @@ const DungeonLevelScreen = observer(() => {
             />
             <PlayerMinionSection />
           </View>
+          <PlayerStatusForSecondary />
         </Parallax>
-        <PlayerStatusForSecondary />
         {displayItem && (
           <View
             style={{

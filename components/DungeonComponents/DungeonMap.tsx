@@ -143,36 +143,69 @@ export const DungeonMapControls = observer(() => {
       </GenericRaisedButton>
     );
   };
-  return (
-    <View style={styles.dungeonControlsContainer}>
+
+  if (uiStore.dimensions.height < 500) {
+    return (
       <View
         style={{
-          marginTop: -uiStore.dimensions.height / 20,
+          alignItems: "center",
           width: "100%",
-          marginHorizontal: "auto",
+          height: "100%",
+          justifyContent: "space-evenly",
+          flexDirection: "row",
         }}
       >
         <ArrowButton direction="up" />
-        <View style={styles.arrowButtonRow}>
-          <ArrowButton direction="left" />
-          {dungeonStore.currentPosition.specialEncounter &&
-            !dungeonStore.currentPosition.specialEncounter.activated && (
-              <GenericRaisedButton
-                backgroundColor="#2563eb"
-                buttonStyle={{ paddingHorizontal: 8 }}
-                onPress={() =>
-                  dungeonStore.setCurrentSpecialEncounter(
-                    dungeonStore.currentPosition!.specialEncounter!,
-                  )
-                }
-              >
-                Enter
-              </GenericRaisedButton>
-            )}
-          <ArrowButton direction="right" />
-        </View>
+        <ArrowButton direction="left" />
+        {dungeonStore.currentPosition.specialEncounter &&
+          !dungeonStore.currentPosition.specialEncounter.activated && (
+            <GenericRaisedButton
+              backgroundColor="#2563eb"
+              buttonStyle={{ paddingHorizontal: 8 }}
+              onPress={() =>
+                dungeonStore.setCurrentSpecialEncounter(
+                  dungeonStore.currentPosition!.specialEncounter!,
+                )
+              }
+            >
+              Enter
+            </GenericRaisedButton>
+          )}
+        <ArrowButton direction="right" />
         <ArrowButton direction="down" />
       </View>
+    );
+  }
+
+  return (
+    <View
+      style={{
+        alignItems: "center",
+        width: "100%",
+        height: "100%",
+        justifyContent: "center",
+      }}
+    >
+      <ArrowButton direction="up" />
+      <View style={styles.arrowButtonRow}>
+        <ArrowButton direction="left" />
+        {dungeonStore.currentPosition.specialEncounter &&
+          !dungeonStore.currentPosition.specialEncounter.activated && (
+            <GenericRaisedButton
+              backgroundColor="#2563eb"
+              buttonStyle={{ paddingHorizontal: 8 }}
+              onPress={() =>
+                dungeonStore.setCurrentSpecialEncounter(
+                  dungeonStore.currentPosition!.specialEncounter!,
+                )
+              }
+            >
+              Enter
+            </GenericRaisedButton>
+          )}
+        <ArrowButton direction="right" />
+      </View>
+      <ArrowButton direction="down" />
     </View>
   );
 });

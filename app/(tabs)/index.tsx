@@ -170,7 +170,10 @@ const HomeScreen = observer(() => {
                 vibration({ style: "light" });
                 setShowStash(true);
               }}
-              style={[styles.stashButton, { paddingBottom: normalize(4) }]}
+              style={{
+                position: "absolute",
+                padding: uiStore.dimensions.width * 0.02,
+              }}
             >
               <Image
                 source={require("@/assets/images/icons/Chest.png")}

@@ -6,6 +6,7 @@ import GenericFlatButton from "@/components/GenericFlatButton";
 import { useRootStore } from "@/hooks/stores";
 import { useStyles } from "@/hooks/styles";
 import { reloadAppAsync } from "expo";
+import React from "react";
 
 export class ErrorBoundary extends Component {
   constructor(props) {
@@ -59,12 +60,20 @@ function ErrorRender() {
           Restart
         </GenericFlatButton>
         {__DEV__ && (
-          <GenericFlatButton
-            style={{ marginTop: 8 }}
-            onPress={() => root.leaveDungeon()}
-          >
-            Clear Dungeon
-          </GenericFlatButton>
+          <>
+            <GenericFlatButton
+              style={{ marginTop: 8 }}
+              onPress={() => root.leaveDungeon()}
+            >
+              Clear Dungeon
+            </GenericFlatButton>
+            <GenericFlatButton
+              style={{ marginTop: 8 }}
+              onPress={() => root.clearAllData()}
+            >
+              Clear All Data
+            </GenericFlatButton>
+          </>
         )}
       </View>
     </View>

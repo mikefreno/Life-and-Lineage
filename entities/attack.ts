@@ -148,7 +148,7 @@ export class Attack {
     this.targets = targets ?? "single";
     this.baseHitChance = baseHitChance ?? 1.0;
     this.damageMult = damageMult ?? 1.0;
-    this.damageTable = parseDamageTypeObject(damageTable);
+    this.damageTable = parseDamageTypeObject(damageTable) ?? {};
     this.selfDamageTable = selfDamageTable
       ? parseDamageTypeObject(selfDamageTable)
       : null;

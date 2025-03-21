@@ -5,6 +5,8 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent,
   LayoutChangeEvent,
+  DimensionValue,
+  LayoutAnimation,
 } from "react-native";
 import { observer } from "mobx-react-lite";
 import { Item } from "@/entities/item";
@@ -12,7 +14,7 @@ import { useRootStore } from "@/hooks/stores";
 import { InventoryItem } from "@/components/Draggable";
 import { Text } from "@/components/Themed";
 import GenericModal from "@/components/GenericModal";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { StatsDisplay } from "@/components/StatsDisplay";
 import GenericStrikeAround from "@/components/GenericStrikeAround";
 import { useStyles } from "@/hooks/styles";
@@ -36,7 +38,10 @@ export const StashDisplay = observer(
       1,
       Math.ceil(stashStore.items.length / SLOTS_PER_PAGE),
     );
-    const [modalWidth, setModalWidth] = useState(0);
+    const [modalDimensions, setModalDimensions] = useState<{
+      height: number;
+      width: number;
+    }>({ height: 0, width: 0 });
 
     const clearDisplayItem = useCallback(() => setDisplayItem(null), []);
 
@@ -48,11 +53,11 @@ export const StashDisplay = observer(
         setCurrentPage(pageIndex); // Immediately update current page
 
         scrollViewRef.current?.scrollTo({
-          x: pageIndex * modalWidth,
+          x: pageIndex * modalDimensions?.width,
           animated: true,
         });
       },
-      [modalWidth],
+      [modalDimensions.width],
     );
 
     const handleScroll = useCallback(
@@ -60,26 +65,162 @@ export const StashDisplay = observer(
         // Only update currentPage from scroll events if we're not handling a button press
         if (targetPage === null) {
           const page = Math.round(
-            event.nativeEvent.contentOffset.x / modalWidth,
+            event.nativeEvent.contentOffset.x / modalDimensions.width,
           );
           setCurrentPage(page);
         }
       },
-      [modalWidth, targetPage],
+      [modalDimensions.width, targetPage],
     );
 
     const handleScrollEnd = useCallback(
       (event: NativeSyntheticEvent<NativeScrollEvent>) => {
         setTargetPage(null); // Clear the target page when scrolling ends
-        const page = Math.round(event.nativeEvent.contentOffset.x / modalWidth);
+        const page = Math.round(
+          event.nativeEvent.contentOffset.x / modalDimensions.width,
+        );
         setCurrentPage(page);
       },
-      [modalWidth],
+      [modalDimensions.width],
+    );
+
+    const gridCalculations = useMemo(() => {
+      const height = modalDimensions.height ?? 0;
+      const width = modalDimensions.width ?? 0;
+      const rows = uiStore.isLandscape ? 3 : 6;
+      const columns = 24 / rows;
+      const itemSize = uiStore.itemBlockSize;
+
+      const excessHeight = height - rows * itemSize;
+      const excessWidth = width - columns * itemSize;
+
+      const verticalGaps = rows + 1;
+      const horizontalGaps = columns + 1;
+
+      const verticalSpacing = excessHeight / verticalGaps;
+      const horizontalSpacing = excessWidth / horizontalGaps;
+
+      const slotPositions = Array.from({ length: 24 }).map((_, index) => {
+        const row = Math.floor(index / columns);
+        const col = index % columns;
+
+        const left = horizontalSpacing + col * (itemSize + horizontalSpacing);
+        const top = verticalSpacing + row * (itemSize + verticalSpacing);
+
+        const leftPercent = width > 0 ? (left / width) * 100 : 0;
+        const topPercent = height > 0 ? (top / height) * 100 : 0;
+
+        return {
+          left: `${leftPercent}%` as DimensionValue,
+          top: `${topPercent}%` as DimensionValue,
+          index,
+        };
+      });
+
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      return {
+        rows,
+        columns,
+        itemSize,
+        slotPositions,
+      };
+    }, [
+      modalDimensions,
+      uiStore.dimensions,
+      uiStore.playerStatusExpandedOnAllRoutes,
+    ]);
+
+    const renderInventorySlot = useCallback(
+      (index: number) => {
+        const position = gridCalculations.slotPositions[index];
+        return (
+          <View
+            style={[
+              styles.inventorySlot,
+              {
+                position: "absolute",
+                left: position.left,
+                top: position.top,
+              },
+            ]}
+            key={"bg-" + index}
+          >
+            <View
+              style={[
+                styles.slotBackground,
+                {
+                  height: uiStore.itemBlockSize,
+                  width: uiStore.itemBlockSize,
+                },
+              ]}
+            />
+          </View>
+        );
+      },
+      [gridCalculations.slotPositions, styles, uiStore.itemBlockSize],
+    );
+
+    const renderInventoryItem = useCallback(
+      (item: { item: Item[] }, index: number) => {
+        const position = gridCalculations.slotPositions[index];
+        return (
+          <View
+            style={[
+              {
+                position: "absolute",
+                left: position.left,
+                top: position.top,
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 10,
+              },
+            ]}
+            key={item.item[0].id}
+          >
+            <View>
+              <InventoryItem
+                item={item.item}
+                setDisplayItem={(params) => {
+                  if (params) {
+                    setDisplayItem({
+                      ...params,
+                      side: "stash",
+                    });
+                  } else {
+                    setDisplayItem(null);
+                  }
+                }}
+                displayItem={displayItem}
+                isDraggable={true}
+                runOnSuccess={() => null}
+                targetBounds={[]}
+              />
+            </View>
+          </View>
+        );
+      },
+      [gridCalculations.slotPositions, displayItem, setDisplayItem],
+    );
+
+    const inventorySlots = useMemo(
+      () =>
+        Array.from({ length: 24 }).map((_, index) =>
+          renderInventorySlot(index),
+        ),
+      [renderInventorySlot],
+    );
+
+    const inventoryItems = useMemo(
+      () =>
+        stashStore.items
+          .slice(0, 24)
+          .map((item, index) => renderInventoryItem(item, index)) || [],
+      [stashStore.items, renderInventoryItem],
     );
 
     const onModalLayout = (event: LayoutChangeEvent) => {
-      const { width } = event.nativeEvent.layout;
-      setModalWidth(width);
+      const { height, width } = event.nativeEvent.layout;
+      setModalDimensions({ height, width });
     };
 
     return (
@@ -89,11 +230,16 @@ export const StashDisplay = observer(
           clear();
           setDisplayItem(null);
         }}
+        scrollEnabled={uiStore.isLandscape}
         size={100}
       >
         <View
           style={[
-            { height: uiStore.dimensions.height * 0.66 },
+            {
+              height: uiStore.isLandscape
+                ? uiStore.dimensions.height
+                : uiStore.dimensions.height * 0.66,
+            },
             { width: "100%" },
           ]}
           onLayout={onModalLayout}
@@ -150,7 +296,11 @@ export const StashDisplay = observer(
             {Array.from({ length: totalPages }).map((_, pageIndex) => (
               <View
                 key={`page-${pageIndex}`}
-                style={{ width: modalWidth, flex: 1, paddingHorizontal: 8 }}
+                style={{
+                  width: modalDimensions.width,
+                  flex: 1,
+                  paddingHorizontal: 8,
+                }}
               >
                 <View style={styles.stashPageOverlay}>
                   <Text style={styles.stashPageText}>
@@ -161,75 +311,8 @@ export const StashDisplay = observer(
                   onPress={() => setDisplayItem(null)}
                   style={styles.stashContainer}
                 >
-                  {Array.from({ length: SLOTS_PER_PAGE }).map((_, index) => (
-                    <View
-                      style={[
-                        styles.inventorySlot,
-                        uiStore.dimensions.width === uiStore.dimensions.greater
-                          ? {
-                              left: `${(index % 8) * 12.5 + 8}%`,
-                              top: `${Math.floor(index / 8) * 33.33 + 6}%`,
-                            }
-                          : {
-                              left: `${(index % 4) * 25 + 5}%`,
-                              top: `${Math.floor(index / 4) * 16.67 + 3}%`,
-                            },
-                      ]}
-                      key={`bg-${pageIndex}-${index}`}
-                    >
-                      <View
-                        style={[
-                          styles.slotBackground,
-                          {
-                            height: uiStore.itemBlockSize,
-                            width: uiStore.itemBlockSize,
-                          },
-                        ]}
-                      />
-                    </View>
-                  ))}
-
-                  {stashStore.items
-                    .slice(
-                      pageIndex * SLOTS_PER_PAGE,
-                      (pageIndex + 1) * SLOTS_PER_PAGE,
-                    )
-                    .map((item, index) => (
-                      <View
-                        style={[
-                          styles.inventorySlot,
-                          { zIndex: 10 },
-                          uiStore.dimensions.width ===
-                          uiStore.dimensions.greater
-                            ? {
-                                left: `${(index % 8) * 12.5 + 8}%`,
-                                top: `${Math.floor(index / 8) * 33.33 + 6}%`,
-                              }
-                            : {
-                                left: `${(index % 4) * 25 + 5}%`,
-                                top: `${Math.floor(index / 4) * 16.67 + 3}%`,
-                              },
-                        ]}
-                        key={item.item[0].id}
-                      >
-                        <View>
-                          <InventoryItem
-                            item={item.item}
-                            setDisplayItem={(params) => {
-                              if (params) {
-                                setDisplayItem({ ...params, side: "stash" });
-                              } else {
-                                setDisplayItem(null);
-                              }
-                            }}
-                            displayItem={displayItem}
-                            isDraggable={false}
-                            runOnSuccess={() => null}
-                            targetBounds={[]}
-                          />
-                        </View>
-                      </View>
-                    ))}
+                  {inventorySlots}
+                  {inventoryItems}
                 </Pressable>
               </View>
             ))}

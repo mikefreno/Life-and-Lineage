@@ -28,7 +28,6 @@ import {
   getMagnitude,
 } from "@/utility/functions/conditions";
 import { BeingOptions } from "./entityTypes";
-import { Attack } from "./attack";
 
 export class Being {
   readonly id: string;
@@ -748,68 +747,56 @@ export class Being {
   }
 
   get fireDamage(): number {
-    return (
-      this.calculateTotalDamage(
-        Modifier.FireDamage,
-        Modifier.FireDamageAdded,
-        Modifier.FireDamageMultiplier,
-        this.baseDamageTable[DamageType.FIRE] ?? 0,
-      ) + this.magicPower
+    return this.calculateTotalDamage(
+      Modifier.FireDamage,
+      Modifier.FireDamageAdded,
+      Modifier.FireDamageMultiplier,
+      this.baseDamageTable[DamageType.FIRE] ?? 0,
     );
   }
 
   get coldDamage(): number {
-    return (
-      this.calculateTotalDamage(
-        Modifier.ColdDamage,
-        Modifier.ColdDamageAdded,
-        Modifier.ColdDamageMultiplier,
-        this.baseDamageTable[DamageType.COLD] ?? 0,
-      ) + this.magicPower
+    return this.calculateTotalDamage(
+      Modifier.ColdDamage,
+      Modifier.ColdDamageAdded,
+      Modifier.ColdDamageMultiplier,
+      this.baseDamageTable[DamageType.COLD] ?? 0,
     );
   }
 
   get lightningDamage(): number {
-    return (
-      this.calculateTotalDamage(
-        Modifier.LightningDamage,
-        Modifier.LightningDamageAdded,
-        Modifier.LightningDamageMultiplier,
-        this.baseDamageTable[DamageType.LIGHTNING] ?? 0,
-      ) + this.magicPower
+    return this.calculateTotalDamage(
+      Modifier.LightningDamage,
+      Modifier.LightningDamageAdded,
+      Modifier.LightningDamageMultiplier,
+      this.baseDamageTable[DamageType.LIGHTNING] ?? 0,
     );
   }
 
   get poisonDamage(): number {
-    return (
-      this.calculateTotalDamage(
-        Modifier.PoisonDamage,
-        Modifier.PoisonDamageAdded,
-        Modifier.PoisonDamageMultiplier,
-        this.baseDamageTable[DamageType.POISON] ?? 0,
-      ) + this.attackPower
+    return this.calculateTotalDamage(
+      Modifier.PoisonDamage,
+      Modifier.PoisonDamageAdded,
+      Modifier.PoisonDamageMultiplier,
+      this.baseDamageTable[DamageType.POISON] ?? 0,
     );
   }
 
   get holyDamage(): number {
-    return (
-      this.calculateTotalDamage(
-        Modifier.HolyDamage,
-        Modifier.HolyDamageAdded,
-        Modifier.HolyDamageMultiplier,
-        this.baseDamageTable[DamageType.HOLY] ?? 0,
-      ) + this.magicPower
+    return this.calculateTotalDamage(
+      Modifier.HolyDamage,
+      Modifier.HolyDamageAdded,
+      Modifier.HolyDamageMultiplier,
+      this.baseDamageTable[DamageType.HOLY] ?? 0,
     );
   }
 
   get magicDamage(): number {
-    return (
-      this.calculateTotalDamage(
-        Modifier.MagicDamage,
-        Modifier.MagicDamageAdded,
-        Modifier.MagicDamageMultiplier,
-        this.baseDamageTable[DamageType.MAGIC] ?? 0,
-      ) + this.magicPower
+    return this.calculateTotalDamage(
+      Modifier.MagicDamage,
+      Modifier.MagicDamageAdded,
+      Modifier.MagicDamageMultiplier,
+      this.baseDamageTable[DamageType.MAGIC] ?? 0,
     );
   }
   //---------------------------Conditions---------------------------//
@@ -928,23 +915,40 @@ export class Being {
     target?: Being,
   ) {
     let cumulativeDamage = 0;
-    let damageMap: { [key in DamageType]?: number } = {};
+    let damageMap: Record<DamageType, number> = {
+      [DamageType.PHYSICAL]: baseDamageMap
+        ? baseDamageMap[DamageType.PHYSICAL] ?? 0
+        : 0,
+      [DamageType.FIRE]: baseDamageMap
+        ? baseDamageMap[DamageType.FIRE] ?? 0
+        : 0,
+      [DamageType.COLD]: baseDamageMap
+        ? baseDamageMap[DamageType.COLD] ?? 0
+        : 0,
+      [DamageType.LIGHTNING]: baseDamageMap
+        ? baseDamageMap[DamageType.LIGHTNING] ?? 0
+        : 0,
+      [DamageType.POISON]: baseDamageMap
+        ? baseDamageMap[DamageType.POISON] ?? 0
+        : 0,
+      [DamageType.HOLY]: baseDamageMap
+        ? baseDamageMap[DamageType.HOLY] ?? 0
+        : 0,
+      [DamageType.MAGIC]: baseDamageMap
+        ? baseDamageMap[DamageType.MAGIC] ?? 0
+        : 0,
+      [DamageType.RAW]: baseDamageMap ? baseDamageMap[DamageType.RAW] ?? 0 : 0,
+    };
 
-    if (!baseDamageMap) {
-      return { cumulativeDamage, damageMap };
-    }
-
-    Object.entries(baseDamageMap).forEach(([typeKey, amount]) => {
-      if (amount && amount > 0) {
-        const damageType = parseInt(typeKey) as DamageType;
-        const calculatedDamage = this.damageTypeCalculation(
-          damageType,
-          amount,
-          target,
-        );
-        damageMap[damageType] = calculatedDamage;
-        cumulativeDamage += Math.max(0, calculatedDamage);
-      }
+    Object.entries(damageMap).forEach(([typeKey, amount]) => {
+      const damageType = parseInt(typeKey) as DamageType;
+      const calculatedDamage = this.damageTypeCalculation(
+        damageType,
+        amount,
+        target,
+      );
+      damageMap[damageType] = calculatedDamage;
+      cumulativeDamage += Math.max(0, calculatedDamage);
     });
 
     return { cumulativeDamage, damageMap };

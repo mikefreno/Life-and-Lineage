@@ -122,6 +122,7 @@ export const useStyles = () => {
     shadowOpacity: platform === "android" ? 0.9 : 0.2,
     shadowRadius: 1.5,
     elevation: 3,
+    backgroundColor: theme.background,
     ...(uiStore.colorScheme === "dark" &&
       ({
         borderWidth: 1,
@@ -1141,7 +1142,6 @@ export const useStyles = () => {
     dungeonBlur: {
       position: "absolute",
       bottom: 0,
-      marginBottom: -uiStore.playerStatusHeight,
       height: "85%",
     } as const,
     // webview

@@ -88,41 +88,38 @@ const RelationshipsScreen = observer(() => {
 
   function renderCharacter(character: Character) {
     return (
-      <ThemedView
-        style={[
-          styles.themedCard,
-          {
-            width: uiStore.dimensions.width / 2.5,
-            marginHorizontal: uiStore.dimensions.width * 0.05,
-          },
-        ]}
+      <Pressable
+        style={{
+          ...styles.themedCard,
+          width: uiStore.dimensions.width / 2.5,
+          marginHorizontal: uiStore.dimensions.width * 0.05,
+          ...styles.columnBetween,
+          opacity: character.deathdate ? 0.5 : 1,
+          paddingVertical: tw_base[2],
+        }}
+        key={character.id}
+        disabled={!!character.deathdate}
+        onPress={() => {
+          setShowInteractionModal(true);
+          setSelectedCharacter(character);
+        }}
       >
-        <Pressable
+        <Text
           style={{
-            ...styles.columnBetween,
-            opacity: character.deathdate ? 0.5 : 1,
-            paddingVertical: tw_base[2],
+            textAlign: "center",
+            ...styles["text-2xl"],
+            textDecorationLine: character.deathdate
+              ? "line-through"
+              : "underline",
           }}
-          key={character.id}
-          disabled={!!character.deathdate}
-          onPress={() => {
-            setShowInteractionModal(true);
-            setSelectedCharacter(character);
-          }}
+          numberOfLines={2}
         >
-          <Text
-            style={{
-              textAlign: "center",
-              ...styles["text-2xl"],
-              textDecorationLine: character.deathdate
-                ? "line-through"
-                : "underline",
-            }}
-            numberOfLines={2}
-          >
-            {character.fullName}
-          </Text>
+          {character.fullName}
+        </Text>
+        <View style={{ width: "100%", height: "40%" }}>
           <CharacterImage character={character} />
+        </View>
+        <View style={{ alignItems: "center" }}>
           <Text style={styles["text-xl"]}>
             {character.deathdate && "Died at "}
             {character.age} Years Old
@@ -167,8 +164,8 @@ const RelationshipsScreen = observer(() => {
               />
             </View>
           )}
-        </Pressable>
-      </ThemedView>
+        </View>
+      </Pressable>
     );
   }
 
@@ -193,6 +190,7 @@ const RelationshipsScreen = observer(() => {
             flexGrow: 1,
             width: (data.length / 2) * uiStore.dimensions.width,
             marginVertical: 4,
+            height: uiStore.dimensions.lesser * 0.8,
           }}
           renderItem={({ item }) => renderCharacter(item)}
           keyExtractor={(item) => item.id}
@@ -348,9 +346,8 @@ const RelationshipsScreen = observer(() => {
         />
         <ScrollView
           contentContainerStyle={{
-            paddingVertical: "2%",
-            paddingBottom: uiStore.playerStatusHeightSecondary,
             paddingTop: headerHeight,
+            paddingBottom: uiStore.playerStatusHeightSecondary,
           }}
         >
           {characterGroups.map((group) => renderGroup(group.title, group.data))}
