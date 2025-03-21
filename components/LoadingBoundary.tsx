@@ -1,14 +1,14 @@
 import { ReactNode, useEffect, useRef, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
-import { useRootStore } from "../hooks/stores";
+import { useRootStore } from "@/hooks/stores";
 import { Animated } from "react-native";
 import { observer } from "mobx-react-lite";
-import D20DieAnimation from "./DieRollAnim";
-import ProgressBar from "./ProgressBar";
-import Colors from "../constants/Colors";
-import { Text } from "./Themed";
+import D20DieAnimation from "@/components/DieRollAnim";
+import ProgressBar from "@/components/ProgressBar";
+import Colors from "@/constants/Colors";
+import { Text } from "@/components/Themed";
 import { useStyles } from "@/hooks/styles";
-import { AnimatedLoadingText } from "./AnimatedLoadingText";
+import { AnimatedLoadingText } from "@/components/AnimatedLoadingText";
 
 export const LoadingBoundary = observer(
   ({ children }: { children: ReactNode }) => {

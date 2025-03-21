@@ -3,7 +3,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { easeGradient } from "react-native-easing-gradient";
 import MaskedView from "@react-native-masked-view/masked-view";
 import { View, StyleSheet, Platform, ViewStyle } from "react-native";
-import { useRootStore } from "../hooks/stores";
+import { useRootStore } from "@/hooks/stores";
 import { observer } from "mobx-react-lite";
 
 export const LinearGradientBlur = observer(

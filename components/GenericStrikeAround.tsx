@@ -4,9 +4,9 @@ import {
   type StyleProp,
   type TextStyle,
 } from "react-native";
-import { Text } from "./Themed";
+import { Text } from "@/components/Themed";
 import { ReactNode } from "react";
-import { useStyles } from "../hooks/styles";
+import { useStyles } from "@/hooks/styles";
 
 interface GenericStrikeAround {
   containerStyles?: StyleProp<ViewStyle>;

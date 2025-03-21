@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from "react";
-import { View, Platform, ViewStyle, ViewProps, StyleProp } from "react-native";
+import { View, Platform, ViewStyle, StyleProp } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
   Easing,
 } from "react-native-reanimated";
-import { Text } from "./Themed";
+import { Text } from "@/components/Themed";
 import { useStyles, normalize } from "@/hooks/styles";
 
 interface ProgressBarProps {

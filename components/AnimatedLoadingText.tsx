@@ -1,6 +1,6 @@
 import { normalize, useStyles } from "@/hooks/styles";
 import React, { useEffect, useState } from "react";
-import { Text } from "./Themed";
+import { Text } from "@/components/Themed";
 import { View } from "react-native";
 
 export const AnimatedLoadingText = () => {

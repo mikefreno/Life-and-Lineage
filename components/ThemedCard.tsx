@@ -1,7 +1,7 @@
 import { type ReactNode } from "react";
 import { ViewStyle, View } from "react-native";
-import { normalize, useStyles } from "../hooks/styles";
-import { ThemedView } from "./Themed";
+import { normalize, useStyles } from "@/hooks/styles";
+import { ThemedView } from "@/components/Themed";
 
 interface ThemedCard {
   children?: ReactNode;

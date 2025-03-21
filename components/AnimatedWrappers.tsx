@@ -1,7 +1,7 @@
 import { Animated, View } from "react-native";
 import { useEffect, useRef, useState } from "react";
-import Colors from "../constants/Colors";
-import { useRootStore } from "../hooks/stores";
+import Colors from "@/constants/Colors";
+import { useRootStore } from "@/hooks/stores";
 
 interface AnimatedWrapperProps {
   children:

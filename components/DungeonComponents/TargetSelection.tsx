@@ -1,15 +1,16 @@
 import { Pressable, View, Animated } from "react-native";
-import { Text } from "../Themed";
-import ProgressBar from "../ProgressBar";
-import { toTitleCase } from "../../utility/functions/misc";
-import { useCombatState } from "../../providers/DungeonData";
-import { useCombatActions } from "../../hooks/combat";
-import type { Enemy, Minion } from "../../entities/creatures";
-import { useRootStore } from "../../hooks/stores";
-import { AnimatedSprite } from "../AnimatedSprite";
-import { EnemyImageMap } from "../../utility/enemyHelpers";
-import { flex, useStyles } from "../../hooks/styles";
+import { Text } from "@/components/Themed";
+import ProgressBar from "@/components/ProgressBar";
+import { toTitleCase } from "@/utility/functions/misc";
+import { useCombatState } from "@/providers/DungeonData";
+import { useCombatActions } from "@/hooks/combat";
+import { Creature, Enemy } from "@/entities/creatures";
+import { useRootStore } from "@/hooks/stores";
+import { AnimatedSprite } from "@/components/AnimatedSprite";
+import { flex, useStyles } from "@/hooks/styles";
 import { useRef } from "react";
+import { Being } from "@/entities/being";
+import { Character } from "@/entities/character";
 
 export default function TargetSelectionRender() {
   const styles = useStyles();
@@ -17,11 +18,13 @@ export default function TargetSelectionRender() {
   const { showTargetSelection, setShowTargetSelection } = useCombatState();
   const { useAttack } = useCombatActions();
 
-  let targets: (Enemy | Minion)[] = enemyStore.enemies;
+  let targets: Being[] = enemyStore.enemies;
 
-  enemyStore.enemies.forEach((enemy) =>
-    enemy.minions.forEach((minion) => targets.push(minion)),
-  );
+  enemyStore.enemies.forEach((enemy) => {
+    if (enemy instanceof Enemy) {
+      enemy.minions.forEach((minion) => targets.push(minion));
+    }
+  });
 
   const animationValues = useRef(new Map());
 
@@ -58,7 +61,6 @@ export default function TargetSelectionRender() {
     >
       {targets.map((target) => {
         const scaleAnim = getAnimationValue(target.id);
-        const store = enemyStore.getAnimationStore(target.id);
 
         return (
           <Animated.View
@@ -74,8 +76,8 @@ export default function TargetSelectionRender() {
               onPress={() => {
                 if (showTargetSelection.chosenAttack) {
                   useAttack({
-                    attackOrSpell: showTargetSelection.chosenAttack,
-                    target,
+                    attack: showTargetSelection.chosenAttack,
+                    targets,
                   });
                   setShowTargetSelection({
                     showing: false,
@@ -91,7 +93,9 @@ export default function TargetSelectionRender() {
                 </View>
                 <View style={[styles.myAuto, { width: "33%" }]}>
                   <Text style={{ textAlign: "center" }}>
-                    {toTitleCase(target.creatureSpecies)}
+                    {toTitleCase(
+                      (target as Creature | Character).nameReference,
+                    )}
                   </Text>
                   <ProgressBar
                     filledColor="#ef4444"

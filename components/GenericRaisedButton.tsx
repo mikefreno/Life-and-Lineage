@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  StyleSheet,
-  ColorValue,
-  Pressable,
-  StyleProp,
-  ViewStyle,
-} from "react-native";
+import { ColorValue, Pressable, StyleProp, ViewStyle } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -13,10 +7,10 @@ import Animated, {
   withSequence,
   Easing,
 } from "react-native-reanimated";
-import { useVibration } from "../hooks/generic";
-import { useRootStore } from "../hooks/stores";
-import AnimatedButtonText from "./AnimatedButtonText";
-import { Text } from "./Themed";
+import { useVibration } from "@/hooks/generic";
+import { useRootStore } from "@/hooks/stores";
+import AnimatedButtonText from "@/components/AnimatedButtonText";
+import { Text } from "@/components/Themed";
 import { normalize, useStyles } from "@/hooks/styles";
 
 interface GenericRaisedButtonProps {

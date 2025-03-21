@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from "react";
-import { ThemedView, Text } from "../Themed";
+import { ThemedView, Text } from "@/components/Themed";
 import {
   Pressable,
   FlatList,

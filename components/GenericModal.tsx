@@ -8,9 +8,9 @@ import {
   type ViewStyle,
 } from "react-native";
 import Modal from "react-native-modal";
-import { ThemedView } from "./Themed";
-import { useRootStore } from "../hooks/stores";
-import { useStyles } from "../hooks/styles";
+import { ThemedView } from "@/components/Themed";
+import { useRootStore } from "@/hooks/stores";
+import { useStyles } from "@/hooks/styles";
 import { observer } from "mobx-react-lite";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 

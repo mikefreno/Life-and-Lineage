@@ -1,11 +1,11 @@
 import Svg, { Rect } from "react-native-svg";
 import { Dimensions, View } from "react-native";
-import GenericRaisedButton from "../GenericRaisedButton";
-import { TILE_SIZE } from "../../stores/DungeonStore";
+import GenericRaisedButton from "@/components/GenericRaisedButton";
+import { TILE_SIZE } from "@/stores/DungeonStore";
 import { observer } from "mobx-react-lite";
-import { useRootStore } from "../../hooks/stores";
-import { normalize, normalizeForText, useStyles } from "../../hooks/styles";
-import { directionsMapping, Tile } from "../../utility/functions/dungeon";
+import { useRootStore } from "@/hooks/stores";
+import { normalizeForText, useStyles } from "@/hooks/styles";
+import { directionsMapping, Tile } from "@/utility/functions/dungeon";
 
 /**
  * Renders the dungeon map made by `generateTiles`.

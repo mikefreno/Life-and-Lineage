@@ -2,12 +2,12 @@ import React from "react";
 import { useRef, useState } from "react";
 import GenericModal from "./GenericModal";
 import { Dimensions, Pressable, View, Image } from "react-native";
-import { Text } from "./Themed";
-import { toTitleCase } from "../utility/functions/misc";
-import GearStatsDisplay from "./GearStatsDisplay";
-import type { Item } from "../entities/item";
-import { useRootStore } from "../hooks/stores";
-import { radius, useStyles } from "../hooks/styles";
+import { Text } from "@/components/Themed";
+import { toTitleCase } from "@/utility/functions/misc";
+import GearStatsDisplay from "@/components/GearStatsDisplay";
+import type { Item } from "@/entities/item";
+import { useRootStore } from "@/hooks/stores";
+import { radius, useStyles } from "@/hooks/styles";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 
 const deviceHeight = Dimensions.get("window").height;

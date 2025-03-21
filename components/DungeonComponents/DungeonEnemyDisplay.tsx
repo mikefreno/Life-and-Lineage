@@ -1,20 +1,20 @@
 import { View, Image, ScrollView } from "react-native";
-import { toTitleCase } from "../../utility/functions/misc";
-import ProgressBar from "../ProgressBar";
-import GenericStrikeAround from "../GenericStrikeAround";
-import { Text } from "../Themed";
-import FadeOutNode from "../FadeOutNode";
+import { toTitleCase } from "@/utility/functions/misc";
+import ProgressBar from "@/components/ProgressBar";
+import GenericStrikeAround from "@/components/GenericStrikeAround";
+import { Text } from "@/components/Themed";
+import FadeOutNode from "@/components/FadeOutNode";
 import { useEffect, useMemo, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { Creature, Enemy } from "../../entities/creatures";
-import { useRootStore } from "../../hooks/stores";
+import { Creature, Enemy } from "@/entities/creatures";
+import { useRootStore } from "@/hooks/stores";
 import { AnimatedSprite } from "../AnimatedSprite";
 import {
   flex,
   normalize,
   normalizeLineHeight,
   useStyles,
-} from "../../hooks/styles";
+} from "@/hooks/styles";
 import Colors from "@/constants/Colors";
 import {
   useSharedValue,

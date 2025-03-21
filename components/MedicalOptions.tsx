@@ -1,14 +1,14 @@
 import React, { useMemo } from "react";
 import { View } from "react-native";
-import { Text } from "./Themed";
-import GenericRaisedButton from "./GenericRaisedButton";
-import ThemedCard from "./ThemedCard";
-import { Coins, Energy, HealthIcon, Sanity } from "../assets/icons/SVGIcons";
+import { Text } from "@/components/Themed";
+import GenericRaisedButton from "@/components/GenericRaisedButton";
+import ThemedCard from "@/components/ThemedCard";
+import { Coins, Energy, HealthIcon, Sanity } from "@/assets/icons/SVGIcons";
 import { observer } from "mobx-react-lite";
-import { useRootStore } from "../hooks/stores";
-import { AccelerationCurves } from "../utility/functions/misc";
-import { useAcceleratedAction } from "../hooks/generic";
-import { useStyles } from "../hooks/styles";
+import { useRootStore } from "@/hooks/stores";
+import { AccelerationCurves } from "@/utility/functions/misc";
+import { useAcceleratedAction } from "@/hooks/generic";
+import { useStyles } from "@/hooks/styles";
 
 interface MedicalOptionProps {
   title: string;

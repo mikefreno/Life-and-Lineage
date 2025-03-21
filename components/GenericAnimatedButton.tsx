@@ -1,7 +1,7 @@
 import { type ReactNode, useRef } from "react";
 import { Pressable, Animated, View } from "react-native";
-import { ThemedView } from "./Themed";
-import { useStyles } from "../hooks/styles";
+import { ThemedView } from "@/components/Themed";
+import { useStyles } from "@/hooks/styles";
 
 const AnimatedThemedView = Animated.createAnimatedComponent(View);
 

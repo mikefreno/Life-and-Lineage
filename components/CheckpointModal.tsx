@@ -7,20 +7,20 @@ import {
   Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useRootStore } from "../hooks/stores";
+import { useRootStore } from "@/hooks/stores";
 import { Text, ThemedView } from "./Themed";
 import ThemedCard from "./ThemedCard";
 import { parse } from "flatted";
-import { Element, ElementToString } from "../utility/types";
-import clearHistory, { toTitleCase, wait } from "../utility/functions/misc";
+import { Element, ElementToString } from "@/utility/types";
+import clearHistory, { toTitleCase, wait } from "@/utility/functions/misc";
 import {
   NecromancerSkull,
   PaladinHammer,
   RangerIcon,
   WizardHat,
-} from "../assets/icons/SVGIcons";
-import BlessingDisplay from "./BlessingsDisplay";
-import { radius, useStyles } from "../hooks/styles";
+} from "@/assets/icons/SVGIcons";
+import BlessingDisplay from "@/components/BlessingsDisplay";
+import { radius, useStyles } from "@/hooks/styles";
 import Modal from "react-native-modal";
 import { normalize } from "@sentry/core";
 import { useNavigation } from "expo-router";

@@ -1,12 +1,12 @@
 import React from "react";
 import { Pressable, View, Image } from "react-native";
-import GenericModal from "../GenericModal";
-import { ThemedView, Text } from "../Themed";
-import { useLootState } from "../../providers/DungeonData";
-import type { Item } from "../../entities/item";
-import { useRootStore } from "../../hooks/stores";
-import { tw_base, useStyles } from "../../hooks/styles";
-import GenericFlatButton from "../GenericFlatButton";
+import GenericModal from "@/components/GenericModal";
+import { ThemedView, Text } from "@/components/Themed";
+import { useLootState } from "@/providers/DungeonData";
+import type { Item } from "@/entities/item";
+import { useRootStore } from "@/hooks/stores";
+import { tw_base, useStyles } from "@/hooks/styles";
+import GenericFlatButton from "@/components/GenericFlatButton";
 
 interface LeftBehindItemsModalProps {
   showLeftBehindItemsScreen: boolean;

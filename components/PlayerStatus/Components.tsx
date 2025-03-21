@@ -31,7 +31,7 @@ import {
   SquarePlus,
   StrengthIcon,
 } from "@/assets/icons/SVGIcons";
-import FadeOutNode from "../FadeOutNode";
+import FadeOutNode from "@/components/FadeOutNode";
 import React from "react";
 import { useRootStore } from "@/hooks/stores";
 import { observer } from "mobx-react-lite";

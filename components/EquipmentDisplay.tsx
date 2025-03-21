@@ -1,15 +1,15 @@
 import React, { useEffect } from "react";
 import { View, Image } from "react-native";
-import { Text } from "./Themed";
-import { InventoryItem } from "./Draggable";
-import type { Item } from "../entities/item";
-import { useDraggableStore, useRootStore } from "../hooks/stores";
+import { Text } from "@/components/Themed";
+import { InventoryItem } from "@/components/Draggable";
+import type { Item } from "@/entities/item";
+import { useDraggableStore, useRootStore } from "@/hooks/stores";
 import { useCallback, useRef } from "react";
-import { PlayerCharacter } from "../entities/character";
-import UIStore from "../stores/UIStore";
-import { DraggableDataStore } from "../stores/DraggableDataStore";
+import { PlayerCharacter } from "@/entities/character";
+import UIStore from "@/stores/UIStore";
+import { DraggableDataStore } from "@/stores/DraggableDataStore";
 import { observer } from "mobx-react-lite";
-import { normalize, normalizeLineHeight, useStyles } from "../hooks/styles";
+import { normalize, normalizeLineHeight, useStyles } from "@/hooks/styles";
 import { useIsFocused } from "@react-navigation/native";
 
 interface EquipmentDisplayProps {

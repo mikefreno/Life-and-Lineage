@@ -1,15 +1,14 @@
-import React from "react";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View, Pressable, Switch, AccessibilityRole } from "react-native";
 import { Entypo } from "@expo/vector-icons";
-import { Text } from "./Themed";
+import { Text } from "@/components/Themed";
 import { observer } from "mobx-react-lite";
-import { TutorialOption } from "../utility/types";
-import GenericModal from "./GenericModal";
-import { useVibration } from "../hooks/generic";
-import { useRootStore } from "../hooks/stores";
-import { normalize, tw, tw_base, useStyles } from "../hooks/styles";
-import Colors from "../constants/Colors";
+import { TutorialOption } from "@/utility/types";
+import GenericModal from "@/components/GenericModal";
+import { useVibration } from "@/hooks/generic";
+import { useRootStore } from "@/hooks/stores";
+import { normalize, tw, tw_base, useStyles } from "@/hooks/styles";
+import Colors from "@/constants/Colors";
 import GenericFlatButton from "./GenericFlatButton";
 import { SCREEN_TRANSITION_TIMING } from "@/stores/UIStore";
 

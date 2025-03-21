@@ -3,7 +3,7 @@ import { View } from "react-native";
 import { observer } from "mobx-react-lite";
 
 import { useDraggableStore } from "@/hooks/stores";
-import { Text } from "./Themed";
+import { Text } from "@/components/Themed";
 import { normalize } from "@/hooks/styles";
 
 const BoundsVisualizer = observer(() => {

@@ -1,19 +1,19 @@
 import React from "react";
-import { Text } from "./Themed";
-import { InvestmentType, InvestmentUpgrade } from "../utility/types";
+import { Text } from "@/components/Themed";
+import { InvestmentType, InvestmentUpgrade } from "@/utility/types";
 import { Pressable, View, Animated, ScrollView } from "react-native";
 import { useEffect, useRef, useState } from "react";
-import { toTitleCase, asReadableGold } from "../utility/functions/misc";
+import { toTitleCase, asReadableGold } from "@/utility/functions/misc";
 import { Entypo } from "@expo/vector-icons";
-import GenericModal from "./GenericModal";
+import GenericModal from "@/components/GenericModal";
 import { observer } from "mobx-react-lite";
-import ThemedCard from "./ThemedCard";
-import GenericStrikeAround from "./GenericStrikeAround";
-import { ClockIcon, Coins, Vault } from "../assets/icons/SVGIcons";
-import { useRootStore } from "../hooks/stores";
-import { useVibration } from "../hooks/generic";
-import type { Investment } from "../entities/investment";
-import { useStyles } from "../hooks/styles";
+import ThemedCard from "@/components/ThemedCard";
+import GenericStrikeAround from "@/components/GenericStrikeAround";
+import { ClockIcon, Coins, Vault } from "@/assets/icons/SVGIcons";
+import { useRootStore } from "@/hooks/stores";
+import { useVibration } from "@/hooks/generic";
+import type { Investment } from "@/entities/investment";
+import { useStyles } from "@/hooks/styles";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 
 const InvestmentCard = observer(

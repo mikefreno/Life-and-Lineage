@@ -6,7 +6,7 @@ import Animated, {
   runOnJS,
   Easing,
 } from "react-native-reanimated";
-import { DEFAULT_FADEOUT_TIME } from "./Themed";
+import { DEFAULT_FADEOUT_TIME } from "@/components/Themed";
 import { type ViewStyle } from "react-native";
 
 interface FadeOutChildProps {

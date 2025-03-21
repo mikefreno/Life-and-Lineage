@@ -3,11 +3,11 @@ import {
   Link,
   type RelativePathString,
 } from "expo-router";
-import { useVibration } from "../hooks/generic";
+import { useVibration } from "@/hooks/generic";
 import { type ReactNode } from "react";
 import { type TextStyle, type AccessibilityRole } from "react-native";
-import { useStyles } from "../hooks/styles";
-import { useRootStore } from "../hooks/stores";
+import { useStyles } from "@/hooks/styles";
+import { useRootStore } from "@/hooks/stores";
 
 export default function GenericFlatLink({
   href,

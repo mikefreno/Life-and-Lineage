@@ -13,8 +13,8 @@ import {
   SummonerSkull,
   Vengeance,
   Water,
-} from "../assets/icons/SVGIcons";
-import { Element } from "../utility/types";
+} from "@/assets/icons/SVGIcons";
+import { Element } from "@/utility/types";
 
 interface BlessingDisplayProps {
   blessing: Element;

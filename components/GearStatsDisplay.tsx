@@ -1,22 +1,22 @@
 import { Platform, Pressable, View } from "react-native";
-import { Text } from "./Themed";
-import { ItemClassType, Modifier } from "../utility/types";
+import { Text } from "@/components/Themed";
+import { ItemClassType, Modifier } from "@/utility/types";
 import { useState } from "react";
-import GenericModal from "./GenericModal";
-import { Item } from "../entities/item";
+import GenericModal from "@/components/GenericModal";
+import { Item } from "@/entities/item";
 import { observer } from "mobx-react-lite";
-import GenericStrikeAround from "./GenericStrikeAround";
+import GenericStrikeAround from "@/components/GenericStrikeAround";
 import { Image } from "expo-image";
-import { cleanRoundToTenths } from "../utility/functions/misc";
+import { cleanRoundToTenths } from "@/utility/functions/misc";
 import {
   getStatInfo,
   getTotalValue,
   shouldShowModifier,
-} from "../utility/functions/stats";
-import { useVibration } from "../hooks/generic";
-import { flex, normalize, useStyles } from "../hooks/styles";
+} from "@/utility/functions/stats";
+import { useVibration } from "@/hooks/generic";
+import { flex, normalize, useStyles } from "@/hooks/styles";
 import React from "react";
-import { useRootStore } from "../hooks/stores";
+import { useRootStore } from "@/hooks/stores";
 
 const StatRow = observer(
   ({

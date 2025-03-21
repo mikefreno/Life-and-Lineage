@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Pressable, Animated, View } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { Text } from "./Themed";
-import { useRootStore } from "../hooks/stores";
-import { useStyles } from "../hooks/styles";
+import { Text } from "@/components/Themed";
+import { useRootStore } from "@/hooks/stores";
+import { useStyles } from "@/hooks/styles";
 
 interface CodexCategoryProps {
   category: string;

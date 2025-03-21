@@ -1,16 +1,16 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
 import { View } from "react-native";
-import { Text } from "../components/Themed";
-import ProgressBar from "./ProgressBar";
-import GenericRaisedButton from "./GenericRaisedButton";
-import { AccelerationCurves, toTitleCase } from "../utility/functions/misc";
-import { Coins, Sanity } from "../assets/icons/SVGIcons";
-import { useAcceleratedAction } from "../hooks/generic";
+import { Text } from "@/components/Themed";
+import ProgressBar from "@/components/ProgressBar";
+import GenericRaisedButton from "@/components/GenericRaisedButton";
+import { AccelerationCurves, toTitleCase } from "@/utility/functions/misc";
+import { Coins, Sanity } from "@/assets/icons/SVGIcons";
+import { useAcceleratedAction } from "@/hooks/generic";
 import { useCallback } from "react";
-import { useRootStore } from "../hooks/stores";
-import { useStyles } from "../hooks/styles";
-import ThemedCard from "./ThemedCard";
+import { useRootStore } from "@/hooks/stores";
+import { useStyles } from "@/hooks/styles";
+import ThemedCard from "@/components/ThemedCard";
 
 interface TrainingCardProps {
   name: string;

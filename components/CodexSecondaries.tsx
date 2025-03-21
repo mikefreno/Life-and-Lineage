@@ -5,22 +5,20 @@ import SpellDetails from "@/components/SpellDetails";
 import { Element, ElementToString, PlayerClassOptions } from "@/utility/types";
 import { ClassDescriptionMap, DescriptionMap } from "@/utility/descriptions";
 import { elementalColorMap, playerClassColors } from "@/constants/Colors";
-import { Text } from "./Themed";
-
-// Import spell data
-import mageSpells from "../assets/json/mageSpells.json";
-import necromancerSpells from "../assets/json/necroSpells.json";
-import paladinSpells from "../assets/json/paladinSpells.json";
-import rangerSpells from "../assets/json/rangerSpells.json";
-import BlessingDisplay from "./BlessingsDisplay";
+import { Text } from "@/components/Themed";
+import mageSpells from "@/assets/json/mageSpells.json";
+import necromancerSpells from "@/assets/json/necroSpells.json";
+import paladinSpells from "@/assets/json/paladinSpells.json";
+import rangerSpells from "@/assets/json/rangerSpells.json";
+import BlessingDisplay from "@/components/BlessingsDisplay";
 import {
   NecromancerSkull,
   PaladinHammer,
   RangerIcon,
   WizardHat,
-} from "../assets/icons/SVGIcons";
-import { useRootStore } from "../hooks/stores";
-import { useStyles } from "../hooks/styles";
+} from "@/assets/icons/SVGIcons";
+import { useRootStore } from "@/hooks/stores";
+import { useStyles } from "@/hooks/styles";
 import { Attack } from "@/entities/attack";
 
 const ClassCodex = ({

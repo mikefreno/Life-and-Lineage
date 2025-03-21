@@ -1,6 +1,6 @@
 import { Image } from "react-native";
-import { getCharacterImage, toTitleCase } from "../utility/functions/misc";
-import { Character } from "../entities/character";
+import { getCharacterImage, toTitleCase } from "@/utility/functions/misc";
+import { Character } from "@/entities/character";
 
 export function CharacterImage({ character }: { character: Character }) {
   return (

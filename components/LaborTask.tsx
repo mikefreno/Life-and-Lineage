@@ -1,15 +1,15 @@
 import React, { useMemo } from "react";
 import { View } from "react-native";
-import ProgressBar from "./ProgressBar";
+import ProgressBar from "@/components/ProgressBar";
 import { observer } from "mobx-react-lite";
-import { AccelerationCurves, numberToRoman } from "../utility/functions/misc";
+import { AccelerationCurves, numberToRoman } from "@/utility/functions/misc";
 import GenericRaisedButton from "./GenericRaisedButton";
-import ThemedCard from "./ThemedCard";
-import { Text } from "./Themed";
-import { Coins, Energy, HealthIcon, Sanity } from "../assets/icons/SVGIcons";
-import { useRootStore } from "../hooks/stores";
-import { useAcceleratedAction } from "../hooks/generic";
-import { useStyles } from "../hooks/styles";
+import ThemedCard from "@/components/ThemedCard";
+import { Text } from "@/components/Themed";
+import { Coins, Energy, HealthIcon, Sanity } from "@/assets/icons/SVGIcons";
+import { useRootStore } from "@/hooks/stores";
+import { useAcceleratedAction } from "@/hooks/generic";
+import { useStyles } from "@/hooks/styles";
 
 interface LaborTaskProps {
   reward: number;

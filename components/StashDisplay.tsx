@@ -7,15 +7,15 @@ import {
   LayoutChangeEvent,
 } from "react-native";
 import { observer } from "mobx-react-lite";
-import { Item } from "../entities/item";
-import { useRootStore } from "../hooks/stores";
-import { InventoryItem } from "./Draggable";
-import { Text } from "./Themed";
-import GenericModal from "./GenericModal";
+import { Item } from "@/entities/item";
+import { useRootStore } from "@/hooks/stores";
+import { InventoryItem } from "@/components/Draggable";
+import { Text } from "@/components/Themed";
+import GenericModal from "@/components/GenericModal";
 import { useCallback, useRef, useState } from "react";
-import { StatsDisplay } from "./StatsDisplay";
-import GenericStrikeAround from "./GenericStrikeAround";
-import { useStyles } from "../hooks/styles";
+import { StatsDisplay } from "@/components/StatsDisplay";
+import GenericStrikeAround from "@/components/GenericStrikeAround";
+import { useStyles } from "@/hooks/styles";
 
 type StashDisplayProps = {
   showingStash: boolean;

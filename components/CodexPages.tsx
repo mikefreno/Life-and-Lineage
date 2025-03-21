@@ -1,5 +1,5 @@
 import { ScrollView, View } from "react-native";
-import { Text } from "./Themed";
+import { Text } from "@/components/Themed";
 import {
   Air,
   ArcaneIcon,
@@ -19,18 +19,18 @@ import {
   Vengeance,
   Water,
   WizardHat,
-} from "../assets/icons/SVGIcons";
+} from "@/assets/icons/SVGIcons";
 import { Link } from "expo-router";
-import { GenericCarousel } from "./GenericCarousel";
-import GenericStrikeAround from "./GenericStrikeAround";
-import { useRootStore } from "../hooks/stores";
-import { useStyles } from "../hooks/styles";
+import { GenericCarousel } from "@/components/GenericCarousel";
+import GenericStrikeAround from "@/components/GenericStrikeAround";
+import { useRootStore } from "@/hooks/stores";
+import { useStyles } from "@/hooks/styles";
 
 export function CombatCodex() {
   const images = [
-    require("../assets/images/codex/DungeonAttacks.png"),
-    require("../assets/images/codex/DungeonEquipment.png"),
-    require("../assets/images/codex/DungeonLog.png"),
+    require("@/assets/images/codex/DungeonAttacks.png"),
+    require("@/assets/images/codex/DungeonEquipment.png"),
+    require("@/assets/images/codex/DungeonLog.png"),
   ];
 
   return (

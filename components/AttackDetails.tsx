@@ -1,10 +1,10 @@
 import React from "react";
 import { View } from "react-native";
-import GenericStrikeAround from "./GenericStrikeAround";
-import { toTitleCase } from "../utility/functions/misc";
-import { Text } from "./Themed";
-import type { Attack } from "../entities/attack";
-import { useStyles } from "../hooks/styles";
+import GenericStrikeAround from "@/components/GenericStrikeAround";
+import { toTitleCase } from "@/utility/functions/misc";
+import { Text } from "@/components/Themed";
+import type { Attack } from "@/entities/attack";
+import { useStyles } from "@/hooks/styles";
 
 export default function AttackDetails({
   attack,
@@ -17,18 +17,15 @@ export default function AttackDetails({
 }) {
   return (
     <View style={styles.attackDetailsContainer}>
-      <Text style={styles.xl}>{toTitleCase(attack.name)}</Text>
+      <Text style={styles["text-xl"]}>{toTitleCase(attack.name)}</Text>
       <Text>
-        {toTitleCase(attack.attackStyle)}{" "}
-        {attack.attackStyle == "single" && "Target"}
+        {toTitleCase(attack.targets)} {attack.targets == "single" && "Target"}
       </Text>
-      {attack.attackStyle && (
-        <Text>{attack.baseHitChance * 100}% hit chance</Text>
-      )}
-      {attack.buffs.length > 0 && (
+      {attack.targets && <Text>{attack.baseHitChance * 100}% hit chance</Text>}
+      {attack.buffNames && attack.buffNames.length > 0 && (
         <>
           <GenericStrikeAround>Buffs</GenericStrikeAround>
-          {attack.buffStrings.map((buff, idx) => (
+          {attack.buffNames.map((buff, idx) => (
             <View key={`${buff}-${idx}`}>
               <Text>{buff}</Text>
             </View>
@@ -38,7 +35,7 @@ export default function AttackDetails({
       {attack.debuffs.length > 0 && (
         <>
           <GenericStrikeAround>Debuffs</GenericStrikeAround>
-          {attack.debuffStrings.map((debuff, idx) => (
+          {attack.debuffNames?.map((debuff, idx) => (
             <View
               key={`${debuff.name}-${idx}`}
               style={styles.attackEffectContainer}
@@ -52,9 +49,9 @@ export default function AttackDetails({
       <View style={styles.attackDamageBox}>
         <Text style={{ textAlign: "center" }}>
           {baseDamage}
-          {attack.hits > 1
-            ? `x${attack.hits}(${
-                Math.round(baseDamage * attack.hits * 4) / 4
+          {attack.hitsPerTurn > 1
+            ? `x${attack.hitsPerTurn}(${
+                Math.round(baseDamage * attack.hitsPerTurn * 4) / 4
               } total)`
             : ""}{" "}
           base attack damage

@@ -5,9 +5,9 @@ import {
   ScrollView as DefaultScrollView,
 } from "react-native";
 
-import Colors from "../constants/Colors";
+import Colors from "@/constants/Colors";
 import { forwardRef } from "react";
-import { useRootStore } from "../hooks/stores";
+import { useRootStore } from "@/hooks/stores";
 import { normalize, normalizeLineHeight } from "@/hooks/styles";
 
 type ThemeProps = {

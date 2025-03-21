@@ -4,7 +4,7 @@ import { observer } from "mobx-react-lite";
 import { Animated, Pressable, ScrollView, TextInput, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import React, { useRef, useState, useEffect } from "react";
-import GenericModal from "./GenericModal";
+import GenericModal from "@/components/GenericModal";
 import { useVibration } from "@/hooks/generic";
 import {
   HandlerStateChangeEvent,
@@ -12,8 +12,8 @@ import {
   PanGestureHandlerEventPayload,
   State,
 } from "react-native-gesture-handler";
-import { Text } from "./Themed";
-import ThemedCard from "./ThemedCard";
+import { Text } from "@/components/Themed";
+import ThemedCard from "@/components/ThemedCard";
 import GenericRaisedButton from "./GenericRaisedButton";
 import Slider from "@react-native-community/slider";
 import { flex, normalize, useStyles } from "@/hooks/styles";

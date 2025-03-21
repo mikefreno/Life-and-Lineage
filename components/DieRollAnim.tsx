@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { View, Animated, Easing } from "react-native";
-import { Text } from "./Themed";
-import { rollD20 } from "../utility/functions/misc";
-import { D20SVG } from "../assets/icons/SVGIcons";
-import { useRootStore } from "../hooks/stores";
+import { Text } from "@/components/Themed";
+import { rollD20 } from "@/utility/functions/misc";
+import { D20SVG } from "@/assets/icons/SVGIcons";
+import { useRootStore } from "@/hooks/stores";
 import { observer } from "mobx-react-lite";
 
 interface D20DieAnimationProps {

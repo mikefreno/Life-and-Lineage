@@ -1,7 +1,7 @@
 import { BlurView } from "expo-blur";
 import { Platform } from "react-native";
-import { ThemedView } from "./Themed";
-import { useRootStore } from "../hooks/stores";
+import { ThemedView } from "@/components/Themed";
+import { useRootStore } from "@/hooks/stores";
 
 export default function PlatformDependantBlurView(props) {
   const { uiStore } = useRootStore();

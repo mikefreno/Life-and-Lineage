@@ -1,8 +1,8 @@
 import { View, Pressable, DimensionValue } from "react-native";
-import { Text } from "../Themed";
-import { useVibration } from "../../hooks/generic";
-import { useRootStore } from "../../hooks/stores";
-import { normalize, useStyles } from "../../hooks/styles";
+import { Text } from "@/components/Themed";
+import { useVibration } from "@/hooks/generic";
+import { useRootStore } from "@/hooks/stores";
+import { normalize, useStyles } from "@/hooks/styles";
 import { useMemo } from "react";
 
 interface BattleTabControlsProps {

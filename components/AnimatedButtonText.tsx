@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Animated, type ColorValue } from "react-native";
-import { Text } from "./Themed";
+import { Text } from "@/components/Themed";
 import React from "react";
 
 const AnimatedText = Animated.createAnimatedComponent(Text);

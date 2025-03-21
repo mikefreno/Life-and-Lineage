@@ -1,6 +1,6 @@
 import React from "react";
 import { Pressable, ScrollView, View } from "react-native";
-import { ThemedView, Text } from "../components/Themed";
+import { ThemedView, Text } from "@/components/Themed";
 import { Activity, BadOutcome, GoodOutcome } from "@/utility/types";
 import { flipCoin, toTitleCase, wait } from "@/utility/functions/misc";
 import { generateNewCharacter } from "@/utility/functions/characterAid";

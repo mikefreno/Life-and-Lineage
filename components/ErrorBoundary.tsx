@@ -1,10 +1,10 @@
 import { Component } from "react";
-import { Text } from "./Themed";
+import { Text } from "@/components/Themed";
 import { View } from "react-native";
-import D20DieAnimation from "./DieRollAnim";
-import GenericFlatButton from "./GenericFlatButton";
-import { useRootStore } from "../hooks/stores";
-import { useStyles } from "../hooks/styles";
+import D20DieAnimation from "@/components/DieRollAnim";
+import GenericFlatButton from "@/components/GenericFlatButton";
+import { useRootStore } from "@/hooks/stores";
+import { useStyles } from "@/hooks/styles";
 import { reloadAppAsync } from "expo";
 
 export class ErrorBoundary extends Component {

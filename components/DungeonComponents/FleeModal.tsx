@@ -1,16 +1,16 @@
-import GenericModal from "../GenericModal";
-import GenericFlatButton from "../GenericFlatButton";
-import { ThemedView, Text } from "../Themed";
-import { wait } from "../../utility/functions/misc";
+import GenericModal from "@/components/GenericModal";
+import GenericFlatButton from "@/components/GenericFlatButton";
+import { ThemedView, Text } from "@/components/Themed";
+import { wait } from "@/utility/functions/misc";
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { useVibration } from "../../hooks/generic";
-import { useRootStore } from "../../hooks/stores";
-import { useCombatActions, useEnemyManagement } from "../../hooks/combat";
-import { savePlayer } from "../../entities/character";
+import { useVibration } from "@/hooks/generic";
+import { useRootStore } from "@/hooks/stores";
+import { useCombatActions, useEnemyManagement } from "@/hooks/combat";
+import { savePlayer } from "@/entities/character";
 import { observer } from "mobx-react-lite";
-import { useStyles } from "../../hooks/styles";
-import { calculateFleeChance, fleeRoll } from "../../utility/functions/dungeon";
+import { useStyles } from "@/hooks/styles";
+import { calculateFleeChance, fleeRoll } from "@/utility/functions/dungeon";
 import { Enemy } from "@/entities/creatures";
 
 const FleeModal = observer(() => {

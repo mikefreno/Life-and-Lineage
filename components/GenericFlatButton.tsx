@@ -10,11 +10,11 @@ import {
   Platform,
   UIManager,
 } from "react-native";
-import { Text } from "./Themed";
-import { useStyles } from "../hooks/styles";
-import { useRootStore } from "../hooks/stores";
+import { Text } from "@/components/Themed";
+import { useStyles } from "@/hooks/styles";
+import { useRootStore } from "@/hooks/stores";
 import React from "react";
-import AnimatedButtonText from "./AnimatedButtonText";
+import AnimatedButtonText from "@/components/AnimatedButtonText";
 
 if (Platform.OS === "android") {
   if (UIManager.setLayoutAnimationEnabledExperimental) {

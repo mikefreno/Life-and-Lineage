@@ -7,12 +7,17 @@ import {
   ScrollView,
   View,
 } from "react-native";
-import { Text, CursiveText, HandwrittenText, CursiveTextBold } from "./Themed";
-import GearStatsDisplay from "./GearStatsDisplay";
+import {
+  Text,
+  CursiveText,
+  HandwrittenText,
+  CursiveTextBold,
+} from "@/components/Themed";
+import GearStatsDisplay from "@/components/GearStatsDisplay";
 import { useRouter } from "expo-router";
-import { asReadableGold, toTitleCase } from "../utility/functions/misc";
-import SpellDetails from "./SpellDetails";
-import GenericFlatButton from "./GenericFlatButton";
+import { asReadableGold, toTitleCase } from "@/utility/functions/misc";
+import SpellDetails from "@/components/SpellDetails";
+import GenericFlatButton from "@/components/GenericFlatButton";
 import {
   Coins,
   DexterityIcon,
@@ -21,23 +26,23 @@ import {
   IntelligenceIcon,
   Sanity,
   StrengthIcon,
-} from "../assets/icons/SVGIcons";
+} from "@/assets/icons/SVGIcons";
 import {
   Attribute,
   ItemClassType,
   MasteryToString,
   RarityAsString,
-} from "../utility/types";
-import GenericModal from "./GenericModal";
-import GenericStrikeAround from "./GenericStrikeAround";
-import type { Item } from "../entities/item";
-import { useVibration } from "../hooks/generic";
-import { useRootStore } from "../hooks/stores";
-import { Condition } from "../entities/conditions";
-import { useEnemyManagement } from "../hooks/combat";
-import type { Shop } from "../entities/shop";
-import Colors, { rarityColors } from "../constants/Colors";
-import { tw, useStyles } from "../hooks/styles";
+} from "@/utility/types";
+import GenericModal from "@/components/GenericModal";
+import GenericStrikeAround from "@/components/GenericStrikeAround";
+import type { Item } from "@/entities/item";
+import { useVibration } from "@/hooks/generic";
+import { useRootStore } from "@/hooks/stores";
+import { Condition } from "@/entities/conditions";
+import { useEnemyManagement } from "@/hooks/combat";
+import type { Shop } from "@/entities/shop";
+import Colors, { rarityColors } from "@/constants/Colors";
+import { tw, useStyles } from "@/hooks/styles";
 
 type BaseProps = {
   displayItem: {

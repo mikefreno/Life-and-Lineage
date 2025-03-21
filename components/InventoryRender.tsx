@@ -7,14 +7,14 @@ import {
   Platform,
   LayoutAnimation,
 } from "react-native";
-import { Text } from "./Themed";
-import { InventoryItem } from "./Draggable";
-import type { Item } from "../entities/item";
-import { useVibration } from "../hooks/generic";
-import { useDraggableStore, useRootStore } from "../hooks/stores";
+import { Text } from "@/components/Themed";
+import { InventoryItem } from "@/components/Draggable";
+import type { Item } from "@/entities/item";
+import { useVibration } from "@/hooks/generic";
+import { useDraggableStore, useRootStore } from "@/hooks/stores";
 import { useRef } from "react";
 import { observer } from "mobx-react-lite";
-import { normalizeForText, useStyles } from "../hooks/styles";
+import { normalizeForText, useStyles } from "@/hooks/styles";
 import { useIsFocused } from "@react-navigation/native";
 import { runInAction } from "mobx";
 

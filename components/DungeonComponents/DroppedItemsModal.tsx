@@ -1,18 +1,18 @@
 import React from "react";
 import { useRouter } from "expo-router";
-import GenericModal from "../GenericModal";
-import { Text } from "../Themed";
+import GenericModal from "@/components/GenericModal";
+import { Text } from "@/components/Themed";
 import { View, Image } from "react-native";
-import { toTitleCase, wait } from "../../utility/functions/misc";
-import { Coins } from "../../assets/icons/SVGIcons";
-import GenericFlatButton from "../GenericFlatButton";
-import { useLootState } from "../../providers/DungeonData";
-import type { Item } from "../../entities/item";
-import { useVibration } from "../../hooks/generic";
-import { useRootStore } from "../../hooks/stores";
-import { rarityColors } from "../../constants/Colors";
-import { Rarity } from "../../utility/types";
-import { flex, tw, useStyles } from "../../hooks/styles";
+import { toTitleCase, wait } from "@/utility/functions/misc";
+import { Coins } from "@/assets/icons/SVGIcons";
+import GenericFlatButton from "@/components/GenericFlatButton";
+import { useLootState } from "@/providers/DungeonData";
+import type { Item } from "@/entities/item";
+import { useVibration } from "@/hooks/generic";
+import { useRootStore } from "@/hooks/stores";
+import { rarityColors } from "@/constants/Colors";
+import { Rarity } from "@/utility/types";
+import { flex, tw, useStyles } from "@/hooks/styles";
 
 export default function DroppedItemsModal() {
   const { playerState, dungeonStore, uiStore } = useRootStore();

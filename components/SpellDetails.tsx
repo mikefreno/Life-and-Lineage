@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 import { View } from "react-native";
-import { toTitleCase } from "../utility/functions/misc";
-import { Text } from "./Themed";
+import { toTitleCase } from "@/utility/functions/misc";
+import { Text } from "@/components/Themed";
 import {
   BeastMasteryIcon,
   ClockIcon,
@@ -16,13 +16,13 @@ import {
   Regen,
   Sword,
   Winter,
-} from "../assets/icons/SVGIcons";
-import BlessingDisplay from "./BlessingsDisplay";
-import { elementalColorMap } from "../constants/Colors";
-import { DamageType, Element } from "../utility/types";
-import { useRootStore } from "../hooks/stores";
-import { normalize, useStyles } from "../hooks/styles";
-import GenericStrikeAround from "./GenericStrikeAround";
+} from "@/assets/icons/SVGIcons";
+import BlessingDisplay from "@/components/BlessingsDisplay";
+import { elementalColorMap } from "@/constants/Colors";
+import { DamageType, Element } from "@/utility/types";
+import { useRootStore } from "@/hooks/stores";
+import { normalize, useStyles } from "@/hooks/styles";
+import GenericStrikeAround from "@/components/GenericStrikeAround";
 import { Attack } from "@/entities/attack";
 
 export default function SpellDetails({ spell }: { spell: Attack }) {

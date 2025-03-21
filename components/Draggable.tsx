@@ -10,14 +10,14 @@ import Animated, {
 } from "react-native-reanimated";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { forwardRef, useImperativeHandle, useRef } from "react";
-import { ThemedView, Text } from "./Themed";
-import { Item, itemMap } from "../entities/item";
-import { useVibration } from "../hooks/generic";
-import { useDraggableStore, useRootStore } from "../hooks/stores";
-import { checkReleasePosition } from "../utility/functions/misc";
+import { ThemedView, Text } from "@/components/Themed";
+import { Item, itemMap } from "@/entities/item";
+import { useVibration } from "@/hooks/generic";
+import { useDraggableStore, useRootStore } from "@/hooks/stores";
+import { checkReleasePosition } from "@/utility/functions/misc";
 import { observer } from "mobx-react-lite";
-import { useStyles } from "../hooks/styles";
-import Colors from "../constants/Colors";
+import { useStyles } from "@/hooks/styles";
+import Colors from "@/constants/Colors";
 
 type DraggableProps = {
   children: React.ReactNode;
