@@ -2,8 +2,9 @@ import { View, Pressable, DimensionValue } from "react-native";
 import { Text } from "@/components/Themed";
 import { useVibration } from "@/hooks/generic";
 import { useRootStore } from "@/hooks/stores";
-import { normalize, useStyles } from "@/hooks/styles";
+import { useStyles } from "@/hooks/styles";
 import { useMemo } from "react";
+import { useScaling } from "@/hooks/scaling";
 
 interface BattleTabControlsProps {
   battleTab: string;
@@ -18,6 +19,7 @@ export default function BattleTabControls({
   const styles = useStyles();
   const vibration = useVibration();
   const { dungeonStore } = useRootStore();
+  const { getNormalizedSize } = useScaling();
 
   const getBackgroundColor = (tab: string) => ({
     backgroundColor: battleTab === tab ? "rgba(39, 39, 42, 0.5)" : undefined,
@@ -26,7 +28,7 @@ export default function BattleTabControls({
   const attacksOrNavigationStyle = useMemo(
     () => ({
       width: "33.333%" as DimensionValue,
-      paddingVertical: normalize(10),
+      paddingVertical: getNormalizedSize(10),
       ...getBackgroundColor("attacksOrNavigation"),
     }),
     [battleTab, getBackgroundColor],
@@ -35,7 +37,7 @@ export default function BattleTabControls({
   const equipmentStyle = useMemo(
     () => ({
       width: "33.333%" as DimensionValue,
-      paddingVertical: normalize(10),
+      paddingVertical: getNormalizedSize(10),
       ...getBackgroundColor("equipment"),
     }),
     [battleTab, getBackgroundColor],
@@ -44,7 +46,7 @@ export default function BattleTabControls({
   const logStyle = useMemo(
     () => ({
       width: "33.333%" as DimensionValue,
-      paddingVertical: normalize(10),
+      paddingVertical: getNormalizedSize(10),
       ...getBackgroundColor("log"),
     }),
     [battleTab, getBackgroundColor],

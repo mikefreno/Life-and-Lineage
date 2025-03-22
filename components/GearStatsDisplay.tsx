@@ -14,9 +14,10 @@ import {
   shouldShowModifier,
 } from "@/utility/functions/stats";
 import { useVibration } from "@/hooks/generic";
-import { flex, normalize, useStyles } from "@/hooks/styles";
+import { flex, useStyles } from "@/hooks/styles";
 import React from "react";
 import { useRootStore } from "@/hooks/stores";
+import { useScaling } from "@/hooks/scaling";
 
 const StatRow = observer(
   ({
@@ -32,6 +33,7 @@ const StatRow = observer(
   }) => {
     const styles = useStyles();
     const { uiStore } = useRootStore();
+    const { getNormalizedSize } = useScaling();
 
     if (!detailed && !shouldShowModifier(mod, item)) {
       return null;
@@ -50,7 +52,7 @@ const StatRow = observer(
         <Text
           style={
             detailed
-              ? { paddingLeft: normalize(16), textAlign: "center" }
+              ? { paddingLeft: getNormalizedSize(16), textAlign: "center" }
               : undefined
           }
         >

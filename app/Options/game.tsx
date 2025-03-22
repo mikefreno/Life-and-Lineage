@@ -13,6 +13,7 @@ import { useRootStore } from "@/hooks/stores";
 import CheckpointModal from "@/components/CheckpointModal";
 import { useStyles } from "@/hooks/styles";
 import GenericFlatButton from "@/components/GenericFlatButton";
+import { observer } from "mobx-react-lite";
 
 const healthWarningOptions: Record<number, string> = {
   0.5: "50%",
@@ -32,7 +33,7 @@ const healthWarningVals = [
 ];
 const healthWarningKeys = [0.5, 0.25, 0.2, 0.15, 0.1, 0];
 
-export default function GameSettings() {
+const GameSettings = observer(() => {
   const { uiStore, tutorialStore } = useRootStore();
   const styles = useStyles();
   const router = useRouter();
@@ -121,7 +122,11 @@ export default function GameSettings() {
       />
 
       <ScrollView
-        contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: "center",
+          ...styles.notchMirroredLanscapePad,
+        }}
       >
         <View style={styles.settingsContainer}>
           <GenericStrikeAround>Game Saves</GenericStrikeAround>
@@ -179,4 +184,5 @@ export default function GameSettings() {
       </ScrollView>
     </>
   );
-}
+});
+export default GameSettings;

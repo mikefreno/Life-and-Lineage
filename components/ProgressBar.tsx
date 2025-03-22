@@ -7,7 +7,8 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 import { Text } from "@/components/Themed";
-import { useStyles, normalize } from "@/hooks/styles";
+import { useStyles } from "@/hooks/styles";
+import { useScaling } from "@/hooks/scaling";
 
 interface ProgressBarProps {
   value: number;
@@ -25,101 +26,102 @@ interface ProgressBarProps {
   containerStyle?: StyleProp<ViewStyle>;
 }
 
-const ProgressBar = ({
-  value,
-  minValue = 0,
-  maxValue,
-  borderColor,
-  filledColor = "#007BFF",
-  unfilledColor = "#f3f3f3",
-  textColor = "#fff",
-  displayNumber = true,
-  removeAtZero = false,
-  showMax = false,
-  animationDuration = 300,
-  skipInitialAnimation = true,
-  containerStyle = undefined,
-}: ProgressBarProps) => {
-  const width = useSharedValue(0);
-  const styles = useStyles();
-  const isFirstRender = useRef(true);
+const ProgressBar = React.memo(
+  ({
+    value,
+    minValue = 0,
+    maxValue,
+    borderColor,
+    filledColor = "#007BFF",
+    unfilledColor = "#f3f3f3",
+    textColor = "#fff",
+    displayNumber = true,
+    removeAtZero = false,
+    showMax = false,
+    animationDuration = 300,
+    skipInitialAnimation = true,
+    containerStyle = undefined,
+  }: ProgressBarProps) => {
+    const width = useSharedValue(0);
+    const styles = useStyles();
+    const isFirstRender = useRef(true);
+    const { getNormalizedLineSize } = useScaling();
 
-  useEffect(() => {
-    const percentage = ((value - minValue) / (maxValue - minValue)) * 100;
-    const adjustedWidth = !removeAtZero && percentage < 8 ? 8 : percentage;
+    useEffect(() => {
+      const percentage = ((value - minValue) / (maxValue - minValue)) * 100;
+      const adjustedWidth = !removeAtZero && percentage < 8 ? 8 : percentage;
 
-    if (isFirstRender.current && skipInitialAnimation) {
-      width.value = adjustedWidth;
-      isFirstRender.current = false;
-    } else {
-      width.value = withTiming(adjustedWidth, {
-        duration: animationDuration,
-        easing: Easing.out(Easing.ease),
-      });
-    }
-  }, [value, minValue, maxValue, removeAtZero, animationDuration]);
+      if (isFirstRender.current && skipInitialAnimation) {
+        width.value = adjustedWidth;
+        isFirstRender.current = false;
+      } else {
+        width.value = withTiming(adjustedWidth, {
+          duration: animationDuration,
+          easing: Easing.out(Easing.ease),
+        });
+      }
+    }, [value, minValue, maxValue, removeAtZero, animationDuration]);
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      width: `${width.value}%`,
-    };
-  });
+    const animatedStyle = useAnimatedStyle(() => {
+      return {
+        width: `${width.value}%`,
+      };
+    });
 
-  const height = normalize(14);
-
-  return (
-    <View
-      style={[
-        {
-          backgroundColor: unfilledColor,
-          borderColor: borderColor,
-          borderWidth: borderColor ? 1 : 0,
-          width: "100%",
-          borderRadius: 50,
-          height,
-        },
-        containerStyle,
-      ]}
-    >
-      <Animated.View
+    return (
+      <View
         style={[
           {
-            backgroundColor: filledColor,
-            position: "absolute",
-            marginTop: Platform.OS == "android" ? -0.1 : 0,
-            marginLeft: Platform.OS == "android" ? -0.1 : 0,
-            height: "100%",
-            alignItems: "center",
-            justifyContent: "center",
+            backgroundColor: unfilledColor,
+            borderColor: borderColor,
+            borderWidth: borderColor ? 1 : 0,
+            width: "100%",
             borderRadius: 50,
+            height: getNormalizedLineSize(14),
           },
-          animatedStyle,
+          containerStyle,
         ]}
       >
-        {displayNumber && (
-          <View
-            style={{
-              marginHorizontal: "auto",
-              flex: 1,
-              flexWrap: "wrap",
-              overflow: "visible",
-            }}
-          >
-            <Text
+        <Animated.View
+          style={[
+            {
+              backgroundColor: filledColor,
+              position: "absolute",
+              marginTop: Platform.OS == "android" ? -0.1 : 0,
+              marginLeft: Platform.OS == "android" ? -0.1 : 0,
+              height: "100%",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 50,
+            },
+            animatedStyle,
+          ]}
+        >
+          {displayNumber && (
+            <View
               style={{
-                marginTop: borderColor ? -2 : -1,
-                color: textColor,
-                ...styles["text-sm"],
+                marginHorizontal: "auto",
+                flex: 1,
+                flexWrap: "wrap",
+                overflow: "visible",
               }}
             >
-              {value}
-              {showMax ? ` / ${maxValue}` : ""}
-            </Text>
-          </View>
-        )}
-      </Animated.View>
-    </View>
-  );
-};
+              <Text
+                style={{
+                  marginTop: borderColor ? -2 : -1,
+                  color: textColor,
+                  ...styles["text-sm"],
+                }}
+              >
+                {value}
+                {showMax ? ` / ${maxValue}` : ""}
+              </Text>
+            </View>
+          )}
+        </Animated.View>
+      </View>
+    );
+  },
+);
 
 export default ProgressBar;

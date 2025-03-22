@@ -12,14 +12,21 @@ import {
   Appearance,
   Dimensions,
   EmitterSubscription,
+  NativeEventSubscription,
   Platform,
   ScaledSize,
 } from "react-native";
 import { storage } from "@/utility/functions/storage";
 import { Character } from "@/entities/character";
 import * as Device from "expo-device";
-import { normalize, normalizeForText } from "@/hooks/styles";
 import { EdgeInsets } from "react-native-safe-area-context";
+import {
+  addOrientationChangeListener,
+  Orientation,
+  getOrientationAsync,
+} from "expo-screen-orientation";
+import { hasNotch } from "react-native-device-info";
+import { baseNormalize, baseNormalizeForText } from "@/hooks/scaling";
 
 export const LOADING_TIPS: string[] = [
   "Remember to check your equipment before entering a dungeon",
@@ -60,6 +67,7 @@ export default class UIStore {
   detailedStatusViewShowing: boolean;
   modalShowing: boolean;
   readonly dimensionsSubscription: EmitterSubscription;
+  readonly orientationSubscription: NativeEventSubscription;
   preferedColorScheme: "system" | "dark" | "light";
   systemColorScheme: "light" | "dark";
   vibrationEnabled: "full" | "minimal" | "none";
@@ -75,12 +83,12 @@ export default class UIStore {
   currentTipIndex: number = 0;
   progressIncrementing: boolean = false;
 
-  iconSizeXL = normalize(28);
-  tabHeightBase = normalize(28) + normalizeForText(12) + normalize(3) + 4;
+  iconSizeXL = baseNormalize(28);
+  tabHeightBase = baseNormalize(28) + 4;
 
-  expansionPadding = normalize(24);
-  iconSizeLarge = normalize(22);
-  iconSizeSmall = normalize(16);
+  expansionPadding = baseNormalize(24);
+  iconSizeLarge = baseNormalize(22);
+  iconSizeSmall = baseNormalize(16);
 
   webviewURL:
     | "privacy-policy/life-and-lineage"
@@ -112,6 +120,9 @@ export default class UIStore {
 
   showDevDebugUI: boolean = false;
 
+  hasNotch = hasNotch();
+  orientation: Orientation = Orientation.UNKNOWN;
+
   insets: {
     top: number;
     right: number;
@@ -141,6 +152,18 @@ export default class UIStore {
         this.handleDimensionChange({ window });
       },
     );
+
+    getOrientationAsync().then((orientation) => {
+      runInAction(() => {
+        this.orientation = orientation;
+      });
+    });
+
+    this.orientationSubscription = addOrientationChangeListener((event) => {
+      runInAction(() => {
+        this.orientation = event.orientationInfo.orientation;
+      });
+    });
 
     this.detailedStatusViewShowing = false;
     this.modalShowing = false;
@@ -192,6 +215,7 @@ export default class UIStore {
       webviewURL: observable,
       playerStatusTop: observable,
       insets: observable,
+      orientation: observable,
 
       setInsets: action,
       setPlayerStatusTop: action,
@@ -275,7 +299,12 @@ export default class UIStore {
   }
 
   get playerStatusIsCompact() {
-    if (!tabRouteIndexing.includes(this.root.pathname)) {
+    if (
+      !(
+        tabRouteIndexing.includes(this.root.pathname) ||
+        this.root.pathname.includes("options")
+      )
+    ) {
       return false;
     }
     if (this.root.playerState) {
@@ -377,7 +406,11 @@ export default class UIStore {
   }
 
   get tabHeight() {
-    return this.tabHeightBase + (this.insets?.bottom ?? 0);
+    return (
+      this.tabHeightBase +
+      (this.insets?.bottom ?? 0) +
+      (!this.isLandscape ? baseNormalizeForText(15) : 0)
+    );
   }
 
   setPlayerStatusHeight(value: number) {
@@ -606,6 +639,9 @@ export default class UIStore {
   destroy() {
     if (this.dimensionsSubscription) {
       this.dimensionsSubscription.remove();
+    }
+    if (this.orientationSubscription) {
+      this.orientationSubscription.remove();
     }
   }
 }

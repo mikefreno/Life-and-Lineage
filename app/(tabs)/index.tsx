@@ -1,11 +1,15 @@
 import React from "react";
-import { Pressable, TouchableWithoutFeedback, View } from "react-native";
+import {
+  LayoutAnimation,
+  Pressable,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 import { Text } from "@/components/Themed";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "@/components/TutorialModal";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
 import InventoryRender from "@/components/InventoryRender";
 import "expo-router/entry";
@@ -17,9 +21,10 @@ import D20DieAnimation from "@/components/DieRollAnim";
 import type { Item } from "@/entities/item";
 import { Image } from "expo-image";
 import { StashDisplay } from "@/components/StashDisplay";
-import { normalize, useStyles } from "../../hooks/styles";
+import { useStyles } from "../../hooks/styles";
 import { useVibration } from "@/hooks/generic";
 import SeasonDisplay from "@/components/SeasonDisplay";
+import { useScaling } from "@/hooks/scaling";
 
 const HomeScreen = observer(() => {
   const root = useRootStore();
@@ -35,12 +40,11 @@ const HomeScreen = observer(() => {
     position: { left: number; top: number };
   } | null>(null);
 
-  const tabBarHeight = useBottomTabBarHeight() + 10;
   const header = useHeaderHeight();
   const isFocused = useIsFocused();
   const vibration = useVibration();
-
   const clearDisplayItem = useCallback(() => setDisplayItem(null), []);
+  const { getNormalizedSize } = useScaling();
 
   useEffect(() => {
     if (isFocused) {
@@ -88,6 +92,11 @@ const HomeScreen = observer(() => {
     uiStore.playerStatusCompactHeight,
   ]);
 
+  useEffect(
+    () => LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut),
+    [uiStore.orientation],
+  );
+
   if (!playerState) {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
@@ -122,7 +131,7 @@ const HomeScreen = observer(() => {
               width: "90%",
               alignSelf: "center",
               alignItems: "center",
-              paddingVertical: normalize(4),
+              paddingVertical: getNormalizedSize(4),
               ...styles.rowBetween,
             }}
           >
@@ -172,12 +181,16 @@ const HomeScreen = observer(() => {
               }}
               style={{
                 position: "absolute",
-                padding: uiStore.dimensions.width * 0.02,
+                ...styles.notchAvoidingLanscapePad,
+                paddingHorizontal: 8,
               }}
             >
               <Image
                 source={require("@/assets/images/icons/Chest.png")}
-                style={{ width: normalize(40), height: normalize(40) }}
+                style={{
+                  width: getNormalizedSize(40),
+                  height: getNormalizedSize(40),
+                }}
               />
             </Pressable>
             <InventoryRender
@@ -224,7 +237,7 @@ const HomeScreen = observer(() => {
             <StatsDisplay
               displayItem={displayItem}
               clearItem={clearDisplayItem}
-              tabBarHeight={tabBarHeight}
+              tabBarHeight={uiStore.bottomBarHeight}
             />
           </View>
         )}

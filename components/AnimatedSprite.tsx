@@ -11,13 +11,14 @@ import {
   EnemyImageMap,
 } from "../utility/enemyHelpers";
 import { useRootStore } from "@/hooks/stores";
-import { calculateRenderScaling, useStyles } from "@/hooks/styles";
+import { useStyles } from "@/hooks/styles";
 import { observer } from "mobx-react-lite";
 import { runInAction } from "mobx";
 import { useHeaderHeight } from "@react-navigation/elements";
 import Colors from "@/constants/Colors";
 import { useReanimatedAnimations } from "@/hooks/animation";
 import { Being } from "@/entities/being";
+import { useScaling } from "@/hooks/scaling";
 
 export const AnimatedSprite = observer(
   ({ enemy, glow }: { enemy: Being; glow?: SharedValue<number> }) => {
@@ -56,6 +57,7 @@ export const AnimatedSprite = observer(
 
     const animationStore = enemyStore.getAnimationStore(enemy?.id ?? "");
     const styles = useStyles();
+    const { memoizedCalculateRenderScaling } = useScaling();
 
     const enemyData =
       enemy && enemy.sprite
@@ -136,9 +138,8 @@ export const AnimatedSprite = observer(
 
     const containerSize = uiStore.dimensions.lesser * 0.5;
 
-    const renderScaleCalc = useMemo(
-      () => calculateRenderScaling(enemyData.renderScale),
-      [enemyData.renderScale],
+    const renderScaleCalc = memoizedCalculateRenderScaling(
+      enemyData.renderScale,
     );
 
     const scaleX = (containerSize / spriteWidth) * renderScaleCalc;

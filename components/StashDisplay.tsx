@@ -230,15 +230,12 @@ export const StashDisplay = observer(
           clear();
           setDisplayItem(null);
         }}
-        scrollEnabled={uiStore.isLandscape}
         size={100}
       >
         <View
           style={[
             {
-              height: uiStore.isLandscape
-                ? uiStore.dimensions.height
-                : uiStore.dimensions.height * 0.66,
+              maxHeight: uiStore.dimensions.height * 0.75,
             },
             { width: "100%" },
           ]}
@@ -290,8 +287,10 @@ export const StashDisplay = observer(
             bounces={false}
             overScrollMode="never"
             collapsable={false}
-            style={{ flex: 1 }}
-            contentContainerStyle={{ flexGrow: 1 }}
+            style={{ height: "100%" }}
+            contentContainerStyle={{
+              flexGrow: 1,
+            }}
           >
             {Array.from({ length: totalPages }).map((_, pageIndex) => (
               <View

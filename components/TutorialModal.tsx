@@ -7,10 +7,11 @@ import { TutorialOption } from "@/utility/types";
 import GenericModal from "@/components/GenericModal";
 import { useVibration } from "@/hooks/generic";
 import { useRootStore } from "@/hooks/stores";
-import { normalize, tw, tw_base, useStyles } from "@/hooks/styles";
+import { tw, tw_base, useStyles } from "@/hooks/styles";
 import Colors from "@/constants/Colors";
 import GenericFlatButton from "./GenericFlatButton";
 import { SCREEN_TRANSITION_TIMING } from "@/stores/UIStore";
+import { useScaling } from "@/hooks/scaling";
 
 type TutorialPage = {
   title?: string;
@@ -145,7 +146,7 @@ const TutorialModal = observer(
               >
                 <Entypo
                   name="chevron-left"
-                  size={normalize(24)}
+                  size={uiStore.iconSizeLarge}
                   color={uiStore.colorScheme === "dark" ? "#f4f4f5" : "black"}
                 />
               </Pressable>

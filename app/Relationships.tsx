@@ -23,13 +23,14 @@ import { observer } from "mobx-react-lite";
 import GenericStrikeAround from "@/components/GenericStrikeAround";
 import { useRootStore } from "@/hooks/stores";
 import type { Character } from "@/entities/character";
-import { flex, normalize, tw_base, useStyles } from "../hooks/styles";
+import { flex, tw_base, useStyles } from "../hooks/styles";
 import TutorialModal from "@/components/TutorialModal";
 import { useIsFocused } from "@react-navigation/native";
 import { TutorialOption } from "@/utility/types";
 import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 import { BlurView } from "expo-blur";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { useScaling } from "@/hooks/scaling";
 
 const RelationshipsScreen = observer(() => {
   const styles = useStyles();
@@ -46,6 +47,7 @@ const RelationshipsScreen = observer(() => {
 
   const headerHeight = useHeaderHeight();
   const isFocused = useIsFocused();
+  const { getNormalizedSize } = useScaling();
 
   const characterGroups = [
     { title: "Children", data: playerState?.children || [] },
@@ -127,7 +129,7 @@ const RelationshipsScreen = observer(() => {
           <View
             style={{
               marginHorizontal: "auto",
-              paddingVertical: normalize(4),
+              paddingVertical: getNormalizedSize(4),
             }}
           >
             <Text
@@ -241,7 +243,7 @@ const RelationshipsScreen = observer(() => {
             headerTitleAlign: "center",
             headerTitleStyle: {
               fontFamily: "PixelifySans",
-              fontSize: normalize(24),
+              fontSize: getNormalizedSize(24),
             },
             headerBackground:
               Platform.OS == "ios"

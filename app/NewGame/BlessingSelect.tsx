@@ -106,7 +106,10 @@ export default function SetBlessing() {
             accessibilityLabel="Next"
             disabled={!(blessingSelection == 0 || !!blessingSelection)}
             childrenWhenDisabled={"Select blessing to continue"}
-            style={{ marginTop: tw_base[3] }}
+            style={{
+              marginTop: tw_base[3],
+              paddingBottom: uiStore.insets?.bottom,
+            }}
           >
             Next
           </GenericFlatButton>

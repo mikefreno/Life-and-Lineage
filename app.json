@@ -2,7 +2,7 @@
   "expo": {
     "name": "Lineage",
     "slug": "life-and-lineage",
-    "version": "0.8.8",
+    "version": "0.8.9",
     "orientation": "default",
     "icon": "assets/images/icon.png",
     "scheme": "lineageapp",
@@ -39,6 +39,24 @@
       "expo-router",
       "react-native-edge-to-edge",
       "expo-apple-authentication",
+      "react-native-bottom-tabs",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "extraPods": [
+              {
+                "name": "SDWebImage",
+                "modular_headers": true
+              },
+              {
+                "name": "SDWebImageSVGCoder",
+                "modular_headers": true
+              }
+            ]
+          }
+        }
+      ],
       [
         "expo-font",
         {
@@ -75,7 +93,8 @@
         {
           "iosUrlScheme": "com.googleusercontent.apps.976302581992-tbi6afmid4eq5dsn63t30kpfpdhjju8m"
         }
-      ]
+      ],
+      "expo-build-properties"
     ],
     "experiments": {
       "typedRoutes": true
@@ -88,7 +107,7 @@
         "projectId": "f4a10fdc-c377-4a37-8ad7-27685b89b4d9"
       }
     },
-    "runtimeVersion": "0.8.7",
+    "runtimeVersion": "0.8.9",
     "updates": {
       "url": "https://u.expo.dev/f4a10fdc-c377-4a37-8ad7-27685b89b4d9"
     },

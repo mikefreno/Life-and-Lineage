@@ -942,11 +942,10 @@ export class Being {
 
     Object.entries(damageMap).forEach(([typeKey, amount]) => {
       const damageType = parseInt(typeKey) as DamageType;
-      const calculatedDamage = this.damageTypeCalculation(
-        damageType,
-        amount,
-        target,
-      );
+      const calculatedDamage =
+        amount === 0 && target && target.id === this.id
+          ? 0
+          : this.damageTypeCalculation(damageType, amount, target);
       damageMap[damageType] = calculatedDamage;
       cumulativeDamage += Math.max(0, calculatedDamage);
     });

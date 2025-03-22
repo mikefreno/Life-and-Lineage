@@ -1,8 +1,9 @@
-import { Stack, useRouter } from "expo-router";
+import { Stack, useNavigation } from "expo-router";
 import { type ReactNode, createContext, useContext, useState } from "react";
 import type { Element, PlayerClassOptions } from "@/utility/types";
 import { useRootStore } from "@/hooks/stores";
 import { HeaderBackButton } from "@react-navigation/elements";
+import clearHistory from "@/utility/functions/misc";
 
 const NewGameContext = createContext<
   | {
@@ -64,7 +65,8 @@ export const useNewGameStore = () => {
 
 export default function NewGameLayout() {
   const { playerState, uiStore } = useRootStore();
-  const router = useRouter();
+  const navigation = useNavigation();
+
   return (
     <NewGameProvider>
       <Stack
@@ -86,7 +88,7 @@ export default function NewGameLayout() {
             headerLeft: !!playerState
               ? ({ tintColor }) => (
                   <HeaderBackButton
-                    onPress={router.dismissAll}
+                    onPress={() => clearHistory(navigation)}
                     tintColor={tintColor}
                     displayMode="generic"
                     style={{ marginLeft: -16 }}

@@ -32,13 +32,14 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { LinearGradientBlur } from "@/components/LinearGradientBlur";
 import { Parallax } from "@/components/DungeonComponents/Parallax";
 import { Image } from "expo-image";
-import { normalize, normalizeForText, useStyles } from "@/hooks/styles";
+import { useStyles } from "@/hooks/styles";
 import { reaction } from "mobx";
 import { ScreenShaker } from "@/components/ScreenShaker";
 import { VFXWrapper } from "@/components/VFXWrapper";
 import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 import { PLAYER_TEXT_STRING_DURATION } from "@/stores/PlayerAnimationStore";
 import Colors from "@/constants/Colors";
+import { useScaling } from "@/hooks/scaling";
 
 const DungeonLevelScreen = observer(() => {
   const { dungeonStore, uiStore, audioStore, playerAnimationStore } =
@@ -51,6 +52,7 @@ const DungeonLevelScreen = observer(() => {
   const { showTargetSelection, setShowTargetSelection } = useCombatState();
   const { addItemToPouch } = usePouch();
   const colorScheme = uiStore.colorScheme;
+  const { getNormalizedSize, getNormalizedFontSize } = useScaling();
 
   const [battleTab, setBattleTab] = useState<
     "attacksOrNavigation" | "equipment" | "log"
@@ -232,7 +234,10 @@ const DungeonLevelScreen = observer(() => {
             onLayout={(e) => setPouchBoundsOnLayout(e)}
             onPress={() => setShowLeftBehindItemsScreen(true)}
           >
-            <SackIcon height={normalize(32)} width={normalize(32)} />
+            <SackIcon
+              height={getNormalizedSize(32)}
+              width={getNormalizedSize(32)}
+            />
           </Pressable>
         </View>
         <Parallax
@@ -280,7 +285,7 @@ const DungeonLevelScreen = observer(() => {
               style={{
                 position: "absolute",
                 width: uiStore.dimensions.width,
-                marginTop: -normalizeForText(30),
+                marginTop: -getNormalizedFontSize(30),
               }}
             >
               <Animated.Text
@@ -337,6 +342,8 @@ const PlayerMinionSection = observer(() => {
   const { playerState, uiStore } = useRootStore();
   const vibration = useVibration();
 
+  const { getNormalizedSize, getNormalizedFontSize } = useScaling();
+
   const [currentMinionPage, setCurrentMinionPage] = useState(0);
   const minionScrollViewRef = useRef<ScrollView>(null);
   if (!playerState || playerState.minionsAndPets.length == 0) {
@@ -352,7 +359,7 @@ const PlayerMinionSection = observer(() => {
         showsHorizontalScrollIndicator={false}
         style={{
           width: "100%",
-          marginBottom: normalize(5),
+          marginBottom: 5,
         }}
         contentContainerStyle={{
           alignItems: "center",
@@ -375,7 +382,7 @@ const PlayerMinionSection = observer(() => {
               width: uiStore.dimensions.width,
               flexDirection: "row",
               justifyContent: "space-between",
-              paddingHorizontal: normalize(10),
+              paddingHorizontal: getNormalizedSize(10),
             }}
           >
             {playerState.minionsAndPets[pageIndex * 2] && (
@@ -385,7 +392,7 @@ const PlayerMinionSection = observer(() => {
                   justifyContent: "center",
                 }}
               >
-                <Text style={{ fontSize: normalizeForText(14) }}>
+                <Text style={{ fontSize: getNormalizedFontSize(14) }}>
                   {toTitleCase(
                     playerState.minionsAndPets[pageIndex * 2].creatureSpecies,
                   )}
@@ -407,7 +414,7 @@ const PlayerMinionSection = observer(() => {
                   justifyContent: "center",
                 }}
               >
-                <Text style={{ fontSize: normalizeForText(14) }}>
+                <Text style={{ fontSize: getNormalizedFontSize(14) }}>
                   {toTitleCase(
                     playerState.minionsAndPets[pageIndex * 2 + 1]
                       .creatureSpecies,
@@ -433,7 +440,7 @@ const PlayerMinionSection = observer(() => {
           style={{
             flexDirection: "row",
             justifyContent: "center",
-            paddingBottom: normalize(8),
+            paddingBottom: getNormalizedSize(8),
           }}
         >
           {Array.from({
@@ -449,14 +456,14 @@ const PlayerMinionSection = observer(() => {
               }}
               key={`indicator-${index}`}
               style={{
-                width: normalize(14),
-                height: normalize(14),
+                width: getNormalizedSize(14),
+                height: getNormalizedSize(14),
                 borderRadius: 9999,
                 backgroundColor:
                   currentMinionPage === index
                     ? "#ffffff"
                     : "rgba(255,255,255,0.3)",
-                marginHorizontal: normalize(12),
+                marginHorizontal: getNormalizedSize(12),
               }}
             />
           ))}

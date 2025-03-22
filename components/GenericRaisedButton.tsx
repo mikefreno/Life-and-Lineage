@@ -1,5 +1,11 @@
-import React, { useState } from "react";
-import { ColorValue, Pressable, StyleProp, ViewStyle } from "react-native";
+import React, { useMemo, useState } from "react";
+import {
+  ColorValue,
+  DimensionValue,
+  Pressable,
+  StyleProp,
+  ViewStyle,
+} from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -11,7 +17,8 @@ import { useVibration } from "@/hooks/generic";
 import { useRootStore } from "@/hooks/stores";
 import AnimatedButtonText from "@/components/AnimatedButtonText";
 import { Text } from "@/components/Themed";
-import { normalize, useStyles } from "@/hooks/styles";
+import { useStyles } from "@/hooks/styles";
+import { useScaling } from "@/hooks/scaling";
 
 interface GenericRaisedButtonProps {
   ref?: React.RefObject<any>;
@@ -36,7 +43,7 @@ interface GenericRaisedButtonProps {
   disableTopLevelStyling?: boolean;
   style?: StyleProp<ViewStyle>;
   buttonStyle?: StyleProp<ViewStyle>;
-  height?: number | string;
+  height?: DimensionValue;
 }
 
 const GenericRaisedButton = ({
@@ -65,6 +72,7 @@ const GenericRaisedButton = ({
   const { uiStore } = useRootStore();
   const [textWidth, setTextWidth] = useState<number | null>(null);
   const styles = useStyles();
+  const { getNormalizedSize } = useScaling();
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -107,20 +115,20 @@ const GenericRaisedButton = ({
 
   const containerStyle = React.useMemo(() => {
     const baseStyles = !disableTopLevelStyling
-      ? {
+      ? ({
           marginHorizontal: "auto",
           paddingBottom: 8,
           paddingTop: 16,
           height: height, // Apply height constraint to container if provided
           justifyContent: height ? "center" : undefined, // Center content vertically if height is provided
-        }
+        } as const)
       : height
-      ? { height, justifyContent: "center" }
+      ? ({ height, justifyContent: "center" } as const)
       : {};
     return [baseStyles, style];
   }, [disableTopLevelStyling, style, height]);
 
-  const dynamicButtonStyle = React.useMemo(() => {
+  const dynamicButtonStyle = useMemo(() => {
     const baseStyle = {
       shadowColor: uiStore.colorScheme === "light" ? "black" : "white",
       elevation: 2,
@@ -129,11 +137,10 @@ const GenericRaisedButton = ({
         (uiStore.colorScheme === "light" ? "white" : "#71717a"),
       shadowOpacity: 0.1,
       shadowRadius: 5,
-      // If height is provided, ensure the button fills the container height
       height: height ? "100%" : undefined,
-      justifyContent: "center", // Center content vertically
-      alignItems: "center", // Center content horizontally
-    };
+      justifyContent: "center",
+      alignItems: "center",
+    } as const;
 
     if (disabled) {
       return {
@@ -144,7 +151,7 @@ const GenericRaisedButton = ({
         opacity: 0.5,
         elevation: 0,
         shadowOpacity: 0,
-      };
+      } as const;
     }
 
     return baseStyle;
@@ -184,8 +191,8 @@ const GenericRaisedButton = ({
         style={[
           {
             borderRadius: 12,
-            paddingHorizontal: normalize(20),
-            paddingVertical: normalize(12),
+            paddingHorizontal: getNormalizedSize(20),
+            paddingVertical: getNormalizedSize(12),
             flexDirection: "row", // Ensure text components are in a row
             justifyContent: "center", // Center content horizontally
             alignItems: "center", // Center content vertically

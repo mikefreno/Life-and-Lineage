@@ -16,16 +16,20 @@ import { Text } from "@/components/Themed";
 import ThemedCard from "@/components/ThemedCard";
 import GenericRaisedButton from "./GenericRaisedButton";
 import Slider from "@react-native-community/slider";
-import { flex, normalize, useStyles } from "@/hooks/styles";
+import { flex, useStyles } from "@/hooks/styles";
 import { Entypo } from "@expo/vector-icons";
 import { enemyOptions } from "@/utility/enemyHelpers";
+import { Orientation } from "expo-screen-orientation";
+import { useScaling } from "@/hooks/scaling";
 
 export const DevControls = observer(() => {
   const rootStore = useRootStore();
+  const { uiStore } = rootStore;
   const [showingDevControls, setShowingDevControls] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [onRight, setOnRight] = useState(true);
   const vibration = useVibration();
+  const { getNormalizedSize } = useScaling();
 
   const translateX = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(0)).current;
@@ -183,8 +187,8 @@ export const DevControls = observer(() => {
           style={{
             position: "absolute",
             top: verticalPosition,
-            width: normalize(60),
-            height: normalize(60),
+            width: getNormalizedSize(60),
+            height: getNormalizedSize(60),
             justifyContent: "center",
             alignItems: "center",
             zIndex: 9999,
@@ -195,16 +199,30 @@ export const DevControls = observer(() => {
           }}
         >
           <View
-            style={{
-              backgroundColor: Colors[rootStore.uiStore.colorScheme].background,
-              borderRadius: 20,
-              padding: 4,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.25,
-              shadowRadius: 3.84,
-              elevation: 5,
-            }}
+            style={[
+              {
+                backgroundColor:
+                  Colors[rootStore.uiStore.colorScheme].background,
+                borderRadius: 20,
+                padding: 4,
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+                elevation: 5,
+              },
+              uiStore.hasNotch &&
+              uiStore.orientation === Orientation.LANDSCAPE_RIGHT &&
+              !onRight &&
+              uiStore.insets
+                ? { marginRight: -uiStore.insets.left }
+                : uiStore.hasNotch &&
+                  uiStore.orientation === Orientation.LANDSCAPE_LEFT &&
+                  onRight &&
+                  uiStore.insets
+                ? { marginLeft: -uiStore.insets.right }
+                : {},
+            ]}
           >
             <Pressable
               onPress={() => {
@@ -214,7 +232,7 @@ export const DevControls = observer(() => {
             >
               <MaterialIcons
                 name="pest-control"
-                size={normalize(32)}
+                size={getNormalizedSize(32)}
                 color={Colors[rootStore.uiStore.colorScheme].border}
               />
             </Pressable>
@@ -239,8 +257,8 @@ export const DevControls = observer(() => {
               style={{
                 position: "absolute",
                 top: 20,
-                width: normalize(8),
-                height: normalize(20),
+                width: getNormalizedSize(8),
+                height: getNormalizedSize(20),
                 backgroundColor: Colors[rootStore.uiStore.colorScheme].border,
                 opacity: 0.3,
                 ...(onRight

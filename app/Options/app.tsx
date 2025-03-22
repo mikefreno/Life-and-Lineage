@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Pressable, ScrollView, TextInput, View } from "react-native";
 import { Text } from "@/components/Themed";
 import { useEffect, useState } from "react";
@@ -123,6 +123,14 @@ export const AppSettings = observer(() => {
     router.dismissAll();
   }
 
+  const scrollContentStyle = useMemo(() => {
+    return {
+      flexGrow: 1,
+      justifyContent: "center",
+      ...styles.notchMirroredLanscapePad,
+    };
+  }, [uiStore.insets]);
+
   return (
     <>
       <GenericModal
@@ -242,9 +250,7 @@ export const AppSettings = observer(() => {
           ))}
         </ScrollView>
       </GenericModal>
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
-      >
+      <ScrollView contentContainerStyle={scrollContentStyle}>
         <View style={styles.settingsContainer}>
           <GenericStrikeAround>
             <Text style={[styles["text-xl"], { textAlign: "center" }]}>
@@ -256,12 +262,7 @@ export const AppSettings = observer(() => {
               <Text style={{ textAlign: "center", paddingVertical: 8 }}>
                 Logged in as: {authStore.getEmail()}
               </Text>
-              <View
-                style={{
-                  ...flex.rowEvenly,
-                  width: "100%",
-                }}
-              >
+              <View style={{ ...flex.rowEvenly, width: "100%" }}>
                 <GenericFlatButton
                   onPress={toggleRemoteSaveWindow}
                   disabled={
@@ -304,12 +305,7 @@ export const AppSettings = observer(() => {
                   You are not connected to the internet
                 </Text>
               )}
-              <View
-                style={{
-                  ...flex.rowEvenly,
-                  width: "100%",
-                }}
-              >
+              <View style={{ ...flex.rowEvenly, width: "100%" }}>
                 <GenericRaisedButton
                   onPress={() => router.push("/Auth/sign-in")}
                   disabled={!authStore.isConnectedAndInitialized}
@@ -341,7 +337,7 @@ export const AppSettings = observer(() => {
                 <View
                   style={[
                     styles.optionCircle,
-                    selectedThemeOption == index && {
+                    selectedThemeOption === index && {
                       backgroundColor:
                         uiStore.colorScheme === "dark" ? "#2563eb" : "#3b82f6",
                     },
@@ -364,7 +360,7 @@ export const AppSettings = observer(() => {
                 <View
                   style={[
                     styles.optionCircle,
-                    selectedVibrationOption == index && {
+                    selectedVibrationOption === index && {
                       backgroundColor:
                         uiStore.colorScheme === "dark" ? "#2563eb" : "#3b82f6",
                     },

@@ -4,7 +4,6 @@ import { observer } from "mobx-react-lite";
 
 import { useDraggableStore } from "@/hooks/stores";
 import { Text } from "@/components/Themed";
-import { normalize } from "@/hooks/styles";
 
 const BoundsVisualizer = observer(() => {
   const { draggableClassStore } = useDraggableStore();
@@ -107,7 +106,7 @@ const BoundsVisualizer = observer(() => {
           borderRadius: 5,
         }}
       >
-        <Text style={{ color: "white", fontSize: normalize(12) }}>
+        <Text style={{ color: "white", fontSize: 12 }}>
           Bounds: {allBounds.filter(([_, b]) => b !== null).length}
         </Text>
       </View>

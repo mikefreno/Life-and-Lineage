@@ -4,6 +4,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  ScrollView,
   TextInput,
   TouchableWithoutFeedback,
   View,
@@ -16,14 +17,15 @@ import { useRouter } from "expo-router";
 import { observer } from "mobx-react-lite";
 import { API_BASE_URL } from "@/config/config";
 import D20DieAnimation from "@/components/DieRollAnim";
-import { ThemedView, Text } from "@/components/Themed";
+import { Text } from "@/components/Themed";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { isValidPassword } from "@/utility/functions/password";
 import { useVibration } from "@/hooks/generic";
 import { useRootStore } from "@/hooks/stores";
-import { normalize, normalizeLineHeight, tw, useStyles } from "@/hooks/styles";
+import { tw, useStyles } from "@/hooks/styles";
 import { runInAction } from "mobx";
 import Colors from "@/constants/Colors";
+import { useScaling } from "@/hooks/scaling";
 
 const SignUpScreen = observer(() => {
   const vibration = useVibration();
@@ -44,6 +46,9 @@ const SignUpScreen = observer(() => {
   const [emailSent, setEmailSent] = useState<boolean>(false);
   const [usingEmail, setUsingEmail] = useState<boolean>(false);
   const header = useHeaderHeight();
+  const { getNormalizedSize, getNormalizedLineSize } = useScaling();
+
+  const theme = Colors[uiStore.colorScheme];
 
   useEffect(() => {
     if (authStore.isAuthenticated) {
@@ -160,11 +165,14 @@ const SignUpScreen = observer(() => {
 
   return (
     <>
-      <ThemedView
-        style={{ flex: 1, paddingHorizontal: uiStore.dimensions.height * 0.05 }}
-      >
+      <View style={{ flex: 1 }}>
         {awaitingResponse ? (
-          <View style={{ paddingTop: 0.25 * uiStore.dimensions.height }}>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+            }}
+          >
             <D20DieAnimation keepRolling={awaitingResponse} />
           </View>
         ) : !usingEmail ? (
@@ -174,7 +182,12 @@ const SignUpScreen = observer(() => {
                 {error}
               </Text>
             )}
-            <View style={styles.authProviderContainer}>
+            <View
+              style={{
+                flex: 1,
+                ...styles.columnCenter,
+              }}
+            >
               <Pressable
                 onPress={handleGoogleSignUp}
                 style={styles.providerButton}
@@ -182,7 +195,10 @@ const SignUpScreen = observer(() => {
                 <Text style={[styles["text-xl"], tw.pr1]}>
                   Sign up with Google
                 </Text>
-                <GoogleIcon height={normalize(20)} width={normalize(20)} />
+                <GoogleIcon
+                  height={getNormalizedSize(20)}
+                  width={getNormalizedSize(20)}
+                />
               </Pressable>
               {Platform.OS == "ios" && (
                 <AppleAuthentication.AppleAuthenticationButton
@@ -196,8 +212,8 @@ const SignUpScreen = observer(() => {
                   }
                   cornerRadius={5}
                   style={{
-                    width: normalize(230),
-                    height: normalizeLineHeight(48),
+                    width: getNormalizedSize(230),
+                    height: getNormalizedLineSize(48),
                   }}
                   onPress={handleAppleSignUp}
                 />
@@ -205,7 +221,7 @@ const SignUpScreen = observer(() => {
               <GenericRaisedButton
                 onPress={() => setUsingEmail(true)}
                 backgroundColor={"#2563eb"}
-                style={{ width: normalize(230) }}
+                style={{ width: getNormalizedSize(230) }}
                 buttonStyle={{ borderRadius: 5 }}
               >
                 <Text
@@ -229,127 +245,127 @@ const SignUpScreen = observer(() => {
             }}
           >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: "space-evenly",
+              <ScrollView
+                contentContainerStyle={{
+                  flexGrow: 1,
                 }}
+                keyboardShouldPersistTaps="handled"
               >
-                <Text
-                  style={{ textAlign: "center", fontSize: 30, paddingTop: 16 }}
-                >
-                  Email Registration
-                </Text>
-                <TextInput
-                  style={[styles.authInput, styles["text-xl"]]}
-                  placeholderTextColor={
-                    uiStore.colorScheme == "light" ? "#d4d4d8" : "#71717a"
-                  }
-                  autoComplete={"email"}
-                  inputMode={"email"}
-                  onChangeText={(text) => setEmailAddress(text)}
-                  placeholder={"Enter Email Address..."}
-                  autoCorrect={false}
-                  autoCapitalize={"none"}
-                  value={emailAddress}
-                />
-                <View>
-                  <TextInput
-                    style={[
-                      styles.authInput,
-                      styles["text-xl"],
-                      isAutofilled && { color: "black" },
-                    ]}
-                    placeholderTextColor={
-                      uiStore.colorScheme == "light" ? "#d4d4d8" : "#71717a"
-                    }
-                    onChangeText={(text) => setPassword(text)}
-                    placeholder={"Enter Password..."}
-                    autoComplete={"new-password"}
-                    autoCorrect={false}
-                    autoCapitalize={"none"}
-                    secureTextEntry
-                    value={password}
-                    passwordRules={
-                      "minlength: 8; required: lower; required: upper; required: digit,[oqtu-#&'()+,./;?@]; required: [-];"
-                    }
-                  />
-                  <Text style={{ textAlign: "center" }}>
-                    Password must contain at least 8 characters, a lower-case,
-                    upper-case, and either a number or special character(!@$%
-                    etc.)
-                  </Text>
+                <View style={{ flex: 1, ...styles.columnCenter }}>
+                  <View style={{ width: "75%", ...styles.pt6, ...styles.pb16 }}>
+                    <Text
+                      style={{
+                        ...styles.textCenter,
+                        ...styles["text-3xl"],
+                        ...styles.pt4,
+                      }}
+                    >
+                      Email Registration
+                    </Text>
+                    <TextInput
+                      style={styles.authInput}
+                      placeholderTextColor={theme.secondary}
+                      autoComplete={"email"}
+                      inputMode={"email"}
+                      onChangeText={(text) => setEmailAddress(text)}
+                      placeholder={"Enter Email Address..."}
+                      autoCorrect={false}
+                      autoCapitalize={"none"}
+                      value={emailAddress}
+                    />
+                    <View>
+                      <TextInput
+                        style={[
+                          styles.authInput,
+                          isAutofilled && { color: "black" },
+                        ]}
+                        placeholderTextColor={theme.secondary}
+                        onChangeText={(text) => setPassword(text)}
+                        placeholder={"Enter Password..."}
+                        autoComplete={"new-password"}
+                        autoCorrect={false}
+                        autoCapitalize={"none"}
+                        secureTextEntry
+                        value={password}
+                        passwordRules={
+                          "minlength: 8; required: lower; required: upper; required: digit,[oqtu-#&'()+,./;?@]; required: [-];"
+                        }
+                      />
+                      <Text style={{ textAlign: "center" }}>
+                        Password must contain at least 8 characters, a
+                        lower-case, upper-case, and either a number or special
+                        character(!@$% etc.)
+                      </Text>
+                    </View>
+                    <TextInput
+                      style={[
+                        styles.authInput,
+                        isAutofilled && { color: "black" },
+                      ]}
+                      placeholderTextColor={theme.secondary}
+                      onChangeText={(text) => setPasswordConf(text)}
+                      placeholder={"Confirm Password..."}
+                      autoComplete={"password-new"}
+                      autoCorrect={false}
+                      secureTextEntry
+                      autoCapitalize={"none"}
+                      value={passwordConf}
+                      passwordRules={
+                        "minlength: 8; required: lower; required: upper; required: digit,[oqtu-#&'()+,./;?@]; required: [-];"
+                      }
+                    />
+                    {shortPassword && (
+                      <Text style={{ textAlign: "center", color: "#ef4444" }}>
+                        Password too short, must be at least 8 chars
+                      </Text>
+                    )}
+                    {simplePassword && (
+                      <Text style={{ textAlign: "center", color: "#ef4444" }}>
+                        Password must contain a lower-case, upper-case, and
+                        either a number or special character(!@$% etc.)
+                      </Text>
+                    )}
+                    {passwordMismatch && (
+                      <Text style={{ textAlign: "center", color: "#ef4444" }}>
+                        Passwords must match!
+                      </Text>
+                    )}
+                    {error && (
+                      <Text style={{ textAlign: "center", color: "#ef4444" }}>
+                        {error}
+                      </Text>
+                    )}
+                    <GenericRaisedButton
+                      disabled={
+                        password.length == 0 ||
+                        passwordConf.length == 0 ||
+                        emailAddress.length == 0
+                      }
+                      onPress={handleEmailSignUp}
+                      backgroundColor={theme.interactive}
+                      textColor={"white"}
+                    >
+                      Sign Up
+                    </GenericRaisedButton>
+                    <Pressable
+                      style={{ alignSelf: "center" }}
+                      onPress={() => {
+                        setUsingEmail(false);
+                        vibration({ essential: true, style: "medium" });
+                      }}
+                    >
+                      <Text
+                        style={{
+                          textDecorationLine: "underline",
+                          color: Colors[uiStore.colorScheme].tabIconSelected,
+                        }}
+                      >
+                        Use a provider instead
+                      </Text>
+                    </Pressable>
+                  </View>
                 </View>
-                <TextInput
-                  style={[
-                    styles.authInput,
-                    styles["text-xl"],
-                    isAutofilled && { color: "black" },
-                  ]}
-                  placeholderTextColor={
-                    uiStore.colorScheme == "light" ? "#d4d4d8" : "#71717a"
-                  }
-                  onChangeText={(text) => setPasswordConf(text)}
-                  placeholder={"Confirm Password..."}
-                  autoComplete={"password-new"}
-                  autoCorrect={false}
-                  secureTextEntry
-                  autoCapitalize={"none"}
-                  value={passwordConf}
-                  passwordRules={
-                    "minlength: 8; required: lower; required: upper; required: digit,[oqtu-#&'()+,./;?@]; required: [-];"
-                  }
-                />
-                {shortPassword && (
-                  <Text style={{ textAlign: "center", color: "#ef4444" }}>
-                    Password too short, must be at least 8 chars
-                  </Text>
-                )}
-                {simplePassword && (
-                  <Text style={{ textAlign: "center", color: "#ef4444" }}>
-                    Password must contain a lower-case, upper-case, and either a
-                    number or special character(!@$% etc.)
-                  </Text>
-                )}
-                {passwordMismatch && (
-                  <Text style={{ textAlign: "center", color: "#ef4444" }}>
-                    Passwords must match!
-                  </Text>
-                )}
-                {error && (
-                  <Text style={{ textAlign: "center", color: "#ef4444" }}>
-                    {error}
-                  </Text>
-                )}
-                <GenericRaisedButton
-                  disabled={
-                    password.length == 0 ||
-                    passwordConf.length == 0 ||
-                    emailAddress.length == 0
-                  }
-                  onPress={handleEmailSignUp}
-                  backgroundColor={"#2563eb"}
-                  textColor={"#fafafa"}
-                >
-                  Sign Up
-                </GenericRaisedButton>
-                <Pressable
-                  onPress={() => {
-                    setUsingEmail(false);
-                    vibration({ essential: true, style: "medium" });
-                  }}
-                  style={{ margin: 32 }}
-                >
-                  <Text
-                    style={{
-                      textDecorationLine: "underline",
-                      color: "#3b82f6",
-                    }}
-                  >
-                    Use a provider instead
-                  </Text>
-                </Pressable>
-              </View>
+              </ScrollView>
             </TouchableWithoutFeedback>
           </KeyboardAvoidingView>
         ) : (
@@ -360,14 +376,6 @@ const SignUpScreen = observer(() => {
             </Text>
           </View>
         )}
-      </ThemedView>
-      <View
-        style={{
-          position: "absolute",
-          bottom: uiStore.dimensions.height * 0.05,
-          width: "100%",
-        }}
-      >
         <Pressable
           onPress={() => {
             runInAction(
@@ -375,6 +383,7 @@ const SignUpScreen = observer(() => {
             );
             router.push("/FrenoDotMeWebview");
           }}
+          style={{ paddingBottom: 6 }}
         >
           <Text
             style={[

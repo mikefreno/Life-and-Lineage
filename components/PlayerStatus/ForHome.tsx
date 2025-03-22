@@ -1,6 +1,12 @@
 import React, { useLayoutEffect, useRef, useEffect, useState } from "react";
 import ProgressBar from "@/components/ProgressBar";
-import { Pressable, View, Animated, Easing } from "react-native";
+import {
+  Pressable,
+  View,
+  Animated,
+  Easing,
+  LayoutChangeEvent,
+} from "react-native";
 import { observer } from "mobx-react-lite";
 import { Coins, SquarePlus } from "@/assets/icons/SVGIcons";
 import { Text } from "@/components/Themed";
@@ -47,27 +53,13 @@ const PlayerStatusForHome = observer(() => {
     }).start();
   }, [uiStore.playerStatusIsCompact]);
 
-  useLayoutEffect(() => {
-    const timer = setTimeout(() => {
-      if (playerStatusRef.current) {
-        playerStatusRef.current?.measure((x, y, width, height, pX, pY) => {
-          uiStore.setPlayerStatusHeight(height);
-          uiStore.setPlayerStatusTop(pY);
-        });
-      }
-    }, 250);
-
-    if (uiStore.playerStatusCompactHeight) {
-      clearTimeout(timer);
+  const onLayoutHandler = (event: LayoutChangeEvent) => {
+    const { height, y } = event.nativeEvent.layout;
+    if (height > 0) {
+      uiStore.setPlayerStatusHeight(height);
+      uiStore.setPlayerStatusTop(y);
     }
-
-    return () => clearTimeout(timer);
-  }, [
-    uiStore.dimensions.height,
-    uiStore.playerStatusIsCompact,
-    uiStore.isLandscape,
-    uiStore.root.dungeonStore.isInDungeon,
-  ]);
+  };
 
   if (!playerState) {
     return null;
@@ -78,6 +70,7 @@ const PlayerStatusForHome = observer(() => {
       <PlayerStatusModal />
       <Pressable
         ref={playerStatusRef}
+        onLayout={onLayoutHandler}
         onPress={() => {
           vibration({ style: "light" });
           uiStore.setDetailedStatusViewShowing(true);

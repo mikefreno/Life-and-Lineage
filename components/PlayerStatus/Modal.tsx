@@ -1,6 +1,6 @@
 import GenericModal from "@/components/GenericModal";
 import { useRootStore } from "@/hooks/stores";
-import { normalize, useStyles } from "@/hooks/styles";
+import { useStyles } from "@/hooks/styles";
 import { Pressable, ScrollView, View } from "react-native";
 import { Text } from "@/components/Themed";
 import Animated, {
@@ -29,10 +29,12 @@ import React from "react";
 import ClassDisplay from "@/components/ClassDisplay";
 import { toTitleCase } from "@/utility/functions/misc";
 import { playerClassColors } from "@/constants/Colors";
+import { useScaling } from "@/hooks/scaling";
 
 export const PlayerStatusModal = observer(() => {
   const { uiStore, playerState } = useRootStore();
   const styles = useStyles();
+  const { getNormalizedSize } = useScaling();
   const vibration = useVibration();
 
   const [ownedOffensive, setOwnedOffensive] = useState<Map<Modifier, number>>(
@@ -90,7 +92,7 @@ export const PlayerStatusModal = observer(() => {
             />
             <View
               style={{
-                width: normalize(20),
+                width: getNormalizedSize(20),
                 height: iconSize,
                 justifyContent: "center",
                 alignItems: "center",
@@ -99,7 +101,7 @@ export const PlayerStatusModal = observer(() => {
             >
               <View
                 style={{
-                  width: normalize(4),
+                  width: getNormalizedSize(4),
                   borderRadius: 5,
                   height: iconSize * 1.2,
                   backgroundColor:
@@ -296,7 +298,7 @@ export const PlayerStatusModal = observer(() => {
                   Math.min(
                     uiStore.dimensions.height * 0.35,
                     Math.max(ownedOffensive.size, ownedDefensive.size) * 70 +
-                      normalize(34),
+                      getNormalizedSize(34),
                     uiStore.dimensions.height * 0.2,
                   ),
                 ),

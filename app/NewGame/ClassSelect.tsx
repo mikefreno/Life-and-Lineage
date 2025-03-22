@@ -111,7 +111,6 @@ const SetClassScreen = observer(() => {
           >
             <Pressable
               style={{
-                marginLeft: -8,
                 height: height * 0.25,
                 width: width * 0.45,
               }}
@@ -166,7 +165,6 @@ const SetClassScreen = observer(() => {
 
             <Pressable
               style={{
-                marginRight: -8,
                 height: height * 0.25,
                 width: width * 0.45,
               }}
@@ -230,7 +228,6 @@ const SetClassScreen = observer(() => {
           >
             <Pressable
               style={{
-                marginLeft: -8,
                 height: height * 0.25,
                 width: width * 0.45,
               }}
@@ -287,7 +284,6 @@ const SetClassScreen = observer(() => {
 
             <Pressable
               style={{
-                marginRight: -8,
                 height: height * 0.25,
                 width: width * 0.45,
               }}
@@ -356,7 +352,10 @@ const SetClassScreen = observer(() => {
             accessibilityRole="link"
             accessibilityLabel="Next"
             childrenWhenDisabled={"Select class to continue"}
-            style={{ marginTop: tw_base[3] }}
+            style={{
+              marginTop: tw_base[3],
+              paddingBottom: uiStore.insets?.bottom,
+            }}
           >
             Next
           </GenericFlatButton>

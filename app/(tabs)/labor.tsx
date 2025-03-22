@@ -74,7 +74,7 @@ const LaborScreen = observer(() => {
               You are missing the following qualifications:
             </Text>
             {missingPreReqs.map((missing) => (
-              <Text key={missing} style={styles.qualificationText}>
+              <Text key={missing} style={styles["text-2xl"]}>
                 {toTitleCase(missing)}
               </Text>
             ))}

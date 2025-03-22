@@ -1,5 +1,5 @@
+import { useScaling } from "@/hooks/scaling";
 import { useRootStore } from "@/hooks/stores";
-import { calculateRenderScaling } from "@/hooks/styles";
 import { type EnemyAnimationStore } from "@/stores/EnemyAnimationStore";
 import { PlayerSpriteAnimationSet } from "@/utility/types";
 import { Vector2 } from "@/utility/Vec2";
@@ -19,6 +19,7 @@ import { Animated, type ColorValue, View } from "react-native";
 
 export const VFXWrapper = observer(({ children }: { children: ReactNode }) => {
   const { uiStore, enemyStore, playerAnimationStore } = useRootStore();
+  const { memoizedCalculateRenderScaling } = useScaling();
 
   const { enemyAnimationStores, enemyAndPosList } = useMemo(() => {
     const stores: EnemyAnimationStore[] = [];
@@ -233,15 +234,13 @@ const PlayerSpriteVFX = ({
   const frameRef = useRef(0);
   const animationTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isMounted = useRef(true);
+  const { memoizedCalculateRenderScaling } = useScaling();
 
   // For missile animation
   const animXY = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
 
-  const renderScaleCalc = useMemo(
-    () => calculateRenderScaling(set.scale),
-    [set.scale],
-  );
+  const renderScaleCalc = memoizedCalculateRenderScaling(set.scale);
 
   const containerSize = uiStore.dimensions.lesser * 0.5;
 
@@ -612,13 +611,12 @@ const ProjectileEffect = ({
   const frameTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isMounted = useRef(true);
 
+  const { memoizedCalculateRenderScaling } = useScaling();
+
   const animXY = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
 
   // Apply the same scaling logic as in AnimatedSprite
-  const renderScaleCalc = useMemo(
-    () => calculateRenderScaling(projectile.scale),
-    [projectile.renderScale],
-  );
+  const renderScaleCalc = memoizedCalculateRenderScaling(projectile.scale);
 
   // Calculate container size based on screen dimensions
   const containerSize = uiStore.dimensions.lesser * 0.5;
@@ -825,12 +823,10 @@ const SplashEffect = ({
   const [splashFrame, setSplashFrame] = useState(0);
   const frameTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isMounted = useRef(true);
+  const { memoizedCalculateRenderScaling } = useScaling();
 
   // Apply the same scaling logic as in AnimatedSprite
-  const renderScaleCalc = useMemo(
-    () => calculateRenderScaling(splash.scale),
-    [splash.scale],
-  );
+  const renderScaleCalc = memoizedCalculateRenderScaling(splash.scale);
 
   // Calculate container size based on screen dimensions
   const containerSize = uiStore.dimensions.lesser * 0.5;

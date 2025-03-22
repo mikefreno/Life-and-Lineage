@@ -30,7 +30,11 @@ const AudioSettings = observer(() => {
 
   return (
     <ScrollView
-      contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+      contentContainerStyle={{
+        flexGrow: 1,
+        justifyContent: "center",
+        ...styles.notchMirroredLanscapePad,
+      }}
     >
       <View
         style={{

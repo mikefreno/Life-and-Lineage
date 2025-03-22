@@ -9,8 +9,9 @@ import { PlayerCharacter } from "@/entities/character";
 import UIStore from "@/stores/UIStore";
 import { DraggableDataStore } from "@/stores/DraggableDataStore";
 import { observer } from "mobx-react-lite";
-import { normalize, normalizeLineHeight, useStyles } from "@/hooks/styles";
+import { useStyles } from "@/hooks/styles";
 import { useIsFocused } from "@react-navigation/native";
+import { useScaling } from "@/hooks/scaling";
 
 interface EquipmentDisplayProps {
   displayItem: {
@@ -37,13 +38,14 @@ export default function EquipmentDisplay({
   const { playerState, uiStore } = useRootStore();
   const { draggableClassStore } = useDraggableStore();
   const styles = useStyles();
+  const { getNormalizedSize, getNormalizedLineSize } = useScaling();
 
   if (playerState) {
     if (uiStore.dimensions.height < 500 && uiStore.isLandscape) {
       return (
         <View style={styles.rowEvenly}>
           <EquipmentSlot
-            slot={"Main-Hand"}
+            slot="Head"
             playerState={playerState}
             uiStore={uiStore}
             draggableClassStore={draggableClassStore}
@@ -51,7 +53,7 @@ export default function EquipmentDisplay({
             inventoryBounds={draggableClassStore.inventoryBounds}
           />
           <EquipmentSlot
-            slot="Head"
+            slot={"Main-Hand"}
             playerState={playerState}
             uiStore={uiStore}
             draggableClassStore={draggableClassStore}
@@ -88,7 +90,7 @@ export default function EquipmentDisplay({
       return (
         <View
           style={{
-            paddingVertical: normalize(8),
+            paddingVertical: getNormalizedSize(8),
             zIndex: 10,
             flexDirection: "row",
             justifyContent: "space-evenly",
@@ -99,7 +101,7 @@ export default function EquipmentDisplay({
           <View style={styles.columnCenter}>
             <View
               style={{
-                height: uiStore.itemBlockSize + normalizeLineHeight(20), // size of an EquipmentSlot
+                height: uiStore.itemBlockSize + getNormalizedLineSize(20), // size of an EquipmentSlot
                 width: uiStore.itemBlockSize,
               }}
             />
@@ -262,7 +264,7 @@ const EquipmentSlot = observer(
         <View style={styles.columnCenter}>
           <Text
             style={{
-              paddingBottom: normalize(2),
+              paddingBottom: 2,
               textAlign: "center",
             }}
           >

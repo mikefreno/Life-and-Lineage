@@ -1,92 +1,14 @@
-import { Dimensions, PixelRatio, Platform, StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import { useRootStore } from "./stores";
 import Colors from "../constants/Colors";
-import { BASE_WIDTH } from "@/stores/UIStore";
-
-const getTaperedScale = () => {
-  const rawScale = Dimensions.get("window").width / BASE_WIDTH;
-  if (rawScale > 1) {
-    return 1 + (rawScale - 1) * 0.2;
-  } else {
-    return 1 - (1 - rawScale) * 0.8;
-  }
-};
-
-const getTaperedScaleForText = () => {
-  const rawScale = Dimensions.get("window").width / BASE_WIDTH;
-  if (rawScale > 1) {
-    return 1 + (rawScale - 1) * 0.1;
-  } else {
-    return 1 - (1 - rawScale) * 0.8;
-  }
-};
-
-const getReversedTaperedScale = () => {
-  const rawScale = BASE_WIDTH / Dimensions.get("window").width;
-  if (rawScale > 1) {
-    return 1 + (rawScale - 1) * 0.5;
-  } else {
-    return 1 - (1 - rawScale) * 0.5;
-  }
-};
-
-const defaultScale = getTaperedScale();
-const defaultScaleForText = getTaperedScaleForText();
-const reverseScale = getReversedTaperedScale();
-
-export const normalize = (size: number, scale: number = defaultScale) => {
-  const newSize = size * scale;
-
-  if (Platform.OS === "ios") {
-    return Math.round(PixelRatio.roundToNearestPixel(newSize));
-  } else {
-    return Math.round(PixelRatio.roundToNearestPixel(newSize)) - 2;
-  }
-};
-
-export const normalizeForText = (
-  size: number,
-  scale: number = defaultScaleForText,
-) => {
-  const newSize = size * scale;
-
-  if (Platform.OS === "ios") {
-    return Math.round(PixelRatio.roundToNearestPixel(newSize));
-  } else {
-    return Math.round(PixelRatio.roundToNearestPixel(newSize)) - 2;
-  }
-};
-
-export const reverseNormalize = (
-  size: number,
-  scale: number = reverseScale,
-) => {
-  const newSize = size * scale;
-
-  if (Platform.OS === "ios") {
-    return Math.round(PixelRatio.roundToNearestPixel(newSize));
-  } else {
-    return Math.round(PixelRatio.roundToNearestPixel(newSize)) - 2;
-  }
-};
-
-export const normalizeLineHeight = (
-  size: number,
-  scale: number = defaultScaleForText,
-) => {
-  return Math.round(size * scale);
-};
-
-export const calculateRenderScaling = (scale: number | undefined) => {
-  if (scale) {
-    return reverseNormalize(scale * 10) / 10;
-  }
-  return 1.0;
-};
+import { Orientation } from "expo-screen-orientation";
+import { useScaling } from "./scaling";
 
 export const useStyles = () => {
   const { uiStore } = useRootStore();
   const { height, width, greater } = uiStore.dimensions;
+  const { getNormalizedSize, getNormalizedFontSize, getNormalizedLineSize } =
+    useScaling();
 
   const platform = Platform.OS;
   const theme = Colors[uiStore.colorScheme];
@@ -132,40 +54,40 @@ export const useStyles = () => {
 
   const text = {
     "text-xs": {
-      fontSize: normalizeForText(10),
-      lineHeight: normalizeLineHeight(12),
+      fontSize: getNormalizedFontSize(10),
+      lineHeight: getNormalizedLineSize(12),
     },
     "text-sm": {
-      fontSize: normalizeForText(12),
-      lineHeight: normalizeLineHeight(16),
+      fontSize: getNormalizedFontSize(12),
+      lineHeight: getNormalizedLineSize(16),
     },
     "text-md": {
-      fontSize: normalizeForText(14),
-      lineHeight: normalizeLineHeight(20),
+      fontSize: getNormalizedFontSize(14),
+      lineHeight: getNormalizedLineSize(18),
     },
     "text-lg": {
-      fontSize: normalizeForText(18),
-      lineHeight: normalizeLineHeight(24),
+      fontSize: getNormalizedFontSize(18),
+      lineHeight: getNormalizedLineSize(22),
     },
     "text-xl": {
-      fontSize: normalizeForText(20),
-      lineHeight: normalizeLineHeight(24),
+      fontSize: getNormalizedFontSize(20),
+      lineHeight: getNormalizedLineSize(24),
     },
     "text-2xl": {
-      fontSize: normalizeForText(24),
-      lineHeight: normalizeLineHeight(28),
+      fontSize: getNormalizedFontSize(24),
+      lineHeight: getNormalizedLineSize(28),
     },
     "text-3xl": {
-      fontSize: normalizeForText(28),
-      lineHeight: normalizeLineHeight(32),
+      fontSize: getNormalizedFontSize(28),
+      lineHeight: getNormalizedLineSize(32),
     },
     "text-4xl": {
-      fontSize: normalizeForText(32),
-      lineHeight: normalizeLineHeight(36),
+      fontSize: getNormalizedFontSize(32),
+      lineHeight: getNormalizedLineSize(36),
     },
     "text-5xl": {
-      fontSize: normalizeForText(44),
-      lineHeight: normalizeLineHeight(48),
+      fontSize: getNormalizedFontSize(44),
+      lineHeight: getNormalizedLineSize(48),
     },
   } as const;
 
@@ -201,6 +123,7 @@ export const useStyles = () => {
     newGameContainer: {
       ...centeredContainer,
       justifyContent: "flex-start",
+      alignSelf: "center",
       paddingHorizontal: 0.08 * width,
       paddingTop: 0.04 * height,
     } as const,
@@ -241,7 +164,6 @@ export const useStyles = () => {
 
     // ---- New Game - Sex Select ---- //
     sexSelectionRow: {
-      marginVertical: "12%",
       flexDirection: "row",
       width: "100%",
       justifyContent: "space-evenly",
@@ -392,15 +314,15 @@ export const useStyles = () => {
     stashButton: {
       zIndex: 10,
       borderRadius: 8,
-      marginTop: normalize(-50),
-      width: normalize(80),
+      marginTop: getNormalizedSize(-50),
+      width: getNormalizedSize(80),
       paddingHorizontal: 16,
     } as const,
     equipmentSlotContainer: {
       zIndex: 50,
       borderWidth: 1,
       borderColor: "#a1a1aa",
-      borderRadius: normalize(8),
+      borderRadius: getNormalizedSize(8),
       alignSelf: "center",
     } as const,
     // ---- Inventory ---- //
@@ -420,7 +342,7 @@ export const useStyles = () => {
       top: "40%",
     } as const,
     slotBackground: {
-      borderRadius: normalize(8),
+      borderRadius: getNormalizedSize(8),
       borderWidth: 1,
       borderColor: theme.secondary,
       zIndex: 0,
@@ -442,7 +364,7 @@ export const useStyles = () => {
       alignItems: "center",
       borderWidth: 0,
       justifyContent: "center",
-      borderRadius: normalize(8),
+      borderRadius: getNormalizedSize(8),
       backgroundColor: "#a1a1aa",
       zIndex: 10,
     } as const,
@@ -465,8 +387,8 @@ export const useStyles = () => {
 
     // ---- Main Tabs - Spells ---- //
     proficiencyContainer: {
-      paddingVertical: normalize(4),
-      paddingHorizontal: normalize(24),
+      paddingVertical: getNormalizedSize(4),
+      paddingHorizontal: getNormalizedSize(24),
       width: "100%",
     } as const,
     spellContainer: {
@@ -479,12 +401,6 @@ export const useStyles = () => {
       textAlign: "center",
       ...text["text-lg"],
     } as const,
-    qualificationText: {
-      paddingVertical: 4,
-      fontSize: 18,
-      lineHeight: 28,
-    } as const,
-
     costContainer: {
       marginVertical: "auto",
       marginBottom: -32,
@@ -533,7 +449,7 @@ export const useStyles = () => {
       padding: "1%",
     } as const,
     shopCardInner: {
-      margin: normalize(4),
+      margin: getNormalizedSize(4),
       borderRadius: 12,
       borderWidth: 1,
       paddingVertical: 16,
@@ -629,8 +545,8 @@ export const useStyles = () => {
       marginHorizontal: "auto",
       borderRadius: 12,
       borderWidth: 1,
-      paddingHorizontal: normalize(16),
-      paddingVertical: normalize(8),
+      paddingHorizontal: getNormalizedSize(16),
+      paddingVertical: getNormalizedSize(8),
     } as const,
 
     flatButtonText: {
@@ -714,7 +630,7 @@ export const useStyles = () => {
       flexDirection: "row",
       flexWrap: "wrap",
       justifyContent: "space-evenly",
-      paddingHorizontal: normalize(4),
+      paddingHorizontal: getNormalizedSize(4),
     } as const,
     loadingContainer: {
       flex: 1,
@@ -995,7 +911,7 @@ export const useStyles = () => {
       borderWidth: 1,
       borderColor: theme.border,
       backgroundColor: theme.background,
-      height: normalizeLineHeight(48),
+      height: getNormalizedLineSize(48),
       borderRadius: 5,
       shadowColor: theme.shadow,
       shadowOffset: { width: 0, height: 1 },
@@ -1004,7 +920,7 @@ export const useStyles = () => {
       elevation: 2,
       paddingHorizontal: 4,
       marginBottom: 16,
-      width: normalize(230),
+      width: getNormalizedSize(230),
     } as const,
     authInput: {
       marginVertical: 24,
@@ -1016,7 +932,7 @@ export const useStyles = () => {
       fontFamily: "PixelifySans",
       paddingVertical: 8,
       minWidth: "50%",
-      fontSize: 20,
+      ...text["text-xl"],
     } as const,
     // ---- Spell Details ---- //
     spellCard: {
@@ -1093,8 +1009,8 @@ export const useStyles = () => {
       alignItems: "center",
       justifyContent: "space-between",
       width: "100%",
-      paddingHorizontal: normalize(2),
-      paddingVertical: normalize(6),
+      paddingHorizontal: getNormalizedSize(2),
+      paddingVertical: getNormalizedSize(6),
       columnGap: 4,
     } as const,
     // ---- Relationships ---- //
@@ -1146,7 +1062,7 @@ export const useStyles = () => {
     } as const,
     // webview
     webViewHeader: {
-      height: normalize(50),
+      height: getNormalizedSize(50),
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
@@ -1159,6 +1075,32 @@ export const useStyles = () => {
       justifyContent: "space-between",
       paddingHorizontal: 10,
     },
+    //landscape with notch
+    notchAvoidingLanscapePad: uiStore.hasNotch
+      ? uiStore.orientation === Orientation.LANDSCAPE_RIGHT
+        ? { paddingLeft: uiStore.insets?.left }
+        : uiStore.orientation === Orientation.LANDSCAPE_LEFT
+        ? { paddingRight: uiStore.insets?.right }
+        : {}
+      : {},
+    notchMirroredLanscapePad: uiStore.hasNotch
+      ? {
+          paddingHorizontal: uiStore.insets?.left ?? 0,
+        }
+      : {},
+    notchAvoidingLanscapeMargin: uiStore.hasNotch
+      ? uiStore.orientation === Orientation.LANDSCAPE_RIGHT
+        ? { marginLeft: uiStore.insets?.left }
+        : uiStore.orientation === Orientation.LANDSCAPE_LEFT
+        ? { marginRight: uiStore.insets?.right }
+        : {}
+      : {},
+    notchMirroredLanscapeMargin: uiStore.hasNotch
+      ? {
+          marginHorizontal:
+            (uiStore.insets?.left ?? 0) + (uiStore.insets?.right ?? 0),
+        }
+      : {},
   });
 };
 

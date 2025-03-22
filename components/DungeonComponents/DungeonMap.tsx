@@ -4,8 +4,9 @@ import GenericRaisedButton from "@/components/GenericRaisedButton";
 import { TILE_SIZE } from "@/stores/DungeonStore";
 import { observer } from "mobx-react-lite";
 import { useRootStore } from "@/hooks/stores";
-import { normalizeForText, useStyles } from "@/hooks/styles";
+import { useStyles } from "@/hooks/styles";
 import { directionsMapping, Tile } from "@/utility/functions/dungeon";
+import { useScaling } from "@/hooks/scaling";
 
 /**
  * Renders the dungeon map made by `generateTiles`.
@@ -105,6 +106,7 @@ export const DungeonMapRender = observer(() => {
 export const DungeonMapControls = observer(() => {
   const { dungeonStore, uiStore } = useRootStore();
   const styles = useStyles();
+  const { getNormalizedFontSize } = useScaling();
 
   if (!dungeonStore.currentPosition || !dungeonStore.currentMap) {
     throw new Error("Missing map, or current position within control handler!");
@@ -128,16 +130,18 @@ export const DungeonMapControls = observer(() => {
    * UI Button to move the player, if a move is invalid(past the edge of the map) that direction will be disabled
    * @param direction - the direction ("up", "down", "left", "right") to render and check for move validity
    */
-  const ArrowButton: React.FC<{
+  const ArrowButton = ({
+    direction,
+  }: {
     direction: "up" | "down" | "left" | "right";
-  }> = ({ direction }) => {
+  }) => {
     const valid = isMoveValid(direction);
     return (
       <GenericRaisedButton
         key={direction}
         onPress={() => dungeonStore.move(direction)}
         disabled={!valid || dungeonStore.movementQueued}
-        style={{ width: normalizeForText(100) }}
+        style={{ width: getNormalizedFontSize(100) }}
       >
         {direction.charAt(0).toUpperCase() + direction.slice(1)}
       </GenericRaisedButton>

@@ -240,7 +240,9 @@ export class DungeonLevel {
     const fightIdx = Math.floor(Math.random() * this.normalEncounters.length);
     const enemiesSpec = this.normalEncounters[fightIdx];
     const enemies = enemiesSpec.map((enemySpec) => {
-      let enemyJSON = enemiesJSON.find((json) => json.name == enemySpec.name);
+      let enemyJSON = enemiesJSON.find(
+        (json) => json.name == enemySpec.name.replaceAll("_", " "),
+      );
       if (!enemyJSON) {
         throw new Error(`missing enemy: ${enemySpec.name}`);
       }

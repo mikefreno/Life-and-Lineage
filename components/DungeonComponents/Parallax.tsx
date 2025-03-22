@@ -2,7 +2,6 @@ import { toJS } from "mobx";
 import React, { type ReactNode, useCallback, useEffect, useMemo } from "react";
 import {
   View,
-  Dimensions,
   StyleSheet,
   type StyleProp,
   type ViewStyle,
@@ -504,9 +503,6 @@ export const Parallax = observer(
     style?: StyleProp<ViewStyle>;
     children: ReactNode;
   }) => {
-    const dimensions = useMemo(() => Dimensions.get("window"), []);
-    const { width: screenWidth, height: screenHeight } = dimensions;
-
     const { uiStore } = useRootStore();
     const scrollX = useSharedValue(0);
     const translateX = useSharedValue(0);
@@ -527,20 +523,33 @@ export const Parallax = observer(
     const header = useHeaderHeight();
 
     const { scale, scaledWidth, scaledHeight, imagesNeeded } = useMemo(() => {
-      const targetHeight = screenHeight;
+      const targetHeight = uiStore.dimensions.height;
       const scale = targetHeight / size.height;
       const scaledWidth = size.width * scale;
       const scaledHeight = targetHeight;
       const imagesNeeded = Math.max(3, Math.ceil(NORMATIVE_WIDTH / size.width));
 
       return { scale, scaledWidth, scaledHeight, imagesNeeded };
-    }, [screenHeight, size.height, size.width]);
+    }, [
+      uiStore.dimensions.height,
+      size.height,
+      size.width,
+      uiStore.isLandscape,
+    ]);
+
+    useEffect(() => {
+      translateX.value = 0;
+      translateY.value = 0;
+      scrollX.value = 0;
+    }, [
+      uiStore.dimensions.width,
+      uiStore.dimensions.height,
+      uiStore.isLandscape,
+    ]);
 
     useEffect(() => {
       if (plainInCombat) {
         const totalWidth = size.width * imagesNeeded;
-
-        scrollX.value = 0;
 
         scrollX.value = withRepeat(
           withTiming(
@@ -561,7 +570,13 @@ export const Parallax = observer(
           scrollX.value = 0;
         };
       }
-    }, [plainInCombat, imagesNeeded, size.width, lastMoveDirection]);
+    }, [
+      plainInCombat,
+      imagesNeeded,
+      size.width,
+      lastMoveDirection,
+      uiStore.isLandscape,
+    ]);
 
     useEffect(() => {
       if (!plainInCombat) {
@@ -581,7 +596,7 @@ export const Parallax = observer(
         const relativeY = plainPlayerPosition.y - plainBoundingBox.offsetY;
         const boundingBoxVerticalCenter =
           plainBoundingBox.height - TILE_SIZE / 2;
-        const verticalOffset = boundingBoxVerticalCenter - relativeY;
+        const verticalOffsetCalc = boundingBoxVerticalCenter - relativeY;
 
         translateX.value = withSpring(-relativeX, {
           damping: 20,
@@ -592,7 +607,7 @@ export const Parallax = observer(
           restSpeedThreshold: 0.01,
         });
 
-        translateY.value = withSpring(verticalOffset, {
+        translateY.value = withSpring(verticalOffsetCalc, {
           damping: 20,
           stiffness: 90,
           mass: 1,
@@ -601,7 +616,12 @@ export const Parallax = observer(
           restSpeedThreshold: 0.01,
         });
       }
-    }, [plainPlayerPosition, plainBoundingBox, plainInCombat]);
+    }, [
+      plainPlayerPosition,
+      plainBoundingBox,
+      plainInCombat,
+      uiStore.isLandscape,
+    ]);
 
     const renderLayers = useCallback(() => {
       const layers = [];
@@ -620,8 +640,8 @@ export const Parallax = observer(
             translateY={translateY}
             inCombat={plainInCombat}
             scale={scale}
-            screenWidth={screenWidth}
-            screenHeight={screenHeight}
+            screenWidth={uiStore.dimensions.width}
+            screenHeight={uiStore.dimensions.height}
             scaledWidth={scaledWidth}
           />,
         );
@@ -637,8 +657,9 @@ export const Parallax = observer(
       translateY,
       plainInCombat,
       scale,
-      screenWidth,
-      screenHeight,
+      uiStore.isLandscape,
+      uiStore.dimensions.width,
+      uiStore.dimensions.height,
       scaledWidth,
     ]);
 
@@ -654,13 +675,13 @@ export const Parallax = observer(
             size={size}
             style={{
               transform: [{ scale }],
-              left: (screenWidth - scaledWidth) / 2,
+              left: (uiStore.dimensions.width - scaledWidth) / 2,
             }}
           />
         ));
       }
       return null;
-    }, [backgroundName, size, scale, screenWidth, scaledWidth]);
+    }, [backgroundName, size, scale, uiStore.dimensions.width, scaledWidth]);
 
     const backgroundContent = useMemo(() => {
       if (plainReduceMotion) {
@@ -670,8 +691,8 @@ export const Parallax = observer(
             style={{
               width: scaledWidth,
               height: scaledHeight,
-              top: -(scaledHeight - screenHeight) / 2,
-              left: (screenWidth - scaledWidth) / 2,
+              top: -(scaledHeight - uiStore.dimensions.height) / 2,
+              left: (uiStore.dimensions.width - scaledWidth) / 2,
               position: "absolute",
             }}
             contentFit="cover"
@@ -686,8 +707,8 @@ export const Parallax = observer(
       imageSet,
       scaledWidth,
       scaledHeight,
-      screenHeight,
-      screenWidth,
+      uiStore.dimensions.height,
+      uiStore.dimensions.width,
       renderLayers,
     ]);
 
@@ -703,10 +724,11 @@ export const Parallax = observer(
         <View
           style={{
             ...StyleSheet.absoluteFillObject,
-            height: screenHeight,
-            marginTop: !plainReduceMotion
-              ? -verticalOffset * screenHeight
-              : undefined,
+            height: uiStore.dimensions.height,
+            marginTop:
+              !plainReduceMotion && !uiStore.isLandscape
+                ? -verticalOffset * uiStore.dimensions.height
+                : undefined,
             bottom: 0,
           }}
         >

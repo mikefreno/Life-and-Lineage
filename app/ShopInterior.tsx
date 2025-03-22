@@ -25,7 +25,7 @@ import { InventoryItem } from "@/components/Draggable";
 import { useDraggableStore, useRootStore } from "@/hooks/stores";
 import { useVibration } from "@/hooks/generic";
 import type { Item } from "@/entities/item";
-import { flex, normalize, shadows, tw, useStyles } from "@/hooks/styles";
+import { flex, shadows, tw, useStyles } from "@/hooks/styles";
 import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 import GenericFlatButton from "@/components/GenericFlatButton";
 import { CharacterInteractionModal } from "@/components/CharacterInteractionModal";
@@ -369,7 +369,7 @@ const ShopInteriorScreen = observer(() => {
             onPress={sellAllJunk}
             childrenWhenDisabled={"No junk to sell"}
             innerStyle={{
-              paddingVertical: normalize(2),
+              paddingVertical: 2,
               paddingHorizontal: 4,
               borderRadius: 8,
             }}

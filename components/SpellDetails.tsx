@@ -21,15 +21,17 @@ import BlessingDisplay from "@/components/BlessingsDisplay";
 import { elementalColorMap } from "@/constants/Colors";
 import { DamageType, Element } from "@/utility/types";
 import { useRootStore } from "@/hooks/stores";
-import { normalize, useStyles } from "@/hooks/styles";
+import { useStyles } from "@/hooks/styles";
 import GenericStrikeAround from "@/components/GenericStrikeAround";
 import { Attack } from "@/entities/attack";
+import { useScaling } from "@/hooks/scaling";
 
 export default function SpellDetails({ spell }: { spell: Attack }) {
   if (spell.element === null) return;
 
   const { uiStore } = useRootStore();
   const styles = useStyles();
+  const { getNormalizedSize } = useScaling();
 
   return (
     <View
@@ -97,21 +99,11 @@ export default function SpellDetails({ spell }: { spell: Attack }) {
               Requires: {toTitleCase(spell.usesWeapon)}
             </Text>
           )}
-          {spell.selfDamage ? (
-            <View style={styles.rowCenter}>
-              <View style={styles.rowCenter}>
-                {spell.selfDamage.cumulative > 0 ? (
-                  <>
-                    <Text>{spell.selfDamage.cumulative} Self</Text>
-                    <HealthIcon
-                      width={normalize(14)}
-                      height={normalize(14)}
-                      style={{ marginLeft: 6 }}
-                    />
-                  </>
-                ) : null}
-              </View>
-            </View>
+          {spell.selfDamage.cumulative > 0 ? (
+            <SplitDamageRender
+              damageMap={spell.selfDamage.map}
+              title={"Self Damage"}
+            />
           ) : null}
           {spell.baseHealing ? (
             <View style={styles.rowCenter}>
@@ -120,8 +112,8 @@ export default function SpellDetails({ spell }: { spell: Attack }) {
                   <>
                     <Text>{spell.baseHealing} Self</Text>
                     <HealthIcon
-                      width={normalize(14)}
-                      height={normalize(14)}
+                      width={getNormalizedSize(14)}
+                      height={getNormalizedSize(14)}
                       style={{ marginLeft: 6 }}
                     />
                   </>
@@ -209,10 +201,10 @@ const SplitDamageRender = ({
     [DamageType.PHYSICAL]: (
       <Sword height={uiStore.iconSizeSmall} width={uiStore.iconSizeSmall} />
     ),
-    [DamageType.X]: (
+    [DamageType.FIRE]: (
       <Fire height={uiStore.iconSizeSmall} width={uiStore.iconSizeSmall} />
     ),
-    [DamageType.FIRE]: (
+    [DamageType.COLD]: (
       <Winter height={uiStore.iconSizeSmall} width={uiStore.iconSizeSmall} />
     ),
     [DamageType.LIGHTNING]: (
@@ -240,7 +232,7 @@ const SplitDamageRender = ({
     .map(([key]) => parseInt(key) as DamageType);
 
   return (
-    <View style={{ width: "100%" }}>
+    <View style={{ width: "100%", paddingHorizontal: 2 }}>
       <GenericStrikeAround style={{ paddingBottom: 4 }}>
         <Text style={styles["text-sm"]}>{title}</Text>
       </GenericStrikeAround>

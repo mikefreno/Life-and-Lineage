@@ -1,11 +1,13 @@
-import { normalize, useStyles } from "@/hooks/styles";
+import { useStyles } from "@/hooks/styles";
 import React, { useEffect, useState } from "react";
 import { Text } from "@/components/Themed";
 import { View } from "react-native";
+import { useScaling } from "@/hooks/scaling";
 
 export const AnimatedLoadingText = () => {
   const [dots, setDots] = useState("");
   const styles = useStyles();
+  const { getNormalizedSize } = useScaling();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -23,13 +25,13 @@ export const AnimatedLoadingText = () => {
   return (
     <Text
       style={{
-        paddingHorizontal: normalize(4),
+        paddingHorizontal: getNormalizedSize(4),
         alignSelf: "center",
         ...styles["text-lg"],
       }}
     >
       Loading
-      <View style={{ width: normalize(24), alignItems: "flex-start" }}>
+      <View style={{ width: getNormalizedSize(24), alignItems: "flex-start" }}>
         <Text style={styles["text-lg"]}>{dots}</Text>
       </View>
     </Text>

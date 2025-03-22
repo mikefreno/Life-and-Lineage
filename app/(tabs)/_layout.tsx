@@ -35,11 +35,13 @@ import { useIsFocused } from "@react-navigation/native";
 import { Element, TutorialOption } from "../../utility/types";
 import { useVibration } from "@/hooks/generic";
 import { useRootStore } from "@/hooks/stores";
-import { normalize, shadows, useStyles } from "../../hooks/styles";
+import { shadows, useStyles } from "../../hooks/styles";
 import { observer } from "mobx-react-lite";
 import { wait } from "@/utility/functions/misc";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import GenericModal from "@/components/GenericModal";
+import { useScaling } from "@/hooks/scaling";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const TabLayout = observer(() => {
   const isFocused = useIsFocused();
@@ -50,6 +52,7 @@ const TabLayout = observer(() => {
   const styles = useStyles();
   const router = useRouter();
   const vibration = useVibration();
+  const { getNormalizedSize } = useScaling();
 
   const tabBarLayout = useMemo(() => {
     const playerStatusHeight = uiStore.playerStatusCompactHeight ?? 0;
@@ -71,25 +74,46 @@ const TabLayout = observer(() => {
     uiStore.playerStatusExpandedOnAllRoutes,
     uiStore.expansionPadding,
   ]);
+  const insets = useSafeAreaInsets();
 
-  const commonOptions = {
-    lazy: false,
-    headerTransparent: true,
-    headerTitleAlign: "center",
-    headerTitleStyle: { fontFamily: "PixelifySans", fontSize: normalize(24) },
-    headerBackground:
-      Platform.OS == "ios"
-        ? () => (
-            <BlurView
-              intensity={50}
-              style={[StyleSheet.absoluteFill, styles.diffuse]}
-              tint={uiStore.colorScheme}
-            />
-          )
-        : () => (
-            <ThemedView style={[StyleSheet.absoluteFill, shadows.diffuse]} />
-          ),
-  } as const;
+  const commonOptions = useMemo(
+    () =>
+      ({
+        lazy: false,
+        headerTransparent: true,
+        headerTitleAlign: "center",
+        headerTitleStyle: {
+          fontFamily: "PixelifySans",
+          fontSize: getNormalizedSize(24),
+        },
+        headerStyle: {
+          height: 44 + insets.top,
+        },
+        headerBackground:
+          Platform.OS === "ios"
+            ? () => {
+                return (
+                  <BlurView
+                    intensity={50}
+                    style={[StyleSheet.absoluteFill, styles.diffuse]}
+                    tint={uiStore.colorScheme}
+                  />
+                );
+              }
+            : () => (
+                <ThemedView
+                  style={[StyleSheet.absoluteFill, shadows.diffuse]}
+                />
+              ),
+      }) as const,
+    [
+      uiStore.colorScheme,
+      styles.diffuse,
+      shadows.diffuse,
+      uiStore.dimensions,
+      insets.top,
+    ],
+  );
 
   return (
     <>
@@ -166,7 +190,7 @@ const TabLayout = observer(() => {
                     fontFamily: "PixelifySans",
                     ...styles["text-sm"],
                     color: props.color,
-                    paddingTop: normalize(2),
+                    paddingTop: 2,
                   }}
                 >
                   {props.children}
@@ -360,7 +384,7 @@ const TabLayout = observer(() => {
                   <Pressable onPress={() => vibration({ style: "light" })}>
                     {({ pressed }) => (
                       <Image
-                        source={require("../../assets/images/icons/investing.png")}
+                        source={require("@/assets/images/icons/investing.png")}
                         style={{
                           height: uiStore.iconSizeXL,
                           width: uiStore.iconSizeXL,
@@ -467,7 +491,7 @@ const TabLayout = observer(() => {
                     uiStore.setTotalLoadingSteps(5);
                     vibration({ style: "warning" });
                     dungeonStore
-                      .setUpDungeon("training grounds", "1")
+                      .setUpDungeon("training grounds", "1", false)
                       .then(() => uiStore.incrementLoadingStep());
                     wait(100).then(() => {
                       router.replace(`/DungeonLevel`);

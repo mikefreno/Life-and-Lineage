@@ -6,9 +6,9 @@ import {
 } from "react-native";
 
 import Colors from "@/constants/Colors";
-import { forwardRef } from "react";
+import { forwardRef, useMemo } from "react";
 import { useRootStore } from "@/hooks/stores";
-import { normalize, normalizeLineHeight } from "@/hooks/styles";
+import { useStyles } from "@/hooks/styles";
 
 type ThemeProps = {
   lightColor?: string;
@@ -42,20 +42,23 @@ export const Text = forwardRef<DefaultText, TextProps>((props, ref) => {
   const { style, lightColor, darkColor, ...otherProps } = props;
 
   const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
+  const styles = useStyles();
+  const finalStyling = useMemo(() => {
+    return [
+      {
+        color,
+        ...styles["text-md"],
+        fontFamily: "PixelifySans",
+      },
+      style,
+    ];
+  }, [style, color]);
 
   return (
     <DefaultText
       ref={ref}
       allowFontScaling={false}
-      style={[
-        { color },
-        {
-          fontFamily: "PixelifySans",
-          fontSize: normalize(14),
-          lineHeight: normalizeLineHeight(20),
-        },
-        style,
-      ]}
+      style={finalStyling}
       {...otherProps}
     />
   );

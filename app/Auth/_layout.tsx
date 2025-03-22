@@ -2,15 +2,17 @@ import { Tabs } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { type GestureResponderEvent, Pressable } from "react-native";
 import { useVibration } from "@/hooks/generic";
-import { normalize } from "@/hooks/styles";
+import { useScaling } from "@/hooks/scaling";
+import { useRootStore } from "@/hooks/stores";
 
 export default function AuthRoutesLayout() {
   const vibration = useVibration();
+  const { uiStore } = useRootStore();
   return (
     <Tabs
       screenOptions={{
         tabBarIconStyle: { marginHorizontal: "auto" },
-        tabBarStyle: { height: normalize(80), paddingBottom: 16 },
+        tabBarStyle: { height: uiStore.tabHeight, paddingBottom: 16 },
         tabBarButton: (props) => {
           const onPressWithVibration = (event: GestureResponderEvent) => {
             vibration({ style: "light" });
@@ -21,7 +23,7 @@ export default function AuthRoutesLayout() {
               onPress={onPressWithVibration}
               style={{
                 marginVertical: "auto",
-                height: normalize(44),
+                height: uiStore.iconSizeXL,
               }}
             >
               {props.children}
@@ -39,7 +41,7 @@ export default function AuthRoutesLayout() {
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
               name="account-circle"
-              size={normalize(24)}
+              size={uiStore.iconSizeLarge}
               color={color}
             />
           ),
@@ -54,7 +56,7 @@ export default function AuthRoutesLayout() {
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
               name="account-plus"
-              size={normalize(24)}
+              size={uiStore.iconSizeLarge}
               color={color}
             />
           ),

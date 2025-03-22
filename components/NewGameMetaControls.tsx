@@ -1,5 +1,5 @@
 import { useRootStore } from "@/hooks/stores";
-import { flex, tw } from "@/hooks/styles";
+import { flex, tw, useStyles } from "@/hooks/styles";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import { observer } from "mobx-react-lite";
 import { Pressable, View } from "react-native";
@@ -7,10 +7,19 @@ import { Pressable, View } from "react-native";
 const NewGameMetaControls = observer(
   ({ forceShowTutorial }: { forceShowTutorial?: () => void }) => {
     const { playerState, tutorialStore, audioStore, uiStore } = useRootStore();
+    const styles = useStyles();
 
     return (
       <View
-        style={[flex.columnCenter, tw.ml2, tw.mt2, { position: "absolute" }]}
+        style={[
+          flex.columnCenter,
+          tw.ml2,
+          tw.mt2,
+          styles.notchAvoidingLanscapePad,
+          {
+            position: "absolute",
+          },
+        ]}
       >
         {forceShowTutorial &&
           (tutorialStore.tutorialsEnabled || !playerState) && (

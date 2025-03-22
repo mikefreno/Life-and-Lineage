@@ -5,13 +5,14 @@ import WebView from "react-native-webview";
 import { View, TouchableOpacity, BackHandler, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import { normalize, useStyles } from "@/hooks/styles";
+import { useStyles } from "@/hooks/styles";
 import { Text, ThemedView } from "@/components/Themed";
 import Colors from "@/constants/Colors";
 import D20DieAnimation from "@/components/DieRollAnim";
 import GenericFlatButton from "@/components/GenericFlatButton";
 import { useRouter } from "expo-router";
 import { AnimatedLoadingText } from "@/components/AnimatedLoadingText";
+import { useScaling } from "@/hooks/scaling";
 
 const FrenoDotMeWebview = observer(() => {
   const { uiStore, authStore } = useRootStore();
@@ -53,12 +54,13 @@ const FrenoDotMeWebview = observer(() => {
   const handleClose = () => {
     navigation.goBack();
   };
+  const { getNormalizedSize } = useScaling();
 
   return (
     <View
       style={{
         flex: 1,
-        paddingTop: Platform.OS == "android" ? normalize(30) : 0,
+        paddingTop: Platform.OS == "android" ? getNormalizedSize(30) : 0,
       }}
     >
       {authStore.isConnected ? (

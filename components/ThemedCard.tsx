@@ -1,7 +1,8 @@
 import { type ReactNode } from "react";
 import { ViewStyle, View } from "react-native";
-import { normalize, useStyles } from "@/hooks/styles";
+import { useStyles } from "@/hooks/styles";
 import { ThemedView } from "@/components/Themed";
+import { useScaling } from "@/hooks/scaling";
 
 interface ThemedCard {
   children?: ReactNode;
@@ -9,9 +10,10 @@ interface ThemedCard {
 }
 export default function ThemedCard({ children, style }: ThemedCard) {
   const styles = useStyles();
+  const { getNormalizedSize } = useScaling();
 
   return (
-    <View style={{ margin: normalize(6), borderRadius: 12, ...style }}>
+    <View style={{ margin: getNormalizedSize(6), borderRadius: 12, ...style }}>
       <ThemedView style={styles.themedCard}>{children}</ThemedView>
     </View>
   );

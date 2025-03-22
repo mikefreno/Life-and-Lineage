@@ -2,12 +2,14 @@ import { Tabs } from "expo-router";
 import { Foundation, MaterialCommunityIcons } from "@expo/vector-icons";
 import {
   type GestureResponderEvent,
+  Platform,
   Pressable,
   Text as RNText,
 } from "react-native";
 import { useVibration } from "@/hooks/generic";
-import { normalize, useStyles } from "@/hooks/styles";
+import { useStyles } from "@/hooks/styles";
 import { useRootStore } from "@/hooks/stores";
+import Colors from "@/constants/Colors";
 
 export default function OptionsLayout() {
   const vibration = useVibration();
@@ -17,15 +19,7 @@ export default function OptionsLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarIconStyle: { alignSelf: "center" },
-        tabBarStyle: {
-          height: 80,
-          paddingBottom: 16,
-          borderTopWidth: 0,
-          alignContent: "center",
-          ...styles.diffuseTop,
-        },
-        animation: uiStore.reduceMotion ? "fade" : "shift",
+        tabBarActiveTintColor: Colors[uiStore.colorScheme].tint,
         tabBarLabel: (props) => {
           return (
             <RNText
@@ -34,13 +28,26 @@ export default function OptionsLayout() {
                 fontFamily: "PixelifySans",
                 ...styles["text-sm"],
                 color: props.color,
-                marginTop: normalize(3),
+                paddingTop: 2,
               }}
             >
               {props.children}
             </RNText>
           );
         },
+        tabBarStyle: {
+          borderTopWidth: 0,
+          ...styles.diffuseTop,
+        },
+        tabBarIconStyle: {
+          height: uiStore.iconSizeXL,
+        },
+        tabBarItemStyle: {
+          justifyContent: "center",
+          paddingTop: 0,
+        },
+        animation:
+          uiStore.reduceMotion || Platform.OS == "android" ? "none" : "shift",
         tabBarButton: (props) => {
           const onPressWithVibration = (event: GestureResponderEvent) => {
             vibration({ style: "light" });
@@ -49,11 +56,16 @@ export default function OptionsLayout() {
           return (
             <Pressable
               onPress={onPressWithVibration}
-              style={{
-                alignContent: "center",
-                marginVertical: "auto",
-                height: 44,
-              }}
+              accessibilityLabel={props.accessibilityLabel}
+              accessibilityRole={props.accessibilityRole}
+              accessibilityState={props.accessibilityState}
+              style={[
+                props.style,
+                {
+                  justifyContent: "space-evenly",
+                  paddingHorizontal: "15%",
+                },
+              ]}
             >
               {props.children}
             </Pressable>

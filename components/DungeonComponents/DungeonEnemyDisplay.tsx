@@ -9,12 +9,7 @@ import { observer } from "mobx-react-lite";
 import { Creature, Enemy } from "@/entities/creatures";
 import { useRootStore } from "@/hooks/stores";
 import { AnimatedSprite } from "../AnimatedSprite";
-import {
-  flex,
-  normalize,
-  normalizeLineHeight,
-  useStyles,
-} from "@/hooks/styles";
+import { flex, useStyles } from "@/hooks/styles";
 import Colors from "@/constants/Colors";
 import {
   useSharedValue,
@@ -23,6 +18,7 @@ import {
 } from "react-native-reanimated";
 import { type Being } from "@/entities/being";
 import { Character } from "@/entities/character";
+import { useScaling } from "@/hooks/scaling";
 
 const EnemyHealthChangePopUp = ({
   healthDiff,
@@ -33,9 +29,10 @@ const EnemyHealthChangePopUp = ({
   showing: boolean;
   reset: () => void;
 }) => {
-  if (!showing) return <View style={{ height: normalizeLineHeight(16) }} />;
+  const { getNormalizedLineSize } = useScaling();
+  if (!showing) return <View style={{ height: getNormalizedLineSize(16) }} />;
   return (
-    <View style={{ height: normalizeLineHeight(16) }}>
+    <View style={{ height: getNormalizedLineSize(16) }}>
       <FadeOutNode clearingFunction={reset}>
         <Text style={{ color: "#f87171" }}>
           {healthDiff > 0 ? "+" : ""}
@@ -48,6 +45,7 @@ const EnemyHealthChangePopUp = ({
 
 const EnemyConditions = ({ enemy }: { enemy: Being }) => {
   const { uiStore } = useRootStore();
+  const { getNormalizedSize } = useScaling();
   const simplifiedConditions = useMemo(() => {
     const condMap = new Map();
     enemy?.conditions.forEach((condition) => {
@@ -108,8 +106,8 @@ const EnemyConditions = ({ enemy }: { enemy: Being }) => {
               style={{
                 flexDirection: "row",
                 position: "absolute",
-                right: normalize(-4),
-                top: normalize(16),
+                right: getNormalizedSize(-4),
+                top: getNormalizedSize(16),
               }}
             >
               <Text style={[styles["text-3xl"], { top: 4 }]}>*</Text>

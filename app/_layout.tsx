@@ -2,7 +2,7 @@ import { useFonts } from "expo-font";
 import { Stack, usePathname, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { Platform, Pressable, View, StyleSheet } from "react-native";
+import { Platform, Pressable, View, StyleSheet, UIManager } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
 import { Text } from "@/components/Themed";
 import * as Sentry from "@sentry/react-native";
@@ -28,7 +28,7 @@ import { DungeonStore } from "@/stores/DungeonStore";
 import GenericModal from "@/components/GenericModal";
 import { CharacterImage } from "@/components/CharacterImage";
 import GenericFlatButton from "@/components/GenericFlatButton";
-import { normalize, useStyles } from "@/hooks/styles";
+import { useStyles } from "@/hooks/styles";
 import { DevControls } from "@/components/DevControls";
 import BoundsVisualizer from "@/components/BoundsVisualizer";
 import {
@@ -41,6 +41,7 @@ import PlatformDependantGestureWrapper from "@/components/PlatformDependantGestu
 import { SCREEN_TRANSITION_TIMING } from "@/stores/UIStore";
 
 import { decode } from "base-64";
+import { useScaling } from "@/hooks/scaling";
 global.atob = decode;
 
 export { ErrorBoundary } from "expo-router";
@@ -87,7 +88,7 @@ Sentry.init({
  * This wraps the entire app, loads the player data, sets up user app settings and holds&sets the `AppContext`.
  * The responsibility of this is largely around unseen app state, whereas `RootLayout` is largely concerned with UI
  */
-const Root = observer(() => {
+const Root = () => {
   const [mainFontLoaded, error] = useFonts({
     PixelifySans: require("../assets/fonts/PixelifySans-Regular.ttf"),
   });
@@ -124,7 +125,7 @@ const Root = observer(() => {
       </DungeonProvider>
     </AppProvider>
   );
-});
+};
 
 /**
  * This focuses on getting the UI set, and relieving the splash screen when ready
@@ -137,7 +138,9 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   useEffect(() => {
-    uiStore.setInsets(insets);
+    if (insets !== uiStore.insets) {
+      uiStore.setInsets(insets);
+    }
   }, [insets]);
 
   const [firstLoad, setFirstLoad] = useState(true);
@@ -145,6 +148,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   const pathname = usePathname();
   const [showBirthModal, setShowBirthModal] = useState(false);
   const [newbornBaby, setNewbornBaby] = useState<Character | null>(null);
+  const { getNormalizedSize } = useScaling();
 
   //const [expoPushToken, setExpoPushToken] = useState("");
   //const [sentToken, setSentToken] = useState(false);
@@ -340,6 +344,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
         >
           <SystemBars
             style={uiStore.colorScheme == "dark" ? "light" : "dark"}
+            hidden={{ navigationBar: true }}
           />
           <ProjectedImage />
           <FleeModal />
@@ -373,37 +378,31 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
             <Stack.Screen
               name="Options"
               options={{
-                presentation:
-                  uiStore.reduceMotion || uiStore.isLargeDevice
-                    ? "card"
-                    : "modal",
+                presentation: "card",
                 headerBackButtonDisplayMode: "minimal",
                 headerBackButtonMenuEnabled: false,
                 headerBackTitleStyle: {
                   fontFamily: "PixelifySans",
-                  fontSize: normalize(16),
+                  fontSize: getNormalizedSize(16),
                 },
                 headerTitleStyle: {
                   fontFamily: "PixelifySans",
-                  fontSize: normalize(22),
+                  fontSize: getNormalizedSize(22),
                 },
               }}
             />
             <Stack.Screen
               name="Auth"
               options={{
-                presentation:
-                  uiStore.reduceMotion || uiStore.isLargeDevice
-                    ? "card"
-                    : "modal",
+                presentation: "card",
                 headerBackButtonMenuEnabled: false,
                 headerBackTitleStyle: {
                   fontFamily: "PixelifySans",
-                  fontSize: normalize(16),
+                  fontSize: getNormalizedSize(16),
                 },
                 headerTitleStyle: {
                   fontFamily: "PixelifySans",
-                  fontSize: normalize(22),
+                  fontSize: getNormalizedSize(22),
                 },
               }}
             />
@@ -415,11 +414,11 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                 headerBackButtonMenuEnabled: false,
                 headerBackTitleStyle: {
                   fontFamily: "PixelifySans",
-                  fontSize: normalize(16),
+                  fontSize: getNormalizedSize(16),
                 },
                 headerTitleStyle: {
                   fontFamily: "PixelifySans",
-                  fontSize: normalize(22),
+                  fontSize: getNormalizedSize(22),
                 },
               }}
             />
@@ -430,11 +429,11 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                 headerBackButtonMenuEnabled: false,
                 headerBackTitleStyle: {
                   fontFamily: "PixelifySans",
-                  fontSize: normalize(16),
+                  fontSize: getNormalizedSize(16),
                 },
                 headerTitleStyle: {
                   fontFamily: "PixelifySans",
-                  fontSize: normalize(22),
+                  fontSize: getNormalizedSize(22),
                 },
               }}
             />
@@ -443,7 +442,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
               options={{
                 headerTitleStyle: {
                   fontFamily: "PixelifySans",
-                  fontSize: normalize(20),
+                  fontSize: getNormalizedSize(20),
                 },
                 headerBackButtonDisplayMode: "minimal",
                 headerTransparent: true,
@@ -466,11 +465,11 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                 headerTransparent: true,
                 headerBackTitleStyle: {
                   fontFamily: "PixelifySans",
-                  fontSize: normalize(16),
+                  fontSize: getNormalizedSize(16),
                 },
                 headerTitleStyle: {
                   fontFamily: "PixelifySans",
-                  fontSize: normalize(22),
+                  fontSize: getNormalizedSize(22),
                 },
                 headerBackground: () => (
                   <BlurView
@@ -490,11 +489,11 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                 headerTransparent: true,
                 headerBackTitleStyle: {
                   fontFamily: "PixelifySans",
-                  fontSize: normalize(16),
+                  fontSize: getNormalizedSize(16),
                 },
                 headerTitleStyle: {
                   fontFamily: "PixelifySans",
-                  fontSize: normalize(22),
+                  fontSize: getNormalizedSize(22),
                 },
                 headerBackground: () => (
                   <BlurView
@@ -513,11 +512,11 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                 headerTransparent: true,
                 headerBackTitleStyle: {
                   fontFamily: "PixelifySans",
-                  fontSize: normalize(16),
+                  fontSize: getNormalizedSize(16),
                 },
                 headerTitleStyle: {
                   fontFamily: "PixelifySans",
-                  fontSize: normalize(22),
+                  fontSize: getNormalizedSize(22),
                 },
                 headerBackground: () => (
                   <BlurView
@@ -537,11 +536,11 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                 headerTransparent: true,
                 headerBackTitleStyle: {
                   fontFamily: "PixelifySans",
-                  fontSize: normalize(16),
+                  fontSize: getNormalizedSize(16),
                 },
                 headerTitleStyle: {
                   fontFamily: "PixelifySans",
-                  fontSize: normalize(22),
+                  fontSize: getNormalizedSize(22),
                 },
                 headerBackground: () => (
                   <BlurView
@@ -557,7 +556,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
               options={{
                 headerTitleStyle: {
                   fontFamily: "PixelifySans",
-                  fontSize: normalize(20),
+                  fontSize: getNormalizedSize(20),
                 },
                 headerTransparent: true,
                 headerBackground: () => (
@@ -607,11 +606,11 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                 headerBackButtonMenuEnabled: false,
                 headerBackTitleStyle: {
                   fontFamily: "PixelifySans",
-                  fontSize: normalize(16),
+                  fontSize: getNormalizedSize(16),
                 },
                 headerTitleStyle: {
                   fontFamily: "PixelifySans",
-                  fontSize: normalize(22),
+                  fontSize: getNormalizedSize(22),
                 },
               }}
             />
@@ -622,11 +621,11 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                 headerBackButtonMenuEnabled: false,
                 headerBackTitleStyle: {
                   fontFamily: "PixelifySans",
-                  fontSize: normalize(16),
+                  fontSize: getNormalizedSize(16),
                 },
                 headerTitleStyle: {
                   fontFamily: "PixelifySans",
-                  fontSize: normalize(22),
+                  fontSize: getNormalizedSize(22),
                 },
               }}
             />

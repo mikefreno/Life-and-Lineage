@@ -102,7 +102,10 @@ export default function NewGameReview() {
           />
           <GenericFlatButton
             onPress={startGame}
-            style={{ marginTop: tw_base[4] }}
+            style={{
+              marginTop: tw_base[4],
+              paddingBottom: uiStore.insets?.bottom,
+            }}
             accessibilityRole="button"
             accessibilityLabel="Confirm"
             disabled={!allocatedStats || remainingPoints > 0}
