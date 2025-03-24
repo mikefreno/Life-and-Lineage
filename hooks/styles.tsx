@@ -39,8 +39,8 @@ export const useStyles = () => {
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 } as const,
+    shadowColor: uiStore.colorScheme === "dark" ? "#fff" : "#000",
+    shadowOffset: { width: 0, height: 2 } as const,
     shadowOpacity: platform === "android" ? 0.9 : 0.2,
     shadowRadius: 1.5,
     elevation: 3,
@@ -88,6 +88,44 @@ export const useStyles = () => {
     "text-5xl": {
       fontSize: getNormalizedFontSize(44),
       lineHeight: getNormalizedLineSize(48),
+    },
+  } as const;
+
+  const shadows = {
+    diffuse: {
+      shadowColor: uiStore.colorScheme == "light" ? "#000000" : "#fff",
+      shadowOffset: { width: 0, height: 5 },
+      shadowOpacity: 0.05,
+      shadowRadius: 10,
+      elevation: 20,
+    },
+    diffuseTop: {
+      shadowColor: uiStore.colorScheme == "light" ? "#000000" : "#fff",
+      shadowOffset: { width: 0, height: -5 },
+      shadowOpacity: 0.05,
+      shadowRadius: 10,
+      elevation: 20,
+    },
+    soft: {
+      shadowColor: uiStore.colorScheme == "light" ? "#000000" : "#fff",
+      shadowOffset: { width: 0, height: 5 },
+      shadowOpacity: 0.25,
+      shadowRadius: 15,
+      elevation: 24,
+    },
+    softTop: {
+      shadowColor: uiStore.colorScheme == "light" ? "#000000" : "#fff",
+      shadowOffset: { width: 0, height: -5 },
+      shadowOpacity: 0.25,
+      shadowRadius: 15,
+      elevation: 24,
+    },
+    cardOffset: {
+      shadowColor: "#000000",
+      shadowOffset: { width: 3, height: 1 },
+      shadowOpacity: 0.2,
+      shadowRadius: 3,
+      elevation: 2,
     },
   } as const;
 
@@ -453,6 +491,7 @@ export const useStyles = () => {
       borderRadius: 12,
       borderWidth: 1,
       paddingVertical: 16,
+      shadowOffset: { width: 2, height: 3 } as const,
       ...flex.columnEvenly,
     } as const,
     enterButtonInner: {
@@ -535,12 +574,6 @@ export const useStyles = () => {
       borderColor: uiStore.colorScheme === "dark" ? "#71717a" : undefined,
       ...shadows.soft,
     } as const,
-    errorContainer: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
-      paddingVertical: 96,
-    } as const,
     flatButtonContainer: {
       marginHorizontal: "auto",
       borderRadius: 12,
@@ -567,7 +600,7 @@ export const useStyles = () => {
     statsRow: {
       flexDirection: "row",
       justifyContent: "space-evenly",
-      paddingBottom: 4,
+      paddingBottom: 6,
     } as const,
     detailedConditionCard: {
       marginVertical: 4,
@@ -1058,7 +1091,7 @@ export const useStyles = () => {
     dungeonBlur: {
       position: "absolute",
       bottom: 0,
-      height: "85%",
+      height: "80%",
     } as const,
     // webview
     webViewHeader: {
@@ -1643,70 +1676,4 @@ export const flex = {
   wrap: {
     flexWrap: "wrap",
   } as const,
-} as const;
-
-export const shadows = {
-  diffuse: {
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 20,
-  },
-  diffuseTop: {
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: -5 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 20,
-  },
-  soft: {
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.25,
-    shadowRadius: 15,
-    elevation: 24,
-  },
-  softTop: {
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: -5 },
-    shadowOpacity: 0.25,
-    shadowRadius: 15,
-    elevation: 24,
-  },
-  diffuseWhite: {
-    shadowColor: "#ffffff",
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
-  },
-  diffuseTopWhite: {
-    shadowColor: "#ffffff",
-    shadowOffset: { width: 0, height: -5 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
-  },
-  softWhite: {
-    shadowColor: "#ffffff",
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.1,
-    shadowRadius: 15,
-    elevation: 3,
-  },
-  softTopWhite: {
-    shadowColor: "#ffffff",
-    shadowOffset: { width: 0, height: -5 },
-    shadowOpacity: 0.1,
-    shadowRadius: 15,
-    elevation: 3,
-  },
-  cardOffset: {
-    shadowColor: "#000000",
-    shadowOffset: { width: 3, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 2,
-  },
 } as const;

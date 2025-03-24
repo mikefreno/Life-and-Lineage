@@ -1,13 +1,12 @@
 import React, { ReactNode } from "react";
 import { View } from "react-native";
-import { toTitleCase } from "@/utility/functions/misc";
+import { statRounding, toTitleCase } from "@/utility/functions/misc";
 import { Text } from "@/components/Themed";
 import {
   BeastMasteryIcon,
   ClockIcon,
   Energy,
   Fire,
-  HealthIcon,
   Holy,
   Lightning,
   NecromancerSkull,
@@ -24,14 +23,12 @@ import { useRootStore } from "@/hooks/stores";
 import { useStyles } from "@/hooks/styles";
 import GenericStrikeAround from "@/components/GenericStrikeAround";
 import { Attack } from "@/entities/attack";
-import { useScaling } from "@/hooks/scaling";
 
 export default function SpellDetails({ spell }: { spell: Attack }) {
   if (spell.element === null) return;
 
   const { uiStore } = useRootStore();
   const styles = useStyles();
-  const { getNormalizedSize } = useScaling();
 
   return (
     <View
@@ -88,9 +85,10 @@ export default function SpellDetails({ spell }: { spell: Attack }) {
               />
             </View>
           ) : null}
-          {spell.displayDamage.cumulative > 0 ? (
+          {spell.displayDamage.cumulativeDamage > 0 &&
+          spell.displayDamage.damageMap ? (
             <SplitDamageRender
-              damageMap={spell.displayDamage.map}
+              damageMap={spell.displayDamage.damageMap}
               title={"Damage"}
             />
           ) : null}
@@ -99,27 +97,12 @@ export default function SpellDetails({ spell }: { spell: Attack }) {
               Requires: {toTitleCase(spell.usesWeapon)}
             </Text>
           )}
-          {spell.selfDamage.cumulative > 0 ? (
+          {spell.selfDamage.cumulativeDamage > 0 &&
+          spell.selfDamage.damageMap ? (
             <SplitDamageRender
-              damageMap={spell.selfDamage.map}
+              damageMap={spell.selfDamage.damageMap}
               title={"Self Damage"}
             />
-          ) : null}
-          {spell.baseHealing ? (
-            <View style={styles.rowCenter}>
-              <View style={styles.rowCenter}>
-                {spell.selfDamage.cumulative > 0 ? (
-                  <>
-                    <Text>{spell.baseHealing} Self</Text>
-                    <HealthIcon
-                      width={getNormalizedSize(14)}
-                      height={getNormalizedSize(14)}
-                      style={{ marginLeft: 6 }}
-                    />
-                  </>
-                ) : null}
-              </View>
-            </View>
           ) : null}
           {spell.summonNames?.map((summon, idx) => (
             <View key={summon + idx} style={styles.rowCenter}>
@@ -241,7 +224,9 @@ const SplitDamageRender = ({
           key={damageType}
           style={[styles.rowCenter, { alignItems: "center" }]}
         >
-          <Text style={{ paddingRight: 4 }}>{damageMap[damageType]}</Text>
+          <Text style={{ paddingRight: 4 }}>
+            {statRounding(damageMap[damageType] ?? 0)}
+          </Text>
           {DamageTypeUtils[damageType]}
         </View>
       ))}

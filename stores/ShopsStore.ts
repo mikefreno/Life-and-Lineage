@@ -4,7 +4,7 @@ import { storage } from "@/utility/functions/storage";
 import { throttle } from "lodash";
 import { parse, stringify } from "flatted";
 import shopsJSON from "@/assets/json/shops.json";
-import { MerchantType } from "@/utility/types";
+import { MerchantType, Personality } from "@/utility/types";
 import { action, computed, makeObservable, observable } from "mobx";
 
 const SHOP_ARCHETYPES: MerchantType[] = [
@@ -80,8 +80,8 @@ export class ShopStore {
 
   getInitShopsState() {
     const map = new Map<MerchantType, Shop>();
-
     const usedCombinations = new Set<string>();
+    const existingShopkeepers = new Map<string, Personality>();
 
     shopsJSON.forEach((shop) => {
       const archetype = shop.type as MerchantType;
@@ -90,22 +90,32 @@ export class ShopStore {
       let sex;
 
       do {
-        shopKeeper = generateShopKeeper(archetype, this.root);
-        this.root.characterStore.addCharacter(shopKeeper);
-        this.root.playerState?.addKnownCharacter(shopKeeper);
-
+        shopKeeper = generateShopKeeper(
+          archetype,
+          this.root,
+          existingShopkeepers,
+        );
         sex = shopKeeper.sex;
-
         const combinationKey = `${archetype}-${sex}`;
 
         if (!usedCombinations.has(combinationKey)) {
+          this.root.characterStore.addCharacter(shopKeeper);
+          this.root.playerState?.addKnownCharacter(shopKeeper);
+
+          existingShopkeepers.set(shopKeeper.id, shopKeeper.personality!);
+
           usedCombinations.add(combinationKey);
           break;
         }
+
         if (usedCombinations.size > 20) {
           console.warn(
             `Couldn't generate unique sex-archetype combination after many attempts`,
           );
+          this.root.characterStore.addCharacter(shopKeeper);
+          this.root.playerState?.addKnownCharacter(shopKeeper);
+
+          existingShopkeepers.set(shopKeeper.id, shopKeeper.personality!);
           break;
         }
       } while (true);

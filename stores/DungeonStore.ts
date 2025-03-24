@@ -59,6 +59,7 @@ export class DungeonStore {
     this.dungeonInstances = this.hydrateDungeonState();
 
     const activityHydration = this.hydrateActivityState();
+
     if (!activityHydration) {
       const currentDungeonHydration = this.hydrateCurrentDungeonState();
       if (!currentDungeonHydration) {
@@ -89,6 +90,8 @@ export class DungeonStore {
         this.logs = logs;
       }
     }
+
+    __DEV__ && this.setupDevActions();
 
     makeObservable(this, {
       inCombat: observable,
@@ -239,6 +242,15 @@ export class DungeonStore {
         }
       },
     );
+  }
+
+  private setupDevActions() {
+    if (__DEV__) {
+      this.root.addDevAction({
+        name: "Open all instances",
+        action: () => this._openAllInstances(),
+      });
+    }
   }
 
   get isInDungeon() {

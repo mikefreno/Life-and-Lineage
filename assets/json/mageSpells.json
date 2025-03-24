@@ -101,7 +101,6 @@
     "proficiencyNeeded": "expert",
     "manaCost": 100,
     "maxTurnsActive": 3,
-    "damageTable": {},
     "buffs": [
       "projectile suppression"
     ],
@@ -234,7 +233,6 @@
     "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 50,
-    "damageTable": {},
     "baseHealing": 35,
     "animation": {
       "sprite": "splash",
@@ -278,7 +276,6 @@
     "damageTable": {
       "fire": 60
     },
-    "damage": 60,
     "buffs": null,
     "debuffs": [
       {
@@ -332,7 +329,6 @@
     "target": "area",
     "type": "defense",
     "manaCost": 200,
-    "damageTable": {},
     "buffs": [
       "lasting heal"
     ],
@@ -575,7 +571,6 @@
     "type": "defense",
     "proficiencyNeeded": "master",
     "manaCost": 125,
-    "damageTable": {},
     "buffs": [
       "hard to see",
       "damaging to hit"

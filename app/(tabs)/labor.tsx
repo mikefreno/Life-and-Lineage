@@ -97,6 +97,7 @@ const LaborScreen = observer(() => {
             paddingBottom: uiStore.bottomBarHeight,
             width: "90%",
             marginHorizontal: "auto",
+            ...styles.notchAvoidingLanscapeMargin,
           }}
           scrollIndicatorInsets={{ top: 48, right: 0, left: 0, bottom: 48 }}
         >

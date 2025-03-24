@@ -25,7 +25,7 @@ import { InventoryItem } from "@/components/Draggable";
 import { useDraggableStore, useRootStore } from "@/hooks/stores";
 import { useVibration } from "@/hooks/generic";
 import type { Item } from "@/entities/item";
-import { flex, shadows, tw, useStyles } from "@/hooks/styles";
+import { flex, tw, useStyles } from "@/hooks/styles";
 import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 import GenericFlatButton from "@/components/GenericFlatButton";
 import { CharacterInteractionModal } from "@/components/CharacterInteractionModal";
@@ -55,7 +55,7 @@ const GreetingComponent = ({ greeting }: { greeting: string }) => {
     <Animated.View
       style={[
         styles.greetingContainer,
-        shadows.soft,
+        styles.soft,
         {
           opacity: fadeAnim,
         },

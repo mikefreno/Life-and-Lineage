@@ -62,7 +62,7 @@ describe("Character", () => {
         root: mockRootStore as any,
       });
 
-      expect(character.equals(differentCharacter)).toBe(false);
+      expect(character.equals(differentCharacter.id)).toBe(false);
     });
 
     it("should return false for characters with different ids", () => {
@@ -75,7 +75,7 @@ describe("Character", () => {
         root: mockRootStore as any,
       });
 
-      expect(character.equals(differentCharacter)).toBe(false);
+      expect(character.equals(differentCharacter.id)).toBe(false);
     });
   });
 

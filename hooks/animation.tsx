@@ -134,6 +134,7 @@ export const useReanimatedAnimations = () => {
   };
 
   const runMoveAnimation = (
+    isForwardMovement: boolean,
     targetPosition: Vector2,
     currentPosition: Vector2,
     moveFrames: number,
@@ -141,7 +142,7 @@ export const useReanimatedAnimations = () => {
   ) => {
     const { duration } = calculateAdjustedFrameRate(moveFrames);
 
-    if (moveX.value === 0 && moveY.value === 0) {
+    if (isForwardMovement) {
       const direction = targetPosition.subtract(currentPosition);
       const distance = direction.magnitude();
       const moveDistance = Math.min(distance, 100);

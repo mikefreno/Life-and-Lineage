@@ -50,8 +50,8 @@ const ShopsScreen = observer(() => {
             {
               backgroundColor: colors.background,
               borderColor: colors.border,
-              shadowColor: colors.border,
-              shadowOpacity: 0.3,
+              shadowColor: colors.background,
+              shadowOpacity: 0.35,
               elevation: 4,
             },
           ]}
@@ -135,10 +135,13 @@ const ShopsScreen = observer(() => {
     return {
       paddingTop: headerHeight,
       paddingBottom: uiStore.compactRoutePadding,
+      ...styles.notchAvoidingLanscapeMargin,
     };
   }, [
     uiStore.playerStatusExpandedOnAllRoutes,
     uiStore.playerStatusCompactHeight,
+    headerHeight,
+    uiStore.orientation,
   ]);
 
   return (

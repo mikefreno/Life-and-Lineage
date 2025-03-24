@@ -474,4 +474,9 @@ export const VFXImageMap = {
     height: 48,
     width: 48,
   },
+  slashAndDust: {
+    source: require("@/assets/vfx/physical/slash-and-dust.webp"),
+    height: 96,
+    width: 95,
+  },
 };

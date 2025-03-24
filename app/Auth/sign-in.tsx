@@ -261,7 +261,7 @@ const SignInScreen = observer(() => {
             {Platform.OS == "ios" && (
               <AppleAuthentication.AppleAuthenticationButton
                 buttonType={
-                  AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP
+                  AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN
                 }
                 buttonStyle={
                   uiStore.colorScheme == "dark"

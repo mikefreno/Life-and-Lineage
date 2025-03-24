@@ -77,6 +77,7 @@ const LearningSpellScreen = observer(() => {
   const [selectedBookSpell, setSelectedBookSpell] = useState<Attack | null>(
     null,
   );
+  console.log(selectedBookSpell);
   const [showMasteryLevelTooLow, setShowMasteryLevelTooLow] =
     useState<Element | null>(null);
   const headerHeight = useHeaderHeight();
@@ -119,7 +120,7 @@ const LearningSpellScreen = observer(() => {
     if (
       playerState &&
       selectedBookSpell &&
-      selectedBookSpell.proficiencyNeeded
+      selectedBookSpell.proficiencyNeeded !== null
     ) {
       return `${
         MasteryToString[selectedBookSpell.proficiencyNeeded]
@@ -188,14 +189,14 @@ const LearningSpellScreen = observer(() => {
             Teaches
           </Text>
           <Text style={[styles.py2, styles["text-lg"], { letterSpacing: 0.1 }]}>
-            ({bookLabel()})
+            {/*TODO*/}({bookLabel()})
           </Text>
           <SpellDetails spell={selectedBookSpell} />
           <GenericRaisedButton
             onPress={() => {
               if (
                 playerState &&
-                selectedBookSpell.proficiencyNeeded &&
+                selectedBookSpell.proficiencyNeeded !== null &&
                 selectedBookSpell.element &&
                 selectedBookSpell.proficiencyNeeded <=
                   playerState.currentMasteryLevel(selectedBookSpell.element)

@@ -3,7 +3,7 @@
     "name": "punch",
     "targets": "single",
     "hitChance": 1.0,
-    "damageMult": 1.0,
+    "damageTable": {},
     "animation": {
       "sprite": "puft",
       "style": "static",
@@ -15,7 +15,7 @@
     "name": "hit",
     "targets": "single",
     "hitChance": 1.0,
-    "damageMult": 1.0,
+    "damageTable": {},
     "animation": {
       "sprite": "puft",
       "style": "static",
@@ -27,7 +27,7 @@
     "name": "stab",
     "targets": "single",
     "hitChance": 0.95,
-    "damageMult": 1.0,
+    "damageTable": {},
     "debuffs": [
       {
         "name": "bleed",
@@ -43,8 +43,10 @@
   {
     "name": "torch stab",
     "targets": "single",
-    "hitChance": 1.0,
-    "damageMult": 1.0,
+    "hitChance": 0.95,
+    "damageTable": {
+      "fire": 2
+    },
     "debuffs": [
       {
         "name": "burn",
@@ -61,7 +63,7 @@
     "name": "slash",
     "targets": "single",
     "hitChance": 1.0,
-    "damageMult": 1.0,
+    "damageTable": {},
     "animation": {
       "sprite": "slash-horizontal",
       "style": "static",
@@ -72,7 +74,7 @@
     "name": "cleave",
     "targets": "dual",
     "hitChance": 0.85,
-    "damageMult": 1.0,
+    "damageTable": {},
     "animation": {
       "sprite": "slash-horizontal",
       "style": "static",
@@ -82,8 +84,8 @@
   {
     "name": "crushing blow",
     "targets": "single",
-    "hitChance": 0.95,
-    "damageMult": 1.0,
+    "hitChance": 0.90,
+    "damageTable": {},
     "debuffs": [
       {
         "name": "stun",
@@ -100,7 +102,7 @@
     "name": "",
     "targets": "single",
     "hitChance": 0.95,
-    "damageMult": 1.0,
+    "damageTable": {},
     "debuffs": [
       {
         "name": "execute",
@@ -117,8 +119,8 @@
   {
     "name": "shoot",
     "targets": "single",
-    "hitChance": 1.0,
-    "damageMult": 1.0,
+    "hitChance": 0.95,
+    "damageTable": {},
     "animation": {
       "sprite": "chainedArrowHit",
       "style": "missile",
@@ -130,8 +132,8 @@
   {
     "name": "rooting shot",
     "targets": "single",
-    "hitChance": 0.95,
-    "damageMult": 0.75,
+    "hitChance": 0.90,
+    "damageTable": {},
     "debuffs": [
       {
         "name": "stun",
@@ -150,7 +152,7 @@
     "name": "hack",
     "targets": "single",
     "hitChance": 0.85,
-    "damageMult": 0.95,
+    "damageTable": {},
     "debuffs": [
       {
         "name": "execute",
@@ -166,8 +168,8 @@
   {
     "name": "rapid shot",
     "targets": "single",
-    "hitChance": 0.65,
-    "damageMult": 0.85,
+    "hitChance": 0.55,
+    "damageTable": {},
     "hits": 3,
     "animation": {
       "sprite": "chainedArrowHit",
@@ -180,7 +182,7 @@
     "name": "careful shot",
     "targets": "single",
     "hitChance": 1.0,
-    "damageMult": 0.95,
+    "damageTable": {},
     "animation": {
       "sprite": "chainedArrowHit",
       "style": "missile",
@@ -191,8 +193,10 @@
   {
     "name": "poison shot",
     "targets": "single",
-    "hitChance": 1.0,
-    "damageMult": 0.85,
+    "hitChance": 0.9,
+    "damageTable": {
+      "poison": 3
+    },
     "debuffs": [
       {
         "name": "poison",
@@ -210,7 +214,9 @@
     "name": "overdraw",
     "targets": "single",
     "hitChance": 0.80,
-    "damageMult": 1.75,
+    "damageTable": {
+      "physical": 4
+    },
     "animation": {
       "sprite": "chainedArrowHit",
       "style": "missile",

@@ -1,4 +1,6 @@
+import attacks from "../assets/json/enemyAttacks.json";
 import {
+  AttackUse,
   Attribute,
   BeingType,
   DamageType,
@@ -21,13 +23,20 @@ import {
 import { RootStore } from "@/stores/RootStore";
 import { EnemyImageKeyOption } from "@/utility/enemyHelpers";
 import { Item } from "./item";
-import { damageReduction } from "@/utility/functions/misc";
+import {
+  damageReduction,
+  statRounding,
+  toTitleCase,
+} from "@/utility/functions/misc";
 import {
   getConditionEffectsOnDefenses,
   getConditionEffectsOnMisc,
   getMagnitude,
 } from "@/utility/functions/conditions";
 import { BeingOptions } from "./entityTypes";
+import { Attack, PerTargetUse } from "./attack";
+import { PlayerCharacter } from "./character";
+import { Enemy } from "./creatures";
 
 export class Being {
   readonly id: string;
@@ -207,6 +216,7 @@ export class Being {
       nonConditionalDexterity: computed,
       criticalChance: computed,
 
+      attacks: computed,
       totalArmor: computed,
       dodgeChance: computed,
       blockChance: computed,
@@ -327,16 +337,20 @@ export class Being {
    */
   public damageHealth({
     damage,
+    attackerId,
   }: {
     attackerId: string;
     damage: number | null;
   }) {
     if (damage) {
-      if (this.currentHealth - damage > this.maxHealth) {
+      let rounded = statRounding(damage); // 0.05 rounding
+      // negative damage overflow protection
+      if (this.currentHealth - rounded > this.maxHealth) {
         this.currentHealth = this.maxHealth;
         return this.currentHealth;
       }
-      this.currentHealth -= damage;
+      this.currentHealth = statRounding(this.currentHealth - rounded);
+      this.threatTable.addThreat(attackerId, rounded);
     }
     return this.currentHealth;
   }
@@ -519,7 +533,31 @@ export class Being {
   }
 
   get attackPower() {
-    return this.totalStrength * 0.5 + this.totalDexterity * 0.25;
+    const baseMultiplier = 1.0;
+
+    let strengthContribution = 0;
+    if (this.totalStrength <= 50) {
+      strengthContribution = this.totalStrength * 0.01;
+    } else {
+      const firstTier = 50 * 0.01;
+      const additionalPoints = this.totalStrength - 50;
+      const diminishedValue =
+        (0.01 * additionalPoints) / (1 + Math.log1p(additionalPoints / 50));
+      strengthContribution = firstTier + diminishedValue;
+    }
+
+    let dexterityContribution = 0;
+    if (this.totalDexterity <= 50) {
+      dexterityContribution = this.totalDexterity * 0.005;
+    } else {
+      const firstTier = 50 * 0.005;
+      const additionalPoints = this.totalStrength - 50;
+      const diminishedValue =
+        (0.005 * additionalPoints) / (1 + Math.log1p(additionalPoints / 50));
+      dexterityContribution = firstTier + diminishedValue;
+    }
+
+    return baseMultiplier + strengthContribution + dexterityContribution;
   }
   //----------------------------------Intelligence-------------------------------//
   get totalIntelligence() {
@@ -545,7 +583,19 @@ export class Being {
   }
 
   get magicPower() {
-    return this.totalIntelligence * 0.5;
+    const baseMultiplier = 1.0;
+
+    let intelligenceContribution = 0;
+    if (this.totalIntelligence <= 50) {
+      intelligenceContribution = this.totalIntelligence * 0.01;
+    } else {
+      const firstTier = 50 * 0.01;
+      const additionalPoints = this.totalIntelligence - 50;
+      const diminishedValue =
+        (0.01 * additionalPoints) / (1 + Math.log1p(additionalPoints / 50));
+      intelligenceContribution = firstTier + diminishedValue;
+    }
+    return baseMultiplier + intelligenceContribution;
   }
   //----------------------------------Dexterity-------------------------------//
   get totalDexterity() {
@@ -664,7 +714,7 @@ export class Being {
       }
     }
     // Cap resistance at 75%
-    return Math.min(resistance, 75);
+    return Math.min(resistance, 75) / 100;
   }
 
   get fireResistance() {
@@ -736,14 +786,14 @@ export class Being {
   }
 
   get physicalDamage(): number {
-    return (
-      this.calculateTotalDamage(
-        Modifier.PhysicalDamage,
-        Modifier.PhysicalDamageAdded,
-        Modifier.PhysicalDamageMultiplier,
-        this.baseDamageTable[DamageType.PHYSICAL] ?? 0,
-      ) + this.attackPower
+    const calc = this.calculateTotalDamage(
+      Modifier.PhysicalDamage,
+      Modifier.PhysicalDamageAdded,
+      Modifier.PhysicalDamageMultiplier,
+      this.baseDamageTable[DamageType.PHYSICAL] ?? 0,
     );
+
+    return calc;
   }
 
   get fireDamage(): number {
@@ -856,20 +906,227 @@ export class Being {
   }
 
   //--------------------Combat-------------------//
+  /**
+   * The built Attacks of the Creature
+   */
+  get attacks() {
+    const builtAttacks: Attack[] = [];
+    this.attackStrings.forEach((attackName) => {
+      const foundAttack = attacks.find(
+        (attackObj) => attackObj.name == attackName,
+      );
+      if (!foundAttack)
+        throw new Error(
+          `No matching attack found for ${attackName} in creating a ${this.nameReference}`,
+        ); // name should be set before this
+      const builtAttack = new Attack({
+        ...foundAttack,
+        targets: foundAttack.targets as "area" | "single" | "dual",
+        user: this,
+      });
+      builtAttacks.push(builtAttack);
+    });
+    return builtAttacks;
+  }
+
+  //---------------------------Equivalency---------------------------//
+  public equals(otherBeingID: string) {
+    return this.id === otherBeingID;
+  }
+
+  //---------------------------Battle---------------------------//
+  /**
+   * This method is meant to be overridden by derived classes. It currently chooses a random attack.
+   * @param {Object} params - An object containing the target to attack.
+   * @param {PlayerCharacter | Minion | Enemy} params.target - The target to attack.
+   * @returns {Object} - An object indicating the result of the turn, including the chosen attack.
+   */
+  protected _takeTurn({
+    targets,
+    nameReference,
+  }: {
+    targets: Being[];
+    nameReference: string;
+  }): {
+    attack: Attack | null;
+    targetResults:
+      | {
+          target: Being;
+          use: PerTargetUse;
+        }[]
+      | null;
+    buffs: Condition[] | null;
+    log: string;
+  } {
+    const execute = this.conditions.find((cond) => cond.name == "execute");
+    if (execute) {
+      this.damageHealth({ attackerId: execute.placedbyID, damage: 9999 });
+      this.endTurn();
+      return {
+        attack: null,
+        targetResults: null,
+        buffs: null,
+        log: `${toTitleCase(nameReference)} was executed!`,
+      };
+    }
+    if (this.isStunned) {
+      const allStunSources = this.conditions.filter((cond) =>
+        cond.effect.includes("stun"),
+      );
+      allStunSources.forEach((stunSource) => {
+        this.threatTable.addThreat(stunSource.placedbyID, 10);
+      });
+      this.endTurn();
+      return {
+        attack: null,
+        buffs: null,
+        targetResults: targets.map((enemy) => ({
+          target: enemy,
+          use: { result: AttackUse.stunned },
+        })),
+        log: `${toTitleCase(nameReference)} was stunned!`,
+      };
+    }
+    const allTargets = targets.reduce((acc: Being[], currentTarget) => {
+      acc.push(currentTarget);
+      if (currentTarget instanceof PlayerCharacter) {
+        acc.push(...(currentTarget.minionsAndPets || []));
+      } else if (currentTarget instanceof Enemy) {
+        acc.push(...(currentTarget.minions || []));
+      }
+      return acc;
+    }, []);
+
+    const availableAttacks = this.attacks.filter(
+      (attack) => attack.canBeUsed.val,
+    );
+    if (availableAttacks.length > 0) {
+      const { attack, numTargets } = this.chooseAttack(
+        availableAttacks,
+        allTargets.length,
+      );
+
+      const bestTargets = this.threatTable.getHighestThreatTargets(
+        allTargets,
+        numTargets,
+      );
+
+      const res = attack.use(bestTargets);
+      this.endTurn();
+      return { ...res, attack };
+    } else {
+      this.endTurn();
+      return {
+        attack: null,
+        buffs: null,
+        targetResults: targets.map((enemy) => ({
+          target: enemy,
+          use: { result: AttackUse.lowMana },
+        })),
+        log: `${toTitleCase(nameReference)} passed (low energy)!`,
+      };
+    }
+  }
+
+  protected chooseAttack(
+    availableAttacks: Attack[],
+    numberOfPotentialTargets: number,
+  ): { attack: Attack; numTargets: number } {
+    const scoredAttacks = availableAttacks.map((attack) => {
+      const damage = attack.displayDamage;
+      const numTargets =
+        attack.targets === "area"
+          ? numberOfPotentialTargets
+          : attack.targets === "dual"
+          ? numberOfPotentialTargets > 1
+            ? 2
+            : 1
+          : 1;
+      const totalDamage = damage.cumulativeDamage * numTargets;
+      const heal = attack.buffs?.filter((buff) => buff.effect.includes("heal"));
+      const nonHealBuffCount =
+        attack.buffs?.filter((buff) => !buff.effect.includes("heal")).length ??
+        0;
+      const debuffCount = attack.debuffNames?.length ?? 0;
+      const summonCount = attack.summonNames?.length ?? 0;
+      const healthPercentage = this.currentHealth / this.baseHealth;
+
+      // Calculate the priority score
+      let priorityScore = totalDamage;
+
+      // Add bonus for buffs and debuffs
+      priorityScore += nonHealBuffCount * 1.25; // adjust the multiplier as needed
+      priorityScore += debuffCount * 1.25; // adjust the multiplier as needed
+
+      if (heal && healthPercentage < 0.85) {
+        if (healthPercentage > 0.5) {
+          priorityScore * 5;
+        } else {
+          priorityScore * 10;
+        }
+      }
+      // Add bonus for summons based on HP and current count
+      if (summonCount > 0 && this instanceof Enemy) {
+        if (healthPercentage > 0.75) {
+          if (this.minions.length === 0) {
+            priorityScore *= 5;
+          } else if (this.minions.length === 1) {
+            priorityScore *= 1.5;
+          } else if (this.minions.length >= 2) {
+            priorityScore /= 2;
+          }
+        } else if (healthPercentage > 0.5) {
+          if (this.minions.length === 0) {
+            priorityScore *= 2;
+          } else if (this.minions.length === 1) {
+            priorityScore /= 2;
+          } else if (this.minions.length >= 2) {
+            priorityScore /= 3;
+          }
+        } else {
+          priorityScore /= 4;
+        }
+      }
+
+      // Add a small random factor to introduce randomness
+      priorityScore += Math.random() * 1.25;
+
+      return { attack, priorityScore, numTargets };
+    });
+
+    // Sort the attacks by priority score in descending order
+    scoredAttacks.sort((a, b) => b.priorityScore - a.priorityScore);
+
+    // Return the attack with the highest priority score
+    return {
+      attack: scoredAttacks[0].attack,
+      numTargets: scoredAttacks[0].numTargets,
+    };
+  }
+
+  protected endTurn() {
+    setTimeout(() => {
+      this.conditionTicker();
+      this.regenMana();
+      this.regenHealth();
+    }, 250);
+  }
+
   public damageTypeCalculation(
     type: DamageType,
     attackDamage: number,
+    isSpell: boolean,
     target?: Being,
   ) {
     if (target) {
       switch (type) {
         case DamageType.PHYSICAL:
           return (
-            (this.physicalDamage + attackDamage) * 1 -
-            target.physicalDamageReduction
+            (this.physicalDamage + attackDamage) *
+            (1 - target.physicalDamageReduction)
           );
         case DamageType.FIRE:
-          return (this.fireDamage + attackDamage) * 1 - target.fireResistance;
+          return (this.fireDamage + attackDamage) * (1 - target.fireResistance);
         case DamageType.COLD:
           return (this.coldDamage + attackDamage) * 1 - target.coldResistance;
         case DamageType.LIGHTNING:
@@ -886,35 +1143,40 @@ export class Being {
         case DamageType.MAGIC:
           return (this.magicDamage + attackDamage) * 1 - target.magicResistance;
         case DamageType.RAW:
-          return attackDamage;
+          console.log(attackDamage);
+          return attackDamage * (isSpell ? this.magicPower : this.attackPower);
       }
     } else {
       switch (type) {
         case DamageType.PHYSICAL:
-          return this.physicalDamage + attackDamage;
+          return (this.physicalDamage + attackDamage) * this.attackPower;
         case DamageType.FIRE:
-          return this.fireDamage + attackDamage;
+          return this.fireDamage * this.magicPower + attackDamage;
         case DamageType.COLD:
-          return this.coldDamage + attackDamage;
+          return this.coldDamage * this.magicPower + attackDamage;
         case DamageType.LIGHTNING:
-          return this.lightningDamage + attackDamage;
+          return this.lightningDamage * this.magicPower + attackDamage;
         case DamageType.POISON:
-          return this.poisonDamage + attackDamage;
+          return this.poisonDamage * this.magicPower + attackDamage;
         case DamageType.HOLY:
-          return this.holyDamage + attackDamage;
+          return this.holyDamage * this.magicPower + attackDamage;
         case DamageType.MAGIC:
-          return this.magicDamage + attackDamage;
+          return this.magicDamage * this.magicPower + attackDamage;
         case DamageType.RAW:
-          return attackDamage;
+          return attackDamage * (isSpell ? this.magicPower : this.attackPower);
       }
     }
   }
 
   public calculateAttackDamage(
     baseDamageMap: { [key in DamageType]?: number } | null,
+    isSpell: boolean,
     target?: Being,
   ) {
     let cumulativeDamage = 0;
+
+    if (baseDamageMap == null)
+      return { cumulativeDamage, damageMap: baseDamageMap };
     let damageMap: Record<DamageType, number> = {
       [DamageType.PHYSICAL]: baseDamageMap
         ? baseDamageMap[DamageType.PHYSICAL] ?? 0
@@ -942,10 +1204,15 @@ export class Being {
 
     Object.entries(damageMap).forEach(([typeKey, amount]) => {
       const damageType = parseInt(typeKey) as DamageType;
-      const calculatedDamage =
-        amount === 0 && target && target.id === this.id
-          ? 0
-          : this.damageTypeCalculation(damageType, amount, target);
+      let calculatedDamage = amount;
+      if (amount >= 0) {
+        calculatedDamage = this.damageTypeCalculation(
+          damageType,
+          amount,
+          isSpell,
+          target,
+        );
+      }
       damageMap[damageType] = calculatedDamage;
       cumulativeDamage += Math.max(0, calculatedDamage);
     });

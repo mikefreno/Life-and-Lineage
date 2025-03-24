@@ -6,7 +6,7 @@ import {
   useStatChanges,
   useVibration,
 } from "@/hooks/generic";
-import { normalize, radius, tw_base, useStyles } from "@/hooks/styles";
+import { radius, tw_base, useStyles } from "@/hooks/styles";
 import { AccelerationCurves, toTitleCase } from "@/utility/functions/misc";
 import { Attribute, AttributeToString, Modifier } from "@/utility/types";
 import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
@@ -40,6 +40,7 @@ import { BlurView } from "expo-blur";
 import { usePathname } from "expo-router";
 import { getTotalValue, statMapping } from "@/utility/functions/stats";
 import Colors from "@/constants/Colors";
+import { useScaling } from "@/hooks/scaling";
 
 export const EXPANDED_PAD = 16;
 
@@ -130,7 +131,7 @@ export const RenderPrimaryStatsBlock = observer(
       case Attribute.sanity:
         current = playerState.currentSanity;
         max = playerState.maxSanity;
-        min = -playerState.maxSanity;
+        min = -playerState.maxSanity!;
         filledColor = "#c084fc";
         unfilledColor = "#e9d5ff";
         break;
@@ -449,6 +450,7 @@ export const DetailedViewDebilitationsRender = observer(() => {
   const conditionScrollViewRef = useRef<ScrollView>(null);
   const [currentConditionPage, setCurrentConditionPage] = useState(0);
   const vibration = useVibration();
+  const { getNormalizedSize } = useScaling();
 
   if (!playerState || playerState.debilitations.length === 0) {
     return (
@@ -532,8 +534,8 @@ export const DetailedViewDebilitationsRender = observer(() => {
               }}
               key={`indicator-${index}`}
               style={{
-                width: normalize(14),
-                height: normalize(14),
+                width: getNormalizedSize(14),
+                height: getNormalizedSize(14),
                 borderRadius: 9999,
                 backgroundColor:
                   currentConditionPage === index
@@ -543,7 +545,7 @@ export const DetailedViewDebilitationsRender = observer(() => {
                     : uiStore.colorScheme === "dark"
                     ? "rgba(255,255,255,0.3)"
                     : "rgba(0,0,0,0.3)",
-                marginHorizontal: normalize(12),
+                marginHorizontal: getNormalizedSize(12),
               }}
             />
           ))}
@@ -559,6 +561,7 @@ export const DetailedViewConditionRender = observer(() => {
   const conditionScrollViewRef = useRef<ScrollView>(null);
   const [currentConditionPage, setCurrentConditionPage] = useState(0);
   const vibration = useVibration();
+  const { getNormalizedSize } = useScaling();
 
   if (!playerState || playerState.conditions.length === 0) {
     return (
@@ -640,8 +643,8 @@ export const DetailedViewConditionRender = observer(() => {
               }}
               key={`indicator-${index}`}
               style={{
-                width: normalize(14),
-                height: normalize(14),
+                width: getNormalizedSize(14),
+                height: getNormalizedSize(14),
                 borderRadius: 9999,
                 backgroundColor:
                   currentConditionPage === index
@@ -651,7 +654,7 @@ export const DetailedViewConditionRender = observer(() => {
                     : uiStore.colorScheme === "dark"
                     ? "rgba(255,255,255,0.3)"
                     : "rgba(0,0,0,0.3)",
-                marginHorizontal: normalize(12),
+                marginHorizontal: getNormalizedSize(12),
               }}
             />
           ))}
@@ -1029,29 +1032,38 @@ export const ColorAndPlatformDependantBlur = observer(
     if (home) {
       if (uiStore.colorScheme === "dark" && Platform.OS === "ios") {
         return (
-          <BlurView
-            intensity={100}
-            tint={uiStore.colorScheme}
-            style={[
-              {
-                marginHorizontal: 16,
-                borderRadius: 12,
-                zIndex: 10,
-                overflow: "hidden",
-              },
-            ]}
+          <View
+            style={{
+              shadowColor: "#ffffff",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.35,
+              shadowRadius: 3.84,
+            }}
           >
-            <Animated.View
-              style={{
-                display: "flex",
-                backgroundColor: showingWarningPulse
-                  ? healthOrSanityWarning()
-                  : healthOrSanityFlash(),
-              }}
+            <BlurView
+              intensity={100}
+              tint={uiStore.colorScheme}
+              style={[
+                {
+                  marginHorizontal: 16,
+                  borderRadius: 12,
+                  zIndex: 10,
+                  overflow: "hidden",
+                },
+              ]}
             >
-              {children}
-            </Animated.View>
-          </BlurView>
+              <Animated.View
+                style={{
+                  display: "flex",
+                  backgroundColor: showingWarningPulse
+                    ? healthOrSanityWarning()
+                    : healthOrSanityFlash(),
+                }}
+              >
+                {children}
+              </Animated.View>
+            </BlurView>
+          </View>
         );
       } else {
         return (
@@ -1065,7 +1077,7 @@ export const ColorAndPlatformDependantBlur = observer(
               shadowColor:
                 uiStore.colorScheme === "dark" ? "#ffffff" : "#000000",
               shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.25,
+              shadowOpacity: 0.35,
               shadowRadius: 3.84,
               elevation: 5,
             }}

@@ -28,7 +28,6 @@ export default function OptionsLayout() {
                 fontFamily: "PixelifySans",
                 ...styles["text-sm"],
                 color: props.color,
-                paddingTop: 2,
               }}
             >
               {props.children}
@@ -41,6 +40,7 @@ export default function OptionsLayout() {
         },
         tabBarIconStyle: {
           height: uiStore.iconSizeXL,
+          marginHorizontal: "auto",
         },
         tabBarItemStyle: {
           justifyContent: "center",
@@ -78,12 +78,16 @@ export default function OptionsLayout() {
         options={{
           headerShown: false,
           title: "App",
-          tabBarLabelStyle: { fontFamily: "PixelifySans" },
+          tabBarIconStyle: {
+            width: uiStore.iconSizeXL,
+            height: uiStore.iconSizeXL,
+            marginRight: uiStore.isLandscape ? 16 : 0,
+          },
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
               name="application-brackets"
-              size={24}
               color={color}
+              size={uiStore.iconSizeXL}
             />
           ),
         }}
@@ -93,12 +97,16 @@ export default function OptionsLayout() {
         options={{
           headerShown: false,
           title: "Game",
-          tabBarLabelStyle: { fontFamily: "PixelifySans" },
+          tabBarIconStyle: {
+            width: uiStore.iconSizeXL,
+            height: uiStore.iconSizeXL,
+            marginRight: uiStore.isLandscape ? 16 : 0,
+          },
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
               name="gamepad-circle-right"
-              size={24}
               color={color}
+              size={uiStore.iconSizeXL}
             />
           ),
         }}
@@ -108,9 +116,13 @@ export default function OptionsLayout() {
         options={{
           headerShown: false,
           title: "Audio",
-          tabBarLabelStyle: { fontFamily: "PixelifySans" },
+          tabBarIconStyle: {
+            width: uiStore.iconSizeXL,
+            height: uiStore.iconSizeXL,
+            marginRight: uiStore.isLandscape ? 16 : 0,
+          },
           tabBarIcon: ({ color }) => (
-            <Foundation name="sound" size={24} color={color} />
+            <Foundation name="sound" color={color} size={uiStore.iconSizeXL} />
           ),
         }}
       />
@@ -122,11 +134,7 @@ export default function OptionsLayout() {
           title: "Codex",
           tabBarLabelStyle: { fontFamily: "PixelifySans" },
           tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons
-              name="book-open-variant"
-              size={24}
-              color={color}
-            />
+            <MaterialCommunityIcons name="book-open-variant" color={color} />
           ),
         }}
       />

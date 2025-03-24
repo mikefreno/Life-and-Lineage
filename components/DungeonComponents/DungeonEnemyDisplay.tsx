@@ -1,5 +1,5 @@
 import { View, Image, ScrollView } from "react-native";
-import { toTitleCase } from "@/utility/functions/misc";
+import { statRounding, toTitleCase } from "@/utility/functions/misc";
 import ProgressBar from "@/components/ProgressBar";
 import GenericStrikeAround from "@/components/GenericStrikeAround";
 import { Text } from "@/components/Themed";
@@ -36,7 +36,7 @@ const EnemyHealthChangePopUp = ({
       <FadeOutNode clearingFunction={reset}>
         <Text style={{ color: "#f87171" }}>
           {healthDiff > 0 ? "+" : ""}
-          {healthDiff.toString()}
+          {statRounding(healthDiff)}
         </Text>
       </FadeOutNode>
     </View>

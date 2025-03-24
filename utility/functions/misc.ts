@@ -32,9 +32,7 @@ import {
   NavigationState,
 } from "@react-navigation/native";
 import { Character } from "../../entities/character";
-import { Enemy } from "../../entities/creatures";
 import { FPS, MAX_ANIMATION_DURATION } from "@/stores/EnemyAnimationStore";
-import { Vector2 } from "../Vec2";
 
 export const AccelerationCurves = {
   none: (t: number) => t,
@@ -47,6 +45,10 @@ export const AccelerationCurves = {
 export const cleanRoundToTenths = (num: number): string => {
   const rounded = Math.round(num * 10) / 10;
   return rounded % 1 === 0 ? rounded.toString() : rounded.toFixed(1);
+};
+
+export const statRounding = (val: number) => {
+  return Math.round(val * 20) / 20; // 0.05 rounding
 };
 
 export function getRandomPersonality(): Personality {

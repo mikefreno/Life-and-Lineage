@@ -5,7 +5,7 @@
     "sanity": null,
     "health": 80,
     "attackPower": 10,
-    "energy": {
+    "mana": {
       "maximum": 50,
       "regen": 5
     },
@@ -37,7 +37,7 @@
     "sanity": 50,
     "health": 140,
     "attackPower": 15,
-    "energy": {
+    "mana": {
       "maximum": 40,
       "regen": 10
     },
@@ -92,7 +92,7 @@
     "sanity": null,
     "health": 160,
     "attackPower": 15,
-    "energy": {
+    "mana": {
       "maximum": 50,
       "regen": 10
     },
@@ -119,7 +119,7 @@
     "sanity": 50,
     "health": 160,
     "attackPower": 25,
-    "energy": {
+    "mana": {
       "maximum": 50,
       "regen": 10
     },
@@ -151,7 +151,7 @@
     "sanity": 50,
     "health": 75,
     "attackPower": 10,
-    "energy": {
+    "mana": {
       "maximum": 50,
       "regen": 3
     },
@@ -195,7 +195,7 @@
     "sanity": 50,
     "health": 200,
     "attackPower": 22.5,
-    "energy": {
+    "mana": {
       "maximum": 50,
       "regen": 10
     },
@@ -223,7 +223,7 @@
     "sanity": 50,
     "health": 150,
     "attackPower": 30,
-    "energy": {
+    "mana": {
       "maximum": 50,
       "regen": 10
     },
@@ -242,7 +242,7 @@
     "sanity": 50,
     "health": 150,
     "attackPower": 30,
-    "energy": {
+    "mana": {
       "maximum": 50,
       "regen": 10
     },
@@ -262,7 +262,7 @@
     "sanity": 100,
     "health": 150,
     "attackPower": 30,
-    "energy": {
+    "mana": {
       "maximum": 50,
       "regen": 10
     },
@@ -282,7 +282,7 @@
     "sanity": 100,
     "health": 150,
     "attackPower": 30,
-    "energy": {
+    "mana": {
       "maximum": 50,
       "regen": 10
     },
@@ -302,7 +302,7 @@
     "sanity": null,
     "health": 150,
     "attackPower": 30,
-    "energy": {
+    "mana": {
       "maximum": 50,
       "regen": 10
     },
@@ -322,7 +322,7 @@
     "sanity": 50,
     "health": 150,
     "attackPower": 30,
-    "energy": {
+    "mana": {
       "maximum": 50,
       "regen": 10
     },
@@ -342,7 +342,7 @@
     "sanity": null,
     "health": 150,
     "attackPower": 30,
-    "energy": {
+    "mana": {
       "maximum": 50,
       "regen": 10
     },
@@ -362,7 +362,7 @@
     "sanity": 50,
     "health": 150,
     "attackPower": 30,
-    "energy": {
+    "mana": {
       "maximum": 50,
       "regen": 10
     },
@@ -382,7 +382,7 @@
     "sanity": 50,
     "health": 150,
     "attackPower": 30,
-    "energy": {
+    "mana": {
       "maximum": 50,
       "regen": 10
     },
@@ -402,7 +402,7 @@
     "sanity": 50,
     "health": 150,
     "attackPower": 30,
-    "energy": {
+    "mana": {
       "maximum": 50,
       "regen": 10
     },
@@ -422,7 +422,7 @@
     "sanity": 50,
     "health": 150,
     "attackPower": 30,
-    "energy": {
+    "mana": {
       "maximum": 50,
       "regen": 10
     },

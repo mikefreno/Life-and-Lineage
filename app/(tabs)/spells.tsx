@@ -201,7 +201,12 @@ const SpellsScreen = observer(() => {
         <GenericStrikeAround containerStyles={{ paddingHorizontal: 8 }}>
           Proficiencies
         </GenericStrikeAround>
-        <ScrollView contentContainerStyle={[styles.columnEvenly, {}]}>
+        <ScrollView
+          contentContainerStyle={[
+            styles.columnEvenly,
+            styles.notchAvoidingLanscapeMargin,
+          ]}
+        >
           {magicProficiencySection(playerState?.magicProficiencies)}
         </ScrollView>
       </View>

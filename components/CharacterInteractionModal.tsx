@@ -350,7 +350,7 @@ const KnownCharacterInteractions = observer(
               characterAge: character.age,
             }) &&
             (playerState.partners.find((partner) =>
-              partner.equals(character),
+              partner.equals(character.id),
             ) ? (
               character.sex !== playerState.sex ? (
                 <>

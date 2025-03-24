@@ -8,14 +8,12 @@
       "minimum": 9999,
       "maximum": 9999
     },
-    "attackPowerRange": {
-      "minimum": 0,
-      "maximum": 0
-    },
-    "energy": {
+    "mana": {
       "maximum": 30,
       "regen": 0
     },
+    "resistanceTable": {},
+    "damageTable": {},
     "attackStrings": [],
     "drops": [
       {
@@ -43,11 +41,15 @@
       "minimum": 20,
       "maximum": 50
     },
-    "attackPowerRange": {
-      "minimum": 2,
-      "maximum": 5
+    "resistanceTable": {
+      "physical": 5,
+      "poison": 10,
+      "fire": -5
     },
-    "energy": {
+    "damageTable": {
+      "physical": 2
+    },
+    "mana": {
       "maximum": 30,
       "regen": 5
     },
@@ -87,7 +89,7 @@
       "minimum": 3,
       "maximum": 8
     },
-    "energy": {
+    "mana": {
       "maximum": 30,
       "regen": 5
     },
@@ -124,7 +126,7 @@
       "minimum": 4,
       "maximum": 8
     },
-    "energy": {
+    "mana": {
       "maximum": 50,
       "regen": 5
     },
@@ -172,7 +174,7 @@
       "minimum": 4,
       "maximum": 8
     },
-    "energy": {
+    "mana": {
       "maximum": 50,
       "regen": 5
     },
@@ -238,7 +240,7 @@
       "minimum": 5,
       "maximum": 10
     },
-    "energy": {
+    "mana": {
       "maximum": 50,
       "regen": 5
     },
@@ -280,7 +282,7 @@
       "minimum": 0,
       "maximum": 0
     },
-    "energy": {
+    "mana": {
       "maximum": 25,
       "regen": 5
     },
@@ -315,7 +317,7 @@
       "minimum": 5,
       "maximum": 10
     },
-    "energy": {
+    "mana": {
       "maximum": 50,
       "regen": 5
     },
@@ -353,7 +355,7 @@
       "minimum": 10,
       "maximum": 15
     },
-    "energy": {
+    "mana": {
       "maximum": 50,
       "regen": 5
     },
@@ -400,7 +402,7 @@
       "minimum": 5,
       "maximum": 10
     },
-    "energy": {
+    "mana": {
       "maximum": 50,
       "regen": 5
     },
@@ -456,7 +458,7 @@
       "minimum": 8,
       "maximum": 10
     },
-    "energy": {
+    "mana": {
       "maximum": 50,
       "regen": 3
     },
@@ -506,7 +508,7 @@
       "minimum": 10,
       "maximum": 12
     },
-    "energy": {
+    "mana": {
       "maximum": 30,
       "regen": 2
     },
@@ -549,7 +551,7 @@
       "minimum": 15,
       "maximum": 20
     },
-    "energy": {
+    "mana": {
       "maximum": 40,
       "regen": 10
     },
@@ -580,7 +582,7 @@
       "minimum": 15,
       "maximum": 20
     },
-    "energy": {
+    "mana": {
       "maximum": 40,
       "regen": 10
     },
@@ -611,7 +613,7 @@
       "minimum": 15,
       "maximum": 20
     },
-    "energy": {
+    "mana": {
       "maximum": 40,
       "regen": 10
     },
@@ -642,7 +644,7 @@
       "minimum": 12,
       "maximum": 16
     },
-    "energy": {
+    "mana": {
       "maximum": 40,
       "regen": 10
     },
@@ -673,7 +675,7 @@
       "minimum": 4,
       "maximum": 6
     },
-    "energy": {
+    "mana": {
       "maximum": 40,
       "regen": 10
     },
@@ -702,7 +704,7 @@
       "minimum": 4,
       "maximum": 6
     },
-    "energy": {
+    "mana": {
       "maximum": 40,
       "regen": 10
     },
@@ -731,7 +733,7 @@
       "minimum": 10,
       "maximum": 15
     },
-    "energy": {
+    "mana": {
       "maximum": 40,
       "regen": 10
     },
@@ -760,7 +762,7 @@
       "minimum": 10,
       "maximum": 15
     },
-    "energy": {
+    "mana": {
       "maximum": 40,
       "regen": 10
     },
@@ -789,7 +791,7 @@
       "minimum": 10,
       "maximum": 15
     },
-    "energy": {
+    "mana": {
       "maximum": 40,
       "regen": 10
     },
@@ -822,7 +824,7 @@
       "minimum": 10,
       "maximum": 15
     },
-    "energy": {
+    "mana": {
       "maximum": 40,
       "regen": 10
     },
@@ -855,7 +857,7 @@
       "minimum": 10,
       "maximum": 15
     },
-    "energy": {
+    "mana": {
       "maximum": 40,
       "regen": 10
     },
@@ -886,7 +888,7 @@
       "minimum": 10,
       "maximum": 15
     },
-    "energy": {
+    "mana": {
       "maximum": 40,
       "regen": 10
     },
@@ -918,7 +920,7 @@
       "minimum": 10,
       "maximum": 15
     },
-    "energy": {
+    "mana": {
       "maximum": 40,
       "regen": 10
     },
@@ -950,7 +952,7 @@
       "minimum": 10,
       "maximum": 15
     },
-    "energy": {
+    "mana": {
       "maximum": 40,
       "regen": 10
     },

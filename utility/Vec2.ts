@@ -152,6 +152,30 @@ export class Vector2 {
     return { x: this.x, y: this.y };
   }
 
+  static multiMidpoint(array: Vector2[]): Vector2 {
+    if (!array || array.length === 0) {
+      return new Vector2(0, 0);
+    }
+
+    if (array.length === 1) {
+      return new Vector2(array[0].x, array[0].y);
+    }
+
+    let sumX = 0;
+    let sumY = 0;
+
+    for (const point of array) {
+      sumX += point.x;
+      sumY += point.y;
+    }
+
+    // Calculate average and round to avoid floating point precision issues
+    const avgX = Math.round((sumX / array.length) * 1000) / 1000;
+    const avgY = Math.round((sumY / array.length) * 1000) / 1000;
+
+    return new Vector2(avgX, avgY);
+  }
+
   // Create a vector with random direction and specified magnitude
   static random(magnitude: number = 1): Vector2 {
     const angle = Math.random() * Math.PI * 2;

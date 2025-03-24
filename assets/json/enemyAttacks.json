@@ -4,7 +4,6 @@
     "manaCost": 5,
     "targets": "single",
     "baseHitChance": 1.0,
-    "damageMult": 1.0,
     "damageTable": {
       "physical": 5
     },
@@ -20,7 +19,6 @@
     "manaCost": 15,
     "targets": "single",
     "baseHitChance": 0.90,
-    "damageMult": 1.0,
     "damageTable": {
       "physical": 5
     },
@@ -38,15 +36,13 @@
     "baseHitChance": 0.95,
     "damageTable": {
       "physical": 5
-    },
-    "damageMult": 1.25
+    }
   },
   {
     "name": "zombie bite",
     "manaCost": 15,
     "targets": "single",
     "baseHitChance": 0.95,
-    "damageMult": 1.25,
     "damageTable": {
       "physical": 3,
       "poison": 5
@@ -63,7 +59,6 @@
     "manaCost": 10,
     "targets": "single",
     "baseHitChance": 0.90,
-    "damageMult": 0.85,
     "damageTable": {
       "physical": 4,
       "poison": 1
@@ -80,10 +75,9 @@
     "manaCost": 10,
     "targets": "single",
     "baseHitChance": 0.90,
-    "damageMult": 0.85,
     "damageTable": {
       "physical": 2,
-      "poison": 4
+      "poison": 3
     },
     "debuffs": [
       {
@@ -97,10 +91,9 @@
     "manaCost": 5,
     "targets": "single",
     "baseHitChance": 0.95,
-    "damageMult": 0.85,
     "damageTable": {
       "physical": 2,
-      "fire": 4
+      "fire": 3
     },
     "debuffs": [
       {
@@ -114,7 +107,6 @@
     "manaCost": 10,
     "targets": "dual",
     "baseHitChance": 0.95,
-    "damageMult": 0.75,
     "damageTable": {
       "physical": 5
     },
@@ -130,9 +122,8 @@
     "manaCost": 10,
     "targets": "dual",
     "baseHitChance": 0.95,
-    "damageMult": 0.75,
     "damageTable": {
-      "physical": 4,
+      "physical": 3,
       "raw": 2
     },
     "debuffs": [
@@ -147,9 +138,8 @@
     "manaCost": 5,
     "targets": "single",
     "baseHitChance": 0.95,
-    "damageMult": 1.25,
     "damageTable": {
-      "physical": 4,
+      "physical": 5,
       "raw": 2
     },
     "debuffs": [
@@ -164,9 +154,8 @@
     "manaCost": 20,
     "targets": "single",
     "baseHitChance": 0.75,
-    "damageMult": 1.0,
     "damageTable": {
-      "physical": 3
+      "physical": 4
     },
     "debuffs": [
       {
@@ -180,7 +169,6 @@
     "manaCost": 20,
     "targets": "single",
     "baseHitChance": 0.75,
-    "damageMult": 0.25,
     "damageTable": {
       "physical": 3,
       "raw": 2
@@ -197,7 +185,6 @@
     "manaCost": 10,
     "targets": "single",
     "baseHitChance": 0.95,
-    "damageMult": 1.0,
     "damageTable": {
       "physical": 2,
       "raw": 4
@@ -214,7 +201,6 @@
     "manaCost": 25,
     "targets": "area",
     "baseHitChance": 0.85,
-    "damageMult": 1.5,
     "damageTable": {
       "physical": 2,
       "raw": 4
@@ -231,7 +217,6 @@
     "manaCost": 5,
     "targets": "single",
     "baseHitChance": 0.90,
-    "damageMult": 0.0,
     "damageTable": {
       "raw": 1
     },
@@ -247,7 +232,6 @@
     "manaCost": 10,
     "targets": "single",
     "baseHitChance": 1.0,
-    "damageMult": 0.25,
     "damageTable": {
       "poison": 5
     },
@@ -263,7 +247,6 @@
     "manaCost": 15,
     "targets": "single",
     "baseHitChance": 0.95,
-    "damageMult": 0.85,
     "damageTable": {
       "physical": 5,
       "poison": 3
@@ -280,7 +263,6 @@
     "manaCost": 20,
     "targets": "single",
     "baseHitChance": 0.95,
-    "damageMult": 1.0,
     "damageTable": {},
     "sanityDamage": 5
   },
@@ -289,7 +271,6 @@
     "manaCost": 20,
     "targets": "area",
     "baseHitChance": 0.85,
-    "damageMult": 0.0,
     "damageTable": {},
     "sanityDamage": 5,
     "debuffs": [
@@ -304,9 +285,8 @@
     "manaCost": 15,
     "targets": "single",
     "baseHitChance": 0.75,
-    "damageMult": 1.75,
     "damageTable": {
-      "physical": 6
+      "physical": 11
     }
   },
   {
@@ -314,7 +294,6 @@
     "manaCost": 10,
     "targets": "single",
     "baseHitChance": 0.95,
-    "damageMult": 1.0,
     "damageTable": {
       "raw": 2,
       "physical": 4
@@ -331,7 +310,6 @@
     "manaCost": 15,
     "targets": "area",
     "baseHitChance": 0.85,
-    "damageMult": 0.85,
     "damageTable": {
       "raw": 2,
       "physical": 4
@@ -348,9 +326,8 @@
     "manaCost": 20,
     "targets": "single",
     "baseHitChance": 0.80,
-    "damageMult": 2.0,
     "damageTable": {
-      "physical": 5
+      "physical": 10
     },
     "debuffs": [
       {
@@ -364,7 +341,6 @@
     "manaCost": 5,
     "targets": "single",
     "baseHitChance": 1.0,
-    "damageMult": 0.75,
     "damageTable": {
       "physical": 6
     },
@@ -380,7 +356,6 @@
     "manaCost": 10,
     "targets": "single",
     "baseHitChance": 0.85,
-    "damageMult": 1.0,
     "damageTable": {
       "raw": 2,
       "physical": 4
@@ -397,7 +372,6 @@
     "manaCost": 5,
     "targets": "single",
     "baseHitChance": 0.95,
-    "damageMult": 1.0,
     "damageTable": {
       "physical": 5
     }
@@ -422,8 +396,6 @@
     "name": "teeth",
     "manaCost": 15,
     "targets": "dual",
-    "baseHitChance": 1.0,
-    "damageMult": 1.0,
     "damageTable": {
       "raw": 6,
       "physical": 2
@@ -450,7 +422,6 @@
     "manaCost": 25,
     "targets": "single",
     "baseHitChance": 0.85,
-    "damageMult": 1.0,
     "damageTable": {
       "lightning": 6
     },
@@ -466,9 +437,8 @@
     "manaCost": 5,
     "targets": "single",
     "baseHitChance": 1.0,
-    "damageMult": 0.25,
     "damageTable": {
-      "physical": 4
+      "physical": 3
     },
     "debuffs": [
       {
@@ -481,9 +451,8 @@
     "name": "pluck eye",
     "targets": "single",
     "baseHitChance": 0.90,
-    "damageMult": 0.5,
     "damageTable": {
-      "physical": 6
+      "physical": 3
     },
     "debuffs": [
       {
@@ -498,15 +467,13 @@
     "baseHitChance": 0.95,
     "damageTable": {
       "physical": 6
-    },
-    "damageMult": 1.0
+    }
   },
   {
     "name": "fire bolt",
     "manaCost": 20,
     "target": "single",
     "baseHitChance": 1.0,
-    "damageMult": 1.5,
     "damageTable": {
       "fire": 6
     },
@@ -522,7 +489,6 @@
     "manaCost": 20,
     "target": "single",
     "baseHitChance": 1.0,
-    "damageMult": 1.0,
     "damageTable": {
       "cold": 6
     },
@@ -540,14 +506,12 @@
     "baseHitChance": 1.0,
     "damageTable": {
       "physical": 6
-    },
-    "damageMult": 1.0
+    }
   },
   {
     "name": "rock toss",
     "manaCost": 15,
     "baseHitChance": 1.0,
-    "damageMult": 1.0,
     "damageTable": {
       "physical": 4,
       "raw": 2
@@ -564,7 +528,6 @@
     "manaCost": 25,
     "targets": "single",
     "baseHitChance": 0.90,
-    "damageMult": 1.25,
     "damageTable": {
       "raw": 5
     },
@@ -584,7 +547,6 @@
     "manaCost": 30,
     "targets": "area",
     "baseHitChance": 0.85,
-    "damageMult": 0.0,
     "sanityDamage": 10,
     "damageTable": {},
     "debuffs": [
@@ -599,7 +561,6 @@
     "manaCost": 20,
     "targets": "single",
     "baseHitChance": 0.95,
-    "damageMult": 1.5,
     "damageTable": {
       "raw": 6
     },
@@ -610,7 +571,6 @@
     "manaCost": 25,
     "targets": "single",
     "baseHitChance": 0.90,
-    "damageMult": 1.75,
     "damageTable": {
       "raw": 12
     },
@@ -626,9 +586,8 @@
     "manaCost": 35,
     "targets": "dual",
     "baseHitChance": 0.85,
-    "damageMult": 1.25,
     "damageTable": {
-      "raw": 12
+      "raw": 15
     },
     "debuffs": [
       {
@@ -642,9 +601,8 @@
     "manaCost": 30,
     "targets": "single",
     "baseHitChance": 1.0,
-    "damageMult": 2.0,
     "damageTable": {
-      "raw": 12
+      "raw": 15
     },
     "debuffs": [
       {
@@ -658,10 +616,9 @@
     "manaCost": 45,
     "targets": "single",
     "baseHitChance": 0.85,
-    "damageMult": 1.5,
     "sanityDamage": 15,
     "damageTable": {
-      "raw": 12
+      "raw": 20
     },
     "debuffs": [
       {
@@ -675,7 +632,6 @@
     "manaCost": 40,
     "targets": "single",
     "baseHitChance": 0.90,
-    "damageMult": 0.0,
     "damageTable": {},
     "debuffs": [
       {
@@ -689,7 +645,6 @@
     "manaCost": 10,
     "targets": "single",
     "baseHitChance": 0.90,
-    "damageMult": 1.0,
     "damageTable": {
       "physical": 6
     },
@@ -706,9 +661,8 @@
     "targets": "single",
     "baseHitChance": 0.80,
     "damageTable": {
-      "physical": 6
-    },
-    "damageMult": 1.5
+      "physical": 10
+    }
   },
   {
     "name": "gust",
@@ -717,15 +671,13 @@
     "baseHitChance": 0.95,
     "damageTable": {
       "physical": 6
-    },
-    "damageMult": 0.75
+    }
   },
   {
     "name": "wing buffet",
     "manaCost": 25,
     "targets": "area",
     "baseHitChance": 0.90,
-    "damageMult": 0.75,
     "damageTable": {
       "physical": 8
     },
@@ -743,18 +695,16 @@
     "baseHitChance": 0.85,
     "damageTable": {
       "physical": 8
-    },
-    "damageMult": 1.25
+    }
   },
   {
     "name": "charged pierce",
     "manaCost": 30,
     "targets": "single",
     "baseHitChance": 0.85,
-    "damageMult": 2.0,
     "damageTable": {
-      "lightning": 4,
-      "physical": 4
+      "lightning": 8,
+      "physical": 8
     },
     "debuffs": [
       {

@@ -197,7 +197,11 @@ export const AnimatedSprite = observer(
               playerAnimationStore.playerOrigin &&
               animationStore.spriteMidPoint
             ) {
+              const moveCounts = animationStore.animationQueue.filter(
+                (animations) => animations == "move",
+              ).length;
               runMoveAnimation(
+                moveCounts == 2,
                 playerAnimationStore.playerOrigin,
                 animationStore.spriteMidPoint,
                 frameCount,

@@ -35,7 +35,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { Element, TutorialOption } from "../../utility/types";
 import { useVibration } from "@/hooks/generic";
 import { useRootStore } from "@/hooks/stores";
-import { shadows, useStyles } from "../../hooks/styles";
+import { useStyles } from "../../hooks/styles";
 import { observer } from "mobx-react-lite";
 import { wait } from "@/utility/functions/misc";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -61,11 +61,10 @@ const TabLayout = observer(() => {
       : 0;
     const totalTabHeight =
       uiStore.tabHeight + playerStatusHeight + expandedPadding;
-    const tabContentHeight = uiStore.tabHeight;
 
     return {
       height: totalTabHeight,
-      contentHeight: tabContentHeight,
+      contentHeight: uiStore.tabHeight,
       paddingTop: playerStatusHeight + expandedPadding,
     };
   }, [
@@ -93,26 +92,20 @@ const TabLayout = observer(() => {
           Platform.OS === "ios"
             ? () => {
                 return (
-                  <BlurView
-                    intensity={50}
-                    style={[StyleSheet.absoluteFill, styles.diffuse]}
-                    tint={uiStore.colorScheme}
-                  />
+                  <View style={[StyleSheet.absoluteFill, styles.diffuse]}>
+                    <BlurView
+                      intensity={50}
+                      style={[StyleSheet.absoluteFill]}
+                      tint={uiStore.colorScheme}
+                    />
+                  </View>
                 );
               }
             : () => (
-                <ThemedView
-                  style={[StyleSheet.absoluteFill, shadows.diffuse]}
-                />
+                <ThemedView style={[StyleSheet.absoluteFill, styles.diffuse]} />
               ),
       }) as const,
-    [
-      uiStore.colorScheme,
-      styles.diffuse,
-      shadows.diffuse,
-      uiStore.dimensions,
-      insets.top,
-    ],
+    [uiStore.colorScheme, uiStore.dimensions, insets.top],
   );
 
   return (
@@ -190,7 +183,6 @@ const TabLayout = observer(() => {
                     fontFamily: "PixelifySans",
                     ...styles["text-sm"],
                     color: props.color,
-                    paddingTop: 2,
                   }}
                 >
                   {props.children}

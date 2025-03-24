@@ -9,10 +9,12 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { observer } from "mobx-react-lite";
 import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 import { useRootStore } from "@/hooks/stores";
+import { useStyles } from "@/hooks/styles";
 
 const InvestingScreen = observer(() => {
   const header = useHeaderHeight();
   const { uiStore } = useRootStore();
+  const styles = useStyles();
 
   return (
     <>
@@ -31,6 +33,7 @@ const InvestingScreen = observer(() => {
         contentContainerStyle={{
           paddingTop: header,
           paddingBottom: uiStore.playerStatusHeightSecondary,
+          ...styles.notchAvoidingLanscapeMargin,
         }}
       >
         {investments.map((investment: InvestmentType, idx) => (

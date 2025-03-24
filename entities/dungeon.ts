@@ -251,21 +251,12 @@ export class DungeonLevel {
         enemyJSON.goldDropRange.maximum *= enemySpec.scaler;
         enemyJSON.healthRange.minimum *= enemySpec.scaler;
         enemyJSON.healthRange.maximum *= enemySpec.scaler;
-        enemyJSON.attackPowerRange.minimum *= enemySpec.scaler;
-        enemyJSON.attackPowerRange.maximum *= enemySpec.scaler;
       }
       const hp =
         Math.floor(
           Math.random() *
             (enemyJSON.healthRange.maximum - enemyJSON.healthRange.minimum + 1),
         ) + enemyJSON.healthRange.minimum;
-      const ap =
-        Math.floor(
-          Math.random() *
-            (enemyJSON.attackPowerRange.maximum -
-              enemyJSON.attackPowerRange.minimum +
-              1),
-        ) + enemyJSON.attackPowerRange.minimum;
       let sprite: string | undefined;
       if (enemySpec.spriteOverride) {
         sprite =
@@ -285,12 +276,13 @@ export class DungeonLevel {
         currentHealth: hp,
         baseHealth: hp,
         currentSanity: enemyJSON.sanity,
+        baseDamageTable: enemyJSON.damageTable,
+        baseResistanceTable: enemyJSON.resistanceTable,
         baseSanity: enemyJSON.sanity,
-        attackPower: ap,
         baseArmor: enemyJSON.armorValue,
-        currentEnergy: enemyJSON.energy.maximum,
-        baseEnergy: enemyJSON.energy.maximum,
-        energyRegen: enemyJSON.energy.regen,
+        currentMana: enemyJSON.mana.maximum,
+        baseMana: enemyJSON.mana.maximum,
+        baseManaRegen: enemyJSON.mana.regen,
         goldDropRange: enemyJSON.goldDropRange,
         drops: enemyJSON.drops as {
           item: string;
@@ -298,7 +290,6 @@ export class DungeonLevel {
           chance: number;
         }[],
         attackStrings: enemyJSON.attackStrings,
-        animationStrings: enemyJSON.animationStrings,
         sprite: sprite as EnemyImageKeyOption,
         root: this.parent.dungeonStore.root,
       });
@@ -320,9 +311,8 @@ export class DungeonLevel {
         scaledBossJSON.goldDropRange.minimum *= bossSpec.scaler;
         scaledBossJSON.goldDropRange.maximum *= bossSpec.scaler;
         scaledBossJSON.health *= bossSpec.scaler;
-        scaledBossJSON.attackPower *= bossSpec.scaler;
-        scaledBossJSON.energy.maximum *= bossSpec.scaler;
-        scaledBossJSON.energy.regen *= bossSpec.scaler;
+        scaledBossJSON.mana.maximum *= bossSpec.scaler;
+        scaledBossJSON.mana.regen *= bossSpec.scaler;
       }
 
       return new Enemy({
@@ -332,13 +322,13 @@ export class DungeonLevel {
         baseHealth: scaledBossJSON.health,
         currentSanity: scaledBossJSON.sanity,
         baseSanity: scaledBossJSON.sanity,
-        attackPower: scaledBossJSON.attackPower,
         baseArmor: scaledBossJSON.armorValue,
-        currentEnergy: scaledBossJSON.energy.maximum,
-        baseEnergy: scaledBossJSON.energy.maximum,
-        energyRegen: scaledBossJSON.energy.regen,
+        baseDamageTable: enemyJSON.damageTable,
+        baseResistanceTable: enemyJSON.resistanceTable,
+        currentMana: scaledBossJSON.mana.maximum,
+        baseMana: scaledBossJSON.mana.maximum,
+        baseManaRegen: scaledBossJSON.mana.regen,
         attackStrings: scaledBossJSON.attackStrings,
-        animationStrings: scaledBossJSON.animationStrings,
         storyDrops: scaledBossJSON.storyDrops,
         goldDropRange: scaledBossJSON.goldDropRange,
         drops: scaledBossJSON.drops as {

@@ -253,15 +253,6 @@ export class Character extends Being {
     this.parentIds = newParentIds;
   }
 
-  /**
-   * Used to check if the character object is the same as another.
-   * @param otherCharacter - The character to compare with.
-   * @returns True if the characters have the same ID, false otherwise.
-   */
-  public equals(otherCharacter: Character): boolean {
-    return this.id === otherCharacter.id;
-  }
-
   get age() {
     const yearDiff = this.root.time.year - this.birthdate.year;
     const weekDiff = this.root.time.week - this.birthdate.week;
@@ -1332,7 +1323,7 @@ export class PlayerCharacter extends Character {
     this.knownSpells.forEach((spell) => {
       const found = spellList.find((spellObj) => spell == spellObj.name);
       if (found) {
-        const spell = new Attack({ ...found });
+        const spell = new Attack({ ...found, user: this });
         spells.push(spell);
       }
     });
@@ -1487,18 +1478,18 @@ export class PlayerCharacter extends Character {
   public isKnownCharacter(characterToCheck: Character) {
     if (
       this.knownCharacters.some((character) =>
-        character.equals(characterToCheck),
+        character.equals(characterToCheck.id),
       )
     ) {
       return true;
     }
-    if (this.partners.some((partner) => partner.equals(characterToCheck))) {
+    if (this.partners.some((partner) => partner.equals(characterToCheck.id))) {
       return true;
     }
-    if (this.children.some((child) => child.equals(characterToCheck))) {
+    if (this.children.some((child) => child.equals(characterToCheck.id))) {
       return true;
     }
-    if (this.parents.some((parent) => parent.equals(characterToCheck))) {
+    if (this.parents.some((parent) => parent.equals(characterToCheck.id))) {
       return true;
     }
 
@@ -1514,12 +1505,12 @@ export class PlayerCharacter extends Character {
   }) {
     if (characterAge >= 18) {
       for (const child of this.children) {
-        if (child.equals(character)) {
+        if (child.equals(character.id)) {
           return false;
         }
       }
       for (const parent of this.parents) {
-        if (parent.equals(character)) {
+        if (parent.equals(character.id)) {
           return false;
         }
       }
@@ -1530,7 +1521,7 @@ export class PlayerCharacter extends Character {
 
   public characterIsChild({ character }: { character: Character }) {
     for (const child of this.children) {
-      if (child.equals(character)) {
+      if (child.equals(character.id)) {
         return true;
       }
     }

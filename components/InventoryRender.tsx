@@ -153,7 +153,7 @@ const InventoryRender = observer(
         setTimeout(
           () =>
             runInAction(() => (uiStore.storeLoadingStatus["inventory"] = true)),
-          50,
+          0,
         );
       }
     }, [

@@ -7,13 +7,14 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { TutorialOption } from "@/utility/types";
 import { ScrollView, View } from "react-native";
 import { useRootStore } from "@/hooks/stores";
-import { tw } from "@/hooks/styles";
+import { tw, useStyles } from "@/hooks/styles";
 import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 
 const JobTraining = () => {
   const isFocused = useIsFocused();
   const header = useHeaderHeight();
   const { playerState, uiStore } = useRootStore();
+  const styles = useStyles();
 
   if (!playerState) {
     return null;
@@ -33,6 +34,7 @@ const JobTraining = () => {
         contentContainerStyle={{
           paddingTop: header,
           paddingBottom: uiStore.playerStatusHeightSecondary,
+          ...styles.notchAvoidingLanscapeMargin,
         }}
       >
         <View style={[tw.px2, tw.pt4]}>

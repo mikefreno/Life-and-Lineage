@@ -2,7 +2,6 @@ import { AnimationOptions } from "@/utility/enemyHelpers";
 import {
   AttackUse,
   DamageType,
-  DamageTypeToString,
   Element,
   ItemClassType,
   MasteryLevel,
@@ -31,10 +30,8 @@ interface AttackOption {
   manaCost?: number;
   baseHitChance?: number;
   targets?: "single" | "dual" | "area"; // area hits all, dual hits two, single one
-  damageMult?: number;
   damageTable: { [key: string]: number | undefined };
   selfDamageTable?: { [key: string]: number | undefined };
-  baseHealing?: number;
   sanityDamage?: number;
   hitsPerTurn?: number;
   buffNames?: string[];
@@ -87,13 +84,9 @@ export class Attack {
 
   readonly baseHitChance: number;
 
-  readonly damageMult: number;
-
   readonly damageTable: { [key in DamageType]?: number } | null;
 
   readonly selfDamageTable: { [key in DamageType]?: number } | null;
-  //TODO:
-  readonly baseHealing: number;
 
   readonly sanityDamage: number;
 
@@ -123,10 +116,8 @@ export class Attack {
     manaCost,
     baseHitChance,
     targets,
-    damageMult,
     damageTable,
     selfDamageTable,
-    baseHealing,
     sanityDamage,
     hitsPerTurn,
     buffNames,
@@ -147,12 +138,10 @@ export class Attack {
     this.manaCost = manaCost ?? 0;
     this.targets = targets ?? "single";
     this.baseHitChance = baseHitChance ?? 1.0;
-    this.damageMult = damageMult ?? 1.0;
-    this.damageTable = parseDamageTypeObject(damageTable) ?? {};
+    this.damageTable = damageTable ? parseDamageTypeObject(damageTable) : null;
     this.selfDamageTable = selfDamageTable
       ? parseDamageTypeObject(selfDamageTable)
       : null;
-    this.baseHealing = baseHealing ?? 0;
     this.sanityDamage = sanityDamage ?? 0;
     this.hitsPerTurn = hitsPerTurn ?? 1;
     this.buffNames = buffNames ?? null;
@@ -232,9 +221,11 @@ export class Attack {
     });
 
     const perHitDamage =
-      this.user.calculateAttackDamage(this.damageTable, target)
-        .cumulativeDamage *
-        this.damageMult *
+      this.user.calculateAttackDamage(
+        this.damageTable,
+        this.element != null,
+        target,
+      ).cumulativeDamage *
         damageMult +
       damageFlat;
 
@@ -246,7 +237,7 @@ export class Attack {
 
     this.debuffNames.map(({ name, chance }) => {
       if (name == "lifesteal") {
-        const healPerHit = Math.round(perHitDamage * 0.5 * 4) / 4;
+        const healPerHit = perHitDamage * 0.5;
         created.push({ perHitHeal: healPerHit, chance });
       } else {
         const built = createDebuff({
@@ -254,8 +245,11 @@ export class Attack {
           enemyMaxHP: target.nonConditionalMaxHealth,
           enemyMaxSanity: target.nonConditionalMaxSanity,
           primaryAttackDamage:
-            this.user.calculateAttackDamage(this.damageTable, target)
-              .cumulativeDamage *
+            this.user.calculateAttackDamage(
+              this.damageTable,
+              this.element != null,
+              target,
+            ).cumulativeDamage *
               damageMult +
             damageFlat,
           applierNameString: this.user.nameReference,
@@ -268,66 +262,26 @@ export class Attack {
   }
 
   get displayDamage() {
-    const res = this.user.calculateAttackDamage(this.damageTable);
-    const damageMap: { [key in DamageType]?: number } = {};
-    Object.entries(res.damageMap).forEach(([k, v]) => {
-      const damageType = parseInt(k) as DamageType;
-      damageMap[damageType] = v * this.damageMult;
-    });
-    return {
-      cumulative: res.cumulativeDamage * this.damageMult,
-      map: damageMap as { [key in DamageType]?: number },
-    };
+    return this.user.calculateAttackDamage(
+      this.damageTable,
+      this.element != null,
+    );
   }
 
   get selfDamage() {
-    const res = this.user.calculateAttackDamage(
+    return this.user.calculateAttackDamage(
       this.selfDamageTable,
+      this.element != null,
       this.user,
     );
-    const damageMap: { [key in DamageType]?: number } = {};
-    Object.entries(res.damageMap).forEach(([k, v]) => {
-      const damageType = parseInt(k) as DamageType;
-      damageMap[damageType] = v * this.damageMult;
-    });
-    return {
-      cumulative: res.cumulativeDamage * this.damageMult,
-      map: damageMap,
-    };
   }
 
   public damage(target: Being) {
-    const { damageFlat, damageMult } = getConditionEffectsOnAttacks({
-      selfConditions: this.user.conditions,
-      enemyConditions: target.conditions,
-    });
-
-    const res = this.user.calculateAttackDamage(this.damageTable, target);
-
-    const definedEntryCount = Object.entries(res.damageMap).filter(
-      ([_, value]) => value !== undefined && value > 0,
-    ).length;
-
-    const flatDamagePerType =
-      definedEntryCount > 0 ? damageFlat / definedEntryCount : 0;
-
-    const damageMap: { [key in DamageType]?: number } = {};
-
-    Object.entries(res.damageMap).forEach(([k, v]) => {
-      const damageType = parseInt(k) as DamageType;
-      damageMap[damageType] =
-        v * this.damageMult * damageMult + flatDamagePerType;
-    });
-
-    const totalDamage = Object.values(damageMap).reduce(
-      (sum, damage) => sum + (damage || 0),
-      0,
+    return this.user.calculateAttackDamage(
+      this.damageTable,
+      this.element != null,
+      target,
     );
-
-    return {
-      cumulative: totalDamage,
-      map: damageMap,
-    };
   }
 
   private rollDebuffs({
@@ -357,7 +311,7 @@ export class Attack {
     if (this.user.isStunned) {
       return { val: false, reason: "Stunned" };
     }
-    if (this.user.isSilenced && this.element) {
+    if (this.user.isSilenced && this.element !== null) {
       return { val: false, reason: "Silenced" };
     }
     if (this.isActive) {
@@ -467,34 +421,31 @@ export class Attack {
       return {
         result: AttackUse.success,
         damages: {
-          physical: damage.map[DamageType.PHYSICAL]
-            ? Math.round(damage.map[DamageType.PHYSICAL] * actualizedHits * 4) /
-              4
+          physical: damage.damageMap[DamageType.PHYSICAL]
+            ? damage.damageMap[DamageType.PHYSICAL] * actualizedHits
             : 0,
-          fire: damage.map[DamageType.FIRE]
-            ? Math.round(damage.map[DamageType.FIRE] * actualizedHits * 4) / 4
+          fire: damage.damageMap[DamageType.FIRE]
+            ? damage.damageMap[DamageType.FIRE] * actualizedHits
             : 0,
-          cold: damage.map[DamageType.COLD]
-            ? Math.round(damage.map[DamageType.COLD] * actualizedHits * 4) / 4
+          cold: damage.damageMap[DamageType.COLD]
+            ? damage.damageMap[DamageType.COLD] * actualizedHits
             : 0,
-          lightning: damage.map[DamageType.LIGHTNING]
-            ? Math.round(
-                damage.map[DamageType.LIGHTNING] * actualizedHits * 4,
-              ) / 4
+          lightning: damage.damageMap[DamageType.LIGHTNING]
+            ? damage.damageMap[DamageType.LIGHTNING] * actualizedHits
             : 0,
-          poison: damage.map[DamageType.POISON]
-            ? Math.round(damage.map[DamageType.POISON] * actualizedHits * 4) / 4
+          poison: damage.damageMap[DamageType.POISON]
+            ? damage.damageMap[DamageType.POISON] * actualizedHits
             : 0,
-          holy: damage.map[DamageType.HOLY]
-            ? Math.round(damage.map[DamageType.HOLY] * actualizedHits * 4) / 4
+          holy: damage.damageMap[DamageType.HOLY]
+            ? damage.damageMap[DamageType.HOLY] * actualizedHits
             : 0,
-          magic: damage.map[DamageType.MAGIC]
-            ? Math.round(damage.map[DamageType.MAGIC] * actualizedHits * 4) / 4
+          magic: damage.damageMap[DamageType.MAGIC]
+            ? damage.damageMap[DamageType.MAGIC] * actualizedHits
             : 0,
-          raw: damage.map[DamageType.RAW]
-            ? Math.round(damage.map[DamageType.RAW] * actualizedHits * 4) / 4
+          raw: damage.damageMap[DamageType.RAW]
+            ? damage.damageMap[DamageType.RAW] * actualizedHits
             : 0,
-          total: damage.cumulative,
+          total: damage.cumulativeDamage,
           sanity: this.sanityDamage,
         },
         debuffs: debuffs,
@@ -643,8 +594,8 @@ export class Attack {
     }
 
     const selfDamageResult = this.selfDamage;
-    if (selfDamageResult.cumulative > 0) {
-      returnString += `  • Took ${selfDamageResult.cumulative} self-damage.\n`;
+    if (selfDamageResult.cumulativeDamage > 0) {
+      returnString += `  • Took ${selfDamageResult.cumulativeDamage} self-damage.\n`;
     }
 
     return returnString.trim();
@@ -660,7 +611,6 @@ export class Attack {
       manaCost: json.manaCost,
       baseHitChance: json.baseHitChance,
       targets: json.targets,
-      damageMult: json.damageMult,
       damageTable: json.damageTable || {},
       selfDamageTable: json.selfDamageTable || {},
       sanityDamage: json.sanityDamage,
@@ -685,7 +635,7 @@ export class Attack {
     return AttackDetails({
       styles,
       attack: this,
-      baseDamage: this.displayDamage.cumulative,
+      baseDamage: this.displayDamage.cumulativeDamage,
     });
   }
 }

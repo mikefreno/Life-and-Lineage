@@ -209,7 +209,9 @@ export class RootStore {
     newPlayer.addToInventory(starterBook);
 
     this.playerState = newPlayer;
-    this.shopsStore.setShops(this.shopsStore.getInitShopsState());
+    const newStores = this.shopsStore.getInitShopsState();
+
+    this.shopsStore.setShops(newStores);
     savePlayer(newPlayer);
     await this.saveStore.createNewGame(newPlayer.fullName);
     this.clearDeathScreen();

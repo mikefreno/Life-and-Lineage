@@ -1,4 +1,3 @@
-import attacks from "../assets/json/enemyAttacks.json";
 import { Condition } from "./conditions";
 import arrows from "../assets/json/items/arrows.json";
 import artifacts from "../assets/json/items/artifacts.json";
@@ -37,10 +36,8 @@ import {
   PlayerClassOptions,
   parseDamageTypeObject,
 } from "../utility/types";
-import { getRandomInt, toTitleCase } from "../utility/functions/misc";
-import { Attack, PerTargetUse } from "./attack";
+import { getRandomInt } from "../utility/functions/misc";
 import { PlayerCharacter } from "./character";
-import { AttackUse } from "../utility/types";
 import { AnimationOptions } from "../utility/enemyHelpers";
 import {
   CreatureOptions,
@@ -65,218 +62,12 @@ export class Creature extends Being {
     makeObservable(this, {
       id: observable,
       creatureSpecies: observable,
-      attacks: computed,
       nameReference: computed,
     });
   }
 
   get nameReference() {
     return this.creatureSpecies;
-  }
-
-  /**
-   * The built Attacks of the Creature
-   */
-  get attacks() {
-    const builtAttacks: Attack[] = [];
-    this.attackStrings.forEach((attackName) => {
-      const foundAttack = attacks.find(
-        (attackObj) => attackObj.name == attackName,
-      );
-      if (!foundAttack)
-        throw new Error(
-          `No matching attack found for ${attackName} in creating a ${this.creatureSpecies}`,
-        ); // name should be set before this
-      const builtAttack = new Attack({
-        ...foundAttack,
-        targets: foundAttack.targets as "area" | "single" | "dual",
-        user: this,
-      });
-      builtAttacks.push(builtAttack);
-    });
-    return builtAttacks;
-  }
-
-  //---------------------------Equivalency---------------------------//
-  public equals(otherMonsterID: string) {
-    return this.id === otherMonsterID;
-  }
-
-  //---------------------------Battle---------------------------//
-  /**
-   * Checks if the creature is currently stunned.
-   * @returns True if the creature is stunned, otherwise false.
-   */
-
-  protected endTurn() {
-    setTimeout(() => {
-      this.conditionTicker();
-      this.regenMana();
-      this.regenHealth();
-    }, 250);
-  }
-
-  /**
-   * This method is meant to be overridden by derived classes. It currently chooses a random attack.
-   * @param {Object} params - An object containing the target to attack.
-   * @param {PlayerCharacter | Minion | Enemy} params.target - The target to attack.
-   * @returns {Object} - An object indicating the result of the turn, including the chosen attack.
-   */
-  protected _takeTurn({ targets }: { targets: Being[] }): {
-    attack: Attack | null;
-    targetResults:
-      | {
-          target: Being;
-          use: PerTargetUse;
-        }[]
-      | null;
-    buffs: Condition[] | null;
-    log: string;
-  } {
-    const execute = this.conditions.find((cond) => cond.name == "execute");
-    if (execute) {
-      this.damageHealth({ attackerId: execute.placedbyID, damage: 9999 });
-      this.endTurn();
-      return {
-        attack: null,
-        targetResults: null,
-        buffs: null,
-        log: `${toTitleCase(this.creatureSpecies)} was executed!`,
-      };
-    }
-    if (this.isStunned) {
-      const allStunSources = this.conditions.filter((cond) =>
-        cond.effect.includes("stun"),
-      );
-      allStunSources.forEach((stunSource) => {
-        this.threatTable.addThreat(stunSource.placedbyID, 10);
-      });
-      this.endTurn();
-      return {
-        attack: null,
-        buffs: null,
-        targetResults: targets.map((enemy) => ({
-          target: enemy,
-          use: { result: AttackUse.stunned },
-        })),
-        log: `${toTitleCase(this.creatureSpecies)} was stunned!`,
-      };
-    }
-    const allTargets = targets.reduce((acc: Being[], currentTarget) => {
-      acc.push(currentTarget);
-      if (currentTarget instanceof PlayerCharacter) {
-        acc.push(...(currentTarget.minionsAndPets || []));
-      } else if (currentTarget instanceof Enemy) {
-        acc.push(...(currentTarget.minions || []));
-      }
-      return acc;
-    }, []);
-
-    const availableAttacks = this.attacks.filter(
-      (attack) => !this.currentMana || this.currentMana >= attack.manaCost,
-    );
-    if (availableAttacks.length > 0) {
-      const { attack, numTargets } = this.chooseAttack(
-        availableAttacks,
-        allTargets.length,
-      );
-
-      const bestTargets = this.threatTable.getHighestThreatTargets(
-        allTargets,
-        numTargets,
-      );
-
-      const res = attack.use(bestTargets);
-      this.endTurn();
-      return { ...res, attack };
-    } else {
-      this.endTurn();
-      return {
-        attack: null,
-        buffs: null,
-        targetResults: targets.map((enemy) => ({
-          target: enemy,
-          use: { result: AttackUse.lowMana },
-        })),
-        log: `${toTitleCase(this.creatureSpecies)} passed (low energy)!`,
-      };
-    }
-  }
-
-  protected chooseAttack(
-    availableAttacks: Attack[],
-    numberOfPotentialTargets: number,
-  ): { attack: Attack; numTargets: number } {
-    const scoredAttacks = availableAttacks.map((attack) => {
-      const damage = attack.displayDamage;
-      const numTargets =
-        attack.targets === "area"
-          ? numberOfPotentialTargets
-          : attack.targets === "dual"
-          ? numberOfPotentialTargets > 1
-            ? 2
-            : 1
-          : 1;
-      const totalDamage = damage.cumulative * numTargets;
-      const heal = attack.buffs?.filter((buff) => buff.effect.includes("heal"));
-      const nonHealBuffCount =
-        attack.buffs?.filter((buff) => !buff.effect.includes("heal")).length ??
-        0;
-      const debuffCount = attack.debuffNames?.length ?? 0;
-      const summonCount = attack.summonNames?.length ?? 0;
-      const healthPercentage = this.currentHealth / this.baseHealth;
-
-      // Calculate the priority score
-      let priorityScore = totalDamage;
-
-      // Add bonus for buffs and debuffs
-      priorityScore += nonHealBuffCount * 1.25; // adjust the multiplier as needed
-      priorityScore += debuffCount * 1.25; // adjust the multiplier as needed
-
-      if (heal && healthPercentage < 0.85) {
-        if (healthPercentage > 0.5) {
-          priorityScore * 5;
-        } else {
-          priorityScore * 10;
-        }
-      }
-      // Add bonus for summons based on HP and current count
-      if (summonCount > 0 && this instanceof Enemy) {
-        if (healthPercentage > 0.75) {
-          if (this.minions.length === 0) {
-            priorityScore *= 5;
-          } else if (this.minions.length === 1) {
-            priorityScore *= 1.5;
-          } else if (this.minions.length >= 2) {
-            priorityScore /= 2;
-          }
-        } else if (healthPercentage > 0.5) {
-          if (this.minions.length === 0) {
-            priorityScore *= 2;
-          } else if (this.minions.length === 1) {
-            priorityScore /= 2;
-          } else if (this.minions.length >= 2) {
-            priorityScore /= 3;
-          }
-        } else {
-          priorityScore /= 4;
-        }
-      }
-
-      // Add a small random factor to introduce randomness
-      priorityScore += Math.random() * 1.25;
-
-      return { attack, priorityScore, numTargets };
-    });
-
-    // Sort the attacks by priority score in descending order
-    scoredAttacks.sort((a, b) => b.priorityScore - a.priorityScore);
-
-    // Return the attack with the highest priority score
-    return {
-      attack: scoredAttacks[0].attack,
-      numTargets: scoredAttacks[0].numTargets,
-    };
   }
 }
 
@@ -418,7 +209,10 @@ export class Enemy extends Creature {
    * @returns {Object} - An object indicating the result of the turn, including the chosen attack.
    */
   public takeTurn({ player }: { player: PlayerCharacter }) {
-    return this._takeTurn({ targets: [player] }); //this is done as a way to easily add additional effects, note this function in Minion
+    return this._takeTurn({
+      targets: [player],
+      nameReference: this.nameReference,
+    }); //this is done as a way to easily add additional effects, note this function in Minion
   }
 
   /**
@@ -664,7 +458,7 @@ export class Minion extends Creature {
       ) {
         this.turnsLeftAlive--;
       }
-      return this._takeTurn({ targets });
+      return this._takeTurn({ targets, nameReference: this.nameReference });
     } else {
       throw new Error("Minion not properly removed!");
     }

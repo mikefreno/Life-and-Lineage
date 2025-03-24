@@ -1,18 +1,54 @@
 import { Tabs } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { type GestureResponderEvent, Pressable } from "react-native";
+import {
+  type GestureResponderEvent,
+  Platform,
+  Pressable,
+  Text as RNText,
+} from "react-native";
 import { useVibration } from "@/hooks/generic";
-import { useScaling } from "@/hooks/scaling";
 import { useRootStore } from "@/hooks/stores";
+import { useStyles } from "@/hooks/styles";
+import Colors from "@/constants/Colors";
+import { observer } from "mobx-react-lite";
 
-export default function AuthRoutesLayout() {
+const AuthRoutesLayout = observer(() => {
   const vibration = useVibration();
   const { uiStore } = useRootStore();
+  const styles = useStyles();
   return (
     <Tabs
       screenOptions={{
-        tabBarIconStyle: { marginHorizontal: "auto" },
-        tabBarStyle: { height: uiStore.tabHeight, paddingBottom: 16 },
+        tabBarActiveTintColor: Colors[uiStore.colorScheme].tint,
+        tabBarLabel: (props) => {
+          return (
+            <RNText
+              style={{
+                textAlign: "center",
+                fontFamily: "PixelifySans",
+                ...styles["text-sm"],
+                color: props.color,
+                paddingTop: 2,
+              }}
+            >
+              {props.children}
+            </RNText>
+          );
+        },
+        tabBarStyle: {
+          borderTopWidth: 0,
+          ...styles.diffuseTop,
+        },
+        tabBarIconStyle: {
+          height: uiStore.iconSizeXL,
+          marginHorizontal: "auto",
+        },
+        tabBarItemStyle: {
+          justifyContent: "center",
+          paddingTop: 0,
+        },
+        animation:
+          uiStore.reduceMotion || Platform.OS == "android" ? "none" : "shift",
         tabBarButton: (props) => {
           const onPressWithVibration = (event: GestureResponderEvent) => {
             vibration({ style: "light" });
@@ -21,10 +57,15 @@ export default function AuthRoutesLayout() {
           return (
             <Pressable
               onPress={onPressWithVibration}
-              style={{
-                marginVertical: "auto",
-                height: uiStore.iconSizeXL,
-              }}
+              accessibilityLabel={props.accessibilityLabel}
+              accessibilityRole={props.accessibilityRole}
+              accessibilityState={props.accessibilityState}
+              style={[
+                props.style,
+                {
+                  justifyContent: "center",
+                },
+              ]}
             >
               {props.children}
             </Pressable>
@@ -37,12 +78,16 @@ export default function AuthRoutesLayout() {
         options={{
           headerShown: false,
           title: "Sign In",
-          tabBarLabelStyle: { fontFamily: "PixelifySans" },
+          tabBarIconStyle: {
+            width: uiStore.iconSizeXL,
+            height: uiStore.iconSizeXL,
+            marginRight: uiStore.isLandscape ? 16 : 0,
+          },
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
-              name="account-circle"
-              size={uiStore.iconSizeLarge}
+              name="account"
               color={color}
+              size={uiStore.iconSizeXL}
             />
           ),
         }}
@@ -52,16 +97,21 @@ export default function AuthRoutesLayout() {
         options={{
           headerShown: false,
           title: "Sign Up",
-          tabBarLabelStyle: { fontFamily: "PixelifySans" },
+          tabBarIconStyle: {
+            width: uiStore.iconSizeXL,
+            height: uiStore.iconSizeXL,
+            marginRight: uiStore.isLandscape ? 16 : 0,
+          },
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
               name="account-plus"
-              size={uiStore.iconSizeLarge}
               color={color}
+              size={uiStore.iconSizeXL}
             />
           ),
         }}
       />
     </Tabs>
   );
-}
+});
+export default AuthRoutesLayout;

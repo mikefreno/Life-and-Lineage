@@ -39,24 +39,6 @@
       "expo-router",
       "react-native-edge-to-edge",
       "expo-apple-authentication",
-      "react-native-bottom-tabs",
-      [
-        "expo-build-properties",
-        {
-          "ios": {
-            "extraPods": [
-              {
-                "name": "SDWebImage",
-                "modular_headers": true
-              },
-              {
-                "name": "SDWebImageSVGCoder",
-                "modular_headers": true
-              }
-            ]
-          }
-        }
-      ],
       [
         "expo-font",
         {
@@ -93,8 +75,7 @@
         {
           "iosUrlScheme": "com.googleusercontent.apps.976302581992-tbi6afmid4eq5dsn63t30kpfpdhjju8m"
         }
-      ],
-      "expo-build-properties"
+      ]
     ],
     "experiments": {
       "typedRoutes": true

@@ -6,11 +6,8 @@
     "type": "defense",
     "proficiencyNeeded": "novice",
     "manaCost": 25,
-    "effects": {
-      "damage": null,
-      "selfDamage": -35,
-      "buffs": null,
-      "debuffs": null
+    "selfDamageTable": {
+      "raw": -35
     },
     "animation": {
       "sprite": "goldenHeal",
@@ -25,14 +22,12 @@
     "type": "defense",
     "proficiencyNeeded": "novice",
     "manaCost": 15,
-    "effects": {
-      "damage": null,
-      "selfDamage": -20,
-      "buffs": [
-        "minor fortitude"
-      ],
-      "debuffs": null
+    "selfDamageTable": {
+      "raw": -35
     },
+    "buffs": [
+      "minor fortitude"
+    ],
     "animation": {
       "sprite": "holyShield",
       "style": "static",
@@ -46,17 +41,15 @@
     "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 20,
-    "effects": {
-      "damage": 15,
-      "selfDamage": null,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "blind",
-          "chance": 0.25
-        }
-      ]
+    "damageTable": {
+      "holy": 15
     },
+    "debuffs": [
+      {
+        "name": "blind",
+        "chance": 0.25
+      }
+    ],
     "animation": {
       "glow": "#FBD44F",
       "position": "field"
@@ -69,14 +62,9 @@
     "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 20,
-    "effects": {
-      "damage": null,
-      "selfDamage": null,
-      "buffs": [
-        "quickened mind"
-      ],
-      "debuffs": null
-    },
+    "buffs": [
+      "quickened mind"
+    ],
     "animation": {
       "glow": "#FBD44F",
       "position": "field"
@@ -89,17 +77,15 @@
     "type": "offense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 50,
-    "effects": {
-      "damage": 25,
-      "selfDamage": null,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "undead cower",
-          "chance": 1.0
-        }
-      ]
+    "damageTable": {
+      "holy": 20
     },
+    "debuffs": [
+      {
+        "name": "undead cower",
+        "chance": 1.0
+      }
+    ],
     "animation": {
       "sprite": "corruptSword",
       "style": "static",
@@ -113,14 +99,12 @@
     "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 40,
-    "effects": {
-      "damage": null,
-      "selfDamage": -25,
-      "buffs": [
-        "purify"
-      ],
-      "debuffs": null
+    "selfDamageTable": {
+      "raw": -25
     },
+    "buffs": [
+      "purify"
+    ],
     "animation": {
       "glow": "#FBD44F",
       "position": "field"
@@ -133,14 +117,9 @@
     "type": "defense",
     "proficiencyNeeded": "adept",
     "manaCost": 75,
-    "effects": {
-      "damage": null,
-      "selfDamage": null,
-      "buffs": [
-        "delayed heal"
-      ],
-      "debuffs": null
-    },
+    "buffs": [
+      "delayed heal"
+    ],
     "animation": {
       "sprite": "goldenHeal",
       "style": "static",
@@ -154,11 +133,8 @@
     "type": "defense",
     "proficiencyNeeded": "adept",
     "manaCost": 75,
-    "effects": {
-      "damage": null,
-      "selfDamage": -85,
-      "buffs": null,
-      "debuffs": null
+    "selfDamageTable": {
+      "raw": -85
     },
     "animation": {
       "sprite": "goldenHeal",
@@ -173,17 +149,18 @@
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 85,
-    "effects": {
-      "damage": 65,
-      "selfDamage": -30,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "blind",
-          "chance": 0.5
-        }
-      ]
+    "damageTable": {
+      "holy": 65
     },
+    "selfDamageTable": {
+      "raw": -30
+    },
+    "debuffs": [
+      {
+        "name": "blind",
+        "chance": 0.5
+      }
+    ],
     "animation": {
       "sprite": "holyOrb",
       "style": "static",
@@ -197,17 +174,15 @@
     "type": "offense",
     "proficiencyNeeded": "expert",
     "manaCost": 100,
-    "effects": {
-      "damage": 75,
-      "selfDamage": null,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "revoke undead",
-          "chance": 1.0
-        }
-      ]
+    "damageTable": {
+      "holy": 75
     },
+    "debuffs": [
+      {
+        "name": "revoke undead",
+        "chance": 1.0
+      }
+    ],
     "animation": {
       "sprite": "corruptSword",
       "style": "static",
@@ -221,14 +196,9 @@
     "type": "defense",
     "proficiencyNeeded": "expert",
     "manaCost": 200,
-    "effects": {
-      "damage": null,
-      "selfDamage": null,
-      "buffs": [
-        "greater quickened mind"
-      ],
-      "debuffs": null
-    },
+    "buffs": [
+      "greater quickened mind"
+    ],
     "animation": {
       "glow": "#FBD44F",
       "position": "field"
@@ -241,14 +211,12 @@
     "type": "defense",
     "proficiencyNeeded": "master",
     "manaCost": 200,
-    "effects": {
-      "damage": null,
-      "selfDamage": -120,
-      "buffs": [
-        "overwhelming glow"
-      ],
-      "debuffs": null
+    "selfDamageTable": {
+      "raw": -120
     },
+    "buffs": [
+      "overwhelming glow"
+    ],
     "animation": {
       "sprite": "holyBeam",
       "style": "static",
@@ -262,14 +230,13 @@
     "type": "defense",
     "proficiencyNeeded": "legend",
     "manaCost": 250,
-    "effects": {
-      "damage": null,
-      "selfDamage": -150,
-      "buffs": [
-        "overwhelming glow"
-      ],
-      "debuffs": null
+    "duration": 3,
+    "selfDamageTable": {
+      "raw": -100
     },
+    "buffs": [
+      "overwhelming glow"
+    ],
     "animation": {
       "sprite": "goldenHeal",
       "style": "static",
@@ -488,21 +455,19 @@
     "usesWeapon": "melee",
     "proficiencyNeeded": "master",
     "manaCost": 175,
-    "effects": {
-      "damage": 150,
-      "selfDamage": null,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "sunder",
-          "chance": 0.75
-        },
-        {
-          "name": "weakened",
-          "chance": 0.75
-        }
-      ]
+    "damageTable": {
+      "holy": 150
     },
+    "debuffs": [
+      {
+        "name": "sunder",
+        "chance": 0.75
+      },
+      {
+        "name": "weakened",
+        "chance": 0.75
+      }
+    ],
     "animation": {
       "sprite": "glowingBlade",
       "style": "static",
@@ -517,14 +482,15 @@
     "usesWeapon": "melee",
     "proficiencyNeeded": "legend",
     "manaCost": 200,
-    "effects": {
-      "damage": 250,
-      "selfDamage": null,
-      "buffs": [
-        "execute"
-      ],
-      "debuffs": null
+    "damageTable": {
+      "holy": 250
     },
+    "debuffs": [
+      {
+        "name": "execute",
+        "chance": 0.2
+      }
+    ],
     "animation": {
       "sprite": "corruptSword",
       "style": "static",
@@ -538,19 +504,18 @@
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 300,
-    "effects": {
-      "damage": 200,
-      "selfDamage": null,
-      "buffs": [
-        "righteous fury"
-      ],
-      "debuffs": [
-        {
-          "name": "severe sunder",
-          "chance": 1.0
-        }
-      ]
+    "damageTable": {
+      "holy": 200
     },
+    "buffs": [
+      "righteous fury"
+    ],
+    "debuffs": [
+      {
+        "name": "severe sunder",
+        "chance": 1.0
+      }
+    ],
     "animation": {
       "sprite": "holySword",
       "style": "static",
@@ -565,14 +530,9 @@
     "usesWeapon": "shield",
     "proficiencyNeeded": "novice",
     "manaCost": 25,
-    "effects": {
-      "damage": null,
-      "selfDamage": null,
-      "buffs": [
-        "guard"
-      ],
-      "debuffs": null
-    },
+    "buffs": [
+      "guard"
+    ],
     "animation": {
       "sprite": "holyShield",
       "style": "static",
@@ -586,14 +546,9 @@
     "type": "defense",
     "proficiencyNeeded": "novice",
     "manaCost": 25,
-    "effects": {
-      "damage": null,
-      "selfDamage": null,
-      "buffs": [
-        "protection aura"
-      ],
-      "debuffs": null
-    },
+    "buffs": [
+      "protection aura"
+    ],
     "animation": {
       "glow": "#FBD44F",
       "position": "field"
@@ -606,14 +561,9 @@
     "type": "defense",
     "proficiencyNeeded": "novice",
     "manaCost": 20,
-    "effects": {
-      "damage": null,
-      "selfDamage": null,
-      "buffs": [
-        "minor fortitude"
-      ],
-      "debuffs": null
-    },
+    "buffs": [
+      "minor fortitude"
+    ],
     "animation": {
       "sprite": "holyFist",
       "style": "static",
@@ -628,14 +578,9 @@
     "usesWeapon": "shield",
     "proficiencyNeeded": "apprentice",
     "manaCost": 50,
-    "effects": {
-      "damage": null,
-      "selfDamage": null,
-      "buffs": [
-        "reflective bulwark"
-      ],
-      "debuffs": null
-    },
+    "buffs": [
+      "reflective bulwark"
+    ],
     "animation": {
       "sprite": "holyShield",
       "style": "static",
@@ -650,14 +595,9 @@
     "usesWeapon": "shield",
     "proficiencyNeeded": "apprentice",
     "manaCost": 10,
-    "effects": {
-      "damage": null,
-      "selfDamage": null,
-      "buffs": [
-        "empowered guarding"
-      ],
-      "debuffs": null
-    },
+    "buffs": [
+      "empowered guarding"
+    ],
     "animation": {
       "sprite": "holyShield",
       "style": "static",
@@ -671,14 +611,9 @@
     "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 45,
-    "effects": {
-      "damage": null,
-      "selfDamage": null,
-      "buffs": [
-        "spell resistance"
-      ],
-      "debuffs": null
-    },
+    "buffs": [
+      "spell resistance"
+    ],
     "animation": {
       "sprite": "holyShield",
       "style": "static",
@@ -693,14 +628,9 @@
     "usesWeapon": "shield",
     "proficiencyNeeded": "adept",
     "manaCost": 65,
-    "effects": {
-      "damage": null,
-      "selfDamage": null,
-      "buffs": [
-        "blessed defense"
-      ],
-      "debuffs": null
-    },
+    "buffs": [
+      "blessed defense"
+    ],
     "animation": {
       "sprite": "holyShield",
       "style": "static",
@@ -714,15 +644,10 @@
     "type": "defense",
     "proficiencyNeeded": "adept",
     "manaCost": 70,
-    "effects": {
-      "damage": null,
-      "selfDamage": null,
-      "buffs": [
-        "fortitude",
-        "spell resistance"
-      ],
-      "debuffs": null
-    },
+    "buffs": [
+      "fortitude",
+      "spell resistance"
+    ],
     "animation": {
       "sprite": "holyShield",
       "style": "static",
@@ -737,15 +662,10 @@
     "usesWeapon": "shield",
     "proficiencyNeeded": "expert",
     "manaCost": 100,
-    "effects": {
-      "damage": null,
-      "selfDamage": null,
-      "buffs": [
-        "guard",
-        "blessed defense"
-      ],
-      "debuffs": null
-    },
+    "buffs": [
+      "guard",
+      "blessed defense"
+    ],
     "animation": {
       "sprite": "holyShield",
       "style": "static",
@@ -759,15 +679,13 @@
     "type": "defense",
     "proficiencyNeeded": "expert",
     "manaCost": 125,
-    "effects": {
-      "damage": null,
-      "selfDamage": null,
-      "buffs": [
-        "protection aura",
-        "minor fortitude"
-      ],
-      "debuffs": null
+    "selfDamageTable": {
+      "raw": -40
     },
+    "buffs": [
+      "protection aura",
+      "minor fortitude"
+    ],
     "animation": {
       "sprite": "holyShield",
       "style": "static",
@@ -782,15 +700,10 @@
     "usesWeapon": "shield",
     "proficiencyNeeded": "master",
     "manaCost": 150,
-    "effects": {
-      "damage": null,
-      "selfDamage": null,
-      "buffs": [
-        "protection aura",
-        "reflective bulwark"
-      ],
-      "debuffs": null
-    },
+    "buffs": [
+      "protection aura",
+      "reflective bulwark"
+    ],
     "animation": {
       "sprite": "holyShield",
       "style": "static",
@@ -805,16 +718,11 @@
     "usesWeapon": "shield",
     "proficiencyNeeded": "legend",
     "manaCost": 250,
-    "effects": {
-      "damage": null,
-      "selfDamage": null,
-      "buffs": [
-        "protection aura",
-        "blessed defense",
-        "reflective bulwark"
-      ],
-      "debuffs": null
-    },
+    "buffs": [
+      "protection aura",
+      "blessed defense",
+      "reflective bulwark"
+    ],
     "animation": {
       "sprite": "holyShield",
       "style": "static",

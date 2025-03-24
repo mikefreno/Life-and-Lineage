@@ -280,7 +280,7 @@ export default class UIStore {
   }
 
   setInsets(insets: EdgeInsets) {
-    this.insets = insets;
+    this.insets = { ...insets, bottom: Math.max(insets.bottom, 8) };
     this.storeLoadingStatus["statusBar"] = true;
   }
 
@@ -409,7 +409,7 @@ export default class UIStore {
     return (
       this.tabHeightBase +
       (this.insets?.bottom ?? 0) +
-      (!this.isLandscape ? baseNormalizeForText(15) : 0)
+      (!this.isLandscape ? baseNormalizeForText(15) : 4)
     );
   }
 

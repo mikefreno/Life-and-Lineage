@@ -25,8 +25,9 @@ import { useRootStore } from "@/hooks/stores";
 import { flex, tw_base, useStyles } from "@/hooks/styles";
 import GenericFlatButton from "@/components/GenericFlatButton";
 import Colors from "@/constants/Colors";
-import { AntDesign } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import GenericRaisedButton from "@/components/GenericRaisedButton";
+import { debounce } from "lodash";
 
 const MIN_RED = 20;
 const MAX_RED = 255;
@@ -58,9 +59,19 @@ const DungeonScreen = observer(() => {
           : b.difficulty - a.difficulty,
       );
     setSorted(sorted);
-  }, [dungeonInstances, sort]);
+  }, [dungeonInstances, sort, dungeonInstances.length]);
 
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    debounce(() => {
+      const offsetY = event.nativeEvent.contentOffset.y;
+      const pageIndex = Math.round(offsetY / scrollViewHeight);
+      setCurrentPage(pageIndex);
+    }, 150);
+  };
+
+  const onMomentumScrollEnd = (
+    event: NativeSyntheticEvent<NativeScrollEvent>,
+  ) => {
     const offsetY = event.nativeEvent.contentOffset.y;
     const pageIndex = Math.round(offsetY / scrollViewHeight);
     setCurrentPage(pageIndex);
@@ -124,6 +135,8 @@ const DungeonScreen = observer(() => {
 
   const scaleAnimUpArrow = useRef(new Animated.Value(1)).current;
   const scaleAnimDownArrow = useRef(new Animated.Value(1)).current;
+  const scaleAnimPrevArrow = useRef(new Animated.Value(1)).current;
+  const scaleAnimNextArrow = useRef(new Animated.Value(1)).current;
 
   const animatePress = (ref: Animated.Value) => {
     Animated.spring(ref, {
@@ -141,6 +154,17 @@ const DungeonScreen = observer(() => {
       friction: 3,
       tension: 40,
     }).start();
+  };
+
+  const scrollToPage = (pageIndex: number) => {
+    if (pageIndex < 0 || pageIndex >= sorted.length) return;
+
+    scrollViewRef.current?.scrollTo({
+      x: 0,
+      y: pageIndex * scrollViewHeight,
+      animated: true,
+    });
+    setCurrentPage(pageIndex);
   };
 
   return (
@@ -188,6 +212,7 @@ const DungeonScreen = observer(() => {
             flex: 1,
             paddingTop: headerHeight + blurHeaderHeight,
             paddingHorizontal: tw_base[2],
+            ...styles.notchAvoidingLanscapeMargin,
           },
         ]}
       >
@@ -232,14 +257,14 @@ const DungeonScreen = observer(() => {
             <View
               style={{
                 position: "absolute",
-                marginTop: uiStore.dimensions.height / 2,
-                marginLeft: 4,
+                marginTop: uiStore.dimensions.height / 2.5,
+                marginLeft: 10,
                 zIndex: 10,
               }}
             >
               <Pressable
                 style={{
-                  marginBottom: tw_base[1],
+                  marginBottom: uiStore.dimensions.height * 0.01,
                 }}
                 onPressIn={() => animatePress(scaleAnimUpArrow)}
                 onPressOut={() => animateRelease(scaleAnimUpArrow)}
@@ -251,15 +276,76 @@ const DungeonScreen = observer(() => {
                     animated: true,
                   });
                 }}
+                disabled={currentPage <= 0}
               >
                 <Animated.View
                   style={{
                     transform: [{ scale: scaleAnimUpArrow }],
+                    borderWidth: 2,
+                    borderRadius: 999,
+                    opacity: currentPage <= 0 ? 0.5 : 1,
+                    borderColor: Colors[uiStore.colorScheme].border,
                   }}
                 >
-                  <AntDesign
-                    name="upcircleo"
-                    size={28}
+                  <Feather
+                    name="chevrons-up"
+                    size={uiStore.iconSizeLarge}
+                    color={Colors[uiStore.colorScheme].border}
+                  />
+                </Animated.View>
+              </Pressable>
+              <Pressable
+                style={{
+                  marginBottom: uiStore.dimensions.height * 0.01,
+                }}
+                onPressIn={() => animatePress(scaleAnimPrevArrow)}
+                onPressOut={() => animateRelease(scaleAnimPrevArrow)}
+                onPress={() => {
+                  vibration({ style: "light" });
+                  scrollToPage(currentPage - 1);
+                }}
+                disabled={currentPage <= 0}
+              >
+                <Animated.View
+                  style={{
+                    transform: [{ scale: scaleAnimPrevArrow }],
+                    borderWidth: 2,
+                    borderRadius: 999,
+                    opacity: currentPage <= 0 ? 0.5 : 1,
+                    borderColor: Colors[uiStore.colorScheme].border,
+                  }}
+                >
+                  <Feather
+                    name="chevron-up"
+                    size={uiStore.iconSizeLarge}
+                    color={Colors[uiStore.colorScheme].border}
+                  />
+                </Animated.View>
+              </Pressable>
+              <Pressable
+                style={{
+                  marginBottom: uiStore.dimensions.height * 0.01,
+                }}
+                onPressIn={() => animatePress(scaleAnimNextArrow)}
+                onPressOut={() => animateRelease(scaleAnimNextArrow)}
+                onPress={() => {
+                  vibration({ style: "light" });
+                  scrollToPage(currentPage + 1);
+                }}
+                disabled={currentPage >= sorted.length - 1}
+              >
+                <Animated.View
+                  style={{
+                    transform: [{ scale: scaleAnimNextArrow }],
+                    borderWidth: 2,
+                    borderRadius: 999,
+                    opacity: currentPage >= sorted.length - 1 ? 0.5 : 1,
+                    borderColor: Colors[uiStore.colorScheme].border,
+                  }}
+                >
+                  <Feather
+                    name="chevron-down"
+                    size={uiStore.iconSizeLarge}
                     color={Colors[uiStore.colorScheme].border}
                   />
                 </Animated.View>
@@ -271,15 +357,20 @@ const DungeonScreen = observer(() => {
                   vibration({ style: "light" });
                   scrollViewRef.current?.scrollToEnd();
                 }}
+                disabled={currentPage >= sorted.length - 1}
               >
                 <Animated.View
                   style={{
                     transform: [{ scale: scaleAnimDownArrow }],
+                    borderWidth: 2,
+                    borderRadius: 999,
+                    opacity: currentPage >= sorted.length - 1 ? 0.5 : 1,
+                    borderColor: Colors[uiStore.colorScheme].border,
                   }}
                 >
-                  <AntDesign
-                    name="downcircleo"
-                    size={28}
+                  <Feather
+                    name="chevrons-down"
+                    size={uiStore.iconSizeLarge}
                     color={Colors[uiStore.colorScheme].border}
                   />
                 </Animated.View>
@@ -292,6 +383,7 @@ const DungeonScreen = observer(() => {
           pagingEnabled
           ref={scrollViewRef}
           onScroll={onScroll}
+          onMomentumScrollEnd={onMomentumScrollEnd}
           onLayout={onLayout}
           scrollEventThrottle={16}
           contentContainerStyle={{
@@ -309,10 +401,14 @@ const DungeonScreen = observer(() => {
                 {toTitleCase(dungeonInstance.name)}
               </Text>
               <View
-                style={{ marginHorizontal: "auto", justifyContent: "center" }}
+                style={[
+                  uiStore.isLandscape
+                    ? { flexDirection: "row" }
+                    : { justifyContent: "center" },
+                ]}
               >
                 {dungeonInstance.levels
-                  .filter((level) => level.unlocked || __DEV__)
+                  .filter((level) => level.unlocked)
                   .map((level, levelIdx) => {
                     const { bgColor, textColor } = getLevelColor(
                       dungeonInstance,
@@ -332,7 +428,7 @@ const DungeonScreen = observer(() => {
                           uiStore.setTotalLoadingSteps(5);
                           vibration({ style: "warning" });
                           dungeonStore
-                            .setUpDungeon(dungeonInstance, level)
+                            .setUpDungeon(dungeonInstance, level, false)
                             .then(() => uiStore.incrementLoadingStep());
                           wait(100).then(() => {
                             router.replace(`/DungeonLevel`);

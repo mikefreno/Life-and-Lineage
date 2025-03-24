@@ -64,6 +64,12 @@ configureReanimatedLogger({
   strict: false,
 });
 
+if (Platform.OS === "android") {
+  if (UIManager.setLayoutAnimationEnabledExperimental) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+  }
+}
+
 SplashScreen.preventAutoHideAsync();
 SplashScreen.setOptions({
   fade: Platform.OS === "ios",

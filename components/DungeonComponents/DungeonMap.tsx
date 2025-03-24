@@ -157,6 +157,7 @@ export const DungeonMapControls = observer(() => {
           height: "100%",
           justifyContent: "space-evenly",
           flexDirection: "row",
+          ...styles.notchMirroredLanscapePad,
         }}
       >
         <ArrowButton direction="up" />
@@ -165,7 +166,6 @@ export const DungeonMapControls = observer(() => {
           !dungeonStore.currentPosition.specialEncounter.activated && (
             <GenericRaisedButton
               backgroundColor="#2563eb"
-              buttonStyle={{ paddingHorizontal: 8 }}
               onPress={() =>
                 dungeonStore.setCurrentSpecialEncounter(
                   dungeonStore.currentPosition!.specialEncounter!,
@@ -197,7 +197,6 @@ export const DungeonMapControls = observer(() => {
           !dungeonStore.currentPosition.specialEncounter.activated && (
             <GenericRaisedButton
               backgroundColor="#2563eb"
-              buttonStyle={{ paddingHorizontal: 8 }}
               onPress={() =>
                 dungeonStore.setCurrentSpecialEncounter(
                   dungeonStore.currentPosition!.specialEncounter!,

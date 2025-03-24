@@ -212,19 +212,18 @@ const BattleTab = observer(
         {battleTab == "attacksOrNavigation" ? (
           !dungeonStore.inCombat ? (
             dungeonStore.currentSpecialEncounter ? (
-              <ThemedView
+              <View
                 style={{
                   width: "100%",
                   height: "100%",
-                  padding: 8,
                   justifyContent: "center",
+                  alignContent: "center",
                 }}
               >
                 <Text
                   style={{
-                    fontSize: 20,
+                    ...styles["text-lg"],
                     textAlign: "center",
-                    marginBottom: 16,
                   }}
                 >
                   {dungeonStore.currentSpecialEncounter.prompt}
@@ -246,7 +245,7 @@ const BattleTab = observer(
                     Ignore
                   </GenericRaisedButton>
                 </View>
-              </ThemedView>
+              </View>
             ) : (
               <DungeonMapControls />
             )
@@ -322,7 +321,9 @@ const BattleTab = observer(
             </View>
           </TouchableWithoutFeedback>
         ) : (
-          <View style={{ flex: 1, ...tw.px2 }}>
+          <View
+            style={{ flex: 1, ...tw.px2, ...styles.notchAvoidingLanscapePad }}
+          >
             <View style={styles.logContent}>
               {dungeonStore.logs.length === 0 ? (
                 <View style={{ marginVertical: "auto" }}>

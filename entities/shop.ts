@@ -388,16 +388,91 @@ function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function generateShopKeeper(archetype: string, root: RootStore) {
-  const sex = rollD20() <= 12 ? "male" : "female";
+export function generateShopKeeper(
+  archetype: string,
+  root: RootStore,
+  existingShopkeepers: Map<string, Personality> = new Map(),
+) {
+  const sex = Math.random() < 0.7 ? "male" : "female";
   const name = getRandomName(sex);
   const birthdate = root.time.generateBirthDateInRange(25, 70);
   const job = toTitleCase(archetype);
   const shopObj = shops.find((obj) => obj.type == archetype);
-  const randIdx = Math.floor(
-    Math.random() * shopObj!.possiblePersonalities.length,
+
+  // Get existing personalities with their sexes
+  const existingPersonalitiesBySex = new Map<string, Personality[]>();
+  existingPersonalitiesBySex.set("male", []);
+  existingPersonalitiesBySex.set("female", []);
+
+  // Populate the map with existing personalities by sex
+  for (const [_, personality] of existingShopkeepers.entries()) {
+    // We need to find the sex of this shopkeeper
+    // Since we don't have direct access to the sex from the map,
+    // we'll need to check all characters in the character store
+    const characters = Array.from(root.characterStore.characters.values());
+    for (const character of characters) {
+      if (character.personality === personality) {
+        const charSex = character.sex as "male" | "female";
+        const existingForSex = existingPersonalitiesBySex.get(charSex) || [];
+        if (!existingForSex.includes(personality)) {
+          existingForSex.push(personality);
+          existingPersonalitiesBySex.set(charSex, existingForSex);
+        }
+      }
+    }
+  }
+
+  // Get all personalities that are invalid based on existing shopkeepers
+  const invalidPersonalities = new Set<Personality>();
+  const existingForCurrentSex = existingPersonalitiesBySex.get(sex) || [];
+
+  // Check each existing personality for the current sex
+  for (const existingPersonality of existingForCurrentSex) {
+    // Add the existing personality itself to invalid list (no duplicates)
+    invalidPersonalities.add(existingPersonality);
+
+    // Add all personalities that are excluded by this existing personality
+    const exclusions = exclusionMapping[sex][existingPersonality] || [];
+    for (const excluded of exclusions) {
+      invalidPersonalities.add(excluded);
+    }
+
+    // Also check if any existing personality would be excluded by a potential new personality
+    for (const potential of Object.values(Personality)) {
+      const potentialExclusions = exclusionMapping[sex][potential] || [];
+      if (potentialExclusions.includes(existingPersonality)) {
+        invalidPersonalities.add(potential);
+      }
+    }
+  }
+
+  // Get all possible personalities for this shop type
+  let possiblePersonalities = shopObj!.possiblePersonalities as Personality[];
+
+  // Filter out invalid personalities
+  let validPersonalities = possiblePersonalities.filter(
+    (p) => !invalidPersonalities.has(p),
   );
-  const personality = shopObj!.possiblePersonalities[randIdx];
+
+  // Fallback if no valid personalities remain
+  if (validPersonalities.length === 0) {
+    // Try using any non-invalid personality
+    validPersonalities = Object.values(Personality).filter(
+      (p) => !invalidPersonalities.has(p),
+    ) as Personality[];
+  }
+
+  // Last resort - use any personality
+  if (validPersonalities.length === 0) {
+    validPersonalities = Object.values(Personality) as Personality[];
+    console.warn(
+      `No valid personalities found for ${archetype}, using any available`,
+    );
+  }
+
+  // Select a random personality from valid options
+  const personality =
+    validPersonalities[Math.floor(Math.random() * validPersonalities.length)];
 
   const newChar = new Character({
     beingType: "human",
@@ -405,10 +480,47 @@ export function generateShopKeeper(archetype: string, root: RootStore) {
     firstName: name.firstName,
     lastName: name.lastName,
     birthdate: birthdate!,
-    personality: personality as Personality,
+    personality: personality,
     job: job,
     root,
     ...getNPCBaseCombatStats(),
   });
+
   return newChar;
 }
+
+export const exclusionMapping: Record<
+  "male" | "female",
+  Record<Personality, Personality[]>
+> = {
+  female: {
+    [Personality.AGGRESSIVE]: [Personality.ARROGANT],
+    [Personality.ARROGANT]: [Personality.AGGRESSIVE, Personality.INSANE],
+    [Personality.CALM]: [Personality.OPEN, Personality.SILENT],
+    [Personality.CREEPY]: [],
+    [Personality.INCREDULOUS]: [Personality.RESERVED],
+    [Personality.INSANE]: [Personality.ARROGANT],
+    [Personality.JOVIAL]: [],
+    [Personality.OPEN]: [Personality.CALM, Personality.RESERVED],
+    [Personality.RESERVED]: [Personality.OPEN, Personality.INCREDULOUS],
+    [Personality.SILENT]: [Personality.CALM],
+    [Personality.WISE]: [],
+  },
+  male: {
+    [Personality.AGGRESSIVE]: [Personality.OPEN, Personality.INCREDULOUS],
+    [Personality.ARROGANT]: [Personality.OPEN],
+    [Personality.CALM]: [Personality.OPEN],
+    [Personality.CREEPY]: [Personality.INSANE, Personality.SILENT],
+    [Personality.INCREDULOUS]: [Personality.AGGRESSIVE],
+    [Personality.INSANE]: [Personality.SILENT, Personality.CREEPY],
+    [Personality.JOVIAL]: [],
+    [Personality.OPEN]: [
+      Personality.ARROGANT,
+      Personality.CALM,
+      Personality.AGGRESSIVE,
+    ],
+    [Personality.RESERVED]: [Personality.WISE],
+    [Personality.SILENT]: [Personality.CREEPY, Personality.INSANE],
+    [Personality.WISE]: [Personality.RESERVED],
+  },
+};

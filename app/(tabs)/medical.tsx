@@ -12,11 +12,13 @@ import GenericStrikeAround from "@/components/GenericStrikeAround";
 import { TutorialOption } from "@/utility/types";
 import { observer } from "mobx-react-lite";
 import { useRootStore } from "@/hooks/stores";
+import { useStyles } from "@/hooks/styles";
 
 const MedicalScreen = observer(() => {
   const isFocused = useIsFocused();
   const { uiStore } = useRootStore();
   const header = useHeaderHeight();
+  const styles = useStyles();
 
   return (
     <>
@@ -39,6 +41,7 @@ const MedicalScreen = observer(() => {
             paddingBottom: uiStore.bottomBarHeight,
             width: "90%",
             marginHorizontal: "auto",
+            ...styles.notchAvoidingLanscapeMargin,
           }}
           scrollIndicatorInsets={{ top: 48, right: 0, left: 0, bottom: 48 }}
         >

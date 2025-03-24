@@ -265,11 +265,11 @@ const DungeonLevelScreen = observer(() => {
               />
             </View>
           ) : inCombat ? (
-            <>
+            <View style={{ flex: 1, height: "40%" }}>
               <VFXWrapper>
                 <DungeonEnemyDisplay />
               </VFXWrapper>
-            </>
+            </View>
           ) : (
             <DungeonMapRender />
           )}
@@ -278,7 +278,6 @@ const DungeonLevelScreen = observer(() => {
             ref={mainBodyRef}
             style={{
               flex: 1,
-              maxHeight: uiStore.dimensions.height < 500 ? "50%" : "45%",
             }}
           >
             <View

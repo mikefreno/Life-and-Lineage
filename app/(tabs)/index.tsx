@@ -168,10 +168,12 @@ const HomeScreen = observer(() => {
         </TouchableWithoutFeedback>
         <TouchableWithoutFeedback onPress={clearDisplayItem}>
           <View style={styles.inventoryContainer}>
-            <EquipmentDisplay
-              displayItem={displayItem}
-              setDisplayItem={setDisplayItem}
-            />
+            <View style={uiStore.isLandscape ? { paddingBottom: 4 } : {}}>
+              <EquipmentDisplay
+                displayItem={displayItem}
+                setDisplayItem={setDisplayItem}
+              />
+            </View>
             <Pressable
               ref={stashButtonRef}
               onLayout={setStashBoundsOnLayout}

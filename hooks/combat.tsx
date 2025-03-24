@@ -10,7 +10,6 @@ import { useIsFocused } from "@react-navigation/native";
 import { AnimationOptions } from "@/utility/enemyHelpers";
 import { type Condition } from "@/entities/conditions";
 import { Being } from "@/entities/being";
-import { result } from "lodash";
 
 const attackHandler = ({
   attackResults,
@@ -49,13 +48,7 @@ const attackHandler = ({
 
 export const useEnemyManagement = () => {
   const root = useRootStore();
-  const {
-    enemyStore,
-    playerState,
-    dungeonStore,
-    tutorialStore,
-    playerAnimationStore,
-  } = root;
+  const { enemyStore, playerState, dungeonStore, tutorialStore } = root;
   const { setDroppedItems } = useLootState();
   const { setShouldShowFirstBossKillTutorialAfterItemDrops } =
     useTutorialState();
@@ -155,37 +148,47 @@ export const useEnemyManagement = () => {
             animStore?.movementDuration ?? 500,
           );
 
-          //TODO: better handle multi-target
-          for (const res of enemyAttackRes.result) {
-            switch (res.result) {
-              case AttackUse.success:
-                animStore?.addToAnimationQueue(
-                  animStore.getAttackQueue(animationForAttack),
-                );
-                break;
-              case AttackUse.miss:
-                animStore?.addToAnimationQueue(
-                  animStore.getAttackQueue(animationForAttack),
-                );
-                playerAnimationStore.setTextString("DODGE!");
-                break;
-              case AttackUse.block:
-                animStore?.addToAnimationQueue(
-                  animStore.getAttackQueue(animationForAttack),
-                );
-                playerAnimationStore.setTextString("BLOCKED!");
-                break;
-              case AttackUse.stunned:
-                animStore?.setTextString("STUNNED!");
-                break;
-              case AttackUse.lowMana:
-                animStore?.setTextString(
-                  (enemy as Enemy | Character).nameReference !==
-                    "training dummy"
-                    ? "EXHAUSTED!"
-                    : "*STARE*",
-                );
-                break;
+          //Indicates an attack took place (could be a miss!) (Null indicates a failure - either had an execution condition or was stunned)
+          if (enemyAttackRes.targetResults && enemyAttackRes.attack) {
+            for (const res of enemyAttackRes.targetResults) {
+              switch (res.use.result) {
+                case AttackUse.success:
+                  animStore?.addToAnimationQueue(
+                    animStore.getAttackQueue(
+                      (enemyAttackRes.attack
+                        .animation as AnimationOptions | null) ?? "attack_1",
+                    ),
+                  );
+                  break;
+                case AttackUse.miss:
+                  animStore?.addToAnimationQueue(
+                    animStore.getAttackQueue(
+                      (enemyAttackRes.attack
+                        .animation as AnimationOptions | null) ?? "attack_1",
+                    ),
+                  );
+                  break;
+                case AttackUse.block:
+                  animStore?.addToAnimationQueue(
+                    animStore.getAttackQueue(
+                      (enemyAttackRes.attack
+                        .animation as AnimationOptions | null) ?? "attack_1",
+                    ),
+                  );
+
+                  break;
+                case AttackUse.stunned:
+                  animStore?.setTextString("STUNNED!");
+                  break;
+                case AttackUse.lowMana:
+                  animStore?.setTextString(
+                    (enemy as Enemy | Character).nameReference !==
+                      "training dummy"
+                      ? "EXHAUSTED!"
+                      : "*STARE*",
+                  );
+                  break;
+              }
             }
           }
 
@@ -258,7 +261,6 @@ export const useCombatActions = () => {
             } else {
               animStore?.addToAnimationQueue("hurt");
             }
-            console.log(res.use);
             res.target.damageHealth({
               damage: res.use.damages?.total ?? 0,
               attackerId: attack.user.id,

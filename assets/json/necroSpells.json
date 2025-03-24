@@ -6,13 +6,12 @@
     "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 20,
-    "effects": {
-      "damage": 5,
-      "buffs": [
-        "blood orb"
-      ],
-      "debuffs": null
+    "damageTable": {
+      "physical": 5
     },
+    "buffs": [
+      "blood orb"
+    ],
     "animation": {
       "sprite": "bloodCone",
       "style": "static",
@@ -28,14 +27,9 @@
     "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": -35,
-    "effects": {
-      "damage": null,
-      "selfDamage": null,
-      "buffs": [
-        "consume blood orb"
-      ],
-      "debuffs": null
-    },
+    "buffs": [
+      "consume blood orb"
+    ],
     "animation": {
       "sprite": "bloodBurst",
       "style": "static",
@@ -49,14 +43,12 @@
     "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 5,
-    "effects": {
-      "damage": null,
-      "selfDamage": -35,
-      "buffs": [
-        "consume blood orb"
-      ],
-      "debuffs": null
+    "selfDamageTable": {
+      "raw": -30
     },
+    "buffs": [
+      "consume blood orb"
+    ],
     "animation": {
       "sprite": "bloodBurst",
       "style": "static",
@@ -69,15 +61,16 @@
     "target": "single",
     "type": "offense",
     "proficiencyNeeded": "adept",
-    "manaCost": 50,
-    "effects": {
-      "damage": 25,
-      "selfDamage": -25,
-      "buffs": [
-        "blood orb"
-      ],
-      "debuffs": null
+    "manaCost": 65,
+    "damageTable": {
+      "physical": 25
     },
+    "selfDamageTable": {
+      "raw": -20
+    },
+    "buffs": [
+      "blood orb"
+    ],
     "animation": {
       "glow": "#7f1d1d80",
       "position": "enemy"
@@ -89,15 +82,13 @@
     "target": "single",
     "type": "offense",
     "proficiencyNeeded": "expert",
-    "manaCost": 75,
-    "effects": {
-      "damage": 90,
-      "selfDamage": null,
-      "buffs": [
-        "consume blood orb"
-      ],
-      "debuffs": null
+    "damageTable": {
+      "physical": 90
     },
+    "manaCost": 75,
+    "buffs": [
+      "consume blood orb"
+    ],
     "animation": {
       "sprite": "bloodLongBolts",
       "style": "span",
@@ -111,19 +102,21 @@
     "type": "offense",
     "proficiencyNeeded": "master",
     "manaCost": 150,
-    "effects": {
-      "damage": 125,
-      "selfDamage": 25,
-      "buffs": [
-        "blood orb"
-      ],
-      "debuffs": [
-        {
-          "name": "hemmorage",
-          "chance": 0.75
-        }
-      ]
+    "damageTable": {
+      "physical": 125
     },
+    "selfDamageTable": {
+      "raw": 25
+    },
+    "buffs": [
+      "blood orb"
+    ],
+    "debuffs": [
+      {
+        "name": "hemmorage",
+        "chance": 0.75
+      }
+    ],
     "animation": {
       "sprite": "bloodSimpleBolts",
       "style": "static",
@@ -137,20 +130,22 @@
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 300,
-    "effects": {
-      "damage": 200,
-      "selfDamage": 50,
-      "buffs": [
-        "blood orb",
-        "blood orb"
-      ],
-      "debuffs": [
-        {
-          "name": "hemmorage",
-          "chance": 1.0
-        }
-      ]
+    "damageTable": {
+      "physical": 200
     },
+    "selfDamageTable": {
+      "raw": 50
+    },
+    "buffs": [
+      "blood orb",
+      "blood orb"
+    ],
+    "debuffs": [
+      {
+        "name": "hemmorage",
+        "chance": 1.0
+      }
+    ],
     "animation": {
       "sprite": "bloodRain",
       "style": "static",
@@ -164,21 +159,23 @@
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 750,
-    "effects": {
-      "damage": 350,
-      "selfDamage": 75,
-      "buffs": [
-        "blood orb",
-        "blood orb",
-        "blood orb"
-      ],
-      "debuffs": [
-        {
-          "name": "severe hemmorage",
-          "chance": 1.0
-        }
-      ]
+    "damageTable": {
+      "physical": 350
     },
+    "selfDamageTable": {
+      "raw": 75
+    },
+    "buffs": [
+      "blood orb",
+      "blood orb",
+      "blood orb"
+    ],
+    "debuffs": [
+      {
+        "name": "severe hemmorage",
+        "chance": 1.0
+      }
+    ],
     "animation": {
       "sprite": "bloodSpikes",
       "style": "static",
@@ -192,14 +189,9 @@
     "type": "defense",
     "proficiencyNeeded": "novice",
     "manaCost": 50,
-    "effects": {
-      "damage": null,
-      "buffs": null,
-      "debuffs": null,
-      "summon": [
-        "flying skull"
-      ]
-    }
+    "summon": [
+      "flying skull"
+    ]
   },
   {
     "name": "raise skeleton",
@@ -208,14 +200,9 @@
     "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 50,
-    "effects": {
-      "damage": null,
-      "buffs": null,
-      "debuffs": null,
-      "summon": [
-        "skeleton"
-      ]
-    }
+    "summon": [
+      "skeleton"
+    ]
   },
   {
     "name": "raise zombie",
@@ -224,14 +211,9 @@
     "type": "defense",
     "proficiencyNeeded": "adept",
     "manaCost": 50,
-    "effects": {
-      "damage": null,
-      "buffs": null,
-      "debuffs": null,
-      "summon": [
-        "skeleton"
-      ]
-    }
+    "summon": [
+      "skeleton"
+    ]
   },
   {
     "name": "summon lich",
@@ -240,14 +222,9 @@
     "type": "defense",
     "proficiencyNeeded": "expert",
     "manaCost": 150,
-    "effects": {
-      "damage": null,
-      "buffs": null,
-      "debuffs": null,
-      "summon": [
-        "lich"
-      ]
-    }
+    "summon": [
+      "lich"
+    ]
   },
   {
     "name": "summon wraith",
@@ -256,14 +233,9 @@
     "type": "defense",
     "proficiencyNeeded": "master",
     "manaCost": 250,
-    "effects": {
-      "damage": null,
-      "buffs": null,
-      "debuffs": null,
-      "summon": [
-        "wraith"
-      ]
-    }
+    "summon": [
+      "wraith"
+    ]
   },
   {
     "name": "summon death knight",
@@ -272,14 +244,9 @@
     "type": "defense",
     "proficiencyNeeded": "legend",
     "manaCost": 500,
-    "effects": {
-      "damage": null,
-      "buffs": null,
-      "debuffs": null,
-      "summon": [
-        "death knight"
-      ]
-    }
+    "summon": [
+      "death knight"
+    ]
   },
   {
     "name": "mass raise dead",
@@ -288,16 +255,11 @@
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 750,
-    "effects": {
-      "damage": 100,
-      "buffs": null,
-      "debuffs": null,
-      "summon": [
-        "skeleton",
-        "skeleton",
-        "skeleton"
-      ]
-    }
+    "summon": [
+      "skeleton",
+      "skeleton",
+      "skeleton"
+    ]
   },
   {
     "name": "teeth",
@@ -306,10 +268,8 @@
     "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 15,
-    "effects": {
-      "damage": 7,
-      "buffs": null,
-      "debuffs": null
+    "damageTable": {
+      "physical": 7
     },
     "animation": {
       "sprite": "teeth",
@@ -324,13 +284,9 @@
     "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 15,
-    "effects": {
-      "damage": null,
-      "buffs": [
-        "bone shield"
-      ],
-      "debuffs": null
-    },
+    "buffs": [
+      "bone shield"
+    ],
     "animation": {
       "sprite": "boneShield",
       "style": "static",
@@ -344,16 +300,12 @@
     "type": "defense",
     "proficiencyNeeded": "adept",
     "manaCost": 60,
-    "effects": {
-      "damage": null,
-      "buffs": [
-        "projectile suppression"
-      ],
-      "debuffs": null
-    },
+    "buffs": [
+      "projectile suppression"
+    ],
     "animation": {
       "sprite": "boneWall",
-      "style": "span",
+      "style": "static",
       "position": "field"
     }
   },
@@ -364,16 +316,15 @@
     "type": "offense",
     "proficiencyNeeded": "expert",
     "manaCost": 45,
-    "effects": {
-      "damage": 40,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "bleed",
-          "chance": 0.5
-        }
-      ]
+    "damageTable": {
+      "physical": 40
     },
+    "debuffs": [
+      {
+        "name": "bleed",
+        "chance": 0.5
+      }
+    ],
     "animation": {
       "sprite": "boneLance",
       "style": "span",
@@ -387,13 +338,9 @@
     "type": "defense",
     "proficiencyNeeded": "master",
     "manaCost": 75,
-    "effects": {
-      "damage": null,
-      "buffs": [
-        "guard"
-      ],
-      "debuffs": null
-    },
+    "buffs": [
+      "guard"
+    ],
     "animation": {
       "sprite": "boneShield",
       "style": "static",
@@ -407,16 +354,15 @@
     "type": "offense",
     "proficiencyNeeded": "master",
     "manaCost": 125,
-    "effects": {
-      "damage": 100,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "stun",
-          "chance": 0.75
-        }
-      ]
+    "damageTable": {
+      "physical": 100
     },
+    "debuffs": [
+      {
+        "name": "stun",
+        "chance": 0.75
+      }
+    ],
     "animation": {
       "sprite": "boneOrb",
       "style": "static",
@@ -430,10 +376,8 @@
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 200,
-    "effects": {
-      "damage": 300,
-      "buffs": null,
-      "debuffs": null
+    "damageTable": {
+      "physical": 300
     },
     "animation": {
       "sprite": "boneBlade",
@@ -448,16 +392,15 @@
     "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 20,
-    "effects": {
-      "damage": 5,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "poison",
-          "chance": 0.75
-        }
-      ]
+    "damageTable": {
+      "poison": 5
     },
+    "debuffs": [
+      {
+        "name": "poison",
+        "chance": 0.75
+      }
+    ],
     "animation": {
       "sprite": "poisonDart",
       "style": "missile",
@@ -473,16 +416,15 @@
     "type": "offense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 35,
-    "effects": {
-      "damage": 15,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "diseased",
-          "chance": 0.5
-        }
-      ]
+    "damageTable": {
+      "poison": 15
     },
+    "debuffs": [
+      {
+        "name": "diseased",
+        "chance": 0.5
+      }
+    ],
     "animation": {
       "sprite": "poisonPuft",
       "style": "static",
@@ -496,20 +438,19 @@
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 60,
-    "effects": {
-      "damage": 5,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "poison",
-          "chance": 0.75
-        },
-        {
-          "name": "poison",
-          "chance": 0.75
-        }
-      ]
+    "damageTable": {
+      "poison": 5
     },
+    "debuffs": [
+      {
+        "name": "poison",
+        "chance": 0.75
+      },
+      {
+        "name": "poison",
+        "chance": 0.75
+      }
+    ],
     "animation": {
       "sprite": "poisonStream",
       "style": "span",
@@ -523,13 +464,9 @@
     "type": "defense",
     "proficiencyNeeded": "adept",
     "manaCost": 50,
-    "effects": {
-      "damage": null,
-      "buffs": [
-        "disease immunity"
-      ],
-      "debuffs": null
-    },
+    "buffs": [
+      "disease immunity"
+    ],
     "animation": {
       "sprite": "poisonShield",
       "style": "span",
@@ -543,20 +480,19 @@
     "type": "offense",
     "proficiencyNeeded": "expert",
     "manaCost": 100,
-    "effects": {
-      "damage": 45,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "poison",
-          "chance": 1.0
-        },
-        {
-          "name": "diseased",
-          "chance": 0.75
-        }
-      ]
+    "damageTable": {
+      "poison": 45
     },
+    "debuffs": [
+      {
+        "name": "poison",
+        "chance": 1.0
+      },
+      {
+        "name": "diseased",
+        "chance": 0.75
+      }
+    ],
     "animation": {
       "sprite": "poisonOrbBurst",
       "style": "static",
@@ -570,19 +506,19 @@
     "type": "defense",
     "proficiencyNeeded": "master",
     "manaCost": 175,
-    "effects": {
-      "damage": 75,
-      "buffs": [
-        "protection aura",
-        "heal from poison"
-      ],
-      "debuffs": [
-        {
-          "name": "diseased",
-          "chance": 1.0
-        }
-      ]
+    "damageTable": {
+      "poison": 75
     },
+    "buffs": [
+      "protection aura",
+      "heal from poison"
+    ],
+    "debuffs": [
+      {
+        "name": "diseased",
+        "chance": 1.0
+      }
+    ],
     "animation": {
       "glow": "#53DF2E",
       "position": "field"
@@ -595,20 +531,19 @@
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 300,
-    "effects": {
-      "damage": 150,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "poison",
-          "chance": 1.0
-        },
-        {
-          "name": "diseased",
-          "chance": 1.0
-        }
-      ]
+    "damageTable": {
+      "poison": 150
     },
+    "debuffs": [
+      {
+        "name": "poison",
+        "chance": 1.0
+      },
+      {
+        "name": "diseased",
+        "chance": 1.0
+      }
+    ],
     "animation": {
       "sprite": "poisonSmallBurst",
       "style": "static",
@@ -622,20 +557,19 @@
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 500,
-    "effects": {
-      "damage": 250,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "severe poison",
-          "chance": 1.0
-        },
-        {
-          "name": "severe disease",
-          "chance": 1.0
-        }
-      ]
+    "damageTable": {
+      "poison": 250
     },
+    "debuffs": [
+      {
+        "name": "severe poison",
+        "chance": 1.0
+      },
+      {
+        "name": "severe disease",
+        "chance": 1.0
+      }
+    ],
     "animation": {
       "sprite": "poisonLargeBurst",
       "style": "static",
