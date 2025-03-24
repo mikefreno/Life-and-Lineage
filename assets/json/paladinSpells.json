@@ -251,10 +251,8 @@
     "usesWeapon": "melee",
     "proficiencyNeeded": "novice",
     "manaCost": 25,
-    "effects": {
-      "damage": 5,
-      "buffs": null,
-      "debuffs": null
+    "damageTable": {
+      "holy": 5
     },
     "animation": {
       "sprite": "holyArc",
@@ -270,14 +268,9 @@
     "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 15,
-    "effects": {
-      "damage": null,
-      "selfDamage": null,
-      "buffs": [
-        "minor fury"
-      ],
-      "debuffs": null
-    },
+    "buffs": [
+      "minor fury"
+    ],
     "animation": {
       "sprite": "crossedSwords",
       "style": "static",
@@ -291,11 +284,8 @@
     "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 20,
-    "effects": {
-      "damage": 20,
-      "selfDamage": null,
-      "buffs": null,
-      "debuffs": null
+    "damageTable": {
+      "holy": 20
     },
     "animation": {
       "sprite": "holyDart",
@@ -313,17 +303,15 @@
     "usesWeapon": "melee",
     "proficiencyNeeded": "apprentice",
     "manaCost": 35,
-    "effects": {
-      "damage": 35,
-      "selfDamage": null,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "sunder",
-          "chance": 0.25
-        }
-      ]
+    "damageTable": {
+      "holy": 35
     },
+    "debuffs": [
+      {
+        "name": "sunder",
+        "chance": 0.25
+      }
+    ],
     "animation": {
       "sprite": "glowingBlade",
       "style": "static",
@@ -338,17 +326,15 @@
     "usesWeapon": "melee",
     "proficiencyNeeded": "apprentice",
     "manaCost": 40,
-    "effects": {
-      "damage": 45,
-      "selfDamage": null,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "stun",
-          "chance": 0.25
-        }
-      ]
+    "damageTable": {
+      "holy": 45
     },
+    "debuffs": [
+      {
+        "name": "stun",
+        "chance": 0.25
+      }
+    ],
     "animation": {
       "sprite": "holyFist",
       "style": "static",
@@ -363,14 +349,12 @@
     "usesWeapon": "melee",
     "proficiencyNeeded": "adept",
     "manaCost": 50,
-    "effects": {
-      "damage": 45,
-      "selfDamage": null,
-      "buffs": [
-        "blessed defense"
-      ],
-      "debuffs": null
+    "damageTable": {
+      "holy": 45
     },
+    "buffs": [
+      "blessed defense"
+    ],
     "animation": {
       "sprite": "glowingBlade",
       "style": "static",
@@ -384,17 +368,15 @@
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 65,
-    "effects": {
-      "damage": 55,
-      "selfDamage": null,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "weakened",
-          "chance": 0.5
-        }
-      ]
+    "damageTable": {
+      "holy": 55
     },
+    "debuffs": [
+      {
+        "name": "weakened",
+        "chance": 0.5
+      }
+    ],
     "animation": {
       "sprite": "holyShred",
       "style": "static",
@@ -409,17 +391,15 @@
     "usesWeapon": "melee",
     "proficiencyNeeded": "expert",
     "manaCost": 75,
-    "effects": {
-      "damage": 85,
-      "selfDamage": null,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "stun",
-          "chance": 0.5
-        }
-      ]
+    "damageTable": {
+      "holy": 85
     },
+    "debuffs": [
+      {
+        "name": "stun",
+        "chance": 0.5
+      }
+    ],
     "animation": {
       "sprite": "holySword",
       "style": "static",
@@ -433,14 +413,12 @@
     "type": "offense",
     "proficiencyNeeded": "master",
     "manaCost": 150,
-    "effects": {
-      "damage": 125,
-      "selfDamage": null,
-      "buffs": [
-        "protection aura"
-      ],
-      "debuffs": null
+    "damageTable": {
+      "holy": 125
     },
+    "buffs": [
+      "protection aura"
+    ],
     "animation": {
       "sprite": "holyTrails",
       "style": "static",
