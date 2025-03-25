@@ -5,7 +5,6 @@ import { useState } from "react";
 import GenericModal from "@/components/GenericModal";
 import { Item } from "@/entities/item";
 import { observer } from "mobx-react-lite";
-import GenericStrikeAround from "@/components/GenericStrikeAround";
 import { Image } from "expo-image";
 import { cleanRoundToTenths } from "@/utility/functions/misc";
 import {
@@ -57,9 +56,6 @@ const StatRow = observer(
           }
         >
           {`${value} ${detailed ? statInfo.description || "" : ""}`}
-          {detailed && statInfo.shouldShowTotal
-            ? ` (${cleanRoundToTenths(item.stats?.get(mod) ?? 0)})`
-            : ""}
         </Text>
       </View>
     );
@@ -137,11 +133,6 @@ export default function GearStatsDisplay({ item }: { item: Item }) {
               />
             </View>
           ))}
-          <GenericStrikeAround>
-            <Text style={{ textAlign: "center", ...styles["text-sm"] }}>
-              ( ) Indicates cumulative effect as a standalone item.
-            </Text>
-          </GenericStrikeAround>
         </View>
       </GenericModal>
       <Pressable

@@ -12,6 +12,9 @@ import {
   type DimensionValue,
   LayoutAnimation,
   Platform,
+  LayoutChangeEvent,
+  findNodeHandle,
+  UIManager,
 } from "react-native";
 import { Text } from "@/components/Themed";
 import { InventoryItem } from "@/components/Draggable";
@@ -20,9 +23,9 @@ import { useVibration } from "@/hooks/generic";
 import { useDraggableStore, useRootStore } from "@/hooks/stores";
 import { observer } from "mobx-react-lite";
 import { useStyles } from "@/hooks/styles";
-import { useIsFocused } from "@react-navigation/native";
 import { runInAction } from "mobx";
 import { useScaling } from "@/hooks/scaling";
+import { SCREEN_TRANSITION_TIMING } from "@/stores/UIStore";
 
 const InventoryRender = observer(
   ({
@@ -70,32 +73,63 @@ const InventoryRender = observer(
     const { playerState, uiStore } = useRootStore();
     const { draggableClassStore } = useDraggableStore();
     const styles = useStyles();
-    const isFocused = useIsFocused();
     const [layoutCompleted, setLayoutCompleted] = useState(false);
     const { getNormalizedFontSize } = useScaling();
 
-    const onLayoutHandler = useCallback(
-      (e) => {
-        const { x, y, width, height } = e.nativeEvent.layout;
-        if (width && height) {
-          runInAction(() => {
+    const [containerDimensions, setContainerDimensions] = useState<{
+      width: number;
+      height: number;
+    } | null>(null);
+
+    const measureInWindow = useCallback(() => {
+      if (!selfRef.current) return;
+
+      const nodeHandle = findNodeHandle(selfRef.current);
+      if (nodeHandle) {
+        UIManager.measure(nodeHandle, (x, y, width, height, pageX, pageY) => {
+          if (width && height) {
             draggableClassStore.setInventoryBounds({
-              x,
-              y,
+              x: pageX,
+              y: pageY,
               width,
               height,
             });
-          });
-        }
+
+            setContainerDimensions({ width, height });
+          }
+        });
+      }
+    }, [uiStore.orientation]);
+
+    const onLayoutHandler = useCallback(
+      (e: LayoutChangeEvent) => {
+        const { width, height } = e.nativeEvent.layout;
+        setContainerDimensions({ width, height });
+
+        setTimeout(
+          () =>
+            requestAnimationFrame(() => {
+              measureInWindow();
+            }),
+          SCREEN_TRANSITION_TIMING,
+        );
       },
-      [draggableClassStore],
+      [measureInWindow],
     );
 
-    // Include explicit dimension dependency to force recalculation on rotation.
     const gridCalculations = useMemo(() => {
-      const inventoryBounds = draggableClassStore.inventoryBounds;
-      const height = inventoryBounds?.height ?? 0;
-      const width = inventoryBounds?.width ?? 0;
+      const width = containerDimensions?.width ?? 0;
+      const height = containerDimensions?.height ?? 0;
+
+      if (height <= 0 || width <= 0) {
+        return {
+          rows: uiStore.isLandscape ? 2 : 4,
+          columns: uiStore.isLandscape ? 12 : 6,
+          itemSize: uiStore.itemBlockSize,
+          slotPositions: [],
+        };
+      }
+
       const rows = uiStore.isLandscape ? 2 : 4;
       const columns = 24 / rows;
       const itemSize = uiStore.itemBlockSize;
@@ -135,13 +169,7 @@ const InventoryRender = observer(
         itemSize,
         slotPositions,
       };
-    }, [
-      draggableClassStore.inventoryBounds,
-      uiStore.dimensions.width,
-      uiStore.dimensions.height,
-      uiStore.isLandscape,
-      uiStore.itemBlockSize,
-    ]);
+    }, [containerDimensions, uiStore.isLandscape, uiStore.itemBlockSize]);
 
     useEffect(() => {
       if (
@@ -157,7 +185,7 @@ const InventoryRender = observer(
         );
       }
     }, [
-      gridCalculations,
+      gridCalculations.slotPositions,
       draggableClassStore.inventoryBounds,
       layoutCompleted,
       uiStore,
@@ -188,27 +216,11 @@ const InventoryRender = observer(
       [playerState, runOnSuccess, setDisplayItem, vibration],
     );
 
-    useEffect(() => {
-      if (isFocused && selfRef.current) {
-        // Trigger onLayout by forcing a measure update.
-        selfRef.current.measure((x, y, w, h, pageX, pageY) => {
-          if (w && h) {
-            runInAction(() => {
-              draggableClassStore.setInventoryBounds({
-                x: pageX,
-                y: pageY,
-                width: w,
-                height: h,
-              });
-            });
-          }
-        });
-      }
-    }, [isFocused, draggableClassStore, uiStore.dimensions]);
-
     const renderInventorySlot = useCallback(
       (index: number) => {
         const position = gridCalculations.slotPositions[index];
+        if (!position) return null;
+
         return (
           <View
             style={[
@@ -239,6 +251,8 @@ const InventoryRender = observer(
     const renderInventoryItem = useCallback(
       (item: { item: Item[] }, index: number) => {
         const position = gridCalculations.slotPositions[index];
+        if (!position) return null;
+
         return (
           <View
             style={[
@@ -289,6 +303,8 @@ const InventoryRender = observer(
     const renderKeyItemSlot = useCallback(
       (index: number) => {
         const position = gridCalculations.slotPositions[index];
+        if (!position) return null;
+
         return (
           <View
             style={[
@@ -319,6 +335,8 @@ const InventoryRender = observer(
     const renderKeyItem = useCallback(
       (item: Item, index: number) => {
         const position = gridCalculations.slotPositions[index];
+        if (!position) return null;
+
         return (
           <View
             style={[
@@ -378,18 +396,18 @@ const InventoryRender = observer(
 
     if (!playerState) return null;
 
+    // Get the effective width from local dimensions or fallback to store bounds or screen width
+    const effectiveWidth =
+      containerDimensions?.width ||
+      draggableClassStore.inventoryBounds?.width ||
+      uiStore.dimensions.width;
+
     return (
       <View
         collapsable={false}
         ref={selfRef}
         onLayout={onLayoutHandler}
-        style={[
-          screen === "home"
-            ? styles.inventoryContainer
-            : screen === "shop"
-            ? { zIndex: 10 }
-            : null,
-        ]}
+        style={styles.inventoryContainer}
       >
         <ScrollView
           horizontal
@@ -405,17 +423,9 @@ const InventoryRender = observer(
         >
           {/* Regular Inventory Panel */}
           <View
-            style={[
-              styles.notchAvoidingLanscapePad,
-              { width: draggableClassStore.inventoryBounds?.width },
-            ]}
+            style={[styles.notchAvoidingLanscapePad, { width: effectiveWidth }]}
           >
-            <View
-              style={[
-                styles.keyItemsText,
-                { width: draggableClassStore.inventoryBounds?.width },
-              ]}
-            >
+            <View style={[styles.keyItemsText, { width: effectiveWidth }]}>
               <Text
                 style={[
                   styles["text-3xl"],
@@ -458,7 +468,13 @@ const InventoryRender = observer(
                     ? styles.keyItemPanel
                     : screen === "shop"
                     ? styles.shopKeyItemPanel
-                    : { height: "100%", marginHorizontal: 8 },
+                    : {
+                        height:
+                          containerDimensions?.height ||
+                          draggableClassStore.inventoryBounds?.height ||
+                          "100%",
+                        marginHorizontal: 8,
+                      },
                   {
                     borderRadius: 8,
                     borderWidth: 1,

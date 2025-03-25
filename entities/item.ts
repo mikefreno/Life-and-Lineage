@@ -197,6 +197,8 @@ export class Item {
       totalColdDamage: computed,
       totalLightningDamage: computed,
       totalPoisonDamage: computed,
+      totalHolyDamage: computed,
+      totalMagicDamage: computed,
       totalDamage: computed,
       totalArmor: computed,
       attachedSpell: computed,
@@ -391,6 +393,14 @@ export class Item {
     return this.calculateTotalDamage("poison");
   }
 
+  get totalHolyDamage() {
+    return this.calculateTotalDamage("holy");
+  }
+
+  get totalMagicDamage() {
+    return this.calculateTotalDamage("magic");
+  }
+
   get totalDamage() {
     return [
       this.totalPhysicalDamage,
@@ -398,6 +408,8 @@ export class Item {
       this.totalColdDamage,
       this.totalLightningDamage,
       this.totalPoisonDamage,
+      this.totalHolyDamage,
+      this.totalMagicDamage,
     ].reduce((sum, damage) => sum + damage, 0);
   }
 
@@ -410,7 +422,14 @@ export class Item {
   }
 
   private calculateTotalDamage(
-    damageType: "physical" | "fire" | "cold" | "lightning" | "poison",
+    damageType:
+      | "physical"
+      | "fire"
+      | "cold"
+      | "lightning"
+      | "poison"
+      | "holy"
+      | "magic",
   ): number {
     if (!this.stats) return 0;
 

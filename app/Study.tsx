@@ -77,7 +77,6 @@ const LearningSpellScreen = observer(() => {
   const [selectedBookSpell, setSelectedBookSpell] = useState<Attack | null>(
     null,
   );
-  console.log(selectedBookSpell);
   const [showMasteryLevelTooLow, setShowMasteryLevelTooLow] =
     useState<Element | null>(null);
   const headerHeight = useHeaderHeight();

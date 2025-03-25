@@ -11,17 +11,17 @@ import {
   StringToMastery,
 } from "@/utility/types";
 import { Character, PlayerCharacter } from "./character";
-import { Condition } from "./conditions";
+import { Condition } from "@/entities/conditions";
 import {
   createBuff,
   createDebuff,
   getConditionDamageToAttacker,
   getConditionEffectsOnAttacks,
 } from "@/utility/functions/conditions";
-import { Creature, Enemy } from "./creatures";
-import { rollD20 } from "@/utility/functions/misc";
+import { Creature, Enemy } from "@/entities/creatures";
+import { rollD20, statRounding } from "@/utility/functions/misc";
 import { action, computed, makeObservable, observable } from "mobx";
-import { Being } from "./being";
+import { Being } from "@/entities/being";
 import { useStyles } from "@/hooks/styles";
 import AttackDetails from "@/components/AttackDetails";
 
@@ -361,19 +361,16 @@ export class Attack {
 
     for (let i = 0; i < this.hitsPerTurn; i++) {
       const finalHitChance = this.baseHitChance * hitChanceMultiplier;
-      // First check: Did we hit or miss based on accuracy?
+      console.log(finalHitChance);
       if (Math.random() < finalHitChance) {
-        // Second check: Did the target dodge?
-        if (Math.random() < target.dodgeChance) {
+        if (Math.random() < target.dodgeChance / 100) {
           hits.push(AttackUse.miss);
           continue;
         }
-        // Third check: Did the target block?
-        if (Math.random() < target.blockChance) {
+        if (Math.random() < target.blockChance / 100) {
           hits.push(AttackUse.block);
           continue;
         }
-        // If we hit, didn't get dodged, and didn't get blocked, it's a success
         hits.push(AttackUse.success);
       } else {
         // We missed due to accuracy
@@ -635,7 +632,7 @@ export class Attack {
     return AttackDetails({
       styles,
       attack: this,
-      baseDamage: this.displayDamage.cumulativeDamage,
+      baseDamage: statRounding(this.displayDamage.cumulativeDamage),
     });
   }
 }

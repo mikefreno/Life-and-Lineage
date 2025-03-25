@@ -343,6 +343,7 @@ export const useStyles = () => {
       position: "relative",
       zIndex: 10,
       height: "100%",
+      width: "100%",
     } as const,
     inventorySlot: {
       position: "absolute",

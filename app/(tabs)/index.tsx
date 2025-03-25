@@ -82,7 +82,7 @@ const HomeScreen = observer(() => {
   const topViewStyle = useMemo(() => {
     return {
       flex: 1,
-      paddingTop: header,
+      paddingTop: 44 + (uiStore.insets?.top ?? 0),
       paddingBottom: uiStore.compactRoutePadding,
     };
   }, [

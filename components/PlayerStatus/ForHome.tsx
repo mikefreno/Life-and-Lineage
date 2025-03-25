@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import ProgressBar from "@/components/ProgressBar";
 import {
   Pressable,
@@ -6,6 +6,8 @@ import {
   Animated,
   Easing,
   LayoutChangeEvent,
+  findNodeHandle,
+  UIManager,
 } from "react-native";
 import { observer } from "mobx-react-lite";
 import { Coins, SquarePlus } from "@/assets/icons/SVGIcons";
@@ -53,13 +55,38 @@ const PlayerStatusForHome = observer(() => {
     }).start();
   }, [uiStore.playerStatusIsCompact]);
 
-  const onLayoutHandler = (event: LayoutChangeEvent) => {
-    const { height, y } = event.nativeEvent.layout;
-    if (height > 0) {
-      uiStore.setPlayerStatusHeight(height);
-      uiStore.setPlayerStatusTop(y);
+  // Function to measure absolute position on
+  const measureInWindow = useCallback(() => {
+    if (!playerStatusRef.current) return;
+
+    const nodeHandle = findNodeHandle(playerStatusRef.current);
+    if (nodeHandle) {
+      UIManager.measure(nodeHandle, (x, y, width, height, pageX, pageY) => {
+        if (height > 0) {
+          uiStore.setPlayerStatusHeight(height);
+          uiStore.setPlayerStatusTop(pageY);
+        }
+      });
     }
+  }, [uiStore.isLandscape]);
+
+  const onLayoutHandler = () => {
+    setTimeout(
+      () =>
+        requestAnimationFrame(() => {
+          measureInWindow();
+        }),
+      0,
+    );
   };
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      measureInWindow();
+    }, SCREEN_TRANSITION_TIMING);
+
+    return () => clearTimeout(timeoutId);
+  }, [uiStore.dimensions, uiStore.orientation, measureInWindow]);
 
   if (!playerState) {
     return null;
@@ -76,7 +103,7 @@ const PlayerStatusForHome = observer(() => {
           uiStore.setDetailedStatusViewShowing(true);
         }}
         style={{
-          zIndex: 10,
+          zIndex: 9999,
           position: "absolute",
           bottom: uiStore.tabHeight,
           width: uiStore.isLandscape ? "75%" : "100%",

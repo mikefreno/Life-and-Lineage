@@ -232,7 +232,10 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
 
     if (dungeonStore.hasPersistedState) {
       router.replace("/DungeonLevel");
-      wait(350).then(() => uiStore.markStoreAsLoaded("routing"));
+      wait(350).then(() => {
+        uiStore.markStoreAsLoaded("routing");
+        uiStore.markStoreAsLoaded("inventory");
+      });
       return;
     }
 
@@ -350,7 +353,6 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
         >
           <SystemBars
             style={uiStore.colorScheme == "dark" ? "light" : "dark"}
-            hidden={{ navigationBar: true }}
           />
           <ProjectedImage />
           <FleeModal />

@@ -208,7 +208,7 @@ const TabLayout = observer(() => {
             },
             animation:
               uiStore.reduceMotion || Platform.OS == "android"
-                ? "none"
+                ? "fade"
                 : "shift",
             tabBarButton: (props) => {
               const onPressWithVibration = (event: GestureResponderEvent) => {

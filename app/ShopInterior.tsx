@@ -214,14 +214,6 @@ const ShopInteriorScreen = observer(() => {
     );
   }
 
-  if (!initialized || !playerState || !uiStore.itemBlockSize) {
-    return (
-      <View style={[flex.columnCenter, { flex: 1 }]}>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
-
   return (
     <>
       <View
@@ -261,7 +253,17 @@ const ShopInteriorScreen = observer(() => {
           ]}
         >
           <View style={[flex.rowEvenly, { height: "40%" }]}>
-            <View style={[flex.columnEvenly, { width: "40%", height: "100%" }]}>
+            <View
+              style={[
+                flex.columnEvenly,
+                {
+                  width: "35%",
+                  height: "80%",
+                  justifyContent: "center",
+                  marginVertical: "auto",
+                },
+              ]}
+            >
               <Pressable
                 onLongPress={() => {
                   vibration({ style: "light" });
@@ -374,24 +376,22 @@ const ShopInteriorScreen = observer(() => {
               borderRadius: 8,
             }}
             disabled={
-              playerState.baseInventory.filter(
+              playerState?.baseInventory.filter(
                 (item) => item.itemClass === "junk",
               ).length === 0
             }
           >
             Sell all junk
           </GenericFlatButton>
-          <View style={{ flex: 1, width: "100%" }} collapsable={false}>
-            <InventoryRender
-              screen="shop"
-              displayItem={displayItem}
-              setDisplayItem={setDisplayItem}
-              targetBounds={[
-                { key: "shopInventory", bounds: shopInventoryBounds },
-              ]}
-              runOnSuccess={(item: Item[]) => sellStack(item)}
-            />
-          </View>
+          <InventoryRender
+            screen="shop"
+            displayItem={displayItem}
+            setDisplayItem={setDisplayItem}
+            targetBounds={[
+              { key: "shopInventory", bounds: shopInventoryBounds },
+            ]}
+            runOnSuccess={(item: Item[]) => sellStack(item)}
+          />
         </View>
       </TouchableWithoutFeedback>
       <PlayerStatusForSecondary />

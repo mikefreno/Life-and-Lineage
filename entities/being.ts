@@ -1,4 +1,4 @@
-import attacks from "../assets/json/enemyAttacks.json";
+import attacks from "@/assets/json/enemyAttacks.json";
 import {
   AttackUse,
   Attribute,
@@ -9,9 +9,9 @@ import {
   parseDamageTypeObject,
   Rarity,
 } from "@/utility/types";
-import { Condition } from "./conditions";
+import { Condition } from "@/entities/conditions";
 import * as Crypto from "expo-crypto";
-import { ThreatTable } from "./threatTable";
+import { ThreatTable } from "@/entities/threatTable";
 import {
   action,
   computed,
@@ -22,7 +22,7 @@ import {
 } from "mobx";
 import { RootStore } from "@/stores/RootStore";
 import { EnemyImageKeyOption } from "@/utility/enemyHelpers";
-import { Item } from "./item";
+import { Item } from "@/entities/item";
 import {
   damageReduction,
   statRounding,
@@ -33,10 +33,10 @@ import {
   getConditionEffectsOnMisc,
   getMagnitude,
 } from "@/utility/functions/conditions";
-import { BeingOptions } from "./entityTypes";
-import { Attack, PerTargetUse } from "./attack";
-import { PlayerCharacter } from "./character";
-import { Enemy } from "./creatures";
+import { BeingOptions } from "@/entities/entityTypes";
+import { Attack, PerTargetUse } from "@/entities/attack";
+import { PlayerCharacter } from "@/entities/character";
+import { Enemy } from "@/entities/creatures";
 
 export class Being {
   readonly id: string;
@@ -126,27 +126,28 @@ export class Being {
           }
         : null;
 
-    this.equipment =
-      props.equipment ?? props.isPlayerCharacter
-        ? {
-            mainHand: new Item({
-              rarity: Rarity.NORMAL,
-              prefix: null,
-              suffix: null,
-              name: "unarmored",
-              slot: "one-hand",
-              stats: { [Modifier.PhysicalDamage]: 1 },
-              baseValue: 0,
-              itemClass: ItemClassType.Melee,
-              attacks: ["punch"],
-              root: props.root,
-            }),
-            offHand: null,
-            head: null,
-            body: null,
-            quiver: null,
-          }
-        : null;
+    this.equipment = props.equipment
+      ? props.equipment
+      : props.isPlayerCharacter
+      ? {
+          mainHand: new Item({
+            rarity: Rarity.NORMAL,
+            prefix: null,
+            suffix: null,
+            name: "unarmored",
+            slot: "one-hand",
+            stats: { [Modifier.PhysicalDamage]: 1 },
+            baseValue: 0,
+            itemClass: ItemClassType.Melee,
+            attacks: ["punch"],
+            root: props.root,
+          }),
+          offHand: null,
+          head: null,
+          body: null,
+          quiver: null,
+        }
+      : null;
 
     this.root = props.root;
 
@@ -929,11 +930,16 @@ export class Being {
     return builtAttacks;
   }
 
+  get attacksHeldActive() {
+    return this.attacks.filter(
+      (attack) =>
+        attack.remainingTurnsActive && attack.remainingTurnsActive > 0,
+    );
+  }
   //---------------------------Equivalency---------------------------//
   public equals(otherBeingID: string) {
     return this.id === otherBeingID;
   }
-
   //---------------------------Battle---------------------------//
   /**
    * This method is meant to be overridden by derived classes. It currently chooses a random attack.
@@ -1143,7 +1149,6 @@ export class Being {
         case DamageType.MAGIC:
           return (this.magicDamage + attackDamage) * 1 - target.magicResistance;
         case DamageType.RAW:
-          console.log(attackDamage);
           return attackDamage * (isSpell ? this.magicPower : this.attackPower);
       }
     } else {

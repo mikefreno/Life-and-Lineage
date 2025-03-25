@@ -1,10 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback, useRef } from "react";
 import { View, Image } from "react-native";
 import { Text } from "@/components/Themed";
 import { InventoryItem } from "@/components/Draggable";
 import type { Item } from "@/entities/item";
 import { useDraggableStore, useRootStore } from "@/hooks/stores";
-import { useCallback, useRef } from "react";
 import { PlayerCharacter } from "@/entities/character";
 import UIStore from "@/stores/UIStore";
 import { DraggableDataStore } from "@/stores/DraggableDataStore";
@@ -32,18 +31,70 @@ interface EquipmentDisplayProps {
   >;
 }
 
-export default function EquipmentDisplay({
-  setDisplayItem,
-}: EquipmentDisplayProps) {
-  const { playerState, uiStore } = useRootStore();
-  const { draggableClassStore } = useDraggableStore();
-  const styles = useStyles();
-  const { getNormalizedSize, getNormalizedLineSize } = useScaling();
+type SlotType = "Head" | "Main-Hand" | "Off-Hand" | "Body" | "Quiver";
+const ALL_SLOTS: SlotType[] = [
+  "Head",
+  "Main-Hand",
+  "Body",
+  "Off-Hand",
+  "Quiver",
+];
 
-  if (playerState) {
+const EquipmentDisplay = observer(
+  ({ setDisplayItem }: EquipmentDisplayProps) => {
+    const { playerState, uiStore } = useRootStore();
+    const { draggableClassStore } = useDraggableStore();
+    const styles = useStyles();
+    const { getNormalizedSize, getNormalizedLineSize } = useScaling();
+
+    if (!playerState) return null;
+
     if (uiStore.dimensions.height < 500 && uiStore.isLandscape) {
       return (
         <View style={styles.rowEvenly}>
+          {ALL_SLOTS.map((slot) => (
+            <EquipmentSlot
+              key={slot}
+              slot={slot}
+              playerState={playerState}
+              uiStore={uiStore}
+              draggableClassStore={draggableClassStore}
+              setDisplayItem={setDisplayItem}
+              inventoryBounds={draggableClassStore.inventoryBounds}
+            />
+          ))}
+        </View>
+      );
+    }
+
+    return (
+      <View
+        style={{
+          paddingVertical: getNormalizedSize(8),
+          zIndex: 10,
+          flexDirection: "row",
+          justifyContent: "space-evenly",
+          width: "70%",
+          alignSelf: "center",
+        }}
+      >
+        <View style={styles.columnCenter}>
+          <View
+            style={{
+              height: uiStore.itemBlockSize + getNormalizedLineSize(20),
+              width: uiStore.itemBlockSize,
+            }}
+          />
+          <EquipmentSlot
+            slot="Main-Hand"
+            playerState={playerState}
+            uiStore={uiStore}
+            draggableClassStore={draggableClassStore}
+            setDisplayItem={setDisplayItem}
+            inventoryBounds={draggableClassStore.inventoryBounds}
+          />
+        </View>
+        <View style={styles.columnBetween}>
           <EquipmentSlot
             slot="Head"
             playerState={playerState}
@@ -52,61 +103,9 @@ export default function EquipmentDisplay({
             setDisplayItem={setDisplayItem}
             inventoryBounds={draggableClassStore.inventoryBounds}
           />
-          <EquipmentSlot
-            slot={"Main-Hand"}
-            playerState={playerState}
-            uiStore={uiStore}
-            draggableClassStore={draggableClassStore}
-            setDisplayItem={setDisplayItem}
-            inventoryBounds={draggableClassStore.inventoryBounds}
-          />
-          <EquipmentSlot
-            slot={"Body"}
-            playerState={playerState}
-            uiStore={uiStore}
-            draggableClassStore={draggableClassStore}
-            setDisplayItem={setDisplayItem}
-            inventoryBounds={draggableClassStore.inventoryBounds}
-          />
-          <EquipmentSlot
-            slot={"Off-Hand"}
-            playerState={playerState}
-            uiStore={uiStore}
-            draggableClassStore={draggableClassStore}
-            setDisplayItem={setDisplayItem}
-            inventoryBounds={draggableClassStore.inventoryBounds}
-          />
-          <EquipmentSlot
-            slot="Quiver"
-            playerState={playerState}
-            uiStore={uiStore}
-            draggableClassStore={draggableClassStore}
-            setDisplayItem={setDisplayItem}
-            inventoryBounds={draggableClassStore.inventoryBounds}
-          />
-        </View>
-      );
-    } else {
-      return (
-        <View
-          style={{
-            paddingVertical: getNormalizedSize(8),
-            zIndex: 10,
-            flexDirection: "row",
-            justifyContent: "space-evenly",
-            width: "70%",
-            alignSelf: "center",
-          }}
-        >
-          <View style={styles.columnCenter}>
-            <View
-              style={{
-                height: uiStore.itemBlockSize + getNormalizedLineSize(20), // size of an EquipmentSlot
-                width: uiStore.itemBlockSize,
-              }}
-            />
+          <View style={{ paddingTop: "30%" }}>
             <EquipmentSlot
-              slot={"Main-Hand"}
+              slot="Body"
               playerState={playerState}
               uiStore={uiStore}
               draggableClassStore={draggableClassStore}
@@ -114,52 +113,93 @@ export default function EquipmentDisplay({
               inventoryBounds={draggableClassStore.inventoryBounds}
             />
           </View>
-          <View style={styles.columnBetween}>
+        </View>
+        <View style={styles.columnCenter}>
+          <View style={{ marginRight: "-50%" }}>
             <EquipmentSlot
-              slot="Head"
+              slot="Quiver"
               playerState={playerState}
               uiStore={uiStore}
               draggableClassStore={draggableClassStore}
               setDisplayItem={setDisplayItem}
               inventoryBounds={draggableClassStore.inventoryBounds}
             />
+          </View>
+          <EquipmentSlot
+            slot="Off-Hand"
+            playerState={playerState}
+            uiStore={uiStore}
+            draggableClassStore={draggableClassStore}
+            setDisplayItem={setDisplayItem}
+            inventoryBounds={draggableClassStore.inventoryBounds}
+          />
+        </View>
+      </View>
+    );
+  },
+);
 
-            <View style={{ paddingTop: "30%" }}>
-              <EquipmentSlot
-                slot={"Body"}
-                playerState={playerState}
-                uiStore={uiStore}
-                draggableClassStore={draggableClassStore}
-                setDisplayItem={setDisplayItem}
-                inventoryBounds={draggableClassStore.inventoryBounds}
-              />
-            </View>
-          </View>
-          <View style={styles.columnCenter}>
-            <View style={{ marginRight: "-50%" }}>
-              <EquipmentSlot
-                slot="Quiver"
-                playerState={playerState}
-                uiStore={uiStore}
-                draggableClassStore={draggableClassStore}
-                setDisplayItem={setDisplayItem}
-                inventoryBounds={draggableClassStore.inventoryBounds}
-              />
-            </View>
-            <EquipmentSlot
-              slot={"Off-Hand"}
-              playerState={playerState}
-              uiStore={uiStore}
-              draggableClassStore={draggableClassStore}
-              setDisplayItem={setDisplayItem}
-              inventoryBounds={draggableClassStore.inventoryBounds}
-            />
-          </View>
-        </View>
-      );
-    }
+const useTargetBounds = (
+  draggableClassStore: DraggableDataStore,
+  inventoryBounds: any,
+) => {
+  return React.useMemo(
+    () => [
+      { key: "playerInventory", bounds: inventoryBounds },
+      {
+        key: "head",
+        bounds: draggableClassStore.ancillaryBoundsMap.get("head"),
+      },
+      {
+        key: "main-hand",
+        bounds: draggableClassStore.ancillaryBoundsMap.get("main-hand"),
+      },
+      {
+        key: "off-hand",
+        bounds: draggableClassStore.ancillaryBoundsMap.get("off-hand"),
+      },
+      {
+        key: "body",
+        bounds: draggableClassStore.ancillaryBoundsMap.get("body"),
+      },
+      {
+        key: "quiver",
+        bounds: draggableClassStore.ancillaryBoundsMap.get("quiver"),
+      },
+      {
+        key: "stash",
+        bounds: draggableClassStore.ancillaryBoundsMap.get("stash"),
+      },
+    ],
+    [draggableClassStore.ancillaryBoundsMap, inventoryBounds],
+  );
+};
+
+const getItemsForSlot = (
+  slot: SlotType,
+  playerState: PlayerCharacter,
+): Item[] => {
+  if (!playerState.equipment) return [];
+
+  switch (slot) {
+    case "Head":
+      return playerState.equipment.head ? [playerState.equipment.head] : [];
+    case "Main-Hand":
+      return playerState.equipment.mainHand.name.toLowerCase() !== "unarmored"
+        ? [playerState.equipment.mainHand]
+        : [];
+    case "Off-Hand":
+      return playerState.equipment.offHand
+        ? [playerState.equipment.offHand]
+        : [];
+    case "Body":
+      return playerState.equipment.body ? [playerState.equipment.body] : [];
+    case "Quiver":
+      return playerState.equipment.quiver ?? [];
+    default:
+      return [];
   }
-}
+};
 
 const EquipmentSlot = observer(
   ({
@@ -170,7 +210,7 @@ const EquipmentSlot = observer(
     setDisplayItem,
     inventoryBounds,
   }: {
-    slot: "Head" | "Main-Hand" | "Off-Hand" | "Body" | "Quiver";
+    slot: SlotType;
     playerState: PlayerCharacter;
     uiStore: UIStore;
     draggableClassStore: DraggableDataStore;
@@ -190,198 +230,141 @@ const EquipmentSlot = observer(
       height: number;
     } | null;
   }) => {
-    let itemStack: Item[] = [];
     const selfRef = useRef<View | null>(null);
     const styles = useStyles();
     const slotKey = slot.toLowerCase();
     const isFocused = useIsFocused();
-    if (!playerState.equipment) return;
+    const targetBounds = useTargetBounds(draggableClassStore, inventoryBounds);
 
-    if (playerState) {
-      switch (slot) {
-        case "Head":
-          playerState.equipment.head &&
-            itemStack.push(playerState.equipment.head);
-          break;
-        case "Main-Hand":
-          playerState.equipment.mainHand.name.toLowerCase() !== "unarmored" &&
-            itemStack.push(playerState.equipment.mainHand);
-          break;
-        case "Off-Hand":
-          playerState.equipment.offHand &&
-            itemStack.push(playerState.equipment.offHand);
-          break;
-        case "Body":
-          playerState.equipment.body &&
-            itemStack.push(playerState.equipment.body);
-          break;
-        case "Quiver":
-          itemStack = playerState.equipment.quiver ?? [];
-          break;
+    if (!playerState.equipment || !uiStore.itemBlockSize) return null;
+
+    const itemStack = getItemsForSlot(slot, playerState);
+    const isTwoHanded = playerState.equipment.mainHand?.slot === "two-hand";
+
+    const measureAndSetBounds = useCallback(() => {
+      if (!selfRef.current) return;
+
+      selfRef.current.measure((x, y, w, h, pageX, pageY) => {
+        draggableClassStore.setAncillaryBounds(slotKey, {
+          x: pageX,
+          y: pageY,
+          width: w,
+          height: h,
+        });
+      });
+    }, [draggableClassStore, slotKey]);
+
+    useEffect(() => {
+      let timeoutId: NodeJS.Timeout;
+
+      if (isFocused) {
+        timeoutId = setTimeout(measureAndSetBounds, 150);
+      } else {
+        draggableClassStore.removeAncillaryBounds(slotKey);
       }
 
-      const isTwoHanded = playerState.equipment.mainHand?.slot === "two-hand";
+      return () => {
+        timeoutId && clearTimeout(timeoutId);
+        draggableClassStore.removeAncillaryBounds(slotKey);
+      };
+    }, [isFocused, measureAndSetBounds, draggableClassStore, slotKey]);
 
-      while (!uiStore.itemBlockSize) {
-        return <></>;
-      }
-
-      const measureAndSetBounds = useCallback(() => {
-        if (selfRef.current) {
-          selfRef.current.measure((x, y, w, h, pageX, pageY) => {
-            draggableClassStore.setAncillaryBounds(slotKey, {
-              x: pageX,
-              y: pageY,
-              width: w,
-              height: h,
-            });
-          });
-        }
-      }, [draggableClassStore, slotKey]);
-
-      useEffect(() => {
-        if (isFocused) {
-          setTimeout(() => {
-            measureAndSetBounds();
-          }, 150);
+    const handleSuccessfulDrop = useCallback(
+      (droppedOnKey: string) => {
+        if (droppedOnKey === "stash") {
+          playerState.unEquipItem(itemStack, false);
+          playerState.root.stashStore.addItem(itemStack);
         } else {
-          draggableClassStore.removeAncillaryBounds(slotKey);
+          playerState.unEquipItem(itemStack);
         }
+        setDisplayItem(null);
+      },
+      [itemStack, playerState, setDisplayItem],
+    );
 
-        return () => {
-          draggableClassStore.removeAncillaryBounds(slotKey);
-        };
-      }, [isFocused, measureAndSetBounds, draggableClassStore, slotKey]);
+    const handleSetDisplayItem = useCallback(
+      (params: any) => {
+        setDisplayItem(params);
+      },
+      [setDisplayItem],
+    );
 
-      const setBoundsOnLayout = useCallback(() => {
-        if (!isFocused) return;
-        setTimeout(() => {
-          measureAndSetBounds();
-        }, 100);
-      }, [isFocused, measureAndSetBounds]);
+    const setBoundsOnLayout = useCallback(() => {
+      if (!isFocused) return;
+      const timeoutId = setTimeout(measureAndSetBounds, 100);
+      return () => clearTimeout(timeoutId);
+    }, [isFocused, measureAndSetBounds]);
 
-      return (
-        <View style={styles.columnCenter}>
-          <Text
-            style={{
-              paddingBottom: 2,
-              textAlign: "center",
-            }}
-          >
-            {slot}
-          </Text>
-          <View onLayout={setBoundsOnLayout} ref={selfRef}>
-            {itemStack.length > 0 ? (
-              <View
-                style={[
-                  styles.equipmentSlotContainer,
-                  {
-                    height: uiStore.itemBlockSize,
-                    width: uiStore.itemBlockSize,
-                  },
-                ]}
-              >
-                <View style={{ marginLeft: -1, marginTop: -1 }}>
-                  <InventoryItem
-                    item={itemStack}
-                    setDisplayItem={(params) => {
-                      setDisplayItem(params);
-                    }}
-                    targetBounds={[
-                      { key: "playerInventory", bounds: inventoryBounds },
-                      {
-                        key: "head",
-                        bounds:
-                          draggableClassStore.ancillaryBoundsMap.get("head"),
-                      },
-                      {
-                        key: "main-hand",
-                        bounds:
-                          draggableClassStore.ancillaryBoundsMap.get(
-                            "main-hand",
-                          ),
-                      },
-                      {
-                        key: "off-hand",
-                        bounds:
-                          draggableClassStore.ancillaryBoundsMap.get(
-                            "off-hand",
-                          ),
-                      },
-                      {
-                        key: "body",
-                        bounds:
-                          draggableClassStore.ancillaryBoundsMap.get("body"),
-                      },
-                      {
-                        key: "quiver",
-                        bounds:
-                          draggableClassStore.ancillaryBoundsMap.get("quiver"),
-                      },
-                      {
-                        key: "stash",
-                        bounds:
-                          draggableClassStore.ancillaryBoundsMap.get("stash"),
-                      },
-                    ]}
-                    runOnSuccess={(droppedOnKey) => {
-                      if (droppedOnKey === "stash") {
-                        playerState.unEquipItem(itemStack, false);
-                        playerState.root.stashStore.addItem(itemStack);
-                      } else {
-                        playerState.unEquipItem(itemStack);
-                      }
-                      setDisplayItem(null);
-                    }}
-                    displayItem={null}
-                    isDraggable={true}
-                    bgColor={
-                      itemStack[0].playerHasRequirements ? "#a1a1aa" : "#991b1b"
-                    }
-                  />
-                </View>
-              </View>
-            ) : slot === "Off-Hand" && isTwoHanded ? (
-              <View
-                style={[
-                  styles.equipmentSlotContainer,
-                  {
-                    alignItems: "center",
-                    height: uiStore.itemBlockSize,
-                    width: uiStore.itemBlockSize,
-                    backgroundColor: playerState.equipment.mainHand
-                      .playerHasRequirements
-                      ? "#a1a1aa"
-                      : "#991b1b",
-                  },
-                ]}
-              >
-                <Image
-                  style={[
-                    { marginVertical: "auto", opacity: 0.5 },
-                    {
-                      height: Math.min(uiStore.itemBlockSize * 0.65, 52),
-                      width: Math.min(uiStore.itemBlockSize * 0.65, 52),
-                    },
-                  ]}
-                  source={playerState.equipment.mainHand?.getItemIcon()}
+    const bgColor = itemStack[0]?.playerHasRequirements ? "#a1a1aa" : "#991b1b";
+
+    return (
+      <View style={styles.columnCenter}>
+        <Text style={{ paddingBottom: 2, textAlign: "center" }}>{slot}</Text>
+        <View onLayout={setBoundsOnLayout} ref={selfRef}>
+          {itemStack.length > 0 ? (
+            <View
+              style={[
+                styles.equipmentSlotContainer,
+                {
+                  height: uiStore.itemBlockSize,
+                  width: uiStore.itemBlockSize,
+                },
+              ]}
+            >
+              <View style={{ marginLeft: -1, marginTop: -1 }}>
+                <InventoryItem
+                  item={itemStack}
+                  setDisplayItem={handleSetDisplayItem}
+                  targetBounds={targetBounds}
+                  runOnSuccess={handleSuccessfulDrop}
+                  displayItem={null}
+                  isDraggable={true}
+                  bgColor={bgColor}
                 />
               </View>
-            ) : (
-              <View
+            </View>
+          ) : slot === "Off-Hand" && isTwoHanded ? (
+            <View
+              style={[
+                styles.equipmentSlotContainer,
+                {
+                  alignItems: "center",
+                  height: uiStore.itemBlockSize,
+                  width: uiStore.itemBlockSize,
+                  backgroundColor: playerState.equipment.mainHand
+                    .playerHasRequirements
+                    ? "#a1a1aa"
+                    : "#991b1b",
+                },
+              ]}
+            >
+              <Image
                 style={[
-                  styles.equipmentSlotContainer,
+                  { marginVertical: "auto", opacity: 0.5 },
                   {
-                    zIndex: 0,
-                    height: uiStore.itemBlockSize,
-                    width: uiStore.itemBlockSize,
+                    height: Math.min(uiStore.itemBlockSize * 0.65, 52),
+                    width: Math.min(uiStore.itemBlockSize * 0.65, 52),
                   },
                 ]}
+                source={playerState.equipment.mainHand?.getItemIcon()}
               />
-            )}
-          </View>
+            </View>
+          ) : (
+            <View
+              style={[
+                styles.equipmentSlotContainer,
+                {
+                  zIndex: 0,
+                  height: uiStore.itemBlockSize,
+                  width: uiStore.itemBlockSize,
+                },
+              ]}
+            />
+          )}
         </View>
-      );
-    }
+      </View>
+    );
   },
 );
+
+export default EquipmentDisplay;

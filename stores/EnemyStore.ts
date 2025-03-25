@@ -72,6 +72,7 @@ export default class EnemyStore {
       autocompleteType: "enemyOptions",
     });
   }
+  //TODO
   _enemyTester(val: string) {
     let enemyJSON = enemiesJSON.find((json) => json.name == val);
     if (!enemyJSON) {
@@ -83,13 +84,6 @@ export default class EnemyStore {
         Math.random() *
           (enemyJSON.healthRange.maximum - enemyJSON.healthRange.minimum + 1),
       ) + enemyJSON.healthRange.minimum;
-    const ap =
-      Math.floor(
-        Math.random() *
-          (enemyJSON.attackPowerRange.maximum -
-            enemyJSON.attackPowerRange.minimum +
-            1),
-      ) + enemyJSON.attackPowerRange.minimum;
 
     this.clearEnemyList();
     const enemy = new Enemy({
@@ -99,11 +93,10 @@ export default class EnemyStore {
       baseHealth: hp,
       currentSanity: enemyJSON.sanity,
       baseSanity: enemyJSON.sanity,
-      attackPower: ap,
       baseArmor: enemyJSON.armorValue,
-      currentEnergy: enemyJSON.energy.maximum,
-      baseEnergy: enemyJSON.energy.maximum,
-      energyRegen: enemyJSON.energy.regen,
+      currentMana: enemyJSON.mana.maximum,
+      baseMana: enemyJSON.mana.maximum,
+      baseManaRegen: enemyJSON.mana.regen,
       goldDropRange: enemyJSON.goldDropRange,
       drops: enemyJSON.drops as {
         item: string;
@@ -111,7 +104,6 @@ export default class EnemyStore {
         chance: number;
       }[],
       attackStrings: enemyJSON.attackStrings,
-      animationStrings: enemyJSON.animationStrings,
       sprite: enemyJSON.sprite as EnemyImageKeyOption,
       root: this.root,
     });

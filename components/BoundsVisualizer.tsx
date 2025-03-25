@@ -4,9 +4,11 @@ import { observer } from "mobx-react-lite";
 
 import { useDraggableStore } from "@/hooks/stores";
 import { Text } from "@/components/Themed";
+import { useScaling } from "@/hooks/scaling";
 
 const BoundsVisualizer = observer(() => {
   const { draggableClassStore } = useDraggableStore();
+  const { getNormalizedSize } = useScaling();
 
   const ancillaryBoundsEntries = Array.from(
     draggableClassStore.ancillaryBoundsMap.entries(),
@@ -77,7 +79,7 @@ const BoundsVisualizer = observer(() => {
               style={{
                 color: "black",
                 fontWeight: "bold",
-                fontSize: normalize(10),
+                fontSize: getNormalizedSize(10),
                 textAlign: "center",
                 backgroundColor: "rgba(255, 255, 255, 0.7)",
                 padding: 4,

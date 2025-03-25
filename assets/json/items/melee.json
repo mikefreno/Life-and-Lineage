@@ -35,7 +35,8 @@
     ],
     "icon": "Torch",
     "stats": {
-      "physicalDamage": 2.5
+      "physicalDamage": 1.5,
+      "fireDamage": 1.5
     }
   },
   {
@@ -182,7 +183,8 @@
     ],
     "icon": "Knife",
     "stats": {
-      "physicalDamage": 22.0
+      "physicalDamage": 18.0,
+      "poisonDamage": 4.0
     },
     "requirements": {
       "strength": 10,
@@ -230,7 +232,8 @@
     ],
     "icon": "Golden_Sword",
     "stats": {
-      "physicalDamage": 35.0
+      "physicalDamage": 30.0,
+      "magicDamage": 5.0
     },
     "requirements": {
       "strength": 25,
@@ -278,7 +281,8 @@
     ],
     "icon": "Golden_Sword",
     "stats": {
-      "physicalDamage": 33.0
+      "physicalDamage": 27.0,
+      "holyDamage": 6.0
     },
     "requirements": {
       "strength": 30,

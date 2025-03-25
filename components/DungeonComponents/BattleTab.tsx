@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 import { ThemedView, Text } from "@/components/Themed";
 import {
   Pressable,
@@ -51,6 +51,7 @@ const BattleTab = observer(
     const { displayItem, setDisplayItem } = useLootState();
     const { draggableClassStore } = useDraggableStore();
     const { setShowTargetSelection } = useCombatState();
+    const initialRenderRef = useRef(true);
 
     const [combinedData, setCombinedData] = useState<Attack[]>([]);
 
@@ -93,6 +94,25 @@ const BattleTab = observer(
       },
       [dungeonStore.currentSpecialEncounter],
     );
+
+    useEffect(() => {
+      if (initialRenderRef.current) {
+        initialRenderRef.current = false;
+
+        const tempDisplayItem = displayItem;
+        setHiddenDisplayItem(tempDisplayItem);
+        setDisplayItem(null);
+
+        setTimeout(() => {
+          if (hiddenDisplayItem) {
+            setDisplayItem(hiddenDisplayItem);
+            setHiddenDisplayItem(null);
+          } else if (tempDisplayItem) {
+            setDisplayItem(tempDisplayItem);
+          }
+        }, 0);
+      }
+    }, []);
 
     useEffect(() => {
       if (attackDetails) {
@@ -499,8 +519,8 @@ const AttackItem = observer(
   },
 );
 
-const PassButton = ({ onPress }: { onPress: () => void }) => {
-  const { uiStore, enemyStore, playerState } = useRootStore();
+const PassButton = observer(({ onPress }: { onPress: () => void }) => {
+  const { uiStore, enemyStore } = useRootStore();
   const styles = useStyles();
 
   return (
@@ -517,16 +537,11 @@ const PassButton = ({ onPress }: { onPress: () => void }) => {
         disableTopLevelStyling
         onPress={onPress}
         backgroundColor={uiStore.colorScheme == "light" ? "#d4d4d8" : "#27272a"}
-        buttonStyle={[
-          styles.actionButton,
-          {
-            opacity:
-              playerState?.isStunned || enemyStore.enemyTurnOngoing ? 0.5 : 1.0,
-          },
-        ]}
+        style={{ opacity: enemyStore.enemyTurnOngoing ? 0.5 : 1 }}
+        buttonStyle={styles.actionButton}
       >
         <Text style={styles["text-xl"]}>Use</Text>
       </GenericRaisedButton>
     </ThemedView>
   );
-};
+});

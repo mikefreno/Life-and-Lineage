@@ -22,8 +22,8 @@ import {
 import BlessingDisplay from "@/components/BlessingsDisplay";
 import { radius, useStyles } from "@/hooks/styles";
 import Modal from "react-native-modal";
-import { normalize } from "@sentry/core";
 import { useNavigation } from "expo-router";
+import { useScaling } from "@/hooks/scaling";
 
 const CheckpointModal = ({
   isVisible,
@@ -237,14 +237,15 @@ const CheckpointModal = ({
   const renderGame = ({ item: gameId }: { item: number }) => {
     const gameCheckpoints = checkpoints[gameId] || [];
     const latestCheckpoint = gameCheckpoints[0];
+    const { getNormalizedSize } = useScaling();
 
     if (!latestCheckpoint) return null;
 
     const rotateAnimation = getRotationAnimation(gameId);
     const heightAnimation = getHeightAnimation(gameId);
 
-    const CHECKPOINT_HEIGHT = normalize(140);
-    const PADDING = normalize(12);
+    const CHECKPOINT_HEIGHT = getNormalizedSize(140);
+    const PADDING = getNormalizedSize(12);
     const calculatedHeight = CHECKPOINT_HEIGHT + PADDING;
 
     const spin = rotateAnimation.interpolate({

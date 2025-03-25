@@ -1,7 +1,5 @@
 import { ColorValue } from "react-native";
-import type { PlayerCharacter } from "@/entities/character";
 import type { Condition } from "@/entities/conditions";
-import type { Enemy, Minion } from "@/entities/creatures";
 import { VFXImageOptions } from "@/utility/vfxmapping";
 import { Being } from "@/entities/being";
 
@@ -170,6 +168,10 @@ export function stringToModifier(key: string): Modifier | undefined {
       return Modifier.LightningResistance;
     case "poisonresistance":
       return Modifier.PoisonResistance;
+    case "holyresistance":
+      return Modifier.HolyResistance;
+    case "magicresistance":
+      return Modifier.MagicResistance;
     case "physicaldamage":
       return Modifier.PhysicalDamage;
     case "physicaldamageadded":
@@ -200,6 +202,18 @@ export function stringToModifier(key: string): Modifier | undefined {
       return Modifier.PoisonDamageAdded;
     case "poisondamagemultiplier":
       return Modifier.PoisonDamageMultiplier;
+    case "holydamage":
+      return Modifier.HolyDamage;
+    case "holydamageadded":
+      return Modifier.HolyDamageAdded;
+    case "holydamagemultiplier":
+      return Modifier.HolyDamageMultiplier;
+    case "magicdamage":
+      return Modifier.MagicDamage;
+    case "magicdamageadded":
+      return Modifier.MagicDamageAdded;
+    case "magicdamagemultiplier":
+      return Modifier.MagicDamageMultiplier;
     default:
       return Number.parseInt(key) as Modifier;
   }

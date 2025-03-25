@@ -149,14 +149,14 @@ export const useEnemyManagement = () => {
           );
 
           //Indicates an attack took place (could be a miss!) (Null indicates a failure - either had an execution condition or was stunned)
-          if (enemyAttackRes.targetResults && enemyAttackRes.attack) {
+          if (enemyAttackRes.targetResults) {
             for (const res of enemyAttackRes.targetResults) {
               switch (res.use.result) {
                 case AttackUse.success:
                   animStore?.addToAnimationQueue(
                     animStore.getAttackQueue(
                       (enemyAttackRes.attack
-                        .animation as AnimationOptions | null) ?? "attack_1",
+                        ?.animation as AnimationOptions | null) ?? "attack_1",
                     ),
                   );
                   break;
@@ -164,7 +164,7 @@ export const useEnemyManagement = () => {
                   animStore?.addToAnimationQueue(
                     animStore.getAttackQueue(
                       (enemyAttackRes.attack
-                        .animation as AnimationOptions | null) ?? "attack_1",
+                        ?.animation as AnimationOptions | null) ?? "attack_1",
                     ),
                   );
                   break;
@@ -172,7 +172,7 @@ export const useEnemyManagement = () => {
                   animStore?.addToAnimationQueue(
                     animStore.getAttackQueue(
                       (enemyAttackRes.attack
-                        .animation as AnimationOptions | null) ?? "attack_1",
+                        ?.animation as AnimationOptions | null) ?? "attack_1",
                     ),
                   );
 

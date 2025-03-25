@@ -1,6 +1,7 @@
 import { RootStore } from "@/stores/RootStore";
 import {
   action,
+  computed,
   makeObservable,
   observable,
   reaction,
@@ -49,6 +50,8 @@ export class PlayerAnimationStore {
       clearAnimation: action,
       setTextString: action,
       setPassed: action,
+
+      playerTurnOngoing: computed,
     });
 
     reaction(
@@ -95,6 +98,7 @@ export class PlayerAnimationStore {
   setTextString(message: string) {
     this.textString = message;
   }
+
   get playerTurnOngoing() {
     return !!this.animationSet || this.usedPass;
   }
