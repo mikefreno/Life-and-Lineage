@@ -536,8 +536,6 @@ export class SpecialEncounter {
           enemyJSON.goldDropRange.maximum *= this.scaler;
           enemyJSON.healthRange.minimum *= this.scaler;
           enemyJSON.healthRange.maximum *= this.scaler;
-          enemyJSON.attackPowerRange.minimum *= this.scaler;
-          enemyJSON.attackPowerRange.maximum *= this.scaler;
         }
         const hp =
           Math.floor(
@@ -546,13 +544,6 @@ export class SpecialEncounter {
                 enemyJSON.healthRange.minimum +
                 1),
           ) + enemyJSON.healthRange.minimum;
-        const ap =
-          Math.floor(
-            Math.random() *
-              (enemyJSON.attackPowerRange.maximum -
-                enemyJSON.attackPowerRange.minimum +
-                1),
-          ) + enemyJSON.attackPowerRange.minimum;
 
         const made = new Enemy({
           beingType: enemyJSON.beingType as BeingType,
@@ -561,11 +552,10 @@ export class SpecialEncounter {
           baseHealth: hp,
           currentSanity: enemyJSON.sanity,
           baseSanity: enemyJSON.sanity,
-          attackPower: ap,
           baseArmor: enemyJSON.armorValue,
-          currentEnergy: enemyJSON.energy.maximum,
-          baseEnergy: enemyJSON.energy.maximum,
-          energyRegen: enemyJSON.energy.regen,
+          currentMana: enemyJSON.mana.maximum,
+          baseMana: enemyJSON.mana.maximum,
+          baseManaRegen: enemyJSON.mana.regen,
           goldDropRange: enemyJSON.goldDropRange,
           drops: enemyJSON.drops,
           attackStrings: enemyJSON.attackStrings,

@@ -196,6 +196,7 @@ export class Being {
 
       physicalDamageReduction: computed,
       physicalDamage: computed,
+      physicalDamageNoWeapon: computed,
 
       fireDamage: computed,
       coldDamage: computed,
@@ -203,6 +204,12 @@ export class Being {
       poisonDamage: computed,
       holyDamage: computed,
       magicDamage: computed,
+      fireDamageNoWeapon: computed,
+      coldDamageNoWeapon: computed,
+      lightningDamageNoWeapon: computed,
+      poisonDamageNoWeapon: computed,
+      holyDamageNoWeapon: computed,
+      magicDamageNoWeapon: computed,
       equipmentStats: computed,
 
       totalStrength: computed,
@@ -766,6 +773,7 @@ export class Being {
     addedDamageModifier: Modifier,
     multiplierModifier: Modifier,
     base: number,
+    usesWeapon?: boolean,
   ): number {
     let baseDamage = base;
     let addedDamage = 0;
@@ -774,9 +782,13 @@ export class Being {
     if (this.equipment) {
       for (const [_, item] of Object.entries(this.equipment)) {
         if (Array.isArray(item)) {
-          baseDamage += item[0].stats?.get(baseDamageModifier) || 0;
+          baseDamage += usesWeapon
+            ? item[0].stats?.get(baseDamageModifier) || 0 // the base damage of an item is not added for spells that do not use weapons
+            : 0;
         } else if (item && item.stats) {
-          baseDamage += item.stats.get(baseDamageModifier) || 0;
+          baseDamage += usesWeapon
+            ? item.stats.get(baseDamageModifier) || 0
+            : 0; // the base damage of an item is not added for spells that do not use weapons
           addedDamage += item.stats.get(addedDamageModifier) || 0;
           multiplier += item.stats.get(multiplierModifier) || 0;
         }
@@ -792,6 +804,7 @@ export class Being {
       Modifier.PhysicalDamageAdded,
       Modifier.PhysicalDamageMultiplier,
       this.baseDamageTable[DamageType.PHYSICAL] ?? 0,
+      true,
     );
 
     return calc;
@@ -803,6 +816,7 @@ export class Being {
       Modifier.FireDamageAdded,
       Modifier.FireDamageMultiplier,
       this.baseDamageTable[DamageType.FIRE] ?? 0,
+      true,
     );
   }
 
@@ -812,6 +826,7 @@ export class Being {
       Modifier.ColdDamageAdded,
       Modifier.ColdDamageMultiplier,
       this.baseDamageTable[DamageType.COLD] ?? 0,
+      true,
     );
   }
 
@@ -821,6 +836,7 @@ export class Being {
       Modifier.LightningDamageAdded,
       Modifier.LightningDamageMultiplier,
       this.baseDamageTable[DamageType.LIGHTNING] ?? 0,
+      true,
     );
   }
 
@@ -830,6 +846,7 @@ export class Being {
       Modifier.PoisonDamageAdded,
       Modifier.PoisonDamageMultiplier,
       this.baseDamageTable[DamageType.POISON] ?? 0,
+      true,
     );
   }
 
@@ -839,6 +856,7 @@ export class Being {
       Modifier.HolyDamageAdded,
       Modifier.HolyDamageMultiplier,
       this.baseDamageTable[DamageType.HOLY] ?? 0,
+      true,
     );
   }
 
@@ -848,8 +866,82 @@ export class Being {
       Modifier.MagicDamageAdded,
       Modifier.MagicDamageMultiplier,
       this.baseDamageTable[DamageType.MAGIC] ?? 0,
+      true,
     );
   }
+
+  get physicalDamageNoWeapon(): number {
+    const calc = this.calculateTotalDamage(
+      Modifier.PhysicalDamage,
+      Modifier.PhysicalDamageAdded,
+      Modifier.PhysicalDamageMultiplier,
+      this.baseDamageTable[DamageType.PHYSICAL] ?? 0,
+      false,
+    );
+
+    return calc;
+  }
+
+  get fireDamageNoWeapon(): number {
+    return this.calculateTotalDamage(
+      Modifier.FireDamage,
+      Modifier.FireDamageAdded,
+      Modifier.FireDamageMultiplier,
+      this.baseDamageTable[DamageType.FIRE] ?? 0,
+      false,
+    );
+  }
+
+  get coldDamageNoWeapon(): number {
+    return this.calculateTotalDamage(
+      Modifier.ColdDamage,
+      Modifier.ColdDamageAdded,
+      Modifier.ColdDamageMultiplier,
+      this.baseDamageTable[DamageType.COLD] ?? 0,
+      false,
+    );
+  }
+
+  get lightningDamageNoWeapon(): number {
+    return this.calculateTotalDamage(
+      Modifier.LightningDamage,
+      Modifier.LightningDamageAdded,
+      Modifier.LightningDamageMultiplier,
+      this.baseDamageTable[DamageType.LIGHTNING] ?? 0,
+      false,
+    );
+  }
+
+  get poisonDamageNoWeapon(): number {
+    return this.calculateTotalDamage(
+      Modifier.PoisonDamage,
+      Modifier.PoisonDamageAdded,
+      Modifier.PoisonDamageMultiplier,
+      this.baseDamageTable[DamageType.POISON] ?? 0,
+      false,
+    );
+  }
+
+  get holyDamageNoWeapon(): number {
+    return this.calculateTotalDamage(
+      Modifier.HolyDamage,
+      Modifier.HolyDamageAdded,
+      Modifier.HolyDamageMultiplier,
+      this.baseDamageTable[DamageType.HOLY] ?? 0,
+      false,
+    );
+  }
+
+  get magicDamageNoWeapon(): number {
+    return this.calculateTotalDamage(
+      Modifier.MagicDamage,
+      Modifier.MagicDamageAdded,
+      Modifier.MagicDamageMultiplier,
+      this.baseDamageTable[DamageType.MAGIC] ?? 0,
+      false,
+    );
+  }
+
   //---------------------------Conditions---------------------------//
   /**
    * Adds a condition to the creature's list of conditions. Sets the `on` property.
@@ -1122,62 +1214,124 @@ export class Being {
     type: DamageType,
     attackDamage: number,
     isSpell: boolean,
+    usesWeapon: boolean,
     target?: Being,
   ) {
     if (target) {
       switch (type) {
         case DamageType.PHYSICAL:
           return (
-            (this.physicalDamage + attackDamage) *
+            (usesWeapon
+              ? this.physicalDamage
+              : this.physicalDamageNoWeapon + attackDamage) *
             (1 - target.physicalDamageReduction)
           );
         case DamageType.FIRE:
-          return (this.fireDamage + attackDamage) * (1 - target.fireResistance);
+          return (
+            (usesWeapon
+              ? this.fireDamage
+              : this.fireDamageNoWeapon + attackDamage) *
+            (1 - target.fireResistance)
+          );
         case DamageType.COLD:
-          return (this.coldDamage + attackDamage) * 1 - target.coldResistance;
+          return (
+            (usesWeapon
+              ? this.coldDamage
+              : this.coldDamageNoWeapon + attackDamage) *
+            (1 - target.coldResistance)
+          );
         case DamageType.LIGHTNING:
           return (
-            (this.lightningDamage + attackDamage) * 1 -
-            target.lightningResistance
+            (usesWeapon
+              ? this.lightningDamage
+              : this.lightningDamageNoWeapon + attackDamage) *
+            (1 - target.lightningResistance)
           );
         case DamageType.POISON:
           return (
-            (this.poisonDamage + attackDamage) * 1 - target.poisonResistance
+            (usesWeapon
+              ? this.poisonDamage
+              : this.poisonDamageNoWeapon + attackDamage) *
+            (1 - target.poisonResistance)
           );
         case DamageType.HOLY:
-          return (this.holyDamage + attackDamage) * 1 - target.holyResistance;
+          return (
+            (usesWeapon
+              ? this.holyDamage
+              : this.holyDamageNoWeapon + attackDamage) *
+            (1 - target.holyResistance)
+          );
         case DamageType.MAGIC:
-          return (this.magicDamage + attackDamage) * 1 - target.magicResistance;
+          return (
+            (usesWeapon
+              ? this.magicDamage
+              : this.magicDamageNoWeapon + attackDamage) *
+            (1 - target.magicResistance)
+          );
         case DamageType.RAW:
           return attackDamage * (isSpell ? this.magicPower : this.attackPower);
       }
     } else {
       switch (type) {
         case DamageType.PHYSICAL:
-          return (this.physicalDamage + attackDamage) * this.attackPower;
+          return (
+            (usesWeapon
+              ? this.physicalDamage
+              : this.physicalDamageNoWeapon + attackDamage) * this.attackPower
+          );
         case DamageType.FIRE:
-          return this.fireDamage * this.magicPower + attackDamage;
+          return (
+            (usesWeapon ? this.fireDamage : this.fireDamageNoWeapon) *
+              this.magicPower +
+            attackDamage
+          );
         case DamageType.COLD:
-          return this.coldDamage * this.magicPower + attackDamage;
+          return (
+            (usesWeapon ? this.coldDamage : this.coldDamageNoWeapon) *
+              this.magicPower +
+            attackDamage
+          );
         case DamageType.LIGHTNING:
-          return this.lightningDamage * this.magicPower + attackDamage;
+          return (
+            (usesWeapon ? this.lightningDamage : this.lightningDamageNoWeapon) *
+              this.magicPower +
+            attackDamage
+          );
         case DamageType.POISON:
-          return this.poisonDamage * this.magicPower + attackDamage;
+          return (
+            (usesWeapon ? this.poisonDamage : this.poisonDamageNoWeapon) *
+              this.magicPower +
+            attackDamage
+          );
         case DamageType.HOLY:
-          return this.holyDamage * this.magicPower + attackDamage;
+          return (
+            (usesWeapon ? this.holyDamage : this.holyDamageNoWeapon) *
+              this.magicPower +
+            attackDamage
+          );
         case DamageType.MAGIC:
-          return this.magicDamage * this.magicPower + attackDamage;
+          return (
+            (usesWeapon ? this.magicDamage : this.magicDamageNoWeapon) *
+              this.magicPower +
+            attackDamage
+          );
         case DamageType.RAW:
           return attackDamage * (isSpell ? this.magicPower : this.attackPower);
       }
     }
   }
 
-  public calculateAttackDamage(
-    baseDamageMap: { [key in DamageType]?: number } | null,
-    isSpell: boolean,
-    target?: Being,
-  ) {
+  public calculateAttackDamage({
+    baseDamageMap,
+    isSpell,
+    usesWeapon,
+    target,
+  }: {
+    baseDamageMap: { [key in DamageType]?: number } | null;
+    isSpell: boolean;
+    usesWeapon: boolean;
+    target?: Being;
+  }) {
     let cumulativeDamage = 0;
 
     if (baseDamageMap == null)
@@ -1215,6 +1369,7 @@ export class Being {
           damageType,
           amount,
           isSpell,
+          usesWeapon,
           target,
         );
       }

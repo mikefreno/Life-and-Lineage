@@ -226,13 +226,7 @@ export class Attack {
     });
 
     const perHitDamage =
-      this.user.calculateAttackDamage(
-        this.damageTable,
-        this.element != null,
-        target,
-      ).cumulativeDamage *
-        damageMult +
-      damageFlat;
+      this.damage(target).cumulativeDamage * damageMult + damageFlat;
 
     const created: {
       debuff?: Condition;
@@ -250,13 +244,7 @@ export class Attack {
           enemyMaxHP: target.nonConditionalMaxHealth,
           enemyMaxSanity: target.nonConditionalMaxSanity,
           primaryAttackDamage:
-            this.user.calculateAttackDamage(
-              this.damageTable,
-              this.element != null,
-              target,
-            ).cumulativeDamage *
-              damageMult +
-            damageFlat,
+            this.damage(target).cumulativeDamage * damageMult + damageFlat,
           applierNameString: this.user.nameReference,
           applierID: this.user.id,
         });
@@ -267,26 +255,29 @@ export class Attack {
   }
 
   get displayDamage() {
-    return this.user.calculateAttackDamage(
-      this.damageTable,
-      this.element != null,
-    );
+    return this.user.calculateAttackDamage({
+      baseDamageMap: this.damageTable,
+      isSpell: this.element !== null,
+      usesWeapon: this.element == null || !!this.usesWeapon,
+    });
   }
 
   get selfDamage() {
-    return this.user.calculateAttackDamage(
-      this.selfDamageTable,
-      this.element != null,
-      this.user,
-    );
+    return this.user.calculateAttackDamage({
+      baseDamageMap: this.selfDamageTable,
+      isSpell: this.element != null,
+      usesWeapon: this.element == null || !!this.usesWeapon,
+      target: this.user,
+    });
   }
 
   public damage(target: Being) {
-    return this.user.calculateAttackDamage(
-      this.damageTable,
-      this.element != null,
-      target,
-    );
+    return this.user.calculateAttackDamage({
+      baseDamageMap: this.damageTable,
+      isSpell: this.element !== null,
+      usesWeapon: this.element == null || !!this.usesWeapon,
+      target: target,
+    });
   }
 
   private rollDebuffs({
