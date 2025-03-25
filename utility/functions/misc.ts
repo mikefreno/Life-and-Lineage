@@ -410,7 +410,7 @@ export function checkReleasePosition({
       | undefined;
   }[];
   position: { x: number; y: number };
-  runOnSuccess: (args: any) => void;
+  runOnSuccess: (args: string) => number | undefined;
   handleSnapBack: () => void;
 }) {
   for (const bound of bounds) {
@@ -423,7 +423,10 @@ export function checkReleasePosition({
         position.y < bound.bounds.y + bound.bounds.height;
 
       if (isWidthAligned && isHeightAligned) {
-        runOnSuccess(bound.key);
+        const x = runOnSuccess(bound.key);
+        if (x === 0) {
+          handleSnapBack();
+        }
         return;
       }
     }

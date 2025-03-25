@@ -314,6 +314,17 @@ export const useCombatActions = () => {
       const continueAttackFlow = () => {
         const logString = handleAttackResult(attack, targets);
         dungeonStore.addLog(logString);
+        if (playerState.attacksHeldActive.length > 0) {
+          playerState.attacksHeldActive.forEach((heldActive) => {
+            if (heldActive.heldActiveTargets) {
+              const log = handleAttackResult(
+                heldActive,
+                heldActive.heldActiveTargets,
+              );
+              dungeonStore.addLog(log);
+            }
+          });
+        }
 
         // skip in case of killed enemy
         targets.forEach((target) => {

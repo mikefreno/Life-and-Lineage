@@ -203,7 +203,10 @@ const ShopInteriorScreen = observer(() => {
   };
 
   const purchaseStack = (itemStack: Item[]) => {
-    playerState?.purchaseStack(itemStack, shopsStore.currentShop?.archetype!);
+    return playerState?.purchaseStack(
+      itemStack,
+      shopsStore.currentShop?.archetype!,
+    );
   };
 
   if (!shopsStore.currentShop) {
@@ -253,7 +256,11 @@ const ShopInteriorScreen = observer(() => {
           ]}
         >
           <View style={[flex.rowEvenly, { height: "40%" }]}>
-            <View
+            <Pressable
+              onLongPress={() => {
+                vibration({ style: "light" });
+                setShowingInteractionModal(true);
+              }}
               style={[
                 flex.columnEvenly,
                 {
@@ -264,18 +271,14 @@ const ShopInteriorScreen = observer(() => {
                 },
               ]}
             >
-              <Pressable
-                onLongPress={() => {
-                  vibration({ style: "light" });
-                  setShowingInteractionModal(true);
-                }}
+              <View
                 style={{
                   height: uiStore.dimensions.lesser / 4,
                   width: uiStore.dimensions.lesser / 4,
                 }}
               >
                 <CharacterImage character={shopsStore.currentShop.shopKeeper} />
-              </Pressable>
+              </View>
               <View style={uiStore.isLandscape ? { ...styles.rowCenter } : {}}>
                 <Text style={[styles.textCenter]}>
                   {shopsStore.currentShop.shopKeeper.fullName}
@@ -317,7 +320,7 @@ const ShopInteriorScreen = observer(() => {
                 />
               </View>
               <GreetingComponent greeting={greeting} />
-            </View>
+            </Pressable>
             <View
               onLayout={(e) => setShopBoundsOnLayout(e)}
               style={styles.shopsInventoryContainer}

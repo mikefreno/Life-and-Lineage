@@ -40,6 +40,7 @@ interface AttackOption {
   rangerPetName?: string;
   maxTurnsActive?: number;
   remainingTurnsActive?: number;
+  heldActiveTargets?: Being[] | null;
   isActive?: boolean;
   maxUses?: number;
   user: Character | Creature;
@@ -100,6 +101,7 @@ export class Attack {
   readonly maxTurnsActive: number; // number of turns where the attack will be reactivated (default:1) -  TODO: implement this handling
   remainingTurnsActive: number | null;
   isActive: boolean;
+  heldActiveTargets: Being[] | null;
 
   remainingUses: number | null; // mainly for enemies, attacks / heals that have limited uses (balance)
 
@@ -127,6 +129,7 @@ export class Attack {
     maxTurnsActive,
     remainingTurnsActive,
     isActive,
+    heldActiveTargets,
     maxUses,
     animation,
     user,
@@ -152,6 +155,7 @@ export class Attack {
     this.remainingTurnsActive = remainingTurnsActive ?? null;
     this.isActive = isActive ?? false;
     this.remainingUses = maxUses ?? null;
+    this.heldActiveTargets = heldActiveTargets ?? null;
     this.animation = animation ?? null;
     this.user = user;
     this.element = element ? StringToElement[element] : null;
@@ -165,6 +169,7 @@ export class Attack {
       remainingUses: observable,
 
       remainingTurnsActive: observable,
+      heldActiveTargets: observable,
 
       buffs: computed,
       debuffs: action,
@@ -361,7 +366,6 @@ export class Attack {
 
     for (let i = 0; i < this.hitsPerTurn; i++) {
       const finalHitChance = this.baseHitChance * hitChanceMultiplier;
-      console.log(finalHitChance);
       if (Math.random() < finalHitChance) {
         if (Math.random() < target.dodgeChance / 100) {
           hits.push(AttackUse.miss);
@@ -373,7 +377,6 @@ export class Attack {
         }
         hits.push(AttackUse.success);
       } else {
-        // We missed due to accuracy
         hits.push(AttackUse.miss);
       }
     }
@@ -503,12 +506,14 @@ export class Attack {
       if (this.remainingTurnsActive <= 1) {
         this.isActive = false;
         this.remainingTurnsActive = null;
+        this.heldActiveTargets = null;
       } else {
         this.remainingTurnsActive -= 1;
       }
     } else if (this.maxTurnsActive > 1) {
       this.isActive = true;
       this.remainingTurnsActive = this.maxTurnsActive - 1;
+      this.heldActiveTargets = targets;
     }
 
     const log = this.buildLogString(allTargetResult, minionSpecies);

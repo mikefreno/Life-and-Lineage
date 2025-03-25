@@ -170,7 +170,7 @@ const InventoryItem = observer(
       } | null,
     ) => void;
     isDraggable?: boolean;
-    runOnSuccess: (droppedOnKey: string) => void;
+    runOnSuccess: (droppedOnKey: string) => number | undefined;
     bgColor?: ColorValue;
   }) => {
     const ref = useRef<View>(null);
