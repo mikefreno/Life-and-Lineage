@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useRef, useMemo } from "react";
+import { ReactNode, useEffect, useRef, useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { useRootStore } from "@/hooks/stores";
 import { Animated } from "react-native";
@@ -63,6 +63,7 @@ export const LoadingBoundary = observer(
           );
           setTimeout(() => {
             if (isLoading) {
+              uiStore.markStoreAsLoaded("inventory");
               uiStore.completeLoading();
             }
           }, 2000);

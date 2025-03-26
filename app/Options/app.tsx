@@ -22,7 +22,7 @@ const vibrationOptions = ["full", "minimal", "none"];
 
 export const AppSettings = observer(() => {
   let root = useRootStore();
-  const { playerState, uiStore, authStore, saveStore } = root;
+  const { playerState, uiStore, authStore, saveStore, iapStore } = root;
   const isDark = uiStore.colorScheme === "dark";
   const [showRemoteSaveWindow, setShowRemoteSaveWindow] =
     useState<boolean>(false);
@@ -198,7 +198,6 @@ export const AppSettings = observer(() => {
           </View>
         )}
       </GenericModal>
-
       <GenericModal
         isVisibleCondition={showRemoteLoadWidow}
         backFunction={() => setShowRemoteLoadWindow(false)}
@@ -305,22 +304,30 @@ export const AppSettings = observer(() => {
                   You are not connected to the internet
                 </Text>
               )}
-              <View style={{ ...flex.rowEvenly, width: "100%" }}>
+              {iapStore.remoteSavesUnlocked ? (
+                <View style={{ ...flex.rowEvenly, width: "100%" }}>
+                  <GenericRaisedButton
+                    onPress={() => router.push("/Auth/sign-in")}
+                    disabled={!authStore.isConnectedAndInitialized}
+                  >
+                    Sign In
+                  </GenericRaisedButton>
+                  <GenericRaisedButton
+                    onPress={() => router.push("/Auth/sign-up")}
+                    backgroundColor={"#2563eb"}
+                    textColor={"#fafafa"}
+                    disabled={!authStore.isConnectedAndInitialized}
+                  >
+                    Sign Up
+                  </GenericRaisedButton>
+                </View>
+              ) : (
                 <GenericRaisedButton
-                  onPress={() => router.push("/Auth/sign-in")}
-                  disabled={!authStore.isConnectedAndInitialized}
+                  onPress={() => router.push("/Options/iaps")}
                 >
-                  Sign In
+                  Unlock
                 </GenericRaisedButton>
-                <GenericRaisedButton
-                  onPress={() => router.push("/Auth/sign-up")}
-                  backgroundColor={"#2563eb"}
-                  textColor={"#fafafa"}
-                  disabled={!authStore.isConnectedAndInitialized}
-                >
-                  Sign Up
-                </GenericRaisedButton>
-              </View>
+              )}
             </>
           )}
 

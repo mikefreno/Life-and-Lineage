@@ -23,6 +23,7 @@ import { SaveStore } from "@/stores/SaveStore";
 import { AudioStore } from "@/stores/AudioStore";
 import { PlayerAnimationStore } from "@/stores/PlayerAnimationStore";
 import { flipCoin } from "@/utility/functions/misc";
+import { IAPStore } from "@/stores/IAPStore";
 
 export class RootStore {
   playerState: PlayerCharacter | null;
@@ -38,6 +39,7 @@ export class RootStore {
   tutorialStore: TutorialStore;
   saveStore: SaveStore;
   audioStore: AudioStore;
+  iapStore: IAPStore;
 
   constructed: boolean = false;
   atDeathScreen: boolean = false;
@@ -57,6 +59,13 @@ export class RootStore {
 
   constructor() {
     this.uiStore = new UIStore({ root: this });
+
+    this.authStore = new AuthStore({ root: this });
+    this.uiStore.markStoreAsLoaded("auth");
+
+    this.iapStore = new IAPStore({ root: this });
+    this.uiStore.markStoreAsLoaded("iaps");
+
     this.time = new TimeStore({ root: this });
     this.uiStore.markStoreAsLoaded("time");
 
@@ -76,9 +85,6 @@ export class RootStore {
 
     this.dungeonStore = new DungeonStore({ root: this });
     this.uiStore.markStoreAsLoaded("dungeon");
-
-    this.authStore = new AuthStore({ root: this });
-    this.uiStore.markStoreAsLoaded("auth");
 
     this.characterStore = new CharacterStore({ root: this });
     this.uiStore.markStoreAsLoaded("character");

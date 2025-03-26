@@ -44,6 +44,7 @@ interface GenericRaisedButtonProps {
   style?: StyleProp<ViewStyle>;
   buttonStyle?: StyleProp<ViewStyle>;
   height?: DimensionValue;
+  textSize?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl";
 }
 
 const GenericRaisedButton = ({
@@ -61,6 +62,7 @@ const GenericRaisedButton = ({
   vibrationStrength = "light",
   vibrationEssentiality = false,
   disableTopLevelStyling = false,
+  textSize,
   style,
   buttonStyle,
   height,
@@ -210,6 +212,7 @@ const GenericRaisedButton = ({
               textColor={textColor}
               styles={styles}
               onLayout={onTextLayout}
+              textSize={textSize}
             />
             {disabled && disabledAddendum && (
               <Text

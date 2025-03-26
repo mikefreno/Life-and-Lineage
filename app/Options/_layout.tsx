@@ -10,6 +10,7 @@ import { useVibration } from "@/hooks/generic";
 import { useStyles } from "@/hooks/styles";
 import { useRootStore } from "@/hooks/stores";
 import Colors from "@/constants/Colors";
+import { Text } from "@/components/Themed";
 
 export default function OptionsLayout() {
   const vibration = useVibration();
@@ -147,8 +148,24 @@ export default function OptionsLayout() {
       <Tabs.Screen
         name="iaps"
         options={{
-          href: null,
           headerShown: false,
+          title: "IAPs",
+          tabBarIconStyle: {
+            width: uiStore.iconSizeXL,
+            height: uiStore.iconSizeXL,
+            marginRight: uiStore.isLandscape ? 16 : 0,
+          },
+          tabBarIcon: ({ color }) => (
+            <Text
+              style={{
+                color,
+                fontSize: uiStore.iconSizeXL,
+                lineHeight: uiStore.iconSizeXL,
+              }}
+            >
+              $
+            </Text>
+          ),
         }}
       />
     </Tabs>

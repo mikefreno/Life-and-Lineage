@@ -22,13 +22,14 @@ import GenericFlatButton from "@/components/GenericFlatButton";
 import { useRouter } from "expo-router";
 import { tw_base, useStyles } from "@/hooks/styles";
 import NewGameMetaControls from "@/components/NewGameMetaControls";
+import { NecromancerPaywall, RangerPaywall } from "@/components/IAPPaywalls";
 
 const SetClassScreen = observer(() => {
   const vibration = useVibration();
   const { classSelection, setClassSelection, setBlessingSelection } =
     useNewGameStore();
   const router = useRouter();
-  const { uiStore, playerState, tutorialStore } = useRootStore();
+  const { uiStore, playerState, tutorialStore, iapStore } = useRootStore();
   const { height, width } = uiStore.dimensions;
 
   const styles = useStyles();
@@ -39,14 +40,63 @@ const SetClassScreen = observer(() => {
 
   const [showTutorialReset, setShowTutorialReset] = useState<boolean>(false);
 
+  const [showNecroPaywall, setShowNecroPaywall] = useState<boolean>(false);
+  const [showRangerPaywall, setShowRangerPaywall] = useState<boolean>(false);
+
   useLayoutEffect(() => {
     wait(200).then(() => {
       setShowTutorialReset(!!playerState);
     });
   }, []);
 
+  const handleRangerSelection = () => {
+    //TODO, use has purchased
+    if (iapStore.rangerUnlocked) {
+      vibration({ style: "light" });
+      if (classSelection !== PlayerClassOptions.ranger) {
+        setClassSelection(PlayerClassOptions.ranger);
+        setBlessingSelection(undefined);
+      }
+    } else {
+      setShowRangerPaywall(true);
+    }
+  };
+
+  const handleNecromancerSelection = () => {
+    //TODO, use has purchased
+    if (iapStore.necromancerUnlocked) {
+      vibration({ style: "light" });
+      if (classSelection !== PlayerClassOptions.necromancer) {
+        setClassSelection(PlayerClassOptions.necromancer);
+        setBlessingSelection(undefined);
+      }
+    } else {
+      setShowNecroPaywall(true);
+    }
+  };
+
   return (
     <>
+      <NecromancerPaywall
+        isVisibleCondition={showNecroPaywall}
+        onClose={() => {
+          setShowNecroPaywall(false);
+          if (iapStore.necromancerUnlocked) {
+            setClassSelection(PlayerClassOptions.necromancer);
+            setBlessingSelection(undefined);
+          }
+        }}
+      />
+      <RangerPaywall
+        isVisibleCondition={showRangerPaywall}
+        onClose={() => {
+          setShowRangerPaywall(false);
+          if (iapStore.rangerUnlocked) {
+            setClassSelection(PlayerClassOptions.ranger);
+            setBlessingSelection(undefined);
+          }
+        }}
+      />
       <TutorialModal
         tutorial={TutorialOption.class}
         override={forceShowTutorial}
@@ -168,13 +218,7 @@ const SetClassScreen = observer(() => {
                 height: height * 0.25,
                 width: width * 0.45,
               }}
-              onPress={() => {
-                vibration({ style: "light" });
-                if (classSelection !== PlayerClassOptions.ranger) {
-                  setClassSelection(PlayerClassOptions.ranger);
-                  setBlessingSelection(undefined);
-                }
-              }}
+              onPress={handleRangerSelection}
               accessibilityRole="button"
               accessibilityLabel="Select Ranger"
             >
@@ -231,13 +275,7 @@ const SetClassScreen = observer(() => {
                 height: height * 0.25,
                 width: width * 0.45,
               }}
-              onPress={() => {
-                vibration({ style: "light" });
-                if (classSelection !== PlayerClassOptions.necromancer) {
-                  setClassSelection(PlayerClassOptions.necromancer);
-                  setBlessingSelection(undefined);
-                }
-              }}
+              onPress={handleNecromancerSelection}
               accessibilityRole="button"
               accessibilityLabel="Select Necromancer"
             >

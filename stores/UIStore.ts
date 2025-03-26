@@ -116,6 +116,7 @@ export default class UIStore {
     ambient: false,
     fonts: false,
     routing: false,
+    iaps: false,
   };
 
   showDevDebugUI: boolean = false;

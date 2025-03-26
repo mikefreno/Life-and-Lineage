@@ -2,7 +2,7 @@
   "expo": {
     "name": "Lineage",
     "slug": "life-and-lineage",
-    "version": "0.9.0",
+    "version": "0.8.11",
     "orientation": "default",
     "icon": "assets/images/icon.png",
     "scheme": "lineageapp",
@@ -14,7 +14,7 @@
       "usesAppleSignIn": true,
       "supportsTablet": true,
       "bundleIdentifier": "com.mikefrenodev.lineage",
-      "buildNumber": "1",
+      "buildNumber": "0",
       "entitlements": {
         "com.apple.developer.networking.wifi-info": true,
         "aps-environment": "development"
@@ -39,6 +39,7 @@
       "expo-router",
       "react-native-edge-to-edge",
       "expo-apple-authentication",
+      "./plugins/iap.js",
       [
         "expo-font",
         {

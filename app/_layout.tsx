@@ -42,6 +42,7 @@ import { SCREEN_TRANSITION_TIMING } from "@/stores/UIStore";
 
 import { decode } from "base-64";
 import { useScaling } from "@/hooks/scaling";
+import Purchases, { LOG_LEVEL } from "react-native-purchases";
 global.atob = decode;
 
 export { ErrorBoundary } from "expo-router";
@@ -138,8 +139,14 @@ const Root = () => {
  */
 const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   const rootStore = useRootStore();
-  const { playerState, dungeonStore, uiStore, audioStore, shopsStore } =
-    rootStore;
+  const {
+    playerState,
+    dungeonStore,
+    uiStore,
+    audioStore,
+    shopsStore,
+    iapStore,
+  } = rootStore;
   const styles = useStyles();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -206,6 +213,21 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   //setSentToken(true);
   //}
   //}, [expoPushToken]);
+  //
+
+  useEffect(() => {
+    Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
+
+    if (Platform.OS === "ios") {
+      Purchases.configure({ apiKey: process.env.EXPO_PUBLIC_RC_IOS as string });
+    } else if (Platform.OS === "android") {
+      Purchases.configure({
+        apiKey: process.env.EXPO_PUBLIC_RC_ANDROID as string,
+      });
+    }
+
+    Purchases.getOfferings().then((val) => iapStore.setOffering(val.current));
+  }, []);
 
   const handleRouting = (
     playerState: PlayerCharacter | null,
