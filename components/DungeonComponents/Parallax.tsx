@@ -418,7 +418,7 @@ const ParallaxLayer = React.memo(
           { scale },
         ],
       }),
-      [moveRate, inCombat],
+      [moveRate, inCombat, scale],
     );
 
     const tileGroups = useMemo(
