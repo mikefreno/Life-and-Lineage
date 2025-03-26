@@ -327,7 +327,7 @@ export class IAPStore {
   }
 
   async getCustomersIAPs() {
-    if (false) {
+    if (this.root.authStore.isConnected) {
       try {
         const val = await Purchases.restorePurchases();
         this.evaluateCustomer(val);
@@ -336,7 +336,7 @@ export class IAPStore {
         console.log("Error restoring purchases:", e);
       }
     } else {
-      //await this.hydrateOffline();
+      await this.hydrateOffline();
     }
   }
 }
