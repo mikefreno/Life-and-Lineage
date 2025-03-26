@@ -50,10 +50,7 @@ export default function InAppPurchasePage() {
       >
         <ThemedCard style={{ width: "100%" }}>
           <Text style={{ ...styles["text-lg"], textAlign: "center" }}>
-            Unlock both the Ranger and the Necromancer
-          </Text>
-          <Text style={[styles["text-lg"], { textAlign: "center" }]}>
-            ($2.99)
+            Unlock both the Ranger and the Necromancer{"\n"}$2.99
           </Text>
           <GenericRaisedButton
             onPress={() => setShowDualPurchase(true)}
@@ -65,7 +62,7 @@ export default function InAppPurchasePage() {
         </ThemedCard>
         <ThemedCard style={{ width: "100%" }}>
           <Text style={[styles["text-lg"], { textAlign: "center" }]}>
-            $1.99 for the Ranger Or the Necromancer
+            Unlock the Ranger Or the Necromancer{"\n"}$1.99
           </Text>
           <GenericRaisedButton
             onPress={() => setShowNecromancerPurchase(true)}
@@ -84,8 +81,7 @@ export default function InAppPurchasePage() {
         </ThemedCard>
         <ThemedCard style={{ width: "100%" }}>
           <Text style={[styles["text-lg"], { textAlign: "center" }]}>
-            $0.99 for cloud saves{"\n"}(offsets server costs - free with a class
-            purchase)
+            Unlock remote saves{"\n"}$0.99
           </Text>
           <GenericRaisedButton
             onPress={() => setShowRemoteSavePurchase(true)}
