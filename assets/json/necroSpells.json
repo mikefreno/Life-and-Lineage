@@ -189,7 +189,7 @@
     "type": "defense",
     "proficiencyNeeded": "novice",
     "manaCost": 50,
-    "summon": [
+    "summonNames": [
       "flying skull"
     ]
   },
@@ -200,7 +200,7 @@
     "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 50,
-    "summon": [
+    "summonNames": [
       "skeleton"
     ]
   },
@@ -211,7 +211,7 @@
     "type": "defense",
     "proficiencyNeeded": "adept",
     "manaCost": 50,
-    "summon": [
+    "summonNames": [
       "skeleton"
     ]
   },
@@ -222,7 +222,7 @@
     "type": "defense",
     "proficiencyNeeded": "expert",
     "manaCost": 150,
-    "summon": [
+    "summonNames": [
       "lich"
     ]
   },
@@ -233,7 +233,7 @@
     "type": "defense",
     "proficiencyNeeded": "master",
     "manaCost": 250,
-    "summon": [
+    "summonNames": [
       "wraith"
     ]
   },
@@ -244,7 +244,7 @@
     "type": "defense",
     "proficiencyNeeded": "legend",
     "manaCost": 500,
-    "summon": [
+    "summonNames": [
       "death knight"
     ]
   },
@@ -255,7 +255,7 @@
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 750,
-    "summon": [
+    "summonNames": [
       "skeleton",
       "skeleton",
       "skeleton"

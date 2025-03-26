@@ -45,6 +45,7 @@ export default function SpellDetails({ spell }: { spell: Attack }) {
         <View
           style={{
             minWidth: "20%",
+            maxWidth: "30%",
             marginVertical: "auto",
             ...styles.itemsCenter,
           }}
@@ -91,16 +92,15 @@ export default function SpellDetails({ spell }: { spell: Attack }) {
               Requires: {toTitleCase(spell.usesWeapon)}
             </Text>
           )}
-          {/*TODO*/}
           {spell.selfDamage.damageMap &&
           spell.selfDamage.cumulativeDamage > 0 ? (
             <SplitDamageRender
               damageMap={spell.selfDamage.damageMap}
               title={"Self Damage"}
             />
-          ) : (
+          ) : spell.selfDamage.cumulativeDamage < 0 ? (
             <HealingRender amount={spell.selfDamage.cumulativeDamage} />
-          )}
+          ) : null}
           {spell.summonNames?.map((summon, idx) => (
             <View key={summon + idx} style={styles.rowCenter}>
               <Text>{toTitleCase(summon)}</Text>
@@ -153,6 +153,7 @@ export default function SpellDetails({ spell }: { spell: Attack }) {
           style={{
             marginVertical: "auto",
             minWidth: "20%",
+            maxWidth: "30%",
             alignItems: "center",
           }}
         >
