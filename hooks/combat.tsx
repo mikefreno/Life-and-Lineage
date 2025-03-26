@@ -141,11 +141,22 @@ export const useEnemyManagement = () => {
               "attack_1";
           }
 
+          if (enemyAttackRes.selfDamage != 0) {
+            enemy?.damageHealth({
+              damage: enemyAttackRes.selfDamage,
+              attackerId: enemy.id,
+            });
+          }
+
           setTimeout(
             () => {
               attackHandler({ attackResults: enemyAttackRes, user: enemy });
+              setTimeout(
+                () => enemy.endTurn(),
+                animStore?.movementDuration ?? 1000,
+              );
             },
-            animStore?.movementDuration ?? 500,
+            animStore?.movementDuration ?? 1000,
           );
 
           //Indicates an attack took place (could be a miss!) (Null indicates a failure - either had an execution condition or was stunned)
@@ -249,16 +260,23 @@ export const useCombatActions = () => {
 
   const handleAttackResult = useCallback(
     (attack: Attack, targets: Being[]) => {
-      const { targetResults, log, buffs } = attack.use(targets);
+      const { targetResults, log, buffs, selfDamage } = attack.use(targets);
 
       buffs?.forEach((buff) => playerState?.addCondition(buff));
+      if (selfDamage != 0) {
+        playerState?.damageHealth({
+          damage: selfDamage,
+          attackerId: playerState.id,
+        });
+      }
+
       for (const res of targetResults) {
         const animStore = enemyStore.getAnimationStore(res.target.id);
         switch (res.use.result) {
           case AttackUse.success:
             if ((res.use.damages?.total ?? 0) >= res.target.currentHealth) {
               animStore?.addToAnimationQueue("death");
-            } else {
+            } else if (res.use.damages && res.use.damages.total > 0) {
               animStore?.addToAnimationQueue("hurt");
             }
             res.target.damageHealth({
@@ -344,6 +362,7 @@ export const useCombatActions = () => {
               }
             }, 500);
           });
+          playerState.endTurn();
         }, 500);
       };
 

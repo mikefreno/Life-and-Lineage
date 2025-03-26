@@ -1678,15 +1678,9 @@ export class PlayerCharacter extends Character {
 
   public pass({ voluntary = false }: { voluntary?: boolean }) {
     if (voluntary) {
-      this.regenMana(); // if the user voluntarily passes the turn, their mana regen is doubled
+      this.regenMana(true); // if the user voluntarily passes the turn, their mana regen is doubled
     }
     this.endTurn();
-  }
-
-  public endTurn() {
-    this.regenMana();
-    this.regenHealth();
-    this.conditionTicker();
   }
 
   //----------------------------------Magical Combat----------------------------------//

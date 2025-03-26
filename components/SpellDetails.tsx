@@ -6,15 +6,8 @@ import {
   BeastMasteryIcon,
   ClockIcon,
   Energy,
-  Fire,
-  Holy,
-  Lightning,
+  HealthIcon,
   NecromancerSkull,
-  Pestilence,
-  Raw,
-  Regen,
-  Sword,
-  Winter,
 } from "@/assets/icons/SVGIcons";
 import BlessingDisplay from "@/components/BlessingsDisplay";
 import { elementalColorMap } from "@/constants/Colors";
@@ -23,6 +16,7 @@ import { useRootStore } from "@/hooks/stores";
 import { useStyles } from "@/hooks/styles";
 import GenericStrikeAround from "@/components/GenericStrikeAround";
 import { Attack } from "@/entities/attack";
+import { DamageTypeRender } from "./DamageTypeRender";
 
 export default function SpellDetails({ spell }: { spell: Attack }) {
   if (spell.element === null) return;
@@ -97,13 +91,16 @@ export default function SpellDetails({ spell }: { spell: Attack }) {
               Requires: {toTitleCase(spell.usesWeapon)}
             </Text>
           )}
-          {spell.selfDamage.cumulativeDamage > 0 &&
-          spell.selfDamage.damageMap ? (
+          {/*TODO*/}
+          {spell.selfDamage.damageMap &&
+          spell.selfDamage.cumulativeDamage > 0 ? (
             <SplitDamageRender
               damageMap={spell.selfDamage.damageMap}
               title={"Self Damage"}
             />
-          ) : null}
+          ) : (
+            <HealingRender amount={spell.selfDamage.cumulativeDamage} />
+          )}
           {spell.summonNames?.map((summon, idx) => (
             <View key={summon + idx} style={styles.rowCenter}>
               <Text>{toTitleCase(summon)}</Text>
@@ -170,6 +167,26 @@ export default function SpellDetails({ spell }: { spell: Attack }) {
   );
 }
 
+const HealingRender = ({ amount }: { amount: number }) => {
+  const styles = useStyles();
+  const { uiStore } = useRootStore();
+
+  return (
+    <View style={{ width: "100%", paddingHorizontal: 2 }}>
+      <GenericStrikeAround style={{ paddingBottom: 4 }}>
+        <Text style={styles["text-sm"]}>Healing</Text>
+      </GenericStrikeAround>
+      <View style={[styles.rowCenter, { alignItems: "center" }]}>
+        <Text style={{ paddingRight: 4 }}>{statRounding(amount * -1)}</Text>
+        <HealthIcon
+          height={uiStore.iconSizeSmall}
+          width={uiStore.iconSizeSmall}
+        />
+      </View>
+    </View>
+  );
+};
+
 const SplitDamageRender = ({
   damageMap,
   title,
@@ -178,40 +195,9 @@ const SplitDamageRender = ({
   title: string;
 }) => {
   const styles = useStyles();
-  const { uiStore } = useRootStore();
-
-  const DamageTypeUtils: Record<DamageType, ReactNode> = {
-    [DamageType.PHYSICAL]: (
-      <Sword height={uiStore.iconSizeSmall} width={uiStore.iconSizeSmall} />
-    ),
-    [DamageType.FIRE]: (
-      <Fire height={uiStore.iconSizeSmall} width={uiStore.iconSizeSmall} />
-    ),
-    [DamageType.COLD]: (
-      <Winter height={uiStore.iconSizeSmall} width={uiStore.iconSizeSmall} />
-    ),
-    [DamageType.LIGHTNING]: (
-      <Lightning height={uiStore.iconSizeSmall} width={uiStore.iconSizeSmall} />
-    ),
-    [DamageType.POISON]: (
-      <Pestilence
-        height={uiStore.iconSizeSmall}
-        width={uiStore.iconSizeSmall}
-      />
-    ),
-    [DamageType.HOLY]: (
-      <Holy height={uiStore.iconSizeSmall} width={uiStore.iconSizeSmall} />
-    ),
-    [DamageType.MAGIC]: (
-      <Regen height={uiStore.iconSizeSmall} width={uiStore.iconSizeSmall} />
-    ),
-    [DamageType.RAW]: (
-      <Raw height={uiStore.iconSizeSmall} width={uiStore.iconSizeSmall} />
-    ),
-  };
 
   const activeDamageTypes = Object.entries(damageMap)
-    .filter(([_, value]) => value && value > 0)
+    .filter(([_, value]) => value && value != 0)
     .map(([key]) => parseInt(key) as DamageType);
 
   return (
@@ -227,7 +213,7 @@ const SplitDamageRender = ({
           <Text style={{ paddingRight: 4 }}>
             {statRounding(damageMap[damageType] ?? 0)}
           </Text>
-          {DamageTypeUtils[damageType]}
+          <DamageTypeRender type={damageType} />
         </View>
       ))}
     </View>

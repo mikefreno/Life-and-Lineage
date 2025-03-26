@@ -358,7 +358,9 @@ export class Being {
         return this.currentHealth;
       }
       this.currentHealth = statRounding(this.currentHealth - rounded);
-      this.threatTable.addThreat(attackerId, rounded);
+      if (this.id !== attackerId) {
+        this.threatTable.addThreat(attackerId, rounded);
+      }
     }
     return this.currentHealth;
   }
@@ -456,9 +458,15 @@ export class Being {
     }
   }
 
-  public regenMana() {
-    if (this.currentMana + this.totalManaRegen < this.maxMana) {
-      this.currentMana += this.totalManaRegen;
+  public regenMana(halfRegen?: boolean) {
+    if (
+      this.currentMana +
+        (halfRegen ? this.totalManaRegen / 2 : this.totalManaRegen) <
+      this.maxMana
+    ) {
+      this.currentMana += halfRegen
+        ? this.totalManaRegen / 2
+        : this.totalManaRegen;
     } else {
       this.currentMana = this.maxMana;
     }
@@ -1054,16 +1062,17 @@ export class Being {
         }[]
       | null;
     buffs: Condition[] | null;
+    selfDamage: number;
     log: string;
   } {
     const execute = this.conditions.find((cond) => cond.name == "execute");
     if (execute) {
       this.damageHealth({ attackerId: execute.placedbyID, damage: 9999 });
-      this.endTurn();
       return {
         attack: null,
         targetResults: null,
         buffs: null,
+        selfDamage: 0,
         log: `${toTitleCase(nameReference)} was executed!`,
       };
     }
@@ -1074,7 +1083,6 @@ export class Being {
       allStunSources.forEach((stunSource) => {
         this.threatTable.addThreat(stunSource.placedbyID, 10);
       });
-      this.endTurn();
       return {
         attack: null,
         buffs: null,
@@ -1082,6 +1090,7 @@ export class Being {
           target: enemy,
           use: { result: AttackUse.stunned },
         })),
+        selfDamage: 0,
         log: `${toTitleCase(nameReference)} was stunned!`,
       };
     }
@@ -1110,10 +1119,8 @@ export class Being {
       );
 
       const res = attack.use(bestTargets);
-      this.endTurn();
       return { ...res, attack };
     } else {
-      this.endTurn();
       return {
         attack: null,
         buffs: null,
@@ -1121,6 +1128,7 @@ export class Being {
           target: enemy,
           use: { result: AttackUse.lowMana },
         })),
+        selfDamage: 0,
         log: `${toTitleCase(nameReference)} passed (low energy)!`,
       };
     }
@@ -1202,12 +1210,11 @@ export class Being {
     };
   }
 
-  protected endTurn() {
-    setTimeout(() => {
-      this.conditionTicker();
-      this.regenMana();
-      this.regenHealth();
-    }, 250);
+  public endTurn() {
+    console.log(`called by: ${this.nameReference}`);
+    this.conditionTicker();
+    this.regenMana();
+    this.regenHealth();
   }
 
   public damageTypeCalculation(
@@ -1364,17 +1371,15 @@ export class Being {
     Object.entries(damageMap).forEach(([typeKey, amount]) => {
       const damageType = parseInt(typeKey) as DamageType;
       let calculatedDamage = amount;
-      if (amount >= 0) {
-        calculatedDamage = this.damageTypeCalculation(
-          damageType,
-          amount,
-          isSpell,
-          usesWeapon,
-          target,
-        );
-      }
+      calculatedDamage = this.damageTypeCalculation(
+        damageType,
+        amount,
+        isSpell,
+        usesWeapon,
+        target,
+      );
       damageMap[damageType] = calculatedDamage;
-      cumulativeDamage += Math.max(0, calculatedDamage);
+      cumulativeDamage += calculatedDamage;
     });
 
     return { cumulativeDamage, damageMap };

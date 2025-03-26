@@ -528,7 +528,7 @@ const PassButton = observer(({ onPress }: { onPress: () => void }) => {
       <View style={styles.columnCenter}>
         <Text style={styles["text-xl"]}>Pass</Text>
         <View style={styles.rowItemsCenter}>
-          <Text>2x</Text>
+          <Text>1.5x</Text>
           <Regen width={uiStore.iconSizeSmall} height={uiStore.iconSizeSmall} />
         </View>
       </View>

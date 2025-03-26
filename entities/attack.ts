@@ -411,34 +411,47 @@ export class Attack {
 
       return {
         result: AttackUse.success,
-        damages: {
-          physical: damage.damageMap[DamageType.PHYSICAL]
-            ? damage.damageMap[DamageType.PHYSICAL] * actualizedHits
-            : 0,
-          fire: damage.damageMap[DamageType.FIRE]
-            ? damage.damageMap[DamageType.FIRE] * actualizedHits
-            : 0,
-          cold: damage.damageMap[DamageType.COLD]
-            ? damage.damageMap[DamageType.COLD] * actualizedHits
-            : 0,
-          lightning: damage.damageMap[DamageType.LIGHTNING]
-            ? damage.damageMap[DamageType.LIGHTNING] * actualizedHits
-            : 0,
-          poison: damage.damageMap[DamageType.POISON]
-            ? damage.damageMap[DamageType.POISON] * actualizedHits
-            : 0,
-          holy: damage.damageMap[DamageType.HOLY]
-            ? damage.damageMap[DamageType.HOLY] * actualizedHits
-            : 0,
-          magic: damage.damageMap[DamageType.MAGIC]
-            ? damage.damageMap[DamageType.MAGIC] * actualizedHits
-            : 0,
-          raw: damage.damageMap[DamageType.RAW]
-            ? damage.damageMap[DamageType.RAW] * actualizedHits
-            : 0,
-          total: damage.cumulativeDamage,
-          sanity: this.sanityDamage,
-        },
+        damages: damage.damageMap
+          ? {
+              physical: damage.damageMap[DamageType.PHYSICAL]
+                ? damage.damageMap[DamageType.PHYSICAL] * actualizedHits
+                : 0,
+              fire: damage.damageMap[DamageType.FIRE]
+                ? damage.damageMap[DamageType.FIRE] * actualizedHits
+                : 0,
+              cold: damage.damageMap[DamageType.COLD]
+                ? damage.damageMap[DamageType.COLD] * actualizedHits
+                : 0,
+              lightning: damage.damageMap[DamageType.LIGHTNING]
+                ? damage.damageMap[DamageType.LIGHTNING] * actualizedHits
+                : 0,
+              poison: damage.damageMap[DamageType.POISON]
+                ? damage.damageMap[DamageType.POISON] * actualizedHits
+                : 0,
+              holy: damage.damageMap[DamageType.HOLY]
+                ? damage.damageMap[DamageType.HOLY] * actualizedHits
+                : 0,
+              magic: damage.damageMap[DamageType.MAGIC]
+                ? damage.damageMap[DamageType.MAGIC] * actualizedHits
+                : 0,
+              raw: damage.damageMap[DamageType.RAW]
+                ? damage.damageMap[DamageType.RAW] * actualizedHits
+                : 0,
+              total: damage.cumulativeDamage,
+              sanity: this.sanityDamage,
+            }
+          : {
+              physical: 0,
+              fire: 0,
+              cold: 0,
+              lightning: 0,
+              poison: 0,
+              holy: 0,
+              magic: 0,
+              raw: 0,
+              total: damage.cumulativeDamage,
+              sanity: this.sanityDamage,
+            },
         debuffs: debuffs,
         healed: amountHealed,
       };
@@ -509,7 +522,12 @@ export class Attack {
 
     const log = this.buildLogString(allTargetResult, minionSpecies);
 
-    return { targetResults: allTargetResult, buffs: this.buffs, log };
+    return {
+      targetResults: allTargetResult,
+      buffs: this.buffs,
+      log,
+      selfDamage: this.selfDamage.cumulativeDamage,
+    };
   }
 
   private buildLogString(

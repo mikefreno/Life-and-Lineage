@@ -27,7 +27,7 @@ export class EnemyAnimationStore {
 
   root: RootStore;
   enemySprite: EnemyImageKeyOption;
-  movementDuration: number = 500;
+  movementDuration: number = 1000;
 
   animationQueue: AnimationOptions[];
   attacksThatSkipMovement: AnimationOptions[];
