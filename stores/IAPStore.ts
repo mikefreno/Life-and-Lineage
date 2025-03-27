@@ -327,16 +327,16 @@ export class IAPStore {
   }
 
   async getCustomersIAPs() {
-    //if (this.root.authStore.isConnected) {
-    //try {
-    //const val = await Purchases.restorePurchases();
-    //this.evaluateCustomer(val);
-    //this.hasHydrated = true;
-    //} catch (e) {
-    //console.log("Error restoring purchases:", e);
-    //}
-    //} else {
-    //await this.hydrateOffline();
-    //}
+    if (this.root.authStore.isConnected) {
+      try {
+        const val = await Purchases.restorePurchases();
+        this.evaluateCustomer(val);
+        this.hasHydrated = true;
+      } catch (e) {
+        console.log("Error restoring purchases:", e);
+      }
+    } else {
+      await this.hydrateOffline();
+    }
   }
 }
