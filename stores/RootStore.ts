@@ -60,17 +60,8 @@ export class RootStore {
   constructor() {
     this.uiStore = new UIStore({ root: this });
 
-    this.authStore = new AuthStore({ root: this });
-    this.uiStore.markStoreAsLoaded("auth");
-
-    this.iapStore = new IAPStore({ root: this });
-    this.uiStore.markStoreAsLoaded("iaps");
-
     this.time = new TimeStore({ root: this });
     this.uiStore.markStoreAsLoaded("time");
-
-    this.enemyStore = new EnemyStore({ root: this });
-    this.uiStore.markStoreAsLoaded("enemy");
 
     const retrieved_player = storage.getString("player");
     this.playerState = retrieved_player
@@ -83,6 +74,15 @@ export class RootStore {
 
     this.uiStore.markStoreAsLoaded("player");
 
+    this.authStore = new AuthStore({ root: this });
+    this.uiStore.markStoreAsLoaded("auth");
+
+    this.iapStore = new IAPStore({ root: this });
+    this.uiStore.markStoreAsLoaded("iaps");
+
+    this.enemyStore = new EnemyStore({ root: this });
+    this.uiStore.markStoreAsLoaded("enemy");
+
     this.dungeonStore = new DungeonStore({ root: this });
     this.uiStore.markStoreAsLoaded("dungeon");
 
@@ -92,9 +92,6 @@ export class RootStore {
     this.shopsStore = new ShopStore({ root: this });
     this.uiStore.markStoreAsLoaded("shops");
 
-    this.audioStore = new AudioStore({ root: this });
-    this.uiStore.markStoreAsLoaded("audio");
-
     this.tutorialStore = new TutorialStore({ root: this });
     this.uiStore.markStoreAsLoaded("tutorial");
 
@@ -103,6 +100,9 @@ export class RootStore {
 
     this.saveStore = new SaveStore({ root: this });
     this.uiStore.markStoreAsLoaded("save");
+
+    this.audioStore = new AudioStore({ root: this });
+    this.uiStore.markStoreAsLoaded("audio");
 
     this.constructed = true;
 

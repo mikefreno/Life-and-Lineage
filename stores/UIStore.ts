@@ -24,12 +24,7 @@ import {
   Orientation,
   getOrientationAsync,
 } from "expo-screen-orientation";
-import {
-  hasNotch,
-  getDeviceTypeSync,
-  isTablet,
-  getDeviceType,
-} from "react-native-device-info";
+import { hasNotch, isTablet, getDeviceType } from "react-native-device-info";
 import { baseNormalize, baseNormalizeForText } from "@/hooks/scaling";
 
 export const LOADING_TIPS: string[] = [
@@ -83,7 +78,6 @@ export default class UIStore {
   constructed: boolean = false;
   totalLoadingSteps: number = 0;
   completedLoadingSteps: number = 0;
-  displayedProgress: number = 0;
   currentTipIndex: number = 0;
   progressIncrementing: boolean = false;
 
@@ -253,6 +247,7 @@ export default class UIStore {
       onExpandedTab: computed,
       compactRoutePadding: computed,
       playerStatusExpandedOnAllRoutes: computed,
+      progress: computed,
     });
 
     reaction(
@@ -360,23 +355,28 @@ export default class UIStore {
     return this.root.pathname === "/medical" || this.root.pathname === "/labor";
   }
 
+  get progress() {
+    if (this.totalLoadingSteps === 0) {
+      const keys = Object.keys(this.storeLoadingStatus);
+      if (keys.length === 0) return 100;
+      const done = keys.filter((key) => this.storeLoadingStatus[key]).length;
+      return (done / keys.length) * 100;
+    }
+    return (this.completedLoadingSteps / this.totalLoadingSteps) * 100;
+  }
+
   debugLoadingStatus() {
     if (__DEV__) {
       console.log("Loading Status:");
       Object.entries(this.storeLoadingStatus).forEach(([key, value]) => {
         console.log(`${key}: ${value}`);
       });
-      console.log(`Total Progress: ${this.displayedProgress}`);
+      console.log(`Total Progress: ${this.progress}`);
     }
   }
 
   markStoreAsLoaded(storeName: keyof typeof this.storeLoadingStatus) {
     this.storeLoadingStatus[storeName] = true;
-    const loadedCount = Object.values(this.storeLoadingStatus).filter(
-      Boolean,
-    ).length;
-    const totalCount = Object.keys(this.storeLoadingStatus).length;
-    this.displayedProgress = (loadedCount / totalCount) * 100;
   }
 
   get allResourcesLoaded() {
@@ -455,7 +455,6 @@ export default class UIStore {
   }
 
   setTotalLoadingSteps(steps: number) {
-    this.displayedProgress = 0;
     this.completedLoadingSteps = 0;
     this.totalLoadingSteps = steps;
     this.progressIncrementing = true;
@@ -465,7 +464,6 @@ export default class UIStore {
           Math.random() * LOADING_TIPS.length,
         )),
     );
-    this.startProgressAnimation();
     this.startTipCycle();
   }
 
@@ -475,59 +473,13 @@ export default class UIStore {
         this.completedLoadingSteps + 1,
         this.totalLoadingSteps,
       );
-
-      if (this.totalLoadingSteps > 0) {
-        this.displayedProgress =
-          (this.completedLoadingSteps / this.totalLoadingSteps) * 100;
-      }
     });
-  }
-
-  private startProgressAnimation() {
-    const animate = () => {
-      if (!this.progressIncrementing) return;
-
-      runInAction(() => {
-        if (this.totalLoadingSteps === 0) {
-          this.displayedProgress = 100;
-          return;
-        }
-
-        const targetProgress =
-          (this.completedLoadingSteps / this.totalLoadingSteps) * 100;
-
-        // Smoothly animate to the target progress
-        if (this.displayedProgress < targetProgress) {
-          const distance = targetProgress - this.displayedProgress;
-          const increment = Math.max(1, distance * 0.1);
-          this.displayedProgress = Math.min(
-            this.displayedProgress + increment,
-            targetProgress,
-          );
-        }
-
-        if (this.completedLoadingSteps >= this.totalLoadingSteps) {
-          // If all steps are complete, finish the animation
-          if (this.displayedProgress >= 100) {
-            this.completeLoading();
-          } else {
-            requestAnimationFrame(animate);
-          }
-        } else {
-          requestAnimationFrame(animate);
-        }
-      });
-    };
-
-    animate();
   }
 
   completeLoading() {
     this.progressIncrementing = false;
-    this.displayedProgress = 100;
     setTimeout(() => {
       runInAction(() => {
-        this.displayedProgress = 0;
         this.totalLoadingSteps = 0;
         this.completedLoadingSteps = 0;
       });

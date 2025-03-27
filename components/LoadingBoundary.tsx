@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useRef, useMemo, useState } from "react";
+import { ReactNode, useEffect, useRef, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import { useRootStore } from "@/hooks/stores";
 import { Animated } from "react-native";
@@ -115,7 +115,7 @@ export const LoadingBoundary = observer(
               }}
             >
               <ProgressBar
-                value={Math.round(uiStore.displayedProgress)}
+                value={Math.round(uiStore.progress)}
                 maxValue={100}
                 skipInitialAnimation={false}
               />
@@ -137,7 +137,7 @@ export const LoadingBoundary = observer(
           </View>
         </View>
       ),
-      [uiStore.displayedProgress, uiStore.getCurrentTip],
+      [uiStore.progress, uiStore.getCurrentTip],
     );
 
     return (

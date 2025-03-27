@@ -5,7 +5,6 @@ import {
   View,
   Animated,
   ScrollView,
-  TouchableWithoutFeedback,
 } from "react-native";
 import { useRef, useEffect, useState, useCallback } from "react";
 import { Pressable } from "react-native";
@@ -277,7 +276,7 @@ const DungeonLevelScreen = observer(() => {
                 ...styles.notchMirroredLanscapePad,
               }}
             >
-              <VFXWrapper>
+              <VFXWrapper headerHeight={header}>
                 <DungeonEnemyDisplay />
               </VFXWrapper>
             </Pressable>

@@ -32,6 +32,7 @@ import { Enemy } from "@/entities/creatures";
 import GenericRaisedButton from "@/components/GenericRaisedButton";
 import { runInAction } from "mobx";
 import { Being } from "@/entities/being";
+import AttacksList from "./AttacksList";
 
 const BattleTab = observer(
   ({
@@ -266,30 +267,10 @@ const BattleTab = observer(
           ) : (
             <View style={styles.battleTabContainer}>
               {!playerState.isStunned ? (
-                <FlatList
-                  data={[...playerState.weaponAttacks, ...playerState.spells]}
-                  inverted
-                  indicatorStyle={"white"}
-                  persistentScrollbar
-                  contentContainerStyle={[
-                    styles.notchAvoidingLanscapePad,
-                    { paddingHorizontal: "2%" },
-                  ]}
-                  renderItem={({ item, index }) => (
-                    <AttackItem
-                      attack={item}
-                      isLast={
-                        index ==
-                        playerState.weaponAttacks.length +
-                          playerState.spells.length -
-                          1
-                      }
-                      setAttackDetails={setAttackDetails}
-                      attackHandler={attackHandler}
-                      pass={pass}
-                      vibration={vibration}
-                    />
-                  )}
+                <AttacksList
+                  setAttackDetails={setAttackDetails}
+                  attackHandler={attackHandler}
+                  vibration={vibration}
                 />
               ) : (
                 <View style={styles.stunnedContainer}>
@@ -387,163 +368,3 @@ const BattleTab = observer(
 );
 
 export default BattleTab;
-
-const AttackItem = observer(
-  ({
-    attack,
-    isLast,
-    attackHandler,
-    pass,
-    vibration,
-    setAttackDetails,
-  }: {
-    attack: Attack;
-    isLast: boolean;
-    setAttackDetails: (val: Attack) => void;
-    attackHandler: (val: Attack) => void;
-    pass: ({ voluntary }: { voluntary?: boolean }) => void;
-    vibration: ({
-      style,
-      essential,
-    }: {
-      style: "light" | "medium" | "heavy" | "success" | "warning" | "error";
-      essential?: boolean;
-    }) => void;
-  }) => {
-    const { playerState, enemyStore, uiStore } = useRootStore();
-    const styles = useStyles();
-
-    if (!playerState) {
-      throw new Error(
-        "playerState should be checked before AttackOrSpellItem render",
-      );
-    }
-
-    const canUse = useMemo(
-      () => attack.canBeUsed,
-      [attack, playerState.currentMana, playerState.isStunned],
-    );
-
-    const isDisabled = useMemo(
-      () => !canUse.val || enemyStore.enemyTurnOngoing,
-      [canUse, enemyStore.enemyTurnOngoing],
-    );
-
-    const handlePress = useCallback(() => {
-      attackHandler(attack);
-    }, [attackHandler, attack]);
-
-    const handlePassPress = useCallback(() => {
-      vibration({ style: "light" });
-      pass({ voluntary: true });
-    }, [pass, vibration]);
-
-    const handleDetailsPress = useCallback(() => {
-      setAttackDetails(attack);
-    }, [setAttackDetails, attack]);
-
-    const isSpell = !!attack.element;
-
-    const buttonText = useMemo(() => {
-      if (playerState.isStunned) return "Stunned!";
-      if (isSpell) return canUse.val ? "Cast" : canUse.reason;
-      return "Attack";
-    }, [isSpell, canUse, playerState.isStunned]);
-
-    const backgroundColor = useMemo(() => {
-      if (isSpell) return elementalColorMap[attack.element].dark;
-      return uiStore.colorScheme === "light" ? "#d4d4d8" : "#27272a";
-    }, [isSpell, attack, uiStore.colorScheme]);
-
-    const textColor = useMemo(() => {
-      if (isSpell) return elementalColorMap[attack.element].dark;
-      return uiStore.colorScheme === "dark" ? "#fafafa" : "#09090b";
-    }, [isSpell, attack, uiStore.colorScheme]);
-
-    return (
-      <>
-        <View
-          style={[
-            styles.attackCardBase,
-            isSpell && {
-              backgroundColor: elementalColorMap[attack.element].light,
-            },
-          ]}
-        >
-          <View style={styles.columnCenter}>
-            <Pressable onPress={handleDetailsPress}>
-              <Text style={[styles["text-xl"], { color: textColor }]}>
-                {toTitleCase(attack.name)}
-              </Text>
-              {!isSpell && attack.baseHitChance ? (
-                <Text style={styles["text-lg"]}>{`${
-                  attack.baseHitChance * 100
-                }% hit chance`}</Text>
-              ) : (
-                isSpell && (
-                  <View style={{ flexDirection: "row" }}>
-                    <Text
-                      style={{
-                        color: elementalColorMap[attack.element].dark,
-                      }}
-                    >
-                      {attack.manaCost}
-                    </Text>
-                    <View style={{ marginVertical: "auto", paddingLeft: 4 }}>
-                      <Energy
-                        height={uiStore.iconSizeSmall}
-                        width={uiStore.iconSizeSmall}
-                        color={
-                          uiStore.colorScheme === "dark" ? "#2563eb" : undefined
-                        }
-                      />
-                    </View>
-                  </View>
-                )
-              )}
-            </Pressable>
-          </View>
-          <GenericRaisedButton
-            disabled={isDisabled}
-            onPress={handlePress}
-            backgroundColor={backgroundColor}
-            disableTopLevelStyling
-            style={{ opacity: isDisabled ? 0.5 : 1 }}
-            buttonStyle={styles.actionButton}
-          >
-            <Text style={styles["text-xl"]}>{buttonText}</Text>
-          </GenericRaisedButton>
-        </View>
-
-        {isLast && <PassButton onPress={handlePassPress} />}
-      </>
-    );
-  },
-);
-
-const PassButton = observer(({ onPress }: { onPress: () => void }) => {
-  const { uiStore, enemyStore } = useRootStore();
-  const styles = useStyles();
-
-  return (
-    <ThemedView style={styles.attackCardBase}>
-      <View style={styles.columnCenter}>
-        <Text style={styles["text-xl"]}>Pass</Text>
-        <View style={styles.rowItemsCenter}>
-          <Text>1.5x</Text>
-          <Regen width={uiStore.iconSizeSmall} height={uiStore.iconSizeSmall} />
-        </View>
-      </View>
-      <GenericRaisedButton
-        disabled={enemyStore.enemyTurnOngoing}
-        disableTopLevelStyling
-        onPress={onPress}
-        backgroundColor={uiStore.colorScheme == "light" ? "#d4d4d8" : "#27272a"}
-        style={{ opacity: enemyStore.enemyTurnOngoing ? 0.5 : 1 }}
-        buttonStyle={styles.actionButton}
-      >
-        <Text style={styles["text-xl"]}>Use</Text>
-      </GenericRaisedButton>
-    </ThemedView>
-  );
-});

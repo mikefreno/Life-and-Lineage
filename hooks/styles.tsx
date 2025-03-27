@@ -703,7 +703,7 @@ export const useStyles = () => {
       backgroundColor: theme.background,
       borderWidth: 1,
       borderColor: theme.border,
-      width: "100%",
+      width: uiStore.isLandscape ? "50%" : "100%",
     },
     stunnedContainer: {
       marginVertical: "auto",

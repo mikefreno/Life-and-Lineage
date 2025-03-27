@@ -17,95 +17,105 @@ import React, {
 import { ReactNode } from "react";
 import { Animated, type ColorValue, View } from "react-native";
 
-export const VFXWrapper = observer(({ children }: { children: ReactNode }) => {
-  const { uiStore, enemyStore, playerAnimationStore } = useRootStore();
-  const { memoizedCalculateRenderScaling } = useScaling();
+export const VFXWrapper = observer(
+  ({
+    children,
+    headerHeight,
+  }: {
+    children: ReactNode;
+    headerHeight: number;
+  }) => {
+    const { uiStore, enemyStore, playerAnimationStore } = useRootStore();
 
-  const { enemyAnimationStores, enemyAndPosList } = useMemo(() => {
-    const stores: EnemyAnimationStore[] = [];
-    const positionalList = [];
+    const { enemyAnimationStores, enemyAndPosList } = useMemo(() => {
+      const stores: EnemyAnimationStore[] = [];
+      const positionalList = [];
 
-    for (const enemy of enemyStore.enemies) {
-      const store = enemyStore.getAnimationStore(enemy.id);
-      if (store) {
-        stores.push(store);
-        if (store.spriteMidPoint) {
-          positionalList.push({
-            enemyID: enemy.id,
-            positionMidPoint: store.spriteMidPoint,
-          });
+      for (const enemy of enemyStore.enemies) {
+        const store = enemyStore.getAnimationStore(enemy.id);
+        if (store) {
+          stores.push(store);
+          if (store.spriteMidPoint) {
+            positionalList.push({
+              enemyID: enemy.id,
+              positionMidPoint: store.spriteMidPoint,
+            });
+          }
         }
       }
-    }
 
-    return { enemyAnimationStores: stores, enemyAndPosList: positionalList };
-  }, [
-    enemyStore.enemies,
-    enemyStore.animationStoreMap.entries,
-    enemyStore.animationStoreMap.keys,
-    enemyStore.midpointUpdater,
-  ]);
+      return { enemyAnimationStores: stores, enemyAndPosList: positionalList };
+    }, [
+      enemyStore.enemies,
+      enemyStore.animationStoreMap.entries,
+      enemyStore.animationStoreMap.keys,
+      enemyStore.midpointUpdater,
+    ]);
 
-  return (
-    <View style={{ flex: 1 }}>
-      {/* Debug dots */}
-      {__DEV__ && uiStore.showDevDebugUI && (
-        <>
-          {enemyAnimationStores.map((elem) => (
+    return (
+      <View style={{ flex: 1 }}>
+        {/* Debug dots */}
+        {__DEV__ && uiStore.showDevDebugUI && (
+          <>
+            {enemyAnimationStores.map((elem) => (
+              <View
+                key={`enemy-dot-${elem.spriteMidPoint?.x}-${elem.spriteMidPoint?.y}`}
+                style={{
+                  position: "absolute",
+                  width: 10,
+                  height: 10,
+                  borderRadius: 5,
+                  backgroundColor: "red",
+                  top: elem.spriteMidPoint?.y,
+                  left: elem.spriteMidPoint?.x,
+                  zIndex: 9999,
+                }}
+              />
+            ))}
             <View
-              key={`enemy-dot-${elem.spriteMidPoint?.x}-${elem.spriteMidPoint?.y}`}
               style={{
                 position: "absolute",
                 width: 10,
                 height: 10,
                 borderRadius: 5,
-                backgroundColor: "red",
-                top: elem.spriteMidPoint?.y,
-                left: elem.spriteMidPoint?.x,
+                backgroundColor: "green",
+                top: playerAnimationStore.playerOrigin.y,
+                left: playerAnimationStore.playerOrigin.x,
                 zIndex: 9999,
               }}
             />
-          ))}
-          <View
-            style={{
-              position: "absolute",
-              width: 10,
-              height: 10,
-              borderRadius: 5,
-              backgroundColor: "green",
-              top: playerAnimationStore.playerOrigin.y,
-              left: playerAnimationStore.playerOrigin.x,
-              zIndex: 9999,
-            }}
-          />
-        </>
-      )}
-      {children}
-      <PlayerVFX
-        enemyPositions={enemyAndPosList}
-        playerOrigin={playerAnimationStore.playerOrigin}
-      />
-      {enemyAnimationStores.map((store) => (
-        <EnemyVFX
-          key={store.id}
-          store={store}
+          </>
+        )}
+        {children}
+        <PlayerVFX
+          enemyPositions={enemyAndPosList}
           playerOrigin={playerAnimationStore.playerOrigin}
+          headerHeight={headerHeight}
         />
-      ))}
-    </View>
-  );
-});
+        {enemyAnimationStores.map((store) => (
+          <EnemyVFX
+            key={store.id}
+            store={store}
+            playerOrigin={playerAnimationStore.playerOrigin}
+          />
+        ))}
+      </View>
+    );
+  },
+);
 
 const PlayerVFX = observer(
   ({
     enemyPositions,
     playerOrigin,
+    headerHeight,
   }: {
     enemyPositions: {
       enemyID: string;
       positionMidPoint: Vector2;
     }[];
     playerOrigin: Vector2;
+    headerHeight: number;
   }) => {
     const { playerAnimationStore } = useRootStore();
 
@@ -139,6 +149,7 @@ const PlayerVFX = observer(
               glow={playerAnimationStore.animationSet.glow}
               duration={playerAnimationStore.animationSet.duration}
               onComplete={() => playerAnimationStore.clearAnimation()}
+              headerHeight={headerHeight}
             />
           )
         )}
@@ -499,10 +510,12 @@ const PlayerGlowVFX = ({
   glow,
   duration = 1000,
   onComplete,
+  headerHeight,
 }: {
   glow: ColorValue;
   duration?: number;
   onComplete: (() => void) | null;
+  headerHeight: number;
 }) => {
   const { uiStore } = useRootStore();
   const opacity = useRef(new Animated.Value(0)).current;
@@ -540,6 +553,7 @@ const PlayerGlowVFX = ({
         zIndex: 9999,
         width: uiStore.dimensions.width,
         height: uiStore.dimensions.height,
+        marginTop: -headerHeight,
         position: "absolute",
         backgroundColor: glow,
         opacity: opacity,

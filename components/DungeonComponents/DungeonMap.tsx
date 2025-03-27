@@ -7,30 +7,47 @@ import { useRootStore } from "@/hooks/stores";
 import { useStyles } from "@/hooks/styles";
 import { directionsMapping, Tile } from "@/utility/functions/dungeon";
 import { useScaling } from "@/hooks/scaling";
+import { useMemo } from "react";
 
 /**
  * Renders the dungeon map made by `generateTiles`.
  */
 export const DungeonMapRender = observer(() => {
-  const strokeWidth = 1;
   const { dungeonStore, uiStore } = useRootStore();
   const { currentMapDimensions, currentMap, currentPosition } = dungeonStore;
+  const { dimensions, isLandscape, colorScheme } = uiStore; // dimensions: { width, height }
 
   if (!currentMapDimensions || !currentMap) {
     throw new Error("Missing map, or map dimensions within map render!");
   }
-  /**
-   * Gets the fill color for a tile based on its state and the color scheme.
-   * @param {Tile} tile - The tile to get the fill color for.
-   * @returns {string} - The fill color for the tile.
-   */
+
+  // Memoize the origin and offset calculations.
+  const { xOrigin, yOrigin, offsetX, offsetY } = useMemo(() => {
+    const xOriginCalc = dimensions.width / 2 - TILE_SIZE / 2;
+    const yOriginCalc = isLandscape
+      ? dimensions.height * 0.15 - TILE_SIZE / 2
+      : dimensions.height * 0.2 - TILE_SIZE / 2;
+    const offX = currentPosition
+      ? currentPosition.x - currentMapDimensions.offsetX
+      : 0;
+    const offY = currentPosition
+      ? currentPosition.y - currentMapDimensions.offsetY
+      : 0;
+    return {
+      xOrigin: xOriginCalc,
+      yOrigin: yOriginCalc,
+      offsetX: offX,
+      offsetY: offY,
+    };
+  }, [dimensions, isLandscape, currentPosition, currentMapDimensions]);
+
   const getFillColor = (tile: Tile) => {
     const isCurrent =
       tile.x === currentPosition?.x && tile.y === currentPosition?.y;
     if (tile.isBossRoom && tile.clearedRoom) {
       return isCurrent ? "#DBA56E" : "#8B4513";
     }
-    if (uiStore.colorScheme == "dark") {
+    if (colorScheme === "dark") {
       if (tile.clearedRoom) {
         return isCurrent ? "#93c5fd" : "#2563eb";
       }
@@ -43,39 +60,18 @@ export const DungeonMapRender = observer(() => {
     }
   };
 
-  /**
-   * Renders a single tile.
-   * @param {Tile} tile - The tile to render.
-   * @returns {JSX.Element} - The rendered tile.
-   */
-  const renderTile = (tile: Tile) => {
-    return (
-      <Rect
-        key={`${tile.x}-${tile.y}`}
-        x={tile.x - currentMapDimensions.offsetX}
-        y={tile.y - currentMapDimensions.offsetY}
-        width={TILE_SIZE}
-        height={TILE_SIZE}
-        fill={getFillColor(tile)}
-        stroke="gray"
-        strokeWidth={strokeWidth}
-      />
-    );
-  };
-
-  const windowWidth = Dimensions.get("window").width;
-  const windowHeight = Dimensions.get("window").height;
-
-  // Position of the map's top left piece
-  const xOrigin = windowWidth / 2 - TILE_SIZE / 2;
-  const yOrigin = windowHeight * 0.2 - TILE_SIZE / 2;
-  // Distance from map's top left piece
-  const offsetX = currentPosition
-    ? currentPosition.x - currentMapDimensions.offsetX
-    : 0;
-  const offsetY = currentPosition
-    ? currentPosition.y - currentMapDimensions.offsetY
-    : 0;
+  const renderTile = (tile: Tile) => (
+    <Rect
+      key={`${tile.x}-${tile.y}`}
+      x={tile.x - currentMapDimensions.offsetX}
+      y={tile.y - currentMapDimensions.offsetY}
+      width={TILE_SIZE}
+      height={TILE_SIZE}
+      fill={getFillColor(tile)}
+      stroke="gray"
+      strokeWidth={1}
+    />
+  );
 
   return (
     <View
@@ -88,9 +84,9 @@ export const DungeonMapRender = observer(() => {
       <Svg
         width={currentMapDimensions.width}
         height={currentMapDimensions.height}
-        viewBox={`${-strokeWidth / 2} ${-strokeWidth / 2} ${
-          currentMapDimensions.width + strokeWidth
-        } ${currentMapDimensions.height + strokeWidth}`}
+        viewBox={`-0.5 -0.5 ${currentMapDimensions.width + 1} ${
+          currentMapDimensions.height + 1
+        }`}
       >
         {currentMap.map((tile) => renderTile(tile))}
       </Svg>

@@ -1212,7 +1212,6 @@ export class Being {
   }
 
   public endTurn() {
-    console.log(`called by: ${this.nameReference}`);
     this.conditionTicker();
     this.regenMana();
     this.regenHealth();
