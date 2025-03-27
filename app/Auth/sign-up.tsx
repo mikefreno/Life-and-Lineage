@@ -26,7 +26,6 @@ import { tw, useStyles } from "@/hooks/styles";
 import { runInAction } from "mobx";
 import Colors from "@/constants/Colors";
 import { useScaling } from "@/hooks/scaling";
-import { Colors } from "react-native/Libraries/NewAppScreen";
 
 const SignUpScreen = observer(() => {
   const vibration = useVibration();
