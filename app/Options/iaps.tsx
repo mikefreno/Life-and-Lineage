@@ -11,8 +11,9 @@ import {
   DualPaywall,
 } from "@/components/IAPPaywalls";
 import { useState } from "react";
+import { observer } from "mobx-react-lite";
 
-export default function InAppPurchasePage() {
+const InAppPurchasePage = observer(() => {
   const { uiStore, iapStore } = useRootStore();
   const styles = useStyles();
   const [showNecromancerPurchase, setShowNecromancerPurchase] =
@@ -94,4 +95,5 @@ export default function InAppPurchasePage() {
       </View>
     </ScrollView>
   );
-}
+});
+export default InAppPurchasePage;
