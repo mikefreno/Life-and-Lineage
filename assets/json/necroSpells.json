@@ -9,7 +9,7 @@
     "damageTable": {
       "physical": 5
     },
-    "buffs": [
+    "buffNames": [
       "blood orb"
     ],
     "animation": {
@@ -27,7 +27,7 @@
     "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": -35,
-    "buffs": [
+    "buffNames": [
       "consume blood orb"
     ],
     "animation": {
@@ -46,7 +46,7 @@
     "selfDamageTable": {
       "raw": -30
     },
-    "buffs": [
+    "buffNames": [
       "consume blood orb"
     ],
     "animation": {
@@ -68,7 +68,7 @@
     "selfDamageTable": {
       "raw": -20
     },
-    "buffs": [
+    "buffNames": [
       "blood orb"
     ],
     "animation": {
@@ -86,7 +86,7 @@
       "physical": 90
     },
     "manaCost": 75,
-    "buffs": [
+    "buffNames": [
       "consume blood orb"
     ],
     "animation": {
@@ -108,10 +108,10 @@
     "selfDamageTable": {
       "raw": 25
     },
-    "buffs": [
+    "buffNames": [
       "blood orb"
     ],
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "hemmorage",
         "chance": 0.75
@@ -136,11 +136,11 @@
     "selfDamageTable": {
       "raw": 50
     },
-    "buffs": [
+    "buffNames": [
       "blood orb",
       "blood orb"
     ],
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "hemmorage",
         "chance": 1.0
@@ -165,12 +165,12 @@
     "selfDamageTable": {
       "raw": 75
     },
-    "buffs": [
+    "buffNames": [
       "blood orb",
       "blood orb",
       "blood orb"
     ],
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "severe hemmorage",
         "chance": 1.0
@@ -284,7 +284,7 @@
     "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 15,
-    "buffs": [
+    "buffNames": [
       "bone shield"
     ],
     "animation": {
@@ -300,7 +300,7 @@
     "type": "defense",
     "proficiencyNeeded": "adept",
     "manaCost": 60,
-    "buffs": [
+    "buffNames": [
       "projectile suppression"
     ],
     "animation": {
@@ -319,7 +319,7 @@
     "damageTable": {
       "physical": 40
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "bleed",
         "chance": 0.5
@@ -338,7 +338,7 @@
     "type": "defense",
     "proficiencyNeeded": "master",
     "manaCost": 75,
-    "buffs": [
+    "buffNames": [
       "guard"
     ],
     "animation": {
@@ -357,7 +357,7 @@
     "damageTable": {
       "physical": 100
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "stun",
         "chance": 0.75
@@ -395,7 +395,7 @@
     "damageTable": {
       "poison": 5
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "poison",
         "chance": 0.75
@@ -419,7 +419,7 @@
     "damageTable": {
       "poison": 15
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "diseased",
         "chance": 0.5
@@ -441,7 +441,7 @@
     "damageTable": {
       "poison": 5
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "poison",
         "chance": 0.75
@@ -464,7 +464,7 @@
     "type": "defense",
     "proficiencyNeeded": "adept",
     "manaCost": 50,
-    "buffs": [
+    "buffNames": [
       "disease immunity"
     ],
     "animation": {
@@ -483,7 +483,7 @@
     "damageTable": {
       "poison": 45
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "poison",
         "chance": 1.0
@@ -509,11 +509,11 @@
     "damageTable": {
       "poison": 75
     },
-    "buffs": [
+    "buffNames": [
       "protection aura",
       "heal from poison"
     ],
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "diseased",
         "chance": 1.0
@@ -534,7 +534,7 @@
     "damageTable": {
       "poison": 150
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "poison",
         "chance": 1.0
@@ -560,7 +560,7 @@
     "damageTable": {
       "poison": 250
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "severe poison",
         "chance": 1.0

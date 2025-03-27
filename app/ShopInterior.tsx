@@ -330,10 +330,13 @@ const ShopInteriorScreen = observer(() => {
                 onScrollBeginDrag={() => setDisplayItem(null)}
                 style={{
                   height: "100%",
-                  paddingTop: uiStore.itemBlockSize,
                   ...tw.px2,
                 }}
-                contentContainerStyle={[flex.rowEvenly, flex.wrap]}
+                contentContainerStyle={[
+                  flex.rowEvenly,
+                  flex.wrap,
+                  { paddingTop: uiStore.itemBlockSize },
+                ]}
               >
                 {shopsStore.currentShop.inventory.map((item) => (
                   <Pressable

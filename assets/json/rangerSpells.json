@@ -9,7 +9,7 @@
     "damageTable": {
       "physical": 15
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "bleed",
         "chance": 0.25
@@ -34,7 +34,7 @@
       "physical": 5,
       "poison": 5
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "poison",
         "chance": 0.5
@@ -59,7 +59,7 @@
     "damageTable": {
       "physical": 2
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "stun",
         "chance": 0.75
@@ -81,7 +81,7 @@
     "damageTable": {
       "physical": 15
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "stun",
         "chance": 0.5
@@ -104,7 +104,7 @@
     "damageTable": {
       "physical": 30
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "bleed",
         "chance": 0.5
@@ -123,7 +123,7 @@
     "type": "defense",
     "proficiencyNeeded": "adept",
     "manaCost": 50,
-    "buffs": [
+    "buffNames": [
       "stealth"
     ],
     "animation": {
@@ -144,7 +144,7 @@
       "physical": 85,
       "raw": 10
     },
-    "buffs": [
+    "buffNames": [
       "remove stealth"
     ],
     "animation": {
@@ -165,7 +165,7 @@
       "physical": 5,
       "poison": 35
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "severe poison",
         "chance": 0.75
@@ -185,7 +185,7 @@
     "usesWeapon": "melee",
     "proficiencyNeeded": "expert",
     "manaCost": 100,
-    "buffs": [
+    "buffNames": [
       "dance of daggers"
     ],
     "animation": {
@@ -205,7 +205,7 @@
     "damage": {
       "physical": 75
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "silence",
         "chance": 0.75
@@ -231,7 +231,7 @@
     "damageTable": {
       "physical": 100
     },
-    "buffs": [
+    "buffNames": [
       "stealth"
     ],
     "animation": {
@@ -250,7 +250,7 @@
     "damageTable": {
       "physical": 275
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "bleed",
         "chance": 1.0
@@ -274,7 +274,7 @@
       "physical": 250,
       "raw": 250
     },
-    "buffs": [
+    "buffNames": [
       "remove stealth"
     ],
     "animation": {
@@ -310,10 +310,10 @@
     "manaCost": 20,
     "effects": {
       "damage": null,
-      "buffs": [
+      "buffNames": [
         "minor fortitude"
       ],
-      "debuffs": null
+      "debuffNames": null
     }
   },
   {
@@ -323,7 +323,7 @@
     "type": "offense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 20,
-    "buffs": [
+    "buffNames": [
       "rat trap"
     ]
   },
@@ -334,7 +334,7 @@
     "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 35,
-    "buffs": [
+    "buffNames": [
       "beast empowerment"
     ]
   },
@@ -354,7 +354,7 @@
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 100,
-    "buffs": [
+    "buffNames": [
       "bear trap"
     ]
   },
@@ -374,7 +374,7 @@
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 75,
-    "buffs": [
+    "buffNames": [
       "dual rage"
     ]
   },
@@ -385,7 +385,7 @@
     "type": "offense",
     "proficiencyNeeded": "expert",
     "manaCost": 200,
-    "buffs": [
+    "buffNames": [
       "dragon trap"
     ]
   },
@@ -409,7 +409,7 @@
     "damageTable": {
       "physical": 75
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "stun",
         "chance": 0.75
@@ -453,7 +453,7 @@
     "usesWeapon": "bow",
     "proficiencyNeeded": "apprentice",
     "manaCost": 25,
-    "buffs": [
+    "buffNames": [
       "enchanted quiver"
     ],
     "animation": {
@@ -513,7 +513,7 @@
     "damageTable": {
       "magic": 90
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "burn",
         "chance": 0.4
@@ -532,7 +532,7 @@
     "type": "defense",
     "proficiencyNeeded": "master",
     "manaCost": 125,
-    "buffs": [
+    "buffNames": [
       "guard",
       "quickened mind"
     ],
@@ -574,7 +574,7 @@
       "fire": 25,
       "magic": 75
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "burn",
         "chance": 0.5

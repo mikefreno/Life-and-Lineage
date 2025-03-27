@@ -11,7 +11,6 @@ import { tw, tw_base, useStyles } from "@/hooks/styles";
 import Colors from "@/constants/Colors";
 import GenericFlatButton from "./GenericFlatButton";
 import { SCREEN_TRANSITION_TIMING } from "@/stores/UIStore";
-import { useScaling } from "@/hooks/scaling";
 
 type TutorialPage = {
   title?: string;
@@ -72,7 +71,7 @@ const TutorialModal = observer(
           if (isFocused) {
             setStillOnPage(true);
           }
-        }, 300 + SCREEN_TRANSITION_TIMING);
+        }, SCREEN_TRANSITION_TIMING);
       } else {
         setStillOnPage(false);
       }
@@ -83,9 +82,9 @@ const TutorialModal = observer(
       setShouldShow(
         override ||
           (stillOnPage &&
+            !tutorialStore.tutorialsShown[tutorial] &&
             (tutorialStore.tutorialsEnabled ||
-              tutorial === TutorialOption.firstBossKill) &&
-            !tutorialStore.tutorialsShown[tutorial]),
+              tutorial === TutorialOption.firstBossKill)),
       );
     }, [
       tutorialStore.tutorialsEnabled,

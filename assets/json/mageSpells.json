@@ -9,7 +9,7 @@
     "damageTable": {
       "fire": 15
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "burn",
         "chance": 0.25
@@ -33,7 +33,7 @@
     "damageTable": {
       "fire": 25
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "burn",
         "chance": 0.25
@@ -56,7 +56,7 @@
     "damageTable": {
       "fire": 25
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "burn",
         "chance": 1.0
@@ -79,7 +79,7 @@
     "damageTable": {
       "fire": 60
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "burn",
         "chance": 0.25
@@ -101,10 +101,10 @@
     "proficiencyNeeded": "expert",
     "manaCost": 100,
     "maxTurnsActive": 3,
-    "buffs": [
+    "buffNames": [
       "projectile suppression"
     ],
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "burn",
         "chance": 0.5
@@ -128,7 +128,7 @@
     "damageTable": {
       "fire": 50
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "burn",
         "chance": 0.25
@@ -150,7 +150,7 @@
     "damageTable": {
       "fire": 275
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "severe burn",
         "chance": 0.75
@@ -173,7 +173,7 @@
     "damageTable": {
       "fire": 400
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "severe burn",
         "chance": 1.0
@@ -196,7 +196,7 @@
     "damageTable": {
       "cold": 10
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "chill",
         "chance": 0.5
@@ -250,7 +250,7 @@
     "damageTable": {
       "cold": 40
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "chill",
         "chance": 1.0
@@ -276,8 +276,8 @@
     "damageTable": {
       "fire": 60
     },
-    "buffs": null,
-    "debuffs": [
+    "buffNames": null,
+    "debuffNames": [
       {
         "name": "burn",
         "chance": 0.5
@@ -301,8 +301,8 @@
     "damageTable": {
       "cold": 100
     },
-    "buffs": null,
-    "debuffs": [
+    "buffNames": null,
+    "debuffNames": [
       {
         "name": "chill",
         "chance": 0.75
@@ -329,10 +329,10 @@
     "target": "area",
     "type": "defense",
     "manaCost": 200,
-    "buffs": [
+    "buffNames": [
       "lasting heal"
     ],
-    "debuffs": null,
+    "debuffNames": null,
     "animation": {
       "sprite": "rainCall",
       "style": "static",
@@ -350,7 +350,7 @@
     "damageTable": {
       "cold": 50
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "chill",
         "chance": 0.75
@@ -391,7 +391,7 @@
     "damageTable": {
       "cold": 150
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "chill",
         "chance": 0.75
@@ -444,7 +444,7 @@
     "damageTable": {
       "lightning": 25
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "shocked",
         "chance": 0.5
@@ -467,7 +467,7 @@
     "damageTable": {
       "lightning": 50
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "shocked",
         "chance": 0.5
@@ -493,7 +493,7 @@
     "damageTable": {
       "lightning": 50
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "shocked",
         "chance": 0.75
@@ -520,7 +520,7 @@
     "damageTable": {
       "lightning": 70
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "shocked",
         "chance": 0.75
@@ -547,7 +547,7 @@
     "damageTable": {
       "physical": 100
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "bleed",
         "chance": 0.75
@@ -571,7 +571,7 @@
     "type": "defense",
     "proficiencyNeeded": "master",
     "manaCost": 125,
-    "buffs": [
+    "buffNames": [
       "hard to see",
       "damaging to hit"
     ],
@@ -611,7 +611,7 @@
     "damageTable": {
       "physical": 125
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "stun",
         "chance": 0.75
@@ -635,7 +635,7 @@
       "physical": 5,
       "raw": 5
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "stun",
         "chance": 0.10
@@ -654,10 +654,10 @@
     "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 20,
-    "buffs": [
+    "buffNames": [
       "stone hands"
     ],
-    "debuffs": null,
+    "debuffNames": null,
     "animation": {
       "glow": "#77484C20",
       "position": "self"
@@ -675,7 +675,7 @@
       "physical": 5,
       "raw": 5
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "stun",
         "chance": 0.25
@@ -694,7 +694,7 @@
     "type": "defense",
     "proficiencyNeeded": "adept",
     "manaCost": 60,
-    "buffs": [
+    "buffNames": [
       "rock armor"
     ],
     "animation": {
@@ -728,7 +728,7 @@
     "proficiencyNeeded": "master",
     "maxTurnsActive": 5,
     "manaCost": 120,
-    "buffs": [
+    "buffNames": [
       "projectile negation"
     ],
     "animation": {
@@ -748,7 +748,7 @@
       "physical": 120,
       "raw": 75
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "heavy stun",
         "chance": 1.0
@@ -775,7 +775,7 @@
       "physical": 330,
       "raw": 100
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "heavy stun",
         "chance": 1.0

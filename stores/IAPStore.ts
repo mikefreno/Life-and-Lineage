@@ -10,6 +10,7 @@ import Purchases, {
 import { storage } from "@/utility/functions/storage";
 import { API_BASE_URL } from "@/config/config";
 import { convertToPlainObject } from "@sentry/core";
+import { isEmulatorSync } from "react-native-device-info";
 
 const NECRO_UNLOCK_IDs = [
   process.env.EXPO_PUBLIC_IOS_NECRO_ID,
@@ -374,17 +375,28 @@ export class IAPStore {
   }
 
   getCustomersIAPs() {
-    if (this.root.authStore.isConnected) {
-      try {
-        Purchases.restorePurchases()
-          .then((val) => this.evaluateCustomer(val))
-          .catch((e) => console.error(e))
-          .finally(() => (this.hasHydrated = true));
-      } catch (e) {
-        console.log("Error restoring purchases:", e);
+    if (!this.hasHydrated) {
+      if (isEmulatorSync()) {
+        this.hasHydrated = true;
+        //console.log("running on emulator");
+      } else {
+        if (this.root.authStore.isConnected) {
+          try {
+            Purchases.restorePurchases()
+              .then((val) => this.evaluateCustomer(val))
+              .catch((e) => {
+                if (e.toString() !== "Error: The receipt is not valid.") {
+                  console.error(e.toString());
+                }
+              })
+              .finally(() => (this.hasHydrated = true));
+          } catch (e) {
+            console.log("Error restoring purchases:", e);
+          }
+        } else {
+          this.hydrateOffline();
+        }
       }
-    } else {
-      this.hydrateOffline();
     }
   }
 }
