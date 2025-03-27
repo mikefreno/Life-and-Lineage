@@ -27,7 +27,6 @@ import {
 import {
   hasNotch,
   getDeviceTypeSync,
-  isLandscapeSync,
   isTablet,
   getDeviceType,
 } from "react-native-device-info";
@@ -138,7 +137,6 @@ export default class UIStore {
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
-    console.log(getDeviceTypeSync());
 
     const dimensions = {
       height: Dimensions.get("window").height,
@@ -389,7 +387,7 @@ export default class UIStore {
   }
 
   get isLandscape() {
-    return isLandscapeSync();
+    return this.dimensions.width > this.dimensions.height;
   }
 
   get isTablet() {

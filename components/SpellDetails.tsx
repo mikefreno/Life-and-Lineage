@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import { View } from "react-native";
 import { statRounding, toTitleCase } from "@/utility/functions/misc";
 import { Text } from "@/components/Themed";
@@ -28,7 +28,10 @@ export default function SpellDetails({ spell }: { spell: Attack }) {
     <View
       style={[
         styles.spellCard,
-        { shadowColor: elementalColorMap[spell.element].dark },
+        {
+          shadowColor: elementalColorMap[spell.element].dark,
+          maxWidth: uiStore.dimensions.lesser * 0.95,
+        },
       ]}
     >
       <View
@@ -87,9 +90,11 @@ export default function SpellDetails({ spell }: { spell: Attack }) {
               title={"Damage"}
             />
           ) : null}
-          {spell.usesWeapon && spell.userHasRequiredWeapon && (
+          {spell.usesWeapon && (
             <Text style={styles.textCenter}>
-              Requires: {toTitleCase(spell.usesWeapon)}
+              Requires: {spell.usesWeapon === "melee" && "\n"}
+              {toTitleCase(spell.usesWeapon)}
+              {spell.usesWeapon === "melee" && " Weapon"}
             </Text>
           )}
           {spell.selfDamage.damageMap &&
@@ -160,7 +165,7 @@ export default function SpellDetails({ spell }: { spell: Attack }) {
           <BlessingDisplay
             blessing={spell.element}
             colorScheme={uiStore.colorScheme}
-            size={uiStore.dimensions.width * 0.15}
+            size={uiStore.dimensions.lesser * 0.15}
           />
         </View>
       </View>

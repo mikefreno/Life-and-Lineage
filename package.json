@@ -1,12 +1,12 @@
 {
   "name": "life-and-lineage",
   "main": "expo-router/entry",
-  "version": "0.8.9",
+  "version": "0.8.11",
   "type": "commonjs",
   "scripts": {
     "start": "expo start",
-    "android": "expo run:android",
-    "ios": "expo run:ios",
+    "android": "expo run:android --device",
+    "ios": "expo run:ios --device",
     "web": "expo start --web",
     "test": "jest --watchAll"
   },
@@ -89,3 +89,4 @@
   },
   "private": true
 }
+

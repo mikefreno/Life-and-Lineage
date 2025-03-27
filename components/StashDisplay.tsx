@@ -7,6 +7,7 @@ import {
   LayoutChangeEvent,
   DimensionValue,
   LayoutAnimation,
+  Alert,
 } from "react-native";
 import { observer } from "mobx-react-lite";
 import { Item } from "@/entities/item";
@@ -16,8 +17,9 @@ import { Text } from "@/components/Themed";
 import GenericModal from "@/components/GenericModal";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { StatsDisplay } from "@/components/StatsDisplay";
-import GenericStrikeAround from "@/components/GenericStrikeAround";
 import { useStyles } from "@/hooks/styles";
+import { Ionicons } from "@expo/vector-icons";
+import { useVibration } from "@/hooks/generic";
 
 type StashDisplayProps = {
   showingStash: boolean;
@@ -25,19 +27,23 @@ type StashDisplayProps = {
 };
 export const StashDisplay = observer(
   ({ showingStash, clear }: StashDisplayProps) => {
-    const { uiStore, stashStore } = useRootStore();
+    const { uiStore, stashStore, iapStore } = useRootStore();
     const styles = useStyles();
     const [displayItem, setDisplayItem] = useState<{
       item: Item[];
       position: { left: number; top: number };
+      side?: "stash";
     } | null>(null);
     const scrollViewRef = useRef<ScrollView>(null);
     const [currentPage, setCurrentPage] = useState(0);
     const SLOTS_PER_PAGE = 24;
-    const totalPages = Math.max(
-      1,
-      Math.ceil(stashStore.items.length / SLOTS_PER_PAGE),
+
+    // Calculate total pages based on purchased tabs + 1 free tab
+    const totalPages = Math.min(
+      Math.max(1, Math.ceil(stashStore.items.length / SLOTS_PER_PAGE)),
+      iapStore.purchasedTabs + 1,
     );
+
     const [modalDimensions, setModalDimensions] = useState<{
       height: number;
       width: number;
@@ -46,6 +52,7 @@ export const StashDisplay = observer(
     const clearDisplayItem = useCallback(() => setDisplayItem(null), []);
 
     const [targetPage, setTargetPage] = useState<number | null>(null);
+    const vibration = useVibration();
 
     const handleTabPress = useCallback(
       (pageIndex: number) => {
@@ -60,9 +67,12 @@ export const StashDisplay = observer(
       [modalDimensions.width],
     );
 
+    const handleAddTab = () => {
+      vibration({ style: "light", essential: true });
+    };
+
     const handleScroll = useCallback(
       (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-        // Only update currentPage from scroll events if we're not handling a button press
         if (targetPage === null) {
           const page = Math.round(
             event.nativeEvent.contentOffset.x / modalDimensions.width,
@@ -120,7 +130,6 @@ export const StashDisplay = observer(
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       return {
         rows,
-        columns,
         itemSize,
         slotPositions,
       };
@@ -210,13 +219,15 @@ export const StashDisplay = observer(
       [renderInventorySlot],
     );
 
-    const inventoryItems = useMemo(
-      () =>
+    const inventoryItems = useMemo(() => {
+      const startIndex = currentPage * SLOTS_PER_PAGE;
+      const endIndex = startIndex + SLOTS_PER_PAGE;
+      return (
         stashStore.items
-          .slice(0, 24)
-          .map((item, index) => renderInventoryItem(item, index)) || [],
-      [stashStore.items, renderInventoryItem],
-    );
+          .slice(startIndex, endIndex)
+          .map((item, index) => renderInventoryItem(item, index)) || []
+      );
+    }, [stashStore.items, renderInventoryItem, currentPage, SLOTS_PER_PAGE]);
 
     const onModalLayout = (event: LayoutChangeEvent) => {
       const { height, width } = event.nativeEvent.layout;
@@ -272,7 +283,23 @@ export const StashDisplay = observer(
                 </Text>
               </Pressable>
             ))}
+
+            <Pressable
+              onPress={handleAddTab}
+              style={[
+                styles.tabButton,
+                {
+                  backgroundColor: "#3b82f6",
+                  width: 40,
+                  justifyContent: "center",
+                  alignItems: "center",
+                },
+              ]}
+            >
+              <Text style={{ color: "white" }}>+</Text>
+            </Pressable>
           </View>
+
           <ScrollView
             ref={scrollViewRef}
             horizontal
@@ -311,7 +338,7 @@ export const StashDisplay = observer(
                   style={styles.stashContainer}
                 >
                   {inventorySlots}
-                  {inventoryItems}
+                  {pageIndex === currentPage && inventoryItems}
                 </Pressable>
               </View>
             ))}
@@ -333,11 +360,6 @@ export const StashDisplay = observer(
               </View>
             )}
           </ScrollView>
-          {totalPages === 1 && (
-            <GenericStrikeAround style={{ textAlign: "center" }}>
-              {`More tabs will be added\n as items are added`}
-            </GenericStrikeAround>
-          )}
         </View>
       </GenericModal>
     );

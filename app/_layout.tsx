@@ -77,7 +77,7 @@ SplashScreen.setOptions({
 });
 
 Sentry.init({
-  dsn: "https://2cff54f8aeb50bcb7151c159cc40fe1b@o4506630160187392.ingest.sentry.io/4506630163398656",
+  dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
   //@ts-ignore
   //replaysSessionSampleRate: __DEV__ ? 1.0 : 0.1,
   //replaysOnErrorSampleRate: 1.0,
@@ -389,6 +389,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
             screenOptions={{
               animation: uiStore.reduceMotion ? "slide_from_bottom" : undefined,
               animationDuration: 500,
+              fullScreenGestureEnabled: true,
             }}
           >
             <Stack.Screen
@@ -470,21 +471,22 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
             <Stack.Screen
               name="Study"
               options={{
+                title: "Magic Study",
                 headerTitleStyle: {
                   fontFamily: "PixelifySans",
-                  fontSize: getNormalizedSize(20),
+                  fontSize: getNormalizedSize(22),
                 },
                 headerBackButtonDisplayMode: "minimal",
                 headerTransparent: true,
                 headerBackground: () => (
-                  <BlurView
-                    blurReductionFactor={12}
-                    tint={uiStore.colorScheme}
-                    intensity={50}
-                    style={StyleSheet.absoluteFill}
-                  />
+                  <View style={[StyleSheet.absoluteFill, styles.diffuse]}>
+                    <BlurView
+                      intensity={50}
+                      style={[StyleSheet.absoluteFill]}
+                      tint={uiStore.colorScheme}
+                    />
+                  </View>
                 ),
-                title: "Magic Study",
               }}
             />
             <Stack.Screen
@@ -502,12 +504,13 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                   fontSize: getNormalizedSize(22),
                 },
                 headerBackground: () => (
-                  <BlurView
-                    blurReductionFactor={12}
-                    tint={uiStore.colorScheme}
-                    intensity={100}
-                    style={StyleSheet.absoluteFill}
-                  />
+                  <View style={[StyleSheet.absoluteFill, styles.diffuse]}>
+                    <BlurView
+                      intensity={50}
+                      style={[StyleSheet.absoluteFill]}
+                      tint={uiStore.colorScheme}
+                    />
+                  </View>
                 ),
               }}
             />
@@ -526,11 +529,13 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                   fontSize: getNormalizedSize(22),
                 },
                 headerBackground: () => (
-                  <BlurView
-                    intensity={100}
-                    style={StyleSheet.absoluteFill}
-                    tint={uiStore.colorScheme}
-                  />
+                  <View style={[StyleSheet.absoluteFill, styles.diffuse]}>
+                    <BlurView
+                      intensity={50}
+                      style={[StyleSheet.absoluteFill]}
+                      tint={uiStore.colorScheme}
+                    />
+                  </View>
                 ),
               }}
             />
@@ -573,11 +578,13 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                   fontSize: getNormalizedSize(22),
                 },
                 headerBackground: () => (
-                  <BlurView
-                    intensity={100}
-                    style={StyleSheet.absoluteFill}
-                    tint={uiStore.colorScheme}
-                  />
+                  <View style={[StyleSheet.absoluteFill, styles.diffuse]}>
+                    <BlurView
+                      intensity={50}
+                      style={[StyleSheet.absoluteFill]}
+                      tint={uiStore.colorScheme}
+                    />
+                  </View>
                 ),
               }}
             />
@@ -586,15 +593,17 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
               options={{
                 headerTitleStyle: {
                   fontFamily: "PixelifySans",
-                  fontSize: getNormalizedSize(20),
+                  fontSize: getNormalizedSize(22),
                 },
                 headerTransparent: true,
                 headerBackground: () => (
-                  <BlurView
-                    intensity={50}
-                    style={StyleSheet.absoluteFill}
-                    tint={uiStore.colorScheme}
-                  />
+                  <View style={[StyleSheet.absoluteFill, styles.diffuse]}>
+                    <BlurView
+                      intensity={50}
+                      style={[StyleSheet.absoluteFill]}
+                      tint={uiStore.colorScheme}
+                    />
+                  </View>
                 ),
                 headerLeft: () => (
                   <Pressable

@@ -5,6 +5,7 @@ import {
   View,
   Animated,
   ScrollView,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { useRef, useEffect, useState, useCallback } from "react";
 import { Pressable } from "react-native";
@@ -253,7 +254,10 @@ const DungeonLevelScreen = observer(() => {
           reduceMotion={uiStore.reduceMotion}
         >
           {dungeonStore.currentSpecialEncounter ? (
-            <View style={styles.dungeonSpecialEncounter}>
+            <Pressable
+              style={styles.dungeonSpecialEncounter}
+              onPress={() => setDisplayItem(null)}
+            >
               <Image
                 source={dungeonStore.currentSpecialEncounter.imageSource}
                 style={{
@@ -263,15 +267,24 @@ const DungeonLevelScreen = observer(() => {
                 }}
                 contentFit="contain"
               />
-            </View>
+            </Pressable>
           ) : inCombat ? (
-            <View style={{ flex: 1, height: "40%" }}>
+            <Pressable
+              onPress={() => setDisplayItem(null)}
+              style={{
+                flex: 1,
+                height: "40%",
+                ...styles.notchMirroredLanscapePad,
+              }}
+            >
               <VFXWrapper>
                 <DungeonEnemyDisplay />
               </VFXWrapper>
-            </View>
+            </Pressable>
           ) : (
-            <DungeonMapRender />
+            <Pressable style={{ flex: 1 }} onPress={() => setDisplayItem(null)}>
+              <DungeonMapRender />
+            </Pressable>
           )}
           <LinearGradientBlur style={styles.dungeonBlur} />
           <View

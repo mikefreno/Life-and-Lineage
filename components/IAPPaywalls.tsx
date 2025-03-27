@@ -1,12 +1,6 @@
 import { useRootStore } from "@/hooks/stores";
 import { ReactNode, useEffect, useRef, useState } from "react";
-import {
-  Easing,
-  Platform,
-  Pressable,
-  ScrollView,
-  ViewStyle,
-} from "react-native";
+import { Platform, Pressable, ScrollView, ViewStyle } from "react-native";
 import Modal from "react-native-modal";
 import { View, StyleSheet, Animated } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -33,15 +27,17 @@ import { useScaling } from "@/hooks/scaling";
 import GenericModal from "./GenericModal";
 import { observer } from "mobx-react-lite";
 import D20DieAnimation from "./DieRollAnim";
-import { autorun, runInAction } from "mobx";
+import { runInAction } from "mobx";
 
 export const NecromancerPaywall = observer(
   ({
     isVisibleCondition,
     onClose,
+    dualToggle,
   }: {
     isVisibleCondition: boolean;
     onClose: () => void;
+    dualToggle: (() => void) | undefined;
   }) => {
     const { uiStore, iapStore, authStore } = useRootStore();
     const styles = useStyles();
@@ -165,6 +161,7 @@ export const NecromancerPaywall = observer(
         priceString={iapStore.necromancerProduct.priceString}
         purchaseError={purchaseError}
         purchaseSuccess={purchaseSuccess}
+        dualToggle={dualToggle}
       >
         <View style={{ flex: 1, alignItems: "center" }}>
           <Text
@@ -224,9 +221,11 @@ export const RangerPaywall = observer(
   ({
     isVisibleCondition,
     onClose,
+    dualToggle,
   }: {
     isVisibleCondition: boolean;
     onClose: () => void;
+    dualToggle: (() => void) | undefined;
   }) => {
     const { uiStore, iapStore, authStore } = useRootStore();
     const styles = useStyles();
@@ -335,6 +334,7 @@ export const RangerPaywall = observer(
         priceString={iapStore.rangerProduct.priceString}
         purchaseError={purchaseError}
         purchaseSuccess={purchaseSuccess}
+        dualToggle={dualToggle}
       >
         <View style={{ flex: 1, alignItems: "center" }}>
           <Text
@@ -701,6 +701,7 @@ export function IAPModal({
   priceString,
   purchaseError,
   purchaseSuccess,
+  dualToggle,
 }: {
   backFunction: () => void;
   isVisibleCondition: boolean;
@@ -709,6 +710,7 @@ export function IAPModal({
   priceString: string;
   purchaseError: string;
   purchaseSuccess: string;
+  dualToggle: (() => void) | undefined;
 }) {
   const { uiStore, iapStore } = useRootStore();
 
@@ -823,6 +825,14 @@ export function IAPModal({
           <GenericRaisedButton onPress={handlePurchaseRequest} textSize={"xl"}>
             Make Purchase
           </GenericRaisedButton>
+          {dualToggle &&
+          !(iapStore.rangerUnlocked || iapStore.necromancerUnlocked) ? (
+            <Pressable>
+              <Text style={styles["text-xl"]}>
+                Or purchase both classes ($2.99)
+              </Text>
+            </Pressable>
+          ) : null}
           {purchaseSuccess.length > 0 ? (
             <Text
               style={[

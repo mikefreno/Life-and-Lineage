@@ -26,6 +26,10 @@ const REMOTE_SAVES_UNLOCK_IDs = [
   process.env.EXPO_PUBLIC_IOS_REMOTE_ID,
   process.env.EXPO_PUBLIC_ANDROID_REMOTE_ID,
 ];
+const MORE_TABS_UNLOCK_IDs = [
+  process.env.EXPO_PUBLIC_IOS_TABS_ID,
+  process.env.EXPO_PUBLIC_ANDROID_TABS_ID,
+];
 
 export class IAPStore {
   root: RootStore;
@@ -34,6 +38,8 @@ export class IAPStore {
   remoteSaveSpecificUnlock = false;
   hasHydrated = false;
   cachedSecret: string | null = null;
+
+  purchasedTabs = 0;
 
   offering: PurchasesOffering | null = null;
   necromancerProduct: PurchasesStoreProduct | null = null;
@@ -54,6 +60,7 @@ export class IAPStore {
       hasHydrated: observable,
       remoteSaveSpecificUnlock: observable,
       cachedSecret: observable,
+      purchasedTabs: observable,
 
       evaluateTransactions: action,
       purchaseHandler: action,

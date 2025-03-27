@@ -78,24 +78,22 @@ export const DungeonMapRender = observer(() => {
     : 0;
 
   return (
-    <View style={{ flex: 1 }}>
-      <View
-        style={{
-          position: "absolute",
-          left: xOrigin - offsetX,
-          top: yOrigin - offsetY,
-        }}
+    <View
+      style={{
+        position: "absolute",
+        left: xOrigin - offsetX,
+        top: yOrigin - offsetY,
+      }}
+    >
+      <Svg
+        width={currentMapDimensions.width}
+        height={currentMapDimensions.height}
+        viewBox={`${-strokeWidth / 2} ${-strokeWidth / 2} ${
+          currentMapDimensions.width + strokeWidth
+        } ${currentMapDimensions.height + strokeWidth}`}
       >
-        <Svg
-          width={currentMapDimensions.width}
-          height={currentMapDimensions.height}
-          viewBox={`${-strokeWidth / 2} ${-strokeWidth / 2} ${
-            currentMapDimensions.width + strokeWidth
-          } ${currentMapDimensions.height + strokeWidth}`}
-        >
-          {currentMap.map((tile) => renderTile(tile))}
-        </Svg>
-      </View>
+        {currentMap.map((tile) => renderTile(tile))}
+      </Svg>
     </View>
   );
 });

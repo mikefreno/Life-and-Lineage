@@ -53,8 +53,6 @@ const BattleTab = observer(
     const { setShowTargetSelection } = useCombatState();
     const initialRenderRef = useRef(true);
 
-    const [combinedData, setCombinedData] = useState<Attack[]>([]);
-
     const [hiddenDisplayItem, setHiddenDisplayItem] = useState<{
       item: Item[];
       position: {
@@ -125,10 +123,6 @@ const BattleTab = observer(
         setTimeout(() => setAttackDetails(null), 250);
       }
     }, [attackDetailsShowing]);
-
-    useEffect(() => {
-      setCombinedData([...playerState.weaponAttacks, ...playerState.spells]);
-    }, [playerState.weaponAttacks, playerState.spells]);
 
     useEffect(() => {
       if (battleTab !== "equipment") {
@@ -273,15 +267,23 @@ const BattleTab = observer(
             <View style={styles.battleTabContainer}>
               {!playerState.isStunned ? (
                 <FlatList
-                  data={combinedData}
+                  data={[...playerState.weaponAttacks, ...playerState.spells]}
                   inverted
                   indicatorStyle={"white"}
                   persistentScrollbar
-                  contentContainerStyle={{ paddingHorizontal: "2%" }}
+                  contentContainerStyle={[
+                    styles.notchAvoidingLanscapePad,
+                    { paddingHorizontal: "2%" },
+                  ]}
                   renderItem={({ item, index }) => (
                     <AttackItem
                       attack={item}
-                      isLast={index == combinedData.length - 1}
+                      isLast={
+                        index ==
+                        playerState.weaponAttacks.length +
+                          playerState.spells.length -
+                          1
+                      }
                       setAttackDetails={setAttackDetails}
                       attackHandler={attackHandler}
                       pass={pass}
