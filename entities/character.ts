@@ -1331,6 +1331,9 @@ export class PlayerCharacter extends Character {
   }
 
   public learnSpellStep(bookName: string, spell: string, element: Element) {
+    if (this.knownSpells.includes(spell)) {
+      return;
+    }
     let spellFound = false;
 
     this.learningSpells = this.learningSpells.reduce(

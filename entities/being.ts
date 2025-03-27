@@ -29,6 +29,7 @@ import {
   toTitleCase,
 } from "@/utility/functions/misc";
 import {
+  getConditionEffectsOnAttacks,
   getConditionEffectsOnDefenses,
   getConditionEffectsOnMisc,
   getMagnitude,
@@ -1340,6 +1341,10 @@ export class Being {
     target?: Being;
   }) {
     let cumulativeDamage = 0;
+    const { damageFlat, damageMult } = getConditionEffectsOnAttacks({
+      selfConditions: this.conditions,
+      enemyConditions: target?.conditions ?? [],
+    });
 
     if (baseDamageMap == null)
       return { cumulativeDamage, damageMap: baseDamageMap };
@@ -1371,13 +1376,17 @@ export class Being {
     Object.entries(damageMap).forEach(([typeKey, amount]) => {
       const damageType = parseInt(typeKey) as DamageType;
       let calculatedDamage = amount;
-      calculatedDamage = this.damageTypeCalculation(
-        damageType,
-        amount,
-        isSpell,
-        usesWeapon,
-        target,
-      );
+      calculatedDamage =
+        this.damageTypeCalculation(
+          damageType,
+          amount,
+          isSpell,
+          usesWeapon,
+          target,
+        ) *
+          damageMult +
+        damageFlat;
+
       damageMap[damageType] = calculatedDamage;
       cumulativeDamage += calculatedDamage;
     });

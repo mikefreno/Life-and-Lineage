@@ -255,7 +255,7 @@ const LearningSpellScreen = observer(() => {
                   style={[
                     radius.lg,
                     styles.columnCenter,
-                    { backgroundColor: "#a1a1aa" },
+                    { backgroundColor: "#a1a1aa", marginHorizontal: 4 },
                     selectedBook?.id === item.id && {
                       borderWidth: 2,
                       borderColor: "red",

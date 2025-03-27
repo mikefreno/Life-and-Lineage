@@ -220,14 +220,6 @@ export class Attack {
     | null {
     if (!this.debuffNames) return null;
 
-    const { damageFlat, damageMult } = getConditionEffectsOnAttacks({
-      selfConditions: this.user.conditions,
-      enemyConditions: target.conditions,
-    });
-
-    const perHitDamage =
-      this.damage(target).cumulativeDamage * damageMult + damageFlat;
-
     const created: {
       debuff?: Condition;
       chance: number;
@@ -236,15 +228,14 @@ export class Attack {
 
     this.debuffNames.map(({ name, chance }) => {
       if (name == "lifesteal") {
-        const healPerHit = perHitDamage * 0.5;
+        const healPerHit = this.damage(target).cumulativeDamage * 0.5;
         created.push({ perHitHeal: healPerHit, chance });
       } else {
         const built = createDebuff({
           debuffName: name,
           enemyMaxHP: target.nonConditionalMaxHealth,
           enemyMaxSanity: target.nonConditionalMaxSanity,
-          primaryAttackDamage:
-            this.damage(target).cumulativeDamage * damageMult + damageFlat,
+          primaryAttackDamage: this.damage(target).cumulativeDamage,
           applierNameString: this.user.nameReference,
           applierID: this.user.id,
         });
