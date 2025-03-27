@@ -225,31 +225,43 @@ export class SaveStore {
         }>(query, params);
 
         if (result) {
+          // Set current game ID first to ensure context is available
+          runInAction(() => {
+            this.currentGameId = gameId;
+          });
+
+          // Parse all data before applying any changes
           const parsedData = {
-            playerData: parse(result.player_data),
             timeData: parse(result.time_data),
+            playerData: parse(result.player_data),
             dungeonData: parse(result.dungeon_data),
             characterData: parse(result.character_data),
             shopsData: parse(result.shops_data),
           };
 
+          // Apply data in the correct order to avoid dependency issues
+          // First, restore time data as many things depend on it
+          this.root.time.fromCheckpointData(parsedData.timeData);
+
+          // Then restore character data
+          this.root.characterStore.fromCheckpointData(parsedData.characterData);
+
+          // Then restore shops data
+          this.root.shopsStore.fromCheckpointData(parsedData.shopsData);
+
+          // Then restore dungeon data
+          this.root.dungeonStore.fromCheckpointData(parsedData.dungeonData);
+
+          // Finally restore player data which may depend on all the above
           this.root.setPlayer(
             PlayerCharacter.fromJSON({
               ...parsedData.playerData,
               root: this.root,
             }),
           );
-          this.root.time.fromCheckpointData(parsedData.timeData);
-          this.root.dungeonStore.fromCheckpointData(parsedData.dungeonData);
-          this.root.characterStore.fromCheckpointData(parsedData.characterData);
-          this.root.shopsStore.fromCheckpointData(parsedData.shopsData);
 
+          // Reset volatile state after everything is loaded
           this.root.dungeonStore.resetVolatileState();
-
-          runInAction(() => {
-            this.currentGameId = gameId;
-          });
-
           this.root.clearDeathScreen();
 
           return true;
@@ -492,27 +504,33 @@ export class SaveStore {
   }
 
   loadRemoteCheckpoint = async (id: number) => {
-    let loading = "playerstate";
     try {
       const checkpoint = await this.getRemoteCheckpoint(id);
       if (checkpoint) {
-        this.root.playerState = PlayerCharacter.fromJSON({
-          ...checkpoint.player_data,
-          root: this,
-        });
         this.root.time.fromCheckpointData(checkpoint.time_data);
-        this.root.dungeonStore.fromCheckpointData(checkpoint.dungeon_data);
+
         this.root.characterStore.fromCheckpointData(checkpoint.character_data);
+
         this.root.shopsStore.fromCheckpointData(checkpoint.shops_data);
 
+        this.root.dungeonStore.fromCheckpointData(checkpoint.dungeon_data);
+
+        this.root.setPlayer(
+          PlayerCharacter.fromJSON({
+            ...checkpoint.player_data,
+            root: this.root,
+          }),
+        );
+
         this.root.dungeonStore.resetVolatileState();
+        this.root.clearDeathScreen();
 
         return true;
       }
     } catch (error) {
-      console.log("Error during ", loading);
       console.error("Error loading remote checkpoint:", error);
     }
+    return false;
   };
 
   private convertHTTPResponseCheckpointRow(rows: any[][]) {

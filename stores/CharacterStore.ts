@@ -266,17 +266,64 @@ export class CharacterStore {
   }
 
   fromCheckpointData(data: any) {
-    runInAction(() => {
-      this.characters = data.characters.map((charData: any) =>
-        Character.fromJSON({ ...charData, root: this.root }),
-      );
-    });
+    if (!data) {
+      console.warn("Character data is undefined in checkpoint");
+      return;
+    }
 
     runInAction(() => {
-      this.independentChildren = data.independentChildren.map(
-        (childData: any) =>
-          Character.fromJSON({ ...childData, root: this.root }),
-      );
+      try {
+        // Handle characters
+        if (Array.isArray(data.characters)) {
+          this.characters = data.characters
+            .map((charData: any) => {
+              try {
+                return Character.fromJSON({
+                  ...(typeof charData === "string"
+                    ? parse(charData)
+                    : charData),
+                  root: this.root,
+                });
+              } catch (e) {
+                console.error("Error parsing character data:", e);
+                return null;
+              }
+            })
+            .filter(Boolean); // Remove any null entries
+        } else {
+          console.warn("Characters data is not an array in checkpoint");
+          this.characters = [];
+        }
+
+        // Handle independent children
+        if (Array.isArray(data.independentChildren)) {
+          this.independentChildren = data.independentChildren
+            .map((childData: any) => {
+              try {
+                return Character.fromJSON({
+                  ...(typeof childData === "string"
+                    ? parse(childData)
+                    : childData),
+                  root: this.root,
+                });
+              } catch (e) {
+                console.error("Error parsing independent child data:", e);
+                return null;
+              }
+            })
+            .filter(Boolean); // Remove any null entries
+        } else {
+          console.warn(
+            "Independent children data is not an array in checkpoint",
+          );
+          this.independentChildren = [];
+        }
+      } catch (e) {
+        console.error("Error in character store fromCheckpointData:", e);
+        // Set to empty arrays as fallback
+        this.characters = [];
+        this.independentChildren = [];
+      }
     });
   }
 }

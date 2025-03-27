@@ -39,6 +39,8 @@ const CheckpointModal = ({
   const [expandedGames, setExpandedGames] = useState<Record<number, boolean>>(
     {},
   );
+
+  const { getNormalizedSize } = useScaling();
   const styles = useStyles();
   const [confirmingAction, setConfirmingAction] = useState<{
     id: number;
@@ -237,7 +239,6 @@ const CheckpointModal = ({
   const renderGame = ({ item: gameId }: { item: number }) => {
     const gameCheckpoints = checkpoints[gameId] || [];
     const latestCheckpoint = gameCheckpoints[0];
-    const { getNormalizedSize } = useScaling();
 
     if (!latestCheckpoint) return null;
 

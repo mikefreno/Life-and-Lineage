@@ -157,7 +157,19 @@ export class TimeStore {
   }
 
   fromCheckpointData(data: any) {
-    this.week = data.week;
-    this.year = data.year;
+    if (!data) {
+      console.warn("Time data is undefined in checkpoint");
+      return;
+    }
+
+    // Ensure we have valid data before setting properties
+    if (typeof data.week === "number" && typeof data.year === "number") {
+      this.week = data.week;
+      this.year = data.year;
+    } else {
+      console.warn("Invalid time data in checkpoint, using defaults");
+      this.week = 0;
+      this.year = 1300;
+    }
   }
 }

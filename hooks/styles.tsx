@@ -263,7 +263,7 @@ export const useStyles = () => {
       minWidth: "50%",
       fontSize: 20,
       borderColor: theme.border,
-      color: theme.accent,
+      color: theme.text,
     } as const,
     remoteSaveContainer: {
       width: "100%",
