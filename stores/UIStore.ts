@@ -18,14 +18,19 @@ import {
 } from "react-native";
 import { storage } from "@/utility/functions/storage";
 import { Character } from "@/entities/character";
-import * as Device from "expo-device";
 import { EdgeInsets } from "react-native-safe-area-context";
 import {
   addOrientationChangeListener,
   Orientation,
   getOrientationAsync,
 } from "expo-screen-orientation";
-import { hasNotch } from "react-native-device-info";
+import {
+  hasNotch,
+  getDeviceTypeSync,
+  isLandscapeSync,
+  isTablet,
+  getDeviceType,
+} from "react-native-device-info";
 import { baseNormalize, baseNormalizeForText } from "@/hooks/scaling";
 
 export const LOADING_TIPS: string[] = [
@@ -133,6 +138,7 @@ export default class UIStore {
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
+    console.log(getDeviceTypeSync());
 
     const dimensions = {
       height: Dimensions.get("window").height,
@@ -383,15 +389,15 @@ export default class UIStore {
   }
 
   get isLandscape() {
-    return this.dimensions.width > this.dimensions.height;
+    return isLandscapeSync();
   }
 
   get isTablet() {
-    return Device.deviceType == Device.DeviceType.TABLET;
+    return isTablet();
   }
 
   get isDesktop() {
-    return Device.deviceType == Device.DeviceType.DESKTOP;
+    return getDeviceType() === "Desktop";
   }
 
   get isLargeDevice() {
