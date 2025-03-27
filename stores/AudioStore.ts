@@ -107,6 +107,10 @@ export class AudioStore {
         this.parseLocationForRelevantTrack(current, previous);
       },
     );
+    reaction(
+      () => this.currentTrack?.name,
+      () => this.setMuteValue(this.muted),
+    );
   }
 
   private parseLocationForRelevantTrack(current?: any, previous?: any) {
@@ -558,6 +562,25 @@ export class AudioStore {
 
   setMuteValue(muted: boolean) {
     this.muted = muted;
+
+    if (muted) {
+      if (this.currentTrack) {
+        this.currentTrack.sound
+          .pauseAsync()
+          .catch((error) =>
+            console.error("Error pausing current track:", error),
+          );
+      }
+    } else {
+      if (this.currentTrack) {
+        this.currentTrack.sound
+          .playAsync()
+          .catch((error) =>
+            console.error("Error resuming current track:", error),
+          );
+      }
+    }
+
     this.updateAllVolumes();
     this.persistSettings();
   }

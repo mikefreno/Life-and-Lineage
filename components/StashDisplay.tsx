@@ -7,7 +7,6 @@ import {
   LayoutChangeEvent,
   DimensionValue,
   LayoutAnimation,
-  Alert,
 } from "react-native";
 import { observer } from "mobx-react-lite";
 import { Item } from "@/entities/item";
@@ -18,8 +17,9 @@ import GenericModal from "@/components/GenericModal";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { StatsDisplay } from "@/components/StatsDisplay";
 import { useStyles } from "@/hooks/styles";
-import { Ionicons } from "@expo/vector-icons";
 import { useVibration } from "@/hooks/generic";
+import { StashPaywall } from "./IAPPaywalls";
+import React from "react";
 
 type StashDisplayProps = {
   showingStash: boolean;
@@ -37,9 +37,9 @@ export const StashDisplay = observer(
     const scrollViewRef = useRef<ScrollView>(null);
     const [currentPage, setCurrentPage] = useState(0);
     const SLOTS_PER_PAGE = 24;
+    const [showPaywall, setShowPaywall] = useState<boolean>(false);
 
-    // Calculate total pages based on purchased tabs + 1 free tab
-    const totalPages = Math.min(
+    const totalPages = Math.max(
       Math.max(1, Math.ceil(stashStore.items.length / SLOTS_PER_PAGE)),
       iapStore.purchasedTabs + 1,
     );
@@ -52,7 +52,6 @@ export const StashDisplay = observer(
     const clearDisplayItem = useCallback(() => setDisplayItem(null), []);
 
     const [targetPage, setTargetPage] = useState<number | null>(null);
-    const vibration = useVibration();
 
     const handleTabPress = useCallback(
       (pageIndex: number) => {
@@ -66,10 +65,6 @@ export const StashDisplay = observer(
       },
       [modalDimensions.width],
     );
-
-    const handleAddTab = () => {
-      vibration({ style: "light", essential: true });
-    };
 
     const handleScroll = useCallback(
       (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -235,133 +230,146 @@ export const StashDisplay = observer(
     };
 
     return (
-      <GenericModal
-        isVisibleCondition={showingStash}
-        backFunction={() => {
-          clear();
-          setDisplayItem(null);
-        }}
-        size={100}
-      >
-        <View
-          style={[
-            {
-              maxHeight: uiStore.dimensions.height * 0.75,
-            },
-            { width: "100%" },
-          ]}
-          onLayout={onModalLayout}
+      <>
+        <StashPaywall
+          isVisibleCondition={showPaywall}
+          onClose={() => setShowPaywall(false)}
+        />
+        <GenericModal
+          isVisibleCondition={showingStash}
+          backFunction={() => {
+            clear();
+            setDisplayItem(null);
+          }}
+          size={100}
         >
-          <View style={styles.tabsContainer}>
-            {Array.from({ length: totalPages }).map((_, index) => (
+          <View
+            style={[
+              {
+                maxHeight: uiStore.dimensions.height * 0.75,
+              },
+              { width: "100%" },
+            ]}
+            onLayout={onModalLayout}
+          >
+            <ScrollView
+              style={{ margin: 8 }}
+              contentContainerStyle={{
+                flexGrow: 1,
+                justifyContent: "center",
+              }}
+              horizontal
+            >
+              {Array.from({ length: totalPages }).map((_, index) => (
+                <Pressable
+                  key={`tab-${index}`}
+                  onPress={() => handleTabPress(index)}
+                  style={[
+                    styles.tabButton,
+                    {
+                      backgroundColor:
+                        currentPage === index
+                          ? "#3b82f6"
+                          : uiStore.colorScheme === "dark"
+                          ? "#374151"
+                          : "#d1d5db",
+                    },
+                  ]}
+                >
+                  <Text
+                    style={{
+                      color:
+                        currentPage === index
+                          ? "#ffffff"
+                          : uiStore.colorScheme === "dark"
+                          ? "#d1d5db"
+                          : "#374151",
+                    }}
+                  >
+                    {index + 1}
+                  </Text>
+                </Pressable>
+              ))}
+
               <Pressable
-                key={`tab-${index}`}
-                onPress={() => handleTabPress(index)}
+                onPress={() => setShowPaywall(true)}
                 style={[
                   styles.tabButton,
                   {
-                    backgroundColor:
-                      currentPage === index
-                        ? "#3b82f6"
-                        : uiStore.colorScheme === "dark"
-                        ? "#374151"
-                        : "#d1d5db",
+                    backgroundColor: "#3b82f6",
+                    width: 40,
+                    justifyContent: "center",
+                    alignItems: "center",
                   },
                 ]}
               >
-                <Text
+                <Text style={{ color: "white" }}>+</Text>
+              </Pressable>
+            </ScrollView>
+
+            <ScrollView
+              ref={scrollViewRef}
+              horizontal
+              pagingEnabled
+              scrollEnabled={totalPages > 1}
+              onScrollBeginDrag={() => setDisplayItem(null)}
+              onScroll={handleScroll}
+              onMomentumScrollEnd={handleScrollEnd}
+              scrollEventThrottle={16}
+              disableScrollViewPanResponder={true}
+              directionalLockEnabled={true}
+              bounces={false}
+              overScrollMode="never"
+              collapsable={false}
+              style={{ height: "100%" }}
+              contentContainerStyle={{
+                flexGrow: 1,
+              }}
+            >
+              {Array.from({ length: totalPages }).map((_, pageIndex) => (
+                <View
+                  key={`page-${pageIndex}`}
                   style={{
-                    color:
-                      currentPage === index
-                        ? "#ffffff"
-                        : uiStore.colorScheme === "dark"
-                        ? "#d1d5db"
-                        : "#374151",
+                    width: modalDimensions.width,
+                    flex: 1,
+                    paddingHorizontal: 8,
                   }}
                 >
-                  {index + 1}
-                </Text>
-              </Pressable>
-            ))}
-
-            <Pressable
-              onPress={handleAddTab}
-              style={[
-                styles.tabButton,
-                {
-                  backgroundColor: "#3b82f6",
-                  width: 40,
-                  justifyContent: "center",
-                  alignItems: "center",
-                },
-              ]}
-            >
-              <Text style={{ color: "white" }}>+</Text>
-            </Pressable>
-          </View>
-
-          <ScrollView
-            ref={scrollViewRef}
-            horizontal
-            pagingEnabled
-            scrollEnabled={totalPages > 1}
-            onScrollBeginDrag={() => setDisplayItem(null)}
-            onScroll={handleScroll}
-            onMomentumScrollEnd={handleScrollEnd}
-            scrollEventThrottle={16}
-            disableScrollViewPanResponder={true}
-            directionalLockEnabled={true}
-            bounces={false}
-            overScrollMode="never"
-            collapsable={false}
-            style={{ height: "100%" }}
-            contentContainerStyle={{
-              flexGrow: 1,
-            }}
-          >
-            {Array.from({ length: totalPages }).map((_, pageIndex) => (
-              <View
-                key={`page-${pageIndex}`}
-                style={{
-                  width: modalDimensions.width,
-                  flex: 1,
-                  paddingHorizontal: 8,
-                }}
-              >
-                <View style={styles.stashPageOverlay}>
-                  <Text style={styles.stashPageText}>
-                    Stash Tab {pageIndex + 1}
-                  </Text>
+                  <View style={styles.stashPageOverlay}>
+                    <Text style={styles.stashPageText}>
+                      Stash Tab {pageIndex + 1}
+                    </Text>
+                  </View>
+                  <Pressable
+                    onPress={() => setDisplayItem(null)}
+                    style={styles.stashContainer}
+                  >
+                    {inventorySlots}
+                    {pageIndex === currentPage && inventoryItems}
+                  </Pressable>
                 </View>
-                <Pressable
-                  onPress={() => setDisplayItem(null)}
-                  style={styles.stashContainer}
+              ))}
+              {displayItem && (
+                <View
+                  style={[
+                    styles.raisedAbsolutePosition,
+                    {
+                      top: -uiStore.dimensions.height * 0.17,
+                      left: -uiStore.dimensions.width * 0.065,
+                    },
+                  ]}
+                  pointerEvents="box-none"
                 >
-                  {inventorySlots}
-                  {pageIndex === currentPage && inventoryItems}
-                </Pressable>
-              </View>
-            ))}
-            {displayItem && (
-              <View
-                style={[
-                  styles.raisedAbsolutePosition,
-                  {
-                    top: -uiStore.dimensions.height * 0.17,
-                    left: -uiStore.dimensions.width * 0.065,
-                  },
-                ]}
-                pointerEvents="box-none"
-              >
-                <StatsDisplay
-                  displayItem={displayItem}
-                  clearItem={clearDisplayItem}
-                />
-              </View>
-            )}
-          </ScrollView>
-        </View>
-      </GenericModal>
+                  <StatsDisplay
+                    displayItem={displayItem}
+                    clearItem={clearDisplayItem}
+                  />
+                </View>
+              )}
+            </ScrollView>
+          </View>
+        </GenericModal>
+      </>
     );
   },
 );

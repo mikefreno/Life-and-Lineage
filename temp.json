@@ -1,0 +1,43 @@
+[
+  {
+    "productId": "F5F9CD73_C8A9_4A4E_B34D_58D2BB9676EF",
+    "productIdentifier": "F5F9CD73_C8A9_4A4E_B34D_58D2BB9676EF",
+    "purchaseDate": "2025-03-26T21:33:17Z",
+    "purchaseDateMillis": 1743024797000,
+    "revenueCatId": "dd3ae03af2",
+    "transactionIdentifier": "dd3ae03af2"
+  },
+  {
+    "productId": "66986FEC_2F3B_41E9_AFB3_FD22537B61CE",
+    "productIdentifier": "66986FEC_2F3B_41E9_AFB3_FD22537B61CE",
+    "purchaseDate": "2025-03-27T16:12:29Z",
+    "purchaseDateMillis": 1743091949000,
+    "revenueCatId": "d3fd422ac3",
+    "transactionIdentifier": "d3fd422ac3"
+  },
+  {
+    "productId": "2A7F4E7B_3C84_4297_8A6F_8B6840225518",
+    "productIdentifier": "2A7F4E7B_3C84_4297_8A6F_8B6840225518",
+    "purchaseDate": "2025-03-27T16:23:40Z",
+    "purchaseDateMillis": 1743092620000,
+    "revenueCatId": "853327ecec",
+    "transactionIdentifier": "853327ecec"
+  },
+  {
+    "productId": "1910736E_53FC_4FA4_B795_74F48D39F3C9",
+    "productIdentifier": "1910736E_53FC_4FA4_B795_74F48D39F3C9",
+    "purchaseDate": "2025-03-27T17:14:56Z",
+    "purchaseDateMillis": 1743095696000,
+    "revenueCatId": "2302312726",
+    "transactionIdentifier": "2302312726"
+  },
+  {
+    "productId": "1910736E_53FC_4FA4_B795_74F48D39F3C9",
+    "productIdentifier": "1910736E_53FC_4FA4_B795_74F48D39F3C9",
+    "purchaseDate": "2025-03-27T17:20:38Z",
+    "purchaseDateMillis": 1743096038000,
+    "revenueCatId": "25d3e044bf",
+    "transactionIdentifier": "25d3e044bf"
+  }
+]
+

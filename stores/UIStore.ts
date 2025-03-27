@@ -307,7 +307,8 @@ export default class UIStore {
     if (
       !(
         tabRouteIndexing.includes(this.root.pathname) ||
-        this.root.pathname.includes("options")
+        this.root.pathname.includes("options") ||
+        this.root.pathname.includes("newgame")
       )
     ) {
       return false;

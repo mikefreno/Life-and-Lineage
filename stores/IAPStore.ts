@@ -9,6 +9,7 @@ import Purchases, {
 } from "react-native-purchases";
 import { storage } from "@/utility/functions/storage";
 import { API_BASE_URL } from "@/config/config";
+import { convertToPlainObject } from "@sentry/core";
 
 const NECRO_UNLOCK_IDs = [
   process.env.EXPO_PUBLIC_IOS_NECRO_ID,
@@ -27,25 +28,28 @@ const REMOTE_SAVES_UNLOCK_IDs = [
   process.env.EXPO_PUBLIC_ANDROID_REMOTE_ID,
 ];
 const MORE_TABS_UNLOCK_IDs = [
-  process.env.EXPO_PUBLIC_IOS_TABS_ID,
-  process.env.EXPO_PUBLIC_ANDROID_TABS_ID,
+  process.env.EXPO_PUBLIC_IOS_STASH_ID,
+  process.env.EXPO_PUBLIC_ANDROID_STASH_ID,
 ];
 
 export class IAPStore {
   root: RootStore;
+  hasHydrated = false;
+
   rangerUnlocked = false;
   necromancerUnlocked = false;
   remoteSaveSpecificUnlock = false;
-  hasHydrated = false;
-  cachedSecret: string | null = null;
-
   purchasedTabs = 0;
 
+  cachedSecret: string | null = null;
+
   offering: PurchasesOffering | null = null;
+
+  dualClassProduct: PurchasesStoreProduct | null = null;
   necromancerProduct: PurchasesStoreProduct | null = null;
   rangerProduct: PurchasesStoreProduct | null = null;
-  dualClassProduct: PurchasesStoreProduct | null = null;
   remoteSaveProduct: PurchasesStoreProduct | null = null;
+  stashProduct: PurchasesStoreProduct | null = null;
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
@@ -54,15 +58,21 @@ export class IAPStore {
     makeObservable(this, {
       rangerUnlocked: observable,
       necromancerUnlocked: observable,
+      remoteSaveSpecificUnlock: observable,
+
       dualClassProduct: observable,
+      necromancerProduct: observable,
+      rangerProduct: observable,
       remoteSaveProduct: observable,
+      stashProduct: observable,
+
       offering: observable,
       hasHydrated: observable,
-      remoteSaveSpecificUnlock: observable,
       cachedSecret: observable,
       purchasedTabs: observable,
 
       evaluateTransactions: action,
+      evaluateCustomer: action,
       purchaseHandler: action,
 
       setOffering: action,
@@ -82,27 +92,36 @@ export class IAPStore {
     return (
       this.remoteSaveSpecificUnlock ||
       this.necromancerUnlocked ||
-      this.rangerUnlocked
+      this.rangerUnlocked ||
+      this.purchasedTabs > 0
     );
   }
 
   setOffering(offering: PurchasesOffering | null) {
-    this.offering = offering;
-    if (NECRO_UNLOCK_IDs.includes(offering?.lifetime?.product.identifier)) {
-      this.necromancerProduct = offering?.lifetime?.product ?? null;
-    }
-    if (RANGER_UNLOCK_IDs.includes(offering?.lifetime?.product.identifier)) {
-      this.rangerProduct = offering?.lifetime?.product ?? null;
-    }
-    if (
-      REMOTE_SAVES_UNLOCK_IDs.includes(offering?.lifetime?.product.identifier)
-    ) {
-      this.remoteSaveProduct = offering?.lifetime?.product ?? null;
-    }
-    if (
-      DUAL_CLASS_UNLOCK_IDs.includes(offering?.lifetime?.product.identifier)
-    ) {
-      this.dualClassProduct = offering?.lifetime?.product ?? null;
+    if (offering) {
+      this.offering = offering;
+      for (const availablePackage of offering.availablePackages) {
+        switch (availablePackage.identifier.toLowerCase()) {
+          case "dual":
+            this.dualClassProduct = availablePackage.product;
+            continue;
+          case "necromancer":
+            this.necromancerProduct = availablePackage.product;
+            continue;
+          case "ranger":
+            this.rangerProduct = availablePackage.product;
+            continue;
+          case "stash":
+            this.stashProduct = availablePackage.product;
+            continue;
+          case "remote":
+            this.remoteSaveProduct = availablePackage.product;
+            continue;
+          default:
+            console.warn(`unknown product: ${availablePackage.product}`);
+            continue;
+        }
+      }
     }
   }
 
@@ -120,11 +139,16 @@ export class IAPStore {
   }
 
   evaluateCustomer(customer: CustomerInfo) {
-    this.evaluateProductIds(customer.allPurchasedProductIdentifiers);
+    this.evaluateProductIds(
+      customer.nonSubscriptionTransactions.map(
+        (transaction) => transaction.productIdentifier,
+      ),
+    );
   }
 
   private evaluateProductIds(transactions: string[]) {
     const messageReporting = [];
+    let tabsPurchaseCounter = 0;
     for (const transaction of transactions) {
       if (DUAL_CLASS_UNLOCK_IDs.includes(transaction)) {
         this.necromancerUnlocked = true;
@@ -151,7 +175,13 @@ export class IAPStore {
         messageReporting.push("Remote Saving Unlocked!");
         continue;
       }
+      if (MORE_TABS_UNLOCK_IDs.includes(transaction)) {
+        tabsPurchaseCounter++;
+        messageReporting.push("4 Stash tabs Added!");
+        continue;
+      }
     }
+    this.purchasedTabs = tabsPurchaseCounter * 4;
     this.persistForOffline();
     return messageReporting;
   }
@@ -165,9 +195,18 @@ export class IAPStore {
       this.necromancerUnlocked = true;
       return "Necromancer Unlocked!";
     }
+    if (DUAL_CLASS_UNLOCK_IDs.includes(val.productIdentifier)) {
+      this.necromancerUnlocked = true;
+      this.rangerUnlocked = true;
+      return `Ranger Unlocked!\nNecromancer Unlocked!`;
+    }
     if (REMOTE_SAVES_UNLOCK_IDs.includes(val.productIdentifier)) {
       this.remoteSaveSpecificUnlock = true;
       return "Remote Saving Unlocked!";
+    }
+    if (MORE_TABS_UNLOCK_IDs.includes(val.productIdentifier)) {
+      this.purchasedTabs += 4;
+      return "4 Stash Tabs Added!";
     }
   }
 
@@ -333,17 +372,18 @@ export class IAPStore {
     return secret;
   }
 
-  async getCustomersIAPs() {
-    if (this.root.authStore.isConnected) {
-      try {
-        const val = await Purchases.restorePurchases();
-        this.evaluateCustomer(val);
-        this.hasHydrated = true;
-      } catch (e) {
-        console.log("Error restoring purchases:", e);
-      }
-    } else {
-      await this.hydrateOffline();
-    }
+  getCustomersIAPs() {
+    //if (this.root.authStore.isConnected) {
+    //try {
+    //Purchases.restorePurchases()
+    //.then((val) => this.evaluateCustomer(val))
+    //.catch((e) => console.error(e))
+    //.finally(() => (this.hasHydrated = true));
+    //} catch (e) {
+    //console.log("Error restoring purchases:", e);
+    //}
+    //} else {
+    //this.hydrateOffline();
+    //}
   }
 }

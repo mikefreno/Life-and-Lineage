@@ -22,7 +22,11 @@ import GenericFlatButton from "@/components/GenericFlatButton";
 import { useRouter } from "expo-router";
 import { tw_base, useStyles } from "@/hooks/styles";
 import NewGameMetaControls from "@/components/NewGameMetaControls";
-import { NecromancerPaywall, RangerPaywall } from "@/components/IAPPaywalls";
+import {
+  DualPaywall,
+  NecromancerPaywall,
+  RangerPaywall,
+} from "@/components/IAPPaywalls";
 
 const SetClassScreen = observer(() => {
   const vibration = useVibration();
@@ -42,6 +46,10 @@ const SetClassScreen = observer(() => {
 
   const [showNecroPaywall, setShowNecroPaywall] = useState<boolean>(false);
   const [showRangerPaywall, setShowRangerPaywall] = useState<boolean>(false);
+  const [showDualPaywall, setShowDualPaywall] = useState<boolean>(false);
+  const [heldForDual, setHeldForDual] = useState<PlayerClassOptions>(
+    PlayerClassOptions.ranger,
+  );
 
   useLayoutEffect(() => {
     wait(200).then(() => {
@@ -78,6 +86,11 @@ const SetClassScreen = observer(() => {
   return (
     <>
       <NecromancerPaywall
+        dualToggle={() => {
+          setShowNecroPaywall(false);
+          setHeldForDual(PlayerClassOptions.necromancer);
+          setTimeout(() => setShowDualPaywall(true), 500);
+        }}
         isVisibleCondition={showNecroPaywall}
         onClose={() => {
           setShowNecroPaywall(false);
@@ -88,6 +101,11 @@ const SetClassScreen = observer(() => {
         }}
       />
       <RangerPaywall
+        dualToggle={() => {
+          setShowRangerPaywall(false);
+          setHeldForDual(PlayerClassOptions.ranger);
+          setTimeout(() => setShowDualPaywall(true), 500);
+        }}
         isVisibleCondition={showRangerPaywall}
         onClose={() => {
           setShowRangerPaywall(false);
@@ -95,6 +113,14 @@ const SetClassScreen = observer(() => {
             setClassSelection(PlayerClassOptions.ranger);
             setBlessingSelection(undefined);
           }
+        }}
+      />
+      <DualPaywall
+        isVisibleCondition={showDualPaywall}
+        onClose={() => {
+          setShowDualPaywall(false);
+          setClassSelection(heldForDual);
+          setBlessingSelection(undefined);
         }}
       />
       <TutorialModal

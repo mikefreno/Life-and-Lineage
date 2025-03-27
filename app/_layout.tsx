@@ -226,7 +226,9 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
       });
     }
 
-    Purchases.getOfferings().then((val) => iapStore.setOffering(val.current));
+    Purchases.getOfferings()
+      .then((val) => iapStore.setOffering(val.current))
+      .catch((e) => console.error(e));
   }, []);
 
   const handleRouting = (

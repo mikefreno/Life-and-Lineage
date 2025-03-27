@@ -28,6 +28,7 @@ import GenericModal from "./GenericModal";
 import { observer } from "mobx-react-lite";
 import D20DieAnimation from "./DieRollAnim";
 import { runInAction } from "mobx";
+import React from "react";
 
 export const NecromancerPaywall = observer(
   ({
@@ -79,7 +80,7 @@ export const NecromancerPaywall = observer(
         duration: 5000,
         useNativeDriver: true,
       }).start(() => {
-        setTimeout(() => roll(), 500);
+        roll();
       });
     };
 
@@ -124,10 +125,10 @@ export const NecromancerPaywall = observer(
       );
     }
 
-    const requestNecromancerPurchase = () => {
+    const requestNecromancerPurchase = async () => {
       if (!iapStore.necromancerProduct) return false;
 
-      Purchases.purchaseStoreProduct(iapStore.necromancerProduct)
+      return Purchases.purchaseStoreProduct(iapStore.necromancerProduct)
         .then((val) => {
           const res = iapStore.purchaseHandler(val);
           if (res) {
@@ -135,7 +136,12 @@ export const NecromancerPaywall = observer(
             setPurchaseSuccess(res);
             vibration({ style: "success", essential: true });
             setTimeout(() => onClose(), 1500);
+            return true;
           }
+          setPurchaseError(
+            "An unknown error occured! If needed, contact: michael@freno.me",
+          );
+          return false;
         })
         .catch((e) => {
           if (e.toString() !== "Error: Purchase was cancelled.") {
@@ -149,8 +155,6 @@ export const NecromancerPaywall = observer(
           }
           return false;
         });
-
-      return false;
     };
 
     return (
@@ -230,6 +234,7 @@ export const RangerPaywall = observer(
     const { uiStore, iapStore, authStore } = useRootStore();
     const styles = useStyles();
     const { getNormalizedSize } = useScaling();
+    const vibration = useVibration();
 
     const [reAttemptingProductGet, setReAttemptingProductGet] =
       useState<boolean>(false);
@@ -267,7 +272,7 @@ export const RangerPaywall = observer(
         duration: 5000,
         useNativeDriver: true,
       }).start(() => {
-        setTimeout(() => roll(), 500);
+        roll();
       });
     };
 
@@ -322,8 +327,36 @@ export const RangerPaywall = observer(
       );
     }
 
-    const requestRangerPurchase = () => {
-      return false;
+    const requestRangerPurchase = async () => {
+      if (!iapStore.rangerProduct) return false;
+
+      return Purchases.purchaseStoreProduct(iapStore.rangerProduct)
+        .then((val) => {
+          const res = iapStore.purchaseHandler(val);
+          if (res) {
+            setPurchaseError("");
+            setPurchaseSuccess(res);
+            vibration({ style: "success", essential: true });
+            setTimeout(() => onClose(), 1500);
+            return true;
+          }
+          setPurchaseError(
+            "An unknown error occured! If needed, contact: michael@freno.me",
+          );
+          return false;
+        })
+        .catch((e) => {
+          if (e.toString() !== "Error: Purchase was cancelled.") {
+            if (authStore.isConnected) {
+              setPurchaseError(
+                "An unknown error occured! If needed, contact: michael@freno.me",
+              );
+            } else {
+              setPurchaseError("Internet Connection Required");
+            }
+          }
+          return false;
+        });
     };
 
     return (
@@ -401,6 +434,7 @@ export const DualPaywall = observer(
     const { iapStore, authStore } = useRootStore();
     const styles = useStyles();
     const { getNormalizedSize } = useScaling();
+    const vibration = useVibration();
 
     const [reAttemptingProductGet, setReAttemptingProductGet] =
       useState<boolean>(false);
@@ -470,8 +504,37 @@ export const DualPaywall = observer(
       );
     }
 
-    const requestDualClassPurchase = () => {
-      return false;
+    const requestDualClassPurchase = async () => {
+      if (!iapStore.dualClassProduct) return false;
+
+      return await Purchases.purchaseStoreProduct(iapStore.dualClassProduct)
+        .then((val) => {
+          const res = iapStore.purchaseHandler(val);
+          if (res) {
+            setPurchaseError("");
+            setPurchaseSuccess(res);
+            vibration({ style: "success", essential: true });
+            setTimeout(() => onClose(), 1500);
+            return true;
+          }
+          setPurchaseError(
+            "An unknown error occured! If needed, contact: michael@freno.me",
+          );
+          return false;
+        })
+        .catch((e) => {
+          if (e.toString() !== "Error: Purchase was cancelled.") {
+            if (authStore.isConnected) {
+              setPurchaseError(
+                "An unknown error occured! If needed, contact: michael@freno.me",
+              );
+            } else {
+              console.error(e);
+              setPurchaseError("Internet Connection Required");
+            }
+          }
+          return false;
+        });
     };
 
     return (
@@ -482,6 +545,7 @@ export const DualPaywall = observer(
         priceString={iapStore.dualClassProduct.priceString}
         purchaseError={purchaseError}
         purchaseSuccess={purchaseSuccess}
+        isDual
       >
         <View style={{ flex: 1, alignItems: "center" }}>
           <Text
@@ -532,11 +596,21 @@ export const DualPaywall = observer(
             <ArcaneIcon height={80} width={80} />
           </ScrollView>
           <Text
+            style={{
+              paddingVertical: 12,
+              ...styles["text-5xl"],
+              color: "white",
+            }}
+          >
+            &
+          </Text>
+          <Text
             style={[
               styles["text-xl"],
               {
                 letterSpacing: 3,
                 color: "white",
+                paddingTop: 8,
               },
             ]}
           >
@@ -581,9 +655,9 @@ export const RemoteSavePaywall = observer(
     isVisibleCondition: boolean;
     onClose: () => void;
   }) => {
-    const { uiStore, iapStore, authStore } = useRootStore();
+    const { iapStore, authStore } = useRootStore();
     const styles = useStyles();
-    const { getNormalizedSize } = useScaling();
+    const vibration = useVibration();
 
     const [reAttemptingProductGet, setReAttemptingProductGet] =
       useState<boolean>(false);
@@ -652,8 +726,36 @@ export const RemoteSavePaywall = observer(
       );
     }
 
-    const requestRemoteSavePurchase = () => {
-      return false;
+    const requestRemoteSavePurchase = async () => {
+      if (!iapStore.remoteSaveProduct) return false;
+
+      return Purchases.purchaseStoreProduct(iapStore.remoteSaveProduct)
+        .then((val) => {
+          const res = iapStore.purchaseHandler(val);
+          if (res) {
+            setPurchaseError("");
+            setPurchaseSuccess(res);
+            vibration({ style: "success", essential: true });
+            setTimeout(() => onClose(), 1500);
+            return true;
+          }
+          setPurchaseError(
+            "An unknown error occured! If needed, contact: michael@freno.me",
+          );
+          return false;
+        })
+        .catch((e) => {
+          if (e.toString() !== "Error: Purchase was cancelled.") {
+            if (authStore.isConnected) {
+              setPurchaseError(
+                "An unknown error occured! If needed, contact: michael@freno.me",
+              );
+            } else {
+              setPurchaseError("Internet Connection Required");
+            }
+          }
+          return false;
+        });
     };
 
     return (
@@ -677,6 +779,11 @@ export const RemoteSavePaywall = observer(
           >
             Remote Save Unlock
           </Text>
+          <Image
+            source={require("@/meta-assets/cloud_save_game.png")}
+            style={{ height: 200, width: 200 }}
+            contentFit={"contain"}
+          />
           <Text
             style={[
               styles["text-xl"],
@@ -693,210 +800,395 @@ export const RemoteSavePaywall = observer(
   },
 );
 
-export function IAPModal({
-  backFunction,
-  isVisibleCondition,
-  handlePurchaseRequest,
-  children,
-  priceString,
-  purchaseError,
-  purchaseSuccess,
-  dualToggle,
-}: {
-  backFunction: () => void;
-  isVisibleCondition: boolean;
-  handlePurchaseRequest: () => boolean;
-  children: ReactNode;
-  priceString: string;
-  purchaseError: string;
-  purchaseSuccess: string;
-  dualToggle: (() => void) | undefined;
-}) {
-  const { uiStore, iapStore } = useRootStore();
+export const StashPaywall = observer(
+  ({
+    isVisibleCondition,
+    onClose,
+  }: {
+    isVisibleCondition: boolean;
+    onClose: () => void;
+  }) => {
+    const { iapStore, authStore } = useRootStore();
+    const styles = useStyles();
+    const vibration = useVibration();
 
-  const styles = useStyles();
-  const insets = useSafeAreaInsets();
-  const vibration = useVibration();
-  const [restoreError, setRestoreError] = useState<boolean>();
-  const [restoreResponse, setRestoreResponse] = useState<{
-    messages: string[];
-    messageColor: string;
-  } | null>(null);
+    const [reAttemptingProductGet, setReAttemptingProductGet] =
+      useState<boolean>(false);
+    const [noProductErrorReport, setNoProductErrorReport] = useState<string>(
+      "Product does not yet exist",
+    );
+    const [purchaseError, setPurchaseError] = useState<string>("");
+    const [purchaseSuccess, setPurchaseSuccess] = useState<string>("");
 
-  const handleRestorePurchase = () => {
-    vibration({ style: "light" });
-    Purchases.restorePurchases()
-      .then((val) => {
-        const res = iapStore.evaluateTransactions(
-          val.nonSubscriptionTransactions,
-        );
-        setRestoreError(false);
-        setRestoreResponse(res);
-      })
-      .catch(() => {
-        setRestoreResponse(null);
-        setRestoreError(true);
-        setTimeout(() => setRestoreError(false), 5000);
-      });
-  };
-
-  return (
-    <Modal
-      animationIn={uiStore.reduceMotion ? "fadeIn" : "slideInUp"}
-      animationOut={uiStore.reduceMotion ? "fadeOut" : "slideOutDown"}
-      animationInTiming={300}
-      animationOutTiming={300}
-      backdropTransitionOutTiming={300}
-      backdropTransitionInTiming={300}
-      backdropColor={
-        Platform.OS == "ios"
-          ? "#000000"
-          : uiStore.colorScheme == "light"
-          ? "#ffffffff"
-          : "#000000"
+    useEffect(() => {
+      if (!iapStore.stashProduct) {
+        if (authStore.isConnected) {
+          //reattempt product get
+          setReAttemptingProductGet(true);
+          Purchases.getOfferings()
+            .then((val) => iapStore.setOffering(val.current))
+            .catch(() =>
+              setNoProductErrorReport(
+                "Failed to retrieve product offerings, make sure you are connected to the interet",
+              ),
+            )
+            .finally(() => setReAttemptingProductGet(false));
+        } else {
+          setNoProductErrorReport("Need Internet Connection");
+        }
       }
-      isVisible={isVisibleCondition}
-      backdropOpacity={0.5}
-      onBackButtonPress={backFunction}
-      statusBarTranslucent={true}
-      coverScreen={true}
-      deviceHeight={uiStore.dimensions.height}
-      deviceWidth={uiStore.dimensions.width}
-      style={{ marginHorizontal: Math.max(insets.left, 8) }}
-    >
-      <PulsingGradientWrapper
-        style={{
-          maxHeight: uiStore.dimensions.height - insets.top - insets.bottom,
-          ...styles.modalContent,
-          width: "100%",
-        }}
+    }, [iapStore.stashProduct, authStore.isConnected]);
+
+    if (!iapStore.stashProduct) {
+      return (
+        <GenericModal
+          isVisibleCondition={isVisibleCondition}
+          backFunction={onClose}
+        >
+          {reAttemptingProductGet ? (
+            <View>
+              <Text style={[styles["text-xl"], { textAlign: "center" }]}>
+                Attempting Product Retrieval...
+              </Text>
+
+              <D20DieAnimation showNumber={false} keepRolling />
+            </View>
+          ) : (
+            <View>
+              <GenericStrikeAround style={styles["text-2xl"]}>
+                ERROR
+              </GenericStrikeAround>
+              <Text style={[styles["text-xl"], { textAlign: "center" }]}>
+                {noProductErrorReport}
+              </Text>
+              {noProductErrorReport === "Product does not yet exist" ? (
+                <GenericRaisedButton
+                  onPress={() => {
+                    runInAction(() => {
+                      iapStore.purchasedTabs += 4;
+                    });
+                    setTimeout(() => onClose(), 1500);
+                  }}
+                >
+                  Temporary Override
+                </GenericRaisedButton>
+              ) : null}
+            </View>
+          )}
+        </GenericModal>
+      );
+    }
+
+    const requestStashPurchase = async () => {
+      if (!iapStore.stashProduct) return false;
+
+      return Purchases.purchaseStoreProduct(iapStore.stashProduct)
+        .then((val) => {
+          const res = iapStore.purchaseHandler(val);
+          if (res) {
+            setPurchaseError("");
+            setPurchaseSuccess(res);
+            vibration({ style: "success", essential: true });
+            setTimeout(() => onClose(), 1500);
+            return true;
+          }
+          setPurchaseError(
+            "An unknown error occured! If needed, contact: michael@freno.me",
+          );
+          return false;
+        })
+        .catch((e) => {
+          if (e.toString() !== "Error: Purchase was cancelled.") {
+            if (authStore.isConnected) {
+              setPurchaseError(
+                "An unknown error occured! If needed, contact: michael@freno.me",
+              );
+            } else {
+              setPurchaseError("Internet Connection Required");
+            }
+          }
+          return false;
+        });
+    };
+
+    return (
+      <IAPModal
+        isVisibleCondition={isVisibleCondition}
+        backFunction={onClose}
+        handlePurchaseRequest={requestStashPurchase}
+        priceString={iapStore.stashProduct.priceString}
+        purchaseError={purchaseError}
+        purchaseSuccess={purchaseSuccess}
       >
-        <ScrollView
+        <View
+          style={{
+            flex: 1,
+            alignItems: "center",
+          }}
+        >
+          <Text
+            style={[
+              styles["text-3xl"],
+              {
+                letterSpacing: 3,
+                color: "white",
+              },
+            ]}
+          >
+            Additional Stash Tabs(4)
+          </Text>
+          <Image
+            source={require("@/meta-assets/stashPurchase.png")}
+            style={{ height: 200, width: 200 }}
+            contentFit={"scale-down"}
+          />
+        </View>
+      </IAPModal>
+    );
+  },
+);
+
+export const IAPModal = observer(
+  ({
+    backFunction,
+    isVisibleCondition,
+    handlePurchaseRequest,
+    children,
+    priceString,
+    purchaseError,
+    purchaseSuccess,
+    dualToggle,
+    isDual = false,
+  }: {
+    backFunction: () => void;
+    isVisibleCondition: boolean;
+    handlePurchaseRequest: () => Promise<boolean>;
+    children: ReactNode;
+    priceString: string;
+    purchaseError: string;
+    purchaseSuccess: string;
+    dualToggle?: () => void;
+    isDual?: boolean;
+  }) => {
+    const { uiStore, iapStore } = useRootStore();
+
+    const styles = useStyles();
+    const insets = useSafeAreaInsets();
+    const vibration = useVibration();
+    const [restoreError, setRestoreError] = useState<boolean>();
+    const [restoreResponse, setRestoreResponse] = useState<{
+      messages: string[];
+      messageColor: string;
+    } | null>(null);
+    const [loadingPurchase, setLoadingPurchase] = useState<boolean>();
+
+    const handleRestorePurchase = () => {
+      vibration({ style: "light" });
+      Purchases.restorePurchases()
+        .then((val) => {
+          const res = iapStore.evaluateTransactions(
+            val.nonSubscriptionTransactions,
+          );
+          setRestoreError(false);
+          setRestoreResponse(res);
+        })
+        .catch(() => {
+          setRestoreResponse(null);
+          setRestoreError(true);
+          setTimeout(() => setRestoreError(false), 5000);
+        });
+    };
+    const handlePurchaseRequestExtended = () => {
+      setLoadingPurchase(true);
+      handlePurchaseRequest().then(() => setLoadingPurchase(false));
+    };
+
+    return (
+      <Modal
+        animationIn={uiStore.reduceMotion ? "fadeIn" : "slideInUp"}
+        animationOut={uiStore.reduceMotion ? "fadeOut" : "slideOutDown"}
+        animationInTiming={300}
+        animationOutTiming={300}
+        backdropTransitionOutTiming={300}
+        backdropTransitionInTiming={300}
+        backdropColor={
+          Platform.OS == "ios"
+            ? "#000000"
+            : uiStore.colorScheme == "light"
+            ? "#ffffffff"
+            : "#000000"
+        }
+        isVisible={isVisibleCondition}
+        backdropOpacity={0.5}
+        onBackButtonPress={backFunction}
+        statusBarTranslucent={true}
+        coverScreen={true}
+        deviceHeight={uiStore.dimensions.height}
+        deviceWidth={uiStore.dimensions.width}
+        style={{ marginHorizontal: Math.max(insets.left, 8) }}
+      >
+        <PulsingGradientWrapper
           style={{
             maxHeight: uiStore.dimensions.height - insets.top - insets.bottom,
+            ...styles.modalContent,
+            width: "100%",
           }}
-          contentContainerStyle={{
-            flexGrow: 1,
-            paddingHorizontal: "2%",
-            justifyContent: "space-evenly",
-          }}
-          showsVerticalScrollIndicator={false}
-          scrollEnabled={uiStore.isLandscape}
         >
-          <View style={styles.rowBetween}>
-            <Image
-              style={{
-                height: uiStore.dimensions.lesser * 0.25,
-                width: uiStore.dimensions.lesser * 0.25,
-              }}
-              source={require("@/meta-assets/RoundedIcon.png")}
-              contentFit="scale-down"
-            />
-            <Pressable
-              onPress={() => {
-                vibration({ style: "warning", essential: true });
-                backFunction();
-              }}
-              style={{
-                ...styles.closeButton,
-                position: "relative",
-              }}
-            >
-              <Text
+          <ScrollView
+            style={{
+              maxHeight: uiStore.dimensions.height - insets.top - insets.bottom,
+            }}
+            contentContainerStyle={{
+              flexGrow: 1,
+              paddingHorizontal: "2%",
+              justifyContent: "space-between",
+            }}
+            showsVerticalScrollIndicator={false}
+            scrollEnabled={uiStore.isLandscape || isDual}
+          >
+            <View style={styles.rowBetween}>
+              <Image
                 style={{
-                  ...styles["text-5xl"],
-                  color: "white",
+                  height: uiStore.dimensions.lesser * 0.25,
+                  width: uiStore.dimensions.lesser * 0.25,
+                }}
+                source={require("@/meta-assets/RoundedIcon.png")}
+                contentFit="scale-down"
+              />
+              <Pressable
+                onPress={() => {
+                  vibration({ style: "warning", essential: true });
+                  backFunction();
+                }}
+                style={{
+                  ...styles.closeButton,
+                  position: "relative",
                 }}
               >
-                x
-              </Text>
-            </Pressable>
-          </View>
-          {children}
-          <Text
-            style={{
-              textAlign: "center",
-              ...styles["text-2xl"],
-              color: "#e5e7eb",
-            }}
-          >
-            {priceString}
-          </Text>
-          <GenericRaisedButton onPress={handlePurchaseRequest} textSize={"xl"}>
-            Make Purchase
-          </GenericRaisedButton>
-          {dualToggle &&
-          !(iapStore.rangerUnlocked || iapStore.necromancerUnlocked) ? (
-            <Pressable>
-              <Text style={styles["text-xl"]}>
-                Or purchase both classes ($2.99)
-              </Text>
-            </Pressable>
-          ) : null}
-          {purchaseSuccess.length > 0 ? (
-            <Text
-              style={[
-                { color: "#86efac", textAlign: "center", letterSpacing: 3 },
-                styles["text-lg"],
-              ]}
-            >
-              {purchaseSuccess}
-            </Text>
-          ) : null}
-          {purchaseError.length > 0 ? (
-            <Text
-              style={[
-                { color: "#fca5a5", textAlign: "center", letterSpacing: 3 },
-                styles["text-lg"],
-              ]}
-            >
-              {purchaseError}
-            </Text>
-          ) : null}
-          <View style={{ padding: uiStore.dimensions.height * 0.05 }}>
-            {restoreResponse
-              ? restoreResponse.messages.map((message, id) => (
+                <Text
+                  style={{
+                    ...styles["text-5xl"],
+                    color: "white",
+                  }}
+                >
+                  x
+                </Text>
+              </Pressable>
+            </View>
+            {children}
+            {loadingPurchase ? (
+              <View style={{ flex: 1, alignSelf: "center" }}>
+                <D20DieAnimation keepRolling showNumber={false} />
+              </View>
+            ) : (
+              <>
+                <Text
+                  style={{
+                    textAlign: "center",
+                    ...styles["text-2xl"],
+                    color: "#e5e7eb",
+                  }}
+                >
+                  {priceString}
+                </Text>
+                <GenericRaisedButton
+                  onPress={handlePurchaseRequestExtended}
+                  textSize={"xl"}
+                >
+                  Make Purchase
+                </GenericRaisedButton>
+                {dualToggle &&
+                !(iapStore.rangerUnlocked || iapStore.necromancerUnlocked) ? (
+                  <Pressable onPress={dualToggle}>
+                    <Text
+                      style={[
+                        styles["text-xl"],
+                        { textAlign: "center", color: "#e5e7eb" },
+                      ]}
+                    >
+                      Or purchase both classes ($2.99)
+                    </Text>
+                  </Pressable>
+                ) : null}
+                {purchaseSuccess.length > 0 ? (
                   <Text
-                    key={id}
                     style={[
                       {
-                        color: restoreResponse.messageColor,
+                        color: "#86efac",
                         textAlign: "center",
+                        letterSpacing: 3,
                       },
                       styles["text-lg"],
                     ]}
                   >
-                    {message}
+                    {purchaseSuccess}
                   </Text>
-                ))
-              : null}
-            {restoreError ? (
-              <Text
-                style={[
-                  { color: "#fca5a5", textAlign: "center", letterSpacing: 3 },
-                  styles["text-lg"],
-                ]}
-              >
-                No valid receipt found.
-              </Text>
-            ) : null}
-            <Pressable
-              onPress={handleRestorePurchase}
-              style={{
-                marginHorizontal: "auto",
-                paddingTop: 12,
-              }}
-            >
-              <Text style={{ color: "#e5e7eb" }}>Restore Purchases</Text>
-            </Pressable>
-          </View>
-        </ScrollView>
-      </PulsingGradientWrapper>
-    </Modal>
-  );
-}
+                ) : null}
+                {purchaseError.length > 0 ? (
+                  <Text
+                    style={[
+                      {
+                        color: "#fca5a5",
+                        textAlign: "center",
+                        letterSpacing: 3,
+                      },
+                      styles["text-lg"],
+                    ]}
+                  >
+                    {purchaseError}
+                  </Text>
+                ) : null}
+                <View style={{ padding: uiStore.dimensions.height * 0.05 }}>
+                  {restoreResponse
+                    ? restoreResponse.messages.map((message, id) => (
+                        <Text
+                          key={id}
+                          style={[
+                            {
+                              color: restoreResponse.messageColor,
+                              textAlign: "center",
+                            },
+                            styles["text-lg"],
+                          ]}
+                        >
+                          {message}
+                        </Text>
+                      ))
+                    : null}
+                  {restoreError ? (
+                    <Text
+                      style={[
+                        {
+                          color: "#fca5a5",
+                          textAlign: "center",
+                          letterSpacing: 3,
+                        },
+                        styles["text-lg"],
+                      ]}
+                    >
+                      No valid receipt found.
+                    </Text>
+                  ) : null}
+                  <Pressable
+                    onPress={handleRestorePurchase}
+                    style={{
+                      marginHorizontal: "auto",
+                      paddingTop: 12,
+                    }}
+                  >
+                    <Text style={{ color: "#e5e7eb" }}>Restore Purchases</Text>
+                  </Pressable>
+                </View>
+              </>
+            )}
+          </ScrollView>
+        </PulsingGradientWrapper>
+      </Modal>
+    );
+  },
+);
 
-const PulsingGradientWrapper = ({
+export const PulsingGradientWrapper = ({
   children,
   style,
 }: {
