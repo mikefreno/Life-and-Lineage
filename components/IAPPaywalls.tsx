@@ -1,6 +1,12 @@
 import { useRootStore } from "@/hooks/stores";
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { Platform, Pressable, ScrollView, ViewStyle } from "react-native";
+import {
+  Easing,
+  Platform,
+  Pressable,
+  ScrollView,
+  ViewStyle,
+} from "react-native";
 import Modal from "react-native-modal";
 import { View, StyleSheet, Animated } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -27,6 +33,7 @@ import { useScaling } from "@/hooks/scaling";
 import GenericModal from "./GenericModal";
 import { observer } from "mobx-react-lite";
 import D20DieAnimation from "./DieRollAnim";
+import { autorun, runInAction } from "mobx";
 
 export const NecromancerPaywall = observer(
   ({
@@ -67,6 +74,32 @@ export const NecromancerPaywall = observer(
       }
     }, [iapStore.necromancerProduct, authStore.isConnected]);
 
+    const spinValue = useRef(new Animated.Value(0)).current;
+
+    const roll = () => {
+      spinValue.setValue(0);
+      Animated.timing(spinValue, {
+        toValue: 1,
+        duration: 5000,
+        useNativeDriver: true,
+      }).start(() => {
+        setTimeout(() => roll(), 500);
+      });
+    };
+
+    useEffect(() => {
+      if (isVisibleCondition && !uiStore.reduceMotion) {
+        roll();
+      }
+    }, [isVisibleCondition, uiStore.reduceMotion]);
+
+    const spin = spinValue.interpolate({
+      inputRange: [0, 1],
+      outputRange: ["0deg", "720deg"],
+    });
+
+    const animatedStyle = { transform: [{ rotateY: spin }] };
+
     if (!iapStore.necromancerProduct) {
       return (
         <GenericModal
@@ -102,6 +135,7 @@ export const NecromancerPaywall = observer(
         .then((val) => {
           const res = iapStore.purchaseHandler(val);
           if (res) {
+            setPurchaseError("");
             setPurchaseSuccess(res);
             vibration({ style: "success", essential: true });
             setTimeout(() => onClose(), 1500);
@@ -109,9 +143,13 @@ export const NecromancerPaywall = observer(
         })
         .catch((e) => {
           if (e.toString() !== "Error: Purchase was cancelled.") {
-            setPurchaseError(
-              "An unknown error occured! If needed, contact: michael@freno.me",
-            );
+            if (authStore.isConnected) {
+              setPurchaseError(
+                "An unknown error occured! If needed, contact: michael@freno.me",
+              );
+            } else {
+              setPurchaseError("Internet Connection Required");
+            }
           }
           return false;
         });
@@ -140,8 +178,15 @@ export const NecromancerPaywall = observer(
           >
             Necromancer Unlock
           </Text>
-          <NecromancerSkull />
-
+          <Animated.View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              ...animatedStyle,
+            }}
+          >
+            <NecromancerSkull />
+          </Animated.View>
           <GenericStrikeAround
             containerStyles={{
               width: "80%",
@@ -214,6 +259,32 @@ export const RangerPaywall = observer(
       }
     }, [iapStore.rangerProduct, authStore.isConnected]);
 
+    const spinValue = useRef(new Animated.Value(0)).current;
+
+    const roll = () => {
+      spinValue.setValue(0);
+      Animated.timing(spinValue, {
+        toValue: 1,
+        duration: 5000,
+        useNativeDriver: true,
+      }).start(() => {
+        setTimeout(() => roll(), 500);
+      });
+    };
+
+    useEffect(() => {
+      if (isVisibleCondition && !uiStore.reduceMotion) {
+        roll();
+      }
+    }, [isVisibleCondition, uiStore.reduceMotion]);
+
+    const spin = spinValue.interpolate({
+      inputRange: [0, 1],
+      outputRange: ["0deg", "720deg"],
+    });
+
+    const animatedStyle = { transform: [{ rotateY: spin }] };
+
     if (!iapStore.rangerProduct) {
       return (
         <GenericModal
@@ -236,6 +307,16 @@ export const RangerPaywall = observer(
               <Text style={[styles["text-xl"], { textAlign: "center" }]}>
                 {noProductErrorReport}
               </Text>
+              {noProductErrorReport === "Product does not yet exist" ? (
+                <GenericRaisedButton
+                  onPress={() => {
+                    runInAction(() => (iapStore.rangerUnlocked = true));
+                    setTimeout(() => onClose(), 1500);
+                  }}
+                >
+                  Temporary Override
+                </GenericRaisedButton>
+              ) : null}
             </View>
           )}
         </GenericModal>
@@ -267,7 +348,15 @@ export const RangerPaywall = observer(
           >
             Ranger Unlock
           </Text>
-          <RangerIcon />
+          <Animated.View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              ...animatedStyle,
+            }}
+          >
+            <RangerIcon />
+          </Animated.View>
 
           <GenericStrikeAround
             containerStyles={{
@@ -309,7 +398,7 @@ export const DualPaywall = observer(
     isVisibleCondition: boolean;
     onClose: () => void;
   }) => {
-    const { uiStore, iapStore, authStore } = useRootStore();
+    const { iapStore, authStore } = useRootStore();
     const styles = useStyles();
     const { getNormalizedSize } = useScaling();
 
@@ -362,6 +451,19 @@ export const DualPaywall = observer(
               <Text style={[styles["text-xl"], { textAlign: "center" }]}>
                 {noProductErrorReport}
               </Text>
+              {noProductErrorReport === "Product does not yet exist" ? (
+                <GenericRaisedButton
+                  onPress={() => {
+                    runInAction(() => {
+                      iapStore.rangerUnlocked = true;
+                      iapStore.necromancerUnlocked = true;
+                    });
+                    setTimeout(() => onClose(), 1500);
+                  }}
+                >
+                  Temporary Override
+                </GenericRaisedButton>
+              ) : null}
             </View>
           )}
         </GenericModal>
@@ -393,6 +495,7 @@ export const DualPaywall = observer(
           >
             Dual Class Unlock
           </Text>
+
           <Text
             style={[
               styles["text-xl"],
@@ -531,6 +634,18 @@ export const RemoteSavePaywall = observer(
               <Text style={[styles["text-xl"], { textAlign: "center" }]}>
                 {noProductErrorReport}
               </Text>
+              {noProductErrorReport === "Product does not yet exist" ? (
+                <GenericRaisedButton
+                  onPress={() => {
+                    runInAction(() => {
+                      iapStore.remoteSaveSpecificUnlock = true;
+                    });
+                    setTimeout(() => onClose(), 1500);
+                  }}
+                >
+                  Temporary Override
+                </GenericRaisedButton>
+              ) : null}
             </View>
           )}
         </GenericModal>
