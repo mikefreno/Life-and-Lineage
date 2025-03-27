@@ -258,6 +258,7 @@ export class IAPStore {
   }
 
   async hydrateOffline() {
+    //TODO need to serialize/hydrate tab count
     try {
       const validationToken = storage.getString("offlineValidationToken");
       if (!validationToken) return;
@@ -373,17 +374,17 @@ export class IAPStore {
   }
 
   getCustomersIAPs() {
-    //if (this.root.authStore.isConnected) {
-    //try {
-    //Purchases.restorePurchases()
-    //.then((val) => this.evaluateCustomer(val))
-    //.catch((e) => console.error(e))
-    //.finally(() => (this.hasHydrated = true));
-    //} catch (e) {
-    //console.log("Error restoring purchases:", e);
-    //}
-    //} else {
-    //this.hydrateOffline();
-    //}
+    if (this.root.authStore.isConnected) {
+      try {
+        Purchases.restorePurchases()
+          .then((val) => this.evaluateCustomer(val))
+          .catch((e) => console.error(e))
+          .finally(() => (this.hasHydrated = true));
+      } catch (e) {
+        console.log("Error restoring purchases:", e);
+      }
+    } else {
+      this.hydrateOffline();
+    }
   }
 }
