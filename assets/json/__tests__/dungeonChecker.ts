@@ -4,7 +4,7 @@ import bosses from "@/assets/json/bosses.json";
 import fs from "fs";
 
 const checkDungeon = () => {
-  fs.writeFileSync("./dungeon_data/bad_boss_entries.json", "", "utf8");
+  fs.writeFileSync("./dungeon_data/bad_boss_entries.txt", "", "utf8");
   const missingEnemyMap: Record<string, string[]> = {};
   const missingBossesMap: Record<string, string[]> = {};
 
@@ -31,7 +31,7 @@ const checkDungeon = () => {
           }
         } else {
           fs.appendFile(
-            "./dungeon_data/bad_boss_entries.json",
+            "./dungeon_data/bad_boss_entries.txt",
             `${dungeon.name}-${level.level}: ${JSON.stringify(enc)}\n`,
             "utf8",
             (err) => {

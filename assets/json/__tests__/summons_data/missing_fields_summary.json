@@ -1,0 +1,50 @@
+{
+  "zombie": [
+    "resistanceTable",
+    "damageTable"
+  ],
+  "wraith": [
+    "resistanceTable",
+    "damageTable"
+  ],
+  "death knight": [
+    "resistanceTable",
+    "damageTable"
+  ],
+  "lich": [
+    "resistanceTable",
+    "damageTable"
+  ],
+  "bandit": [
+    "resistanceTable",
+    "damageTable"
+  ],
+  "hobgoblin": [
+    "resistanceTable",
+    "damageTable"
+  ],
+  "raven": [
+    "resistanceTable",
+    "damageTable"
+  ],
+  "wolf": [
+    "resistanceTable",
+    "damageTable"
+  ],
+  "bear": [
+    "resistanceTable",
+    "damageTable"
+  ],
+  "dragon welp": [
+    "resistanceTable",
+    "damageTable"
+  ],
+  "griffon": [
+    "resistanceTable",
+    "damageTable"
+  ],
+  "dragon": [
+    "resistanceTable",
+    "damageTable"
+  ]
+}

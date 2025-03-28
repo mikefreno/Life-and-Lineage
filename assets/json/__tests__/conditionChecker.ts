@@ -35,7 +35,7 @@ const effectOptionsArray = [
 
 const checkBuffsDebuffs = () => {
   // Clear the missing_conditions.json file at start
-  fs.writeFileSync("./condition_data/missing_conditions.json", "", "utf8");
+  fs.writeFileSync("./condition_data/missing_conditions.txt", "", "utf8");
 
   const missingConditionsMap = {};
 
@@ -75,7 +75,7 @@ const checkBuffsDebuffs = () => {
       };
 
       fs.appendFile(
-        "./condition_data/missing_conditions.json",
+        "./condition_data/missing_conditions.txt",
         `Attack "${attack.name}" missing conditions: ${JSON.stringify({
           buffs: missingBuffs,
           debuffs: missingDebuffs,
@@ -109,7 +109,7 @@ checkBuffsDebuffs();
 
 const checkConditionEffects = () => {
   // Clear the condition_effects_check.json file at start
-  fs.writeFileSync("./condition_data/condition_effects_check.json", "", "utf8");
+  fs.writeFileSync("./condition_data/condition_effects_check.txt", "", "utf8");
 
   const invalidEffects = [];
   const effectUsageCount = {};
@@ -131,7 +131,7 @@ const checkConditionEffects = () => {
           });
 
           fs.appendFile(
-            "./condition_data/condition_effects_check.json",
+            "./condition_data/condition_effects_check.txt",
             `Condition "${condition.name}" has invalid effect: "${effect}"\n`,
             "utf8",
             (err) => {

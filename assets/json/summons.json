@@ -3,7 +3,13 @@
     "name": "flying skull",
     "beingType": "undead",
     "health": 20,
-    "baseStrength": 5,
+    "resistanceTable": {
+      "poison": 10,
+      "holy": -50
+    },
+    "damageTable": {
+      "physical": 2
+    },
     "mana": {
       "maximum": 50,
       "regen": 5
@@ -18,6 +24,13 @@
     "beingType": "undead",
     "health": 40,
     "baseStrength": 5,
+    "resistanceTable": {
+      "poison": 10,
+      "holy": -50
+    },
+    "damageTable": {
+      "physical": 6
+    },
     "mana": {
       "maximum": 50,
       "regen": 5

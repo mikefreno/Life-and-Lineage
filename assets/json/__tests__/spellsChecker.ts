@@ -10,7 +10,7 @@ import fs from "fs";
 
 const checkSpellBooks = () => {
   // Clear the missing_spells.json file at start
-  fs.writeFileSync("./spell_data/missing_spells.json", "", "utf8");
+  fs.writeFileSync("./spell_data/missing_spells.txt", "", "utf8");
 
   const missingSpellsMap = {
     mage: [],
@@ -27,7 +27,7 @@ const checkSpellBooks = () => {
         missingSpellsMap.mage.push(book.teaches);
 
         fs.appendFile(
-          "./spell_data/missing_spells.json",
+          "./spell_data/missing_spells.txt",
           `Mage book "${book.name}" teaches non-existent spell: "${book.teaches}"\n`,
           "utf8",
           (err) => {
@@ -48,7 +48,7 @@ const checkSpellBooks = () => {
         missingSpellsMap.ranger.push(book.teaches);
 
         fs.appendFile(
-          "./spell_data/missing_spells.json",
+          "./spell_data/missing_spells.txt",
           `Ranger book "${book.name}" teaches non-existent spell: "${book.teaches}"\n`,
           "utf8",
           (err) => {
@@ -69,7 +69,7 @@ const checkSpellBooks = () => {
         missingSpellsMap.paladin.push(book.teaches);
 
         fs.appendFile(
-          "./spell_data/missing_spells.json",
+          "./spell_data/missing_spells.txt",
           `Paladin book "${book.name}" teaches non-existent spell: "${book.teaches}"\n`,
           "utf8",
           (err) => {
@@ -90,7 +90,7 @@ const checkSpellBooks = () => {
         missingSpellsMap.necromancer.push(book.teaches);
 
         fs.appendFile(
-          "./spell_data/missing_spells.json",
+          "./spell_data/missing_spells.txt",
           `Necromancer book "${book.name}" teaches non-existent spell: "${book.teaches}"\n`,
           "utf8",
           (err) => {
