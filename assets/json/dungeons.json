@@ -2,6 +2,7 @@
   {
     "name": "training grounds",
     "bgName": "Castle_Atrium",
+    "isComplete": true,
     "id": 0,
     "difficulty": 0,
     "levels": [
@@ -12,7 +13,7 @@
         "normalEncounters": [
           [
             {
-              "name": "training_dummy",
+              "name": "training dummy",
               "scaler": 1
             }
           ]
@@ -26,6 +27,7 @@
   {
     "name": "nearby cave",
     "bgName": "Cave",
+    "isComplete": true,
     "id": 1,
     "difficulty": 1,
     "instanceDrops": [
@@ -269,6 +271,7 @@
   {
     "name": "goblin cave",
     "bgName": "Cave_2",
+    "isComplete": true,
     "id": 2,
     "difficulty": 3,
     "levels": [
@@ -415,6 +418,7 @@
   {
     "name": "bandit hideout",
     "bgName": "Medieval",
+    "isComplete": true,
     "id": 3,
     "difficulty": 3,
     "levels": [
@@ -512,7 +516,10 @@
           ]
         ],
         "bossEncounter": [
-          "huge knight"
+          {
+            "name": "huge knight",
+            "scaler": 1.0
+          }
         ],
         "specialEncounters": [
           {
@@ -551,6 +558,7 @@
   {
     "name": "frost spire fortress",
     "id": 4,
+    "isComplete": true,
     "difficulty": 5,
     "bgName": "SnowyMountain",
     "levels": [
@@ -790,6 +798,7 @@
   },
   {
     "name": "infestation",
+    "isComplete": true,
     "id": 5,
     "difficulty": 6,
     "bgName": "SpiderLair",
@@ -923,6 +932,7 @@
     "name": "dark forest",
     "id": 6,
     "difficulty": 6,
+    "isComplete": true,
     "bgName": "DemonWoods",
     "levels": [
       {
@@ -1026,6 +1036,7 @@
     "name": "ancient arena",
     "id": 7,
     "difficulty": 8,
+    "isComplete": false,
     "bgName": "dungeon",
     "levels": [
       {
@@ -1234,6 +1245,7 @@
       {
         "level": 1,
         "tiles": 20,
+        "isComplete": false,
         "normalEncounters": [],
         "bossEncounter": [
           {
@@ -1264,6 +1276,7 @@
     "name": "crystal labyrinthine - second excavation",
     "id": 8,
     "difficulty": 9,
+    "isComplete": false,
     "bgName": "CrystalCave_2",
     "levels": [
       {
@@ -1299,6 +1312,7 @@
     "name": "crystal labyrinthine - third excavation",
     "id": 9,
     "difficulty": 10,
+    "isComplete": false,
     "bgName": "CrystalCave_3",
     "levels": [
       {
@@ -1334,6 +1348,7 @@
     "name": "crystal labyrinthine - fourth excavation",
     "id": 10,
     "difficulty": 11,
+    "isComplete": false,
     "bgName": "CrystalCave_4",
     "levels": [
       {
@@ -1369,6 +1384,7 @@
     "name": "corrupted temple - outer terrace",
     "id": 11,
     "difficulty": 12,
+    "isComplete": false,
     "bgName": "Castle_Entrance",
     "levels": [
       {
@@ -1404,6 +1420,7 @@
     "name": "corrupted temple - ramparts",
     "id": 12,
     "difficulty": 14,
+    "isComplete": false,
     "bgName": "Castle_Ramparts",
     "levels": [
       {
@@ -1439,6 +1456,7 @@
     "name": "corrupted temple - hall",
     "id": 13,
     "difficulty": 16,
+    "isComplete": false,
     "bgName": "Castle_Hall",
     "levels": [
       {
@@ -1472,6 +1490,7 @@
     "name": "corrupted temple - atrium",
     "id": 14,
     "difficulty": 18,
+    "isComplete": false,
     "bgName": "Castle_Atrium",
     "levels": [
       {
@@ -1507,6 +1526,7 @@
     "name": "ronin's redoubt",
     "id": 15,
     "difficulty": 20,
+    "isComplete": false,
     "bgName": "AutumnForest",
     "levels": [
       {
@@ -1530,6 +1550,7 @@
     "name": "kōtetsu moses",
     "id": 16,
     "difficulty": 25,
+    "isComplete": false,
     "bgName": "AutumnForest",
     "levels": [
       {

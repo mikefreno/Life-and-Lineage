@@ -28,7 +28,7 @@
     "targets": "single",
     "hitChance": 0.95,
     "damageTable": {},
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "bleed",
         "chance": 0.2
@@ -47,7 +47,7 @@
     "damageTable": {
       "fire": 2
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "burn",
         "chance": 0.85
@@ -86,7 +86,7 @@
     "targets": "single",
     "hitChance": 0.90,
     "damageTable": {},
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "stun",
         "chance": 0.25
@@ -103,7 +103,7 @@
     "targets": "single",
     "hitChance": 0.95,
     "damageTable": {},
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "execute",
         "chance": 0.05
@@ -134,7 +134,7 @@
     "targets": "single",
     "hitChance": 0.90,
     "damageTable": {},
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "stun",
         "chance": 0.5
@@ -153,7 +153,7 @@
     "targets": "single",
     "hitChance": 0.85,
     "damageTable": {},
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "execute",
         "chance": 0.1
@@ -197,7 +197,7 @@
     "damageTable": {
       "poison": 3
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "poison",
         "chance": 0.65

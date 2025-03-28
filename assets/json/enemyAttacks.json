@@ -7,7 +7,7 @@
     "damageTable": {
       "physical": 5
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "bleed",
         "chance": 0.20
@@ -22,7 +22,7 @@
     "damageTable": {
       "physical": 5
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "hemmorage",
         "chance": 0.25
@@ -47,7 +47,7 @@
       "physical": 3,
       "poison": 5
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "diseased",
         "chance": 0.05
@@ -63,7 +63,7 @@
       "physical": 4,
       "poison": 1
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "lifesteal",
         "chance": 0.65
@@ -79,7 +79,7 @@
       "physical": 2,
       "poison": 3
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "poison",
         "chance": 0.65
@@ -95,7 +95,7 @@
       "physical": 2,
       "fire": 3
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "burn",
         "chance": 0.75
@@ -110,7 +110,7 @@
     "damageTable": {
       "physical": 5
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "bleed",
         "chance": 0.35
@@ -126,7 +126,7 @@
       "physical": 3,
       "raw": 2
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "stun",
         "chance": 0.35
@@ -142,7 +142,7 @@
       "physical": 5,
       "raw": 2
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "stun",
         "chance": 0.15
@@ -157,7 +157,7 @@
     "damageTable": {
       "physical": 4
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "stun",
         "chance": 0.35
@@ -173,7 +173,7 @@
       "physical": 3,
       "raw": 2
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "stun",
         "chance": 0.8
@@ -189,7 +189,7 @@
       "physical": 2,
       "raw": 4
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "stun",
         "chance": 0.1
@@ -205,7 +205,7 @@
       "physical": 2,
       "raw": 4
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "stun",
         "chance": 0.25
@@ -220,7 +220,7 @@
     "damageTable": {
       "raw": 1
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "blind",
         "chance": 0.75
@@ -235,7 +235,7 @@
     "damageTable": {
       "poison": 5
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "poison",
         "chance": 0.85
@@ -251,7 +251,7 @@
       "physical": 5,
       "poison": 3
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "poison",
         "chance": 0.5
@@ -273,7 +273,7 @@
     "baseHitChance": 0.85,
     "damageTable": {},
     "sanityDamage": 5,
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "fear",
         "chance": 0.50
@@ -298,7 +298,7 @@
       "raw": 2,
       "physical": 4
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "stun",
         "chance": 0.10
@@ -314,7 +314,7 @@
       "raw": 2,
       "physical": 4
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "stun",
         "chance": 0.50
@@ -329,7 +329,7 @@
     "damageTable": {
       "physical": 10
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "stun",
         "chance": 0.20
@@ -344,7 +344,7 @@
     "damageTable": {
       "physical": 6
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "bleed",
         "chance": 0.25
@@ -360,7 +360,7 @@
       "raw": 2,
       "physical": 4
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "stun",
         "chance": 0.20
@@ -405,7 +405,7 @@
     "name": "frenzy",
     "damageTable": {},
     "manaCost": 10,
-    "buffs": [
+    "buffNames": [
       "frenzy"
     ]
   },
@@ -413,7 +413,7 @@
     "name": "chug beer",
     "damageTable": {},
     "manaCost": 10,
-    "buffs": [
+    "buffNames": [
       "frenzy"
     ]
   },
@@ -425,7 +425,7 @@
     "damageTable": {
       "lightning": 6
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "stun",
         "chance": 0.5
@@ -440,7 +440,7 @@
     "damageTable": {
       "physical": 3
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "stun",
         "chance": 0.1
@@ -454,7 +454,7 @@
     "damageTable": {
       "physical": 3
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "blind",
         "chance": 0.9
@@ -477,7 +477,7 @@
     "damageTable": {
       "fire": 6
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "burn",
         "chance": 0.25
@@ -492,7 +492,7 @@
     "damageTable": {
       "cold": 6
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "chill",
         "chance": 0.5
@@ -516,7 +516,7 @@
       "physical": 4,
       "raw": 2
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "stun",
         "chance": 0.10
@@ -531,7 +531,7 @@
     "damageTable": {
       "raw": 5
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "lifesteal",
         "chance": 0.5
@@ -549,7 +549,7 @@
     "baseHitChance": 0.85,
     "sanityDamage": 10,
     "damageTable": {},
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "fear",
         "chance": 0.75
@@ -574,7 +574,7 @@
     "damageTable": {
       "raw": 12
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "hemmorage",
         "chance": 0.50
@@ -589,7 +589,7 @@
     "damageTable": {
       "raw": 15
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "necrotic wound",
         "chance": 0.45
@@ -604,7 +604,7 @@
     "damageTable": {
       "raw": 15
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "necrotic wound",
         "chance": 0.65
@@ -620,7 +620,7 @@
     "damageTable": {
       "raw": 20
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "dulled mind",
         "chance": 0.75
@@ -633,7 +633,7 @@
     "targets": "single",
     "baseHitChance": 0.90,
     "damageTable": {},
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "death mark",
         "chance": 1.0
@@ -648,7 +648,7 @@
     "damageTable": {
       "physical": 6
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "bleed",
         "chance": 0.25
@@ -681,7 +681,7 @@
     "damageTable": {
       "physical": 8
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "stun",
         "chance": 0.25
@@ -706,7 +706,7 @@
       "lightning": 8,
       "physical": 8
     },
-    "debuffs": [
+    "debuffNames": [
       {
         "name": "shocked",
         "chance": 0.75

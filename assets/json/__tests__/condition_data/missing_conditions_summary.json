@@ -1,0 +1,32 @@
+{
+  "vampiric bite": {
+    "buffs": [],
+    "debuffs": [
+      "lifesteal"
+    ]
+  },
+  "life drain": {
+    "buffs": [],
+    "debuffs": [
+      "lifesteal"
+    ]
+  },
+  "corrupted cleave": {
+    "buffs": [],
+    "debuffs": [
+      "necrotic wound"
+    ]
+  },
+  "death bolt": {
+    "buffs": [],
+    "debuffs": [
+      "necrotic wound"
+    ]
+  },
+  "curse": {
+    "buffs": [],
+    "debuffs": [
+      "death mark"
+    ]
+  }
+}

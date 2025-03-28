@@ -1,0 +1,18 @@
+{
+  "missingSpells": {
+    "mage": [],
+    "ranger": [
+      "beast mastery"
+    ],
+    "paladin": [],
+    "necromancer": []
+  },
+  "spellsWithoutBooks": {
+    "mage": [],
+    "ranger": [],
+    "paladin": [],
+    "necromancer": [
+      "bone prison"
+    ]
+  }
+}

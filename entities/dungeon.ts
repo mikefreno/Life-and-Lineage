@@ -49,6 +49,7 @@ interface DungeonInstanceOptions {
     itemType: ItemClassType;
     chance: number;
   }[];
+  isComplete?: boolean;
 }
 
 /**
@@ -68,6 +69,7 @@ export class DungeonInstance {
     itemType: ItemClassType;
     chance: number;
   }[];
+  isComplete: boolean;
 
   constructor({
     id,
@@ -78,6 +80,7 @@ export class DungeonInstance {
     unlocks,
     dungeonStore,
     instanceDrops,
+    isComplete,
   }: DungeonInstanceOptions) {
     this.id = id;
     this.bgName = bgName;
@@ -89,6 +92,7 @@ export class DungeonInstance {
     this.unlocks = unlocks;
     this.dungeonStore = dungeonStore;
     this.instanceDrops = instanceDrops ?? [];
+    this.isComplete = isComplete ?? false;
 
     makeObservable(this, {
       levels: observable.deep,
@@ -135,6 +139,7 @@ export class DungeonInstance {
       unlocks: json.unlocks,
       dungeonStore: json.dungeonStore,
       instanceDrops: json.instanceDrops,
+      isComplete: json.isComplete,
     });
 
     return instance;

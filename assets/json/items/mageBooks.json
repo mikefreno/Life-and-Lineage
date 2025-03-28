@@ -205,7 +205,7 @@
   {
     "name": "book of stone salvo",
     "type": "spell",
-    "teaches": "stone salve",
+    "teaches": "stone salvo",
     "icon": "Book",
     "baseValue": 20000
   },

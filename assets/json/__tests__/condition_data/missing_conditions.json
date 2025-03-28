@@ -1,0 +1,5 @@
+Attack "vampiric bite" missing conditions: {"buffs":[],"debuffs":["lifesteal"]}
+Attack "life drain" missing conditions: {"buffs":[],"debuffs":["lifesteal"]}
+Attack "corrupted cleave" missing conditions: {"buffs":[],"debuffs":["necrotic wound"]}
+Attack "curse" missing conditions: {"buffs":[],"debuffs":["death mark"]}
+Attack "death bolt" missing conditions: {"buffs":[],"debuffs":["necrotic wound"]}

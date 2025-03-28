@@ -1,0 +1,36 @@
+{
+  "training grounds": [],
+  "nearby cave": [],
+  "goblin cave": [
+    "warg"
+  ],
+  "bandit hideout": [
+    "bandit heavy"
+  ],
+  "frost spire fortress": [],
+  "infestation": [
+    "giant venomous spider",
+    "brood mother",
+    "venomous spider"
+  ],
+  "dark forest": [
+    "centaur"
+  ],
+  "ancient arena": [],
+  "crystal labyrinthine - first excavation": [],
+  "crystal labyrinthine - second excavation": [],
+  "crystal labyrinthine - third excavation": [],
+  "crystal labyrinthine - fourth excavation": [],
+  "corrupted temple - outer terrace": [],
+  "corrupted temple - ramparts": [],
+  "corrupted temple - hall": [],
+  "corrupted temple - atrium": [],
+  "ronin's redoubt": [
+    "samurai old"
+  ],
+  "kōtetsu moses": [
+    "samurai old",
+    "samurai old",
+    "samurai old"
+  ]
+}
