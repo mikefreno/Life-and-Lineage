@@ -1,0 +1,19 @@
+{
+  "missingSummons": {
+    "ranger": [],
+    "necromancer": []
+  },
+  "missingSummonAttacks": {
+    "dragon welp": [
+      "fire breath"
+    ],
+    "dragon": [
+      "fire breath"
+    ]
+  },
+  "unusedSummons": [
+    "zombie",
+    "bandit",
+    "hobgoblin"
+  ]
+}

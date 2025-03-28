@@ -1,0 +1,84 @@
+{
+  "invalidEffects": [
+    {
+      "condition": "head trauma",
+      "invalidEffect": "health decrease"
+    },
+    {
+      "condition": "enlighten",
+      "invalidEffect": "mana increase"
+    },
+    {
+      "condition": "dulled mind",
+      "invalidEffect": "mana decrease"
+    },
+    {
+      "condition": "protection aura",
+      "invalidEffect": "protection"
+    },
+    {
+      "condition": "execute",
+      "invalidEffect": "execution"
+    },
+    {
+      "condition": "blessed defense",
+      "invalidEffect": "holy damage resistance"
+    },
+    {
+      "condition": "stealth",
+      "invalidEffect": "invisibility"
+    },
+    {
+      "condition": "stealth",
+      "invalidEffect": "damage increase"
+    },
+    {
+      "condition": "remove stealth",
+      "invalidEffect": "remove stealth"
+    },
+    {
+      "condition": "weaken",
+      "invalidEffect": "damage reduction"
+    }
+  ],
+  "unusedEffects": [
+    "sanityMax increase",
+    "sanityMax decrease",
+    "healthMax decrease",
+    "manaMax increase",
+    "manaMax decrease",
+    "execute",
+    "stealth"
+  ],
+  "effectUsageCount": {
+    "health damage": 10,
+    "strengthen": 7,
+    "armor increase": 6,
+    "blur": 6,
+    "heal": 4,
+    "stun": 3,
+    "accuracy reduction": 3,
+    "thorns": 3,
+    "trap": 3,
+    "accuracy increase": 2,
+    "sanity heal": 2,
+    "healthMax increase": 2,
+    "mana regen": 2,
+    "mana drain": 2,
+    "armor decrease": 2,
+    "weaken": 2,
+    "silenced": 1,
+    "sanity damage": 1,
+    "destroy undead": 1,
+    "undead cower": 1,
+    "revenge": 1,
+    "blood magic consumable": 1,
+    "sanityMax increase": 0,
+    "sanityMax decrease": 0,
+    "healthMax decrease": 0,
+    "manaMax increase": 0,
+    "manaMax decrease": 0,
+    "execute": 0,
+    "stealth": 0
+  }
+}
