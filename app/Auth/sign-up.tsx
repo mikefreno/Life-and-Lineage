@@ -26,6 +26,7 @@ import { tw, useStyles } from "@/hooks/styles";
 import { runInAction } from "mobx";
 import Colors from "@/constants/Colors";
 import { useScaling } from "@/hooks/scaling";
+import { reloadAppAsync } from "expo";
 
 const SignUpScreen = observer(() => {
   const vibration = useVibration();
@@ -145,6 +146,7 @@ const SignUpScreen = observer(() => {
     setAwaitingResponse(true);
     try {
       await authStore.googleSignIn();
+      reloadAppAsync();
       setAwaitingResponse(false);
     } catch (error) {
       setError("Failed to sign up with Google. Please try again.");
@@ -156,6 +158,7 @@ const SignUpScreen = observer(() => {
     setAwaitingResponse(true);
     try {
       await authStore.appleSignIn();
+      reloadAppAsync();
       setAwaitingResponse(false);
     } catch (error) {
       setError("Failed to sign up with Apple. Please try again.");

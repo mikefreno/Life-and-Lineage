@@ -110,7 +110,7 @@ function ErrorRender({ error }: { error: unknown }): React.ReactElement {
             </GenericFlatButton>
             <GenericFlatButton
               style={{ marginTop: 8 }}
-              onPress={(): void => root.clearAllData()}
+              onPress={() => root.clearAllData()}
             >
               Clear All Data
             </GenericFlatButton>

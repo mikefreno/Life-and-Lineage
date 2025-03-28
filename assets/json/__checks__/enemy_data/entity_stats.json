@@ -1,0 +1,123 @@
+{
+  "totalEnemies": 27,
+  "totalBosses": 23,
+  "enemiesWithMissingAttacks": 0,
+  "bossesWithMissingAttacks": 1,
+  "enemiesWithMissingFields": 0,
+  "bossesWithMissingFields": 22,
+  "beingTypes": {
+    "enemies": {
+      "block o wood": 1,
+      "beast": 7,
+      "undead": 4,
+      "demi-human": 6,
+      "human": 9
+    },
+    "bosses": {
+      "undead": 1,
+      "human": 12,
+      "demi-human": 4,
+      "beast": 5,
+      "undefined": 1
+    }
+  },
+  "damageTypes": {
+    "enemies": {
+      "physical": 22,
+      "magic": 2,
+      "raw": 3,
+      "poison": 4,
+      "lightning": 1,
+      "cold": 1,
+      "fire": 2
+    },
+    "bosses": {
+      "physical": 2
+    }
+  },
+  "resistanceTypes": {
+    "enemies": {
+      "physical": 18,
+      "poison": 23,
+      "fire": 17,
+      "lightning": 9,
+      "cold": 22,
+      "holy": 10,
+      "magic": 1
+    },
+    "bosses": {
+      "physical": 2,
+      "poison": 2,
+      "fire": 2,
+      "cold": 2,
+      "holy": 2
+    }
+  },
+  "averageEnemyHealth": 444.4074074074074,
+  "averageBossHealth": 145,
+  "averageGoldDrop": {
+    "enemies": {
+      "minimum": 58.51851851851852,
+      "maximum": 78.88888888888889
+    },
+    "bosses": {
+      "minimum": 1336.9565217391305,
+      "maximum": 1611.0869565217392
+    }
+  },
+  "attackDistribution": {
+    "enemies": {
+      "bite": 4,
+      "vampiric bite": 1,
+      "stab": 6,
+      "cleave": 2,
+      "dark bolt": 1,
+      "grab": 1,
+      "zombie bite": 1,
+      "wail": 1,
+      "blunt cleave": 1,
+      "heavy swing": 2,
+      "claw": 2,
+      "chop": 2,
+      "charged pierce": 1,
+      "pocket sand": 1,
+      "serrate": 2,
+      "headbutt": 1,
+      "bonk": 4,
+      "frost": 1,
+      "fire bolt": 1,
+      "gust": 2,
+      "rock toss": 1,
+      "venomous bite": 2,
+      "poisoned shot": 1,
+      "maddening shot": 1,
+      "shoot": 1,
+      "dive": 1,
+      "stampede": 1,
+      "pierce": 2,
+      "stomp": 1
+    },
+    "bosses": {
+      "grab": 1,
+      "zombie bite": 1,
+      "dark burst": 1,
+      "raise skeleton": 1,
+      "stab": 3,
+      "frenzy": 1,
+      "spark": 1,
+      "bonk": 1,
+      "bite": 1,
+      "claw": 1,
+      "pocket sand": 1,
+      "serrate": 1,
+      "headbutt": 1,
+      "heavy swing": 2,
+      "call backup": 1,
+      "venomous bite": 3,
+      "stampede": 1,
+      "chop": 1
+    }
+  },
+  "bossesWithPhases": 1,
+  "averagePhases": 1
+}

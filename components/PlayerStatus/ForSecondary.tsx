@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useCallback, useRef } from "react";
 import ProgressBar from "@/components/ProgressBar";
-import { Pressable, View } from "react-native";
+import { findNodeHandle, Pressable, UIManager, View } from "react-native";
 import { observer } from "mobx-react-lite";
 import { Coins, SquarePlus } from "@/assets/icons/SVGIcons";
 import { Text } from "@/components/Themed";
@@ -18,10 +18,35 @@ const PlayerStatusForSecondary = observer(() => {
   const root = useRootStore();
   const { playerState, uiStore } = root;
   const styles = useStyles();
+  const playerStatusRef = useRef<View>(null);
 
   const vibration = useVibration();
 
   const { statChanges, animationCycler } = useStatChanges(playerState!);
+
+  const measureInWindow = useCallback(() => {
+    if (!playerStatusRef.current) return;
+
+    const nodeHandle = findNodeHandle(playerStatusRef.current);
+    if (nodeHandle) {
+      UIManager.measure(nodeHandle, (x, y, width, height, pageX, pageY) => {
+        if (height > 0) {
+          uiStore.setPlayerStatusHeight(height);
+          uiStore.setPlayerStatusTop(pageY);
+        }
+      });
+    }
+  }, [uiStore.isLandscape]);
+
+  const onLayoutHandler = () => {
+    setTimeout(
+      () =>
+        requestAnimationFrame(() => {
+          measureInWindow();
+        }),
+      0,
+    );
+  };
 
   if (!playerState) {
     return null;
@@ -32,6 +57,8 @@ const PlayerStatusForSecondary = observer(() => {
       <PlayerStatusModal />
       <ColorAndPlatformDependantBlur home={false}>
         <Pressable
+          ref={playerStatusRef}
+          onLayout={onLayoutHandler}
           onPress={() => {
             vibration({ style: "light" });
             uiStore.setDetailedStatusViewShowing(true);

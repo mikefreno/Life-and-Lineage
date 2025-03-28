@@ -24,6 +24,7 @@ import { AudioStore } from "@/stores/AudioStore";
 import { PlayerAnimationStore } from "@/stores/PlayerAnimationStore";
 import { flipCoin } from "@/utility/functions/misc";
 import { IAPStore } from "@/stores/IAPStore";
+import { reloadAppAsync } from "expo";
 
 export class RootStore {
   playerState: PlayerCharacter | null;
@@ -382,6 +383,7 @@ export class RootStore {
       for (const key of keys) {
         storage.delete(key);
       }
+      reloadAppAsync("clearing data");
     }
   }
 }

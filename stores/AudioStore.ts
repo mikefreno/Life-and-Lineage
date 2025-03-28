@@ -51,6 +51,8 @@ export class AudioStore {
   isAmbientLoaded: boolean = false;
   isCombatLoaded: boolean = false;
 
+  isRecovering: boolean = false;
+
   private ambientPlayers: Map<string, Sound> = new Map();
   private combatPlayers: Map<string, Sound> = new Map();
   private soundEffects: Map<string, Sound> = new Map();
@@ -84,6 +86,7 @@ export class AudioStore {
       currentTrack: observable,
       isAmbientLoaded: observable,
       isCombatLoaded: observable,
+      isRecovering: observable,
 
       loadAudioResources: action,
       playAmbient: action,
@@ -92,6 +95,7 @@ export class AudioStore {
       setMuteValue: action,
       setAudioLevel: action,
       cleanup: action,
+      recoverFromError: action,
     });
 
     this.initializeAudio();
@@ -104,37 +108,52 @@ export class AudioStore {
         inCombat: this.root.dungeonStore.inCombat,
       }),
       (current, previous) => {
-        this.parseLocationForRelevantTrack(current, previous);
+        try {
+          this.parseLocationForRelevantTrack(current, previous);
+        } catch (error) {
+          this.handleError("Error in location reaction", error);
+        }
       },
     );
+
     reaction(
       () => this.currentTrack?.name,
-      () => this.setMuteValue(this.muted),
+      () => {
+        try {
+          this.setMuteValue(this.muted);
+        } catch (error) {
+          this.handleError("Error in mute reaction", error);
+        }
+      },
     );
   }
 
   private parseLocationForRelevantTrack(current?: any, previous?: any) {
-    if (!previous || !current) {
-      if (this.root.dungeonStore.inCombat) {
-        this.playCombat("basic");
-      } else {
+    try {
+      if (!previous || !current) {
+        if (this.root.dungeonStore.inCombat) {
+          this.playCombat("basic");
+        } else {
+          this.playAmbient();
+        }
+      }
+      if (current.inCombat !== previous?.inCombat) {
+        if (current.inCombat) {
+          this.playCombat("basic");
+        } else {
+          this.playAmbient();
+        }
+      } else if (
+        current.inDungeon !== previous?.inDungeon ||
+        current.inMarket !== previous?.inMarket ||
+        (!current.inDungeon &&
+          !current.inMarket &&
+          current.playerAge !== previous?.playerAge)
+      ) {
         this.playAmbient();
       }
-    }
-    if (current.inCombat !== previous?.inCombat) {
-      if (current.inCombat) {
-        this.playCombat("basic");
-      } else {
-        this.playAmbient();
-      }
-    } else if (
-      current.inDungeon !== previous?.inDungeon ||
-      current.inMarket !== previous?.inMarket ||
-      (!current.inDungeon &&
-        !current.inMarket &&
-        current.playerAge !== previous?.playerAge)
-    ) {
-      this.playAmbient();
+    } catch (error) {
+      this.handleError("Error parsing location for track", error);
     }
   }
 
@@ -147,8 +166,7 @@ export class AudioStore {
       });
       await this.loadAudioResources();
     } catch (error) {
-      console.error("Failed to initialize audio:", error);
-      this.cleanup();
+      this.handleError("Failed to initialize audio", error);
     }
   }
 
@@ -173,46 +191,70 @@ export class AudioStore {
         this.playAmbient();
       }
     } catch (error) {
-      console.error("Failed to load audio resources:", error);
+      this.handleError("Failed to load audio resources", error);
     }
   }
 
   private async loadSoundEffects() {
-    const loadPromises = Object.entries(SOUND_EFFECTS).map(
-      async ([id, source]) => {
-        const { sound } = await Audio.Sound.createAsync(source, {
-          volume: this.getEffectiveVolume("soundEffects"),
-        });
-        this.soundEffects.set(id, sound);
-      },
-    );
-    await Promise.all(loadPromises);
+    try {
+      const loadPromises = Object.entries(SOUND_EFFECTS).map(
+        async ([id, source]) => {
+          try {
+            const { sound } = await Audio.Sound.createAsync(source, {
+              volume: this.getEffectiveVolume("soundEffects"),
+            });
+            this.soundEffects.set(id, sound);
+          } catch (error) {
+            this.handleError(`Failed to load sound effect: ${id}`, error);
+          }
+        },
+      );
+      await Promise.all(loadPromises);
+    } catch (error) {
+      this.handleError("Failed to load sound effects", error);
+    }
   }
 
   private async loadAmbientTracks() {
-    const loadPromises = Object.entries(AMBIENT_TRACKS).map(
-      async ([id, source]) => {
-        const { sound } = await Audio.Sound.createAsync(source, {
-          volume: 0,
-          isLooping: true,
-        });
-        this.ambientPlayers.set(id, sound);
-      },
-    );
-    await Promise.all(loadPromises);
+    try {
+      const loadPromises = Object.entries(AMBIENT_TRACKS).map(
+        async ([id, source]) => {
+          try {
+            const { sound } = await Audio.Sound.createAsync(source, {
+              volume: 0,
+              isLooping: true,
+            });
+            this.ambientPlayers.set(id, sound);
+          } catch (error) {
+            this.handleError(`Failed to load ambient track: ${id}`, error);
+          }
+        },
+      );
+      await Promise.all(loadPromises);
+    } catch (error) {
+      this.handleError("Failed to load ambient tracks", error);
+    }
   }
 
   private async loadCombatTracks() {
-    const loadPromises = Object.entries(COMBAT_TRACKS).map(
-      async ([id, source]) => {
-        const { sound } = await Audio.Sound.createAsync(source, {
-          volume: 0,
-          isLooping: true,
-        });
-        this.combatPlayers.set(id, sound);
-      },
-    );
-    await Promise.all(loadPromises);
+    try {
+      const loadPromises = Object.entries(COMBAT_TRACKS).map(
+        async ([id, source]) => {
+          try {
+            const { sound } = await Audio.Sound.createAsync(source, {
+              volume: 0,
+              isLooping: true,
+            });
+            this.combatPlayers.set(id, sound);
+          } catch (error) {
+            this.handleError(`Failed to load combat track: ${id}`, error);
+          }
+        },
+      );
+      await Promise.all(loadPromises);
+    } catch (error) {
+      this.handleError("Failed to load combat tracks", error);
+    }
   }
 
   async playAmbient(track?: keyof typeof AMBIENT_TRACKS) {
@@ -278,8 +320,7 @@ export class AudioStore {
         duration: DEFAULT_FADE,
       });
     } catch (error) {
-      console.error(`Failed to play ambient track:`, error);
-      await this.recoverFromError();
+      this.handleError(`Failed to play ambient track`, error);
     }
   }
 
@@ -334,8 +375,7 @@ export class AudioStore {
         duration: DEFAULT_FADE,
       });
     } catch (error) {
-      console.error(`Failed to play combat track:`, error);
-      await this.recoverFromError();
+      this.handleError(`Failed to play combat track`, error);
     }
   }
 
@@ -351,34 +391,40 @@ export class AudioStore {
         console.error(`Sound effect ${id} not found`);
       }
     } catch (error) {
-      console.error(`Failed to play sound effect ${id}:`, error);
+      this.handleError(`Failed to play sound effect ${id}`, error);
     }
   }
 
   async getPlayingTracksCount() {
-    let ambientCount = 0;
-    let combatCount = 0;
+    try {
+      let ambientCount = 0;
+      let combatCount = 0;
 
-    // Check ambient players
-    for (const sound of this.ambientPlayers.values()) {
-      const status = await sound.getStatusAsync();
-      if (status.isLoaded && status.isPlaying) ambientCount++;
+      // Check ambient players
+      for (const sound of this.ambientPlayers.values()) {
+        const status = await sound.getStatusAsync();
+        if (status.isLoaded && status.isPlaying) ambientCount++;
+      }
+
+      // Check combat players
+      for (const sound of this.combatPlayers.values()) {
+        const status = await sound.getStatusAsync();
+        if (status.isLoaded && status.isPlaying) combatCount++;
+      }
+
+      return { ambientCount, combatCount };
+    } catch (error) {
+      this.handleError("Error getting playing tracks count", error);
+      return { ambientCount: 0, combatCount: 0 };
     }
-
-    // Check combat players
-    for (const sound of this.combatPlayers.values()) {
-      const status = await sound.getStatusAsync();
-      if (status.isLoaded && status.isPlaying) combatCount++;
-    }
-
-    return { ambientCount, combatCount };
   }
 
   private async getCurrentVolume(sound: Sound): Promise<number> {
     try {
       const status = await sound.getStatusAsync();
       return status.isLoaded ? status.volume : 0;
-    } catch {
+    } catch (error) {
+      this.handleError("Error getting current volume", error);
       return 0;
     }
   }
@@ -408,8 +454,8 @@ export class AudioStore {
         return;
       }
     } catch (error) {
-      console.warn(
-        `Error checking sound status for ${soundCategory} ${soundName}:`,
+      this.handleError(
+        `Error checking sound status for ${soundCategory} ${soundName}`,
         error,
       );
       return;
@@ -549,60 +595,76 @@ export class AudioStore {
   private getEffectiveVolume(
     type: "ambientMusic" | "combatMusic" | "soundEffects",
   ): number {
-    const typeVolume =
-      type === "ambientMusic"
-        ? this.ambientMusicVolume
-        : type === "combatMusic"
-        ? this.combatMusicVolume
-        : this.soundEffectsVolume;
-    return this.muted
-      ? 0
-      : Math.min(1, Math.max(0, typeVolume * this.masterVolume * GLOBAL_MULT));
+    try {
+      const typeVolume =
+        type === "ambientMusic"
+          ? this.ambientMusicVolume
+          : type === "combatMusic"
+          ? this.combatMusicVolume
+          : this.soundEffectsVolume;
+      return this.muted
+        ? 0
+        : Math.min(
+            1,
+            Math.max(0, typeVolume * this.masterVolume * GLOBAL_MULT),
+          );
+    } catch (error) {
+      this.handleError("Error calculating effective volume", error);
+      return 0;
+    }
   }
 
   setMuteValue(muted: boolean) {
-    this.muted = muted;
+    try {
+      this.muted = muted;
 
-    if (muted) {
-      if (this.currentTrack) {
-        this.currentTrack.sound
-          .pauseAsync()
-          .catch((error) =>
-            console.error("Error pausing current track:", error),
-          );
+      if (muted) {
+        if (this.currentTrack) {
+          this.currentTrack.sound
+            .pauseAsync()
+            .catch((error) =>
+              this.handleError("Error pausing current track", error),
+            );
+        }
+      } else {
+        if (this.currentTrack) {
+          this.currentTrack.sound
+            .playAsync()
+            .catch((error) =>
+              this.handleError("Error resuming current track", error),
+            );
+        }
       }
-    } else {
-      if (this.currentTrack) {
-        this.currentTrack.sound
-          .playAsync()
-          .catch((error) =>
-            console.error("Error resuming current track:", error),
-          );
-      }
+
+      this.updateAllVolumes();
+      this.persistSettings();
+    } catch (error) {
+      this.handleError("Error setting mute value", error);
     }
-
-    this.updateAllVolumes();
-    this.persistSettings();
   }
 
   setAudioLevel(type: "master" | "ambient" | "sfx" | "combat", level: number) {
-    if (level >= 0 && level <= 1) {
-      switch (type) {
-        case "master":
-          this.masterVolume = level;
-          break;
-        case "ambient":
-          this.ambientMusicVolume = level;
-          break;
-        case "sfx":
-          this.soundEffectsVolume = level;
-          break;
-        case "combat":
-          this.combatMusicVolume = level;
-          break;
+    try {
+      if (level >= 0 && level <= 1) {
+        switch (type) {
+          case "master":
+            this.masterVolume = level;
+            break;
+          case "ambient":
+            this.ambientMusicVolume = level;
+            break;
+          case "sfx":
+            this.soundEffectsVolume = level;
+            break;
+          case "combat":
+            this.combatMusicVolume = level;
+            break;
+        }
+        this.updateAllVolumes();
+        this.persistSettings();
       }
-      this.updateAllVolumes();
-      this.persistSettings();
+    } catch (error) {
+      this.handleError(`Error setting audio level for ${type}`, error);
     }
   }
 
@@ -617,41 +679,93 @@ export class AudioStore {
         await sound.setVolumeAsync(this.getEffectiveVolume("soundEffects"));
       }
     } catch (error) {
-      console.error("Error updating volumes:", error);
+      this.handleError("Error updating volumes", error);
     }
   }
 
   private loadPersistedSettings() {
-    const stored = storage.getString("audio_settings");
-    if (stored) {
-      const settings = JSON.parse(stored);
-      this.masterVolume = settings.master ?? 1;
-      this.ambientMusicVolume = settings.ambient ?? 1;
-      this.soundEffectsVolume = settings.sfx ?? 1;
-      this.combatMusicVolume = settings.combat ?? 1;
-      this.muted = settings.muted ?? false;
+    try {
+      const stored = storage.getString("audio_settings");
+      if (stored) {
+        const settings = JSON.parse(stored);
+        this.masterVolume = settings.master ?? 1;
+        this.ambientMusicVolume = settings.ambient ?? 1;
+        this.soundEffectsVolume = settings.sfx ?? 1;
+        this.combatMusicVolume = settings.combat ?? 1;
+        this.muted = settings.muted ?? false;
+      }
+    } catch (error) {
+      this.handleError("Error loading persisted settings", error);
+      // Use defaults if settings can't be loaded
+      this.masterVolume = 1;
+      this.ambientMusicVolume = 1;
+      this.soundEffectsVolume = 1;
+      this.combatMusicVolume = 1;
+      this.muted = false;
     }
   }
 
   private persistSettings() {
-    const settings = {
-      master: this.masterVolume,
-      ambient: this.ambientMusicVolume,
-      sfx: this.soundEffectsVolume,
-      combat: this.combatMusicVolume,
-      muted: this.muted,
-    };
-    storage.set("audio_settings", JSON.stringify(settings));
+    try {
+      const settings = {
+        master: this.masterVolume,
+        ambient: this.ambientMusicVolume,
+        sfx: this.soundEffectsVolume,
+        combat: this.combatMusicVolume,
+        muted: this.muted,
+      };
+      storage.set("audio_settings", JSON.stringify(settings));
+    } catch (error) {
+      this.handleError("Error persisting settings", error);
+    }
   }
 
-  private async recoverFromError() {
-    this.cleanup();
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+  async recoverFromError() {
+    if (this.isRecovering) return;
+
     try {
+      runInAction(() => {
+        this.isRecovering = true;
+      });
+
+      this.cleanup();
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       await this.initializeAudio();
+
+      runInAction(() => {
+        this.isRecovering = false;
+      });
     } catch (error) {
       console.error("Failed to recover audio system:", error);
+      this.logError("Failed to recover audio system", error);
+
+      // Final attempt - wait longer and try one more time
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        await this.initializeAudio();
+      } catch (finalError) {
+        console.error("Final recovery attempt failed:", finalError);
+        this.logError("Final audio recovery attempt failed", finalError);
+      } finally {
+        runInAction(() => {
+          this.isRecovering = false;
+        });
+      }
     }
+  }
+
+  private handleError(message: string, error: any) {
+    if (this.isBackgroundError(error)) {
+      // Background errors are expected, just log them
+      console.log(`Background audio error: ${message}`, error);
+      return;
+    }
+
+    console.error(`AudioStore error: ${message}`, error);
+    this.logError(message, error);
+
+    // Trigger recovery process
+    this.recoverFromError();
   }
 
   private async withTimeout<T>(
@@ -677,11 +791,11 @@ export class AudioStore {
       return result;
     } catch (error) {
       clearTimeout(timeoutId!);
-      console.error(`Audio operation "${operation}" failed:`, error);
-      // Kill the hanging audio process
-      this.cleanup();
+      this.handleError(`Audio operation "${operation}" failed`, error);
       // Reset state
-      this.currentTrack = null;
+      runInAction(() => {
+        this.currentTrack = null;
+      });
       this.parseLocationForRelevantTrack();
     }
   }
@@ -787,6 +901,7 @@ export class AudioStore {
         isCombatLoaded: this.isCombatLoaded,
         isSoundEffectsLoaded: this.isSoundEffectsLoaded,
         currentTrack: this.currentTrack?.name || "none",
+        isRecovering: this.isRecovering,
       });
 
       if (error instanceof Error) {

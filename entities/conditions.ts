@@ -328,4 +328,6 @@ const conditionIconMap: { [key: string]: any } = {
   rock_shield: require("@/assets/images/conditions/rock_shield.png"),
   holy_shield: require("@/assets/images/conditions/holy_shield.png"),
   magic_shield: require("@/assets/images/conditions/magic_shield.png"),
+  necrotic: require("@/assets/images/conditions/necrotic.png"),
+  death_mark: require("@/assets/images/conditions/death_mark.png"),
 };

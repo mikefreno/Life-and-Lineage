@@ -249,7 +249,7 @@ export class Attack {
     return this.user.calculateAttackDamage({
       baseDamageMap: this.damageTable,
       isSpell: this.element !== null,
-      usesWeapon: this.element == null || !!this.usesWeapon,
+      usesWeapon: this.element == null || this.usesWeapon !== null,
     });
   }
 
@@ -257,7 +257,7 @@ export class Attack {
     return this.user.calculateAttackDamage({
       baseDamageMap: this.selfDamageTable,
       isSpell: this.element != null,
-      usesWeapon: this.element == null || !!this.usesWeapon,
+      usesWeapon: this.element == null || this.usesWeapon !== null,
       target: this.user,
     });
   }
@@ -266,7 +266,7 @@ export class Attack {
     return this.user.calculateAttackDamage({
       baseDamageMap: this.damageTable,
       isSpell: this.element !== null,
-      usesWeapon: this.element == null || !!this.usesWeapon,
+      usesWeapon: this.element == null || this.usesWeapon !== null,
       target: target,
     });
   }
@@ -303,6 +303,12 @@ export class Attack {
     }
     if (this.isActive) {
       return { val: false, reason: "Active" };
+    }
+    if (
+      this.buffNames?.includes("remove stealth") &&
+      !this.user.conditions.find((cond) => cond.effect.includes("stealth"))
+    ) {
+      return { val: false, reason: "Requires stealth" };
     }
     if (this.remainingUses !== null && this.remainingUses == 0) {
       return { val: false, reason: "No uses" };

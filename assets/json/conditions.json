@@ -232,7 +232,7 @@
     "style": "debuff",
     "turns": 5,
     "effect": [
-      "health decrease"
+      "healthMax decrease"
     ],
     "effectStyle": [
       "multiplier"
@@ -307,7 +307,7 @@
     "style": "buff",
     "turns": 5,
     "effect": [
-      "mana increase"
+      "manaMax increase"
     ],
     "effectStyle": [
       "multiplier"
@@ -352,7 +352,7 @@
     "style": "debuff",
     "turns": 5,
     "effect": [
-      "mana decrease"
+      "manaMax decrease"
     ],
     "effectStyle": [
       "multiplier"
@@ -462,7 +462,7 @@
     "turns": -1,
     "aura": true,
     "effect": [
-      "protection"
+      "armor increase"
     ],
     "effectStyle": [
       "flat"
@@ -494,7 +494,7 @@
     "turns": 1,
     "aura": false,
     "effect": [
-      "execution"
+      "execute"
     ],
     "effectStyle": [
       null
@@ -613,38 +613,17 @@
     "icon": "shield"
   },
   {
-    "name": "blessed defense",
-    "style": "buff",
-    "turns": 5,
-    "effect": [
-      "armor increase",
-      "holy damage resistance"
-    ],
-    "effectStyle": [
-      "multiplier",
-      "multiplier"
-    ],
-    "effectAmount": [
-      0.35,
-      0.5
-    ],
-    "icon": "holy_shield"
-  },
-  {
     "name": "stealth",
     "style": "buff",
     "turns": 3,
     "effect": [
-      "invisibility",
-      "damage increase"
+      "stealth"
     ],
     "effectStyle": [
-      null,
-      "multiplier"
+      null
     ],
     "effectAmount": [
-      null,
-      1.5
+      null
     ],
     "icon": "hidden"
   },
@@ -668,7 +647,7 @@
     "style": "debuff",
     "turns": 3,
     "effect": [
-      "damage reduction"
+      "weaken"
     ],
     "effectStyle": [
       "multiplier"
@@ -1046,6 +1025,42 @@
       10
     ],
     "icon": "holy_water"
+  },
+  {
+    "name": "necrotic wound",
+    "style": "debuff",
+    "turns": 5,
+    "effect": [
+      "sanityMax decrease",
+      "healthMax decrease",
+      "weaken"
+    ],
+    "effectStyle": [
+      "multiplier",
+      "multiplier",
+      "multiplier"
+    ],
+    "effectAmount": [
+      0.15,
+      0.15,
+      0.15
+    ],
+    "icon": "necrotic"
+  },
+  {
+    "name": "death mark",
+    "style": "debuff",
+    "turns": 2,
+    "effect": [
+      "health damage"
+    ],
+    "effectStyle": [
+      "percentage"
+    ],
+    "effectAmount": [
+      0.15
+    ],
+    "icon": "death_mark"
   }
 ]
 

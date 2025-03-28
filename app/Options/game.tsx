@@ -14,6 +14,7 @@ import CheckpointModal from "@/components/CheckpointModal";
 import { useStyles } from "@/hooks/styles";
 import GenericFlatButton from "@/components/GenericFlatButton";
 import { observer } from "mobx-react-lite";
+import { reloadAppAsync } from "expo";
 
 const healthWarningOptions: Record<number, string> = {
   0.5: "50%",
@@ -34,7 +35,9 @@ const healthWarningVals = [
 const healthWarningKeys = [0.5, 0.25, 0.2, 0.15, 0.1, 0];
 
 const GameSettings = observer(() => {
-  const { uiStore, tutorialStore } = useRootStore();
+  const root = useRootStore();
+  const { uiStore, tutorialStore } = root;
+
   const styles = useStyles();
   const router = useRouter();
   const vibration = useVibration();
@@ -99,7 +102,7 @@ const GameSettings = observer(() => {
                   tutorialStore.resetTutorialState(async () => {
                     setShowTutorialResetConfirm(false);
                     setLoading(false);
-                    await expo.reloadAppAsync("tutorial reset");
+                    await reloadAppAsync("tutorial reset");
                   });
                 }}
               >
@@ -133,7 +136,11 @@ const GameSettings = observer(() => {
           <GenericRaisedButton onPress={() => setShowCheckpoints(true)}>
             Manage Game Saves
           </GenericRaisedButton>
-
+          {__DEV__ && (
+            <GenericRaisedButton onPress={() => root.clearAllData()}>
+              Reset App
+            </GenericRaisedButton>
+          )}
           <GenericStrikeAround>Game Restart</GenericStrikeAround>
           <GenericRaisedButton onPress={startNewGame}>
             Start New Game

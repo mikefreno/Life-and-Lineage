@@ -1,21 +1,12 @@
 {
   "training grounds": [],
   "nearby cave": [],
-  "goblin cave": [
-    "warg",
-    "warg",
-    "warg"
-  ],
+  "goblin cave": [],
   "bandit hideout": [],
   "frost spire fortress": [],
   "infestation": [],
   "dark forest": [],
-  "ancient arena": [
-    "lizardman",
-    "lizardman",
-    "lizardman",
-    "lizardman"
-  ],
+  "ancient arena": [],
   "crystal labyrinthine - first excavation": [],
   "crystal labyrinthine - second excavation": [],
   "crystal labyrinthine - third excavation": [],

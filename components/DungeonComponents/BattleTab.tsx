@@ -8,14 +8,11 @@ import {
   TouchableWithoutFeedback,
   ScrollView,
 } from "react-native";
-import { toTitleCase } from "@/utility/functions/misc";
 import { useEffect, useState } from "react";
 import GenericModal from "@/components/GenericModal";
 import SpellDetails from "@/components/SpellDetails";
 import InventoryRender from "@/components/InventoryRender";
 import { DungeonMapControls } from "./DungeonMap";
-import { Energy, Regen } from "@/assets/icons/SVGIcons";
-import { elementalColorMap } from "@/constants/Colors";
 import { useCombatState, useLootState } from "@/providers/DungeonData";
 import { Attack } from "@/entities/attack";
 import { useCombatActions } from "@/hooks/combat";

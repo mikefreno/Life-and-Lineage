@@ -932,6 +932,7 @@ export const EnemyImageMap: EnemyImageMapType = {
       },
       attack_2: {
         anim: require("@/assets/monsters/Necromancer/ATTACK_2.webp"),
+        disablePreMovement: true,
       },
       attack_3: {
         anim: require("@/assets/monsters/Necromancer/ATTACK_3.webp"),
@@ -2232,10 +2233,10 @@ export const EnemyImageMap: EnemyImageMapType = {
   wolf_black: {
     sets: {
       attack_1: {
-        anim: require("@/assets/monsters/Wolf_Black/ATTACK_1.webp"),
+        anim: require("@/assets/monsters/Wolf_Black/ATTACK_1.webp"), //bite
       },
       attack_2: {
-        anim: require("@/assets/monsters/Wolf_Black/ATTACK_2.webp"),
+        anim: require("@/assets/monsters/Wolf_Black/ATTACK_2.webp"), //claw
       },
       hurt: {
         anim: require("@/assets/monsters/Wolf_Black/HURT.webp"),

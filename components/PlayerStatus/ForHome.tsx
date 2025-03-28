@@ -5,7 +5,6 @@ import {
   View,
   Animated,
   Easing,
-  LayoutChangeEvent,
   findNodeHandle,
   UIManager,
 } from "react-native";
@@ -55,7 +54,6 @@ const PlayerStatusForHome = observer(() => {
     }).start();
   }, [uiStore.playerStatusIsCompact]);
 
-  // Function to measure absolute position on
   const measureInWindow = useCallback(() => {
     if (!playerStatusRef.current) return;
 

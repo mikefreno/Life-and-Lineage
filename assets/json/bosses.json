@@ -1,10 +1,10 @@
 [
   {
     "name": "zombie",
+    "sprite": "zombie",
     "beingType": "undead",
     "sanity": null,
     "health": 80,
-    "attackPower": 10,
     "mana": {
       "maximum": 50,
       "regen": 5
@@ -13,7 +13,20 @@
       "grab",
       "zombie bite"
     ],
-    "sprite": "zombie",
+    "animationStrings": {
+      "grab": "attack_1",
+      "zombie bite": "attack_1"
+    },
+    "baseResistanceTable": {
+      "physical": 15,
+      "poison": 75,
+      "fire": 15,
+      "cold": 15,
+      "holy": -50
+    },
+    "baseDamageTable": {
+      "physical": 8
+    },
     "drops": [
       {
         "item": "chunk of flesh",
@@ -34,39 +47,57 @@
   {
     "name": "necromancer",
     "beingType": "human",
+    "sprite": "necromancer",
     "sanity": 50,
     "health": 140,
-    "attackPower": 15,
     "mana": {
       "maximum": 40,
       "regen": 10
     },
     "attackStrings": [
-      "raise skeleton",
-      "teeth"
+      "dark burst",
+      "raise skeleton"
     ],
-    "sprite": "necromancer",
-    "basePhysicalDamage": 15,
-    "baseFireDamage": 20,
-    "baseColdDamage": 0,
-    "baseLightningDamage": 0,
-    "basePoisonDamage": 10,
-    "baseFireResistance": 0,
-    "baseColdResistance": 0,
-    "baseLightningResistance": 0,
-    "basePoisonResistance": 0,
+    "animationStrings": {
+      "dark burst": "attack_1",
+      "raise skeleton": "attack_2",
+      "": "attack_3"
+    },
+    "baseResistanceTable": {
+      "physical": 15,
+      "poison": 10,
+      "fire": 5,
+      "cold": 15,
+      "holy": -20
+    },
+    "baseDamageTable": {
+      "physical": 12
+    },
     "phases": [
       {
         "triggerHealth": 0.5,
         "sprite": "reaper",
-        "attackPower": 20,
         "dialogue": "Witness my true power!",
-        "baseFireResistance": 0.2,
+        "baseResistanceTable": {
+          "physical": 15,
+          "poison": 50,
+          "fire": 15,
+          "cold": 30,
+          "holy": -75
+        },
+        "baseDamageTable": {
+          "poison": 10,
+          "cold": 15
+        },
         "attackStrings": [
           "raise skeleton",
           "teeth",
           "fireball"
-        ]
+        ],
+        "animationStrings": {
+          "grab": "attack_1",
+          "teeth": "attack_1"
+        }
       }
     ],
     "drops": [
@@ -145,6 +176,58 @@
     }
   },
   {
+    "name": "warg",
+    "sprite": "wolf_black",
+    "beingType": "beast",
+    "sanity": null,
+    "healthRange": {
+      "minimum": 50,
+      "maximum": 70
+    },
+    "attackPowerRange": {
+      "minimum": 5,
+      "maximum": 10
+    },
+    "mana": {
+      "maximum": 50,
+      "regen": 5
+    },
+    "attackStrings": [
+      "bite",
+      "claw"
+    ],
+    "animationStrings": {
+      "bite": "attack_1",
+      "claw": "attack_2"
+    },
+    "drops": [
+      {
+        "item": "patch of hair",
+        "itemType": "junk",
+        "chance": 0.85
+      },
+      {
+        "item": "patch of hair",
+        "itemType": "junk",
+        "chance": 0.85
+      },
+      {
+        "item": "bone",
+        "itemType": "ingredient",
+        "chance": 0.75
+      },
+      {
+        "item": "bone",
+        "itemType": "ingredient",
+        "chance": 0.75
+      }
+    ],
+    "goldDropRange": {
+      "minimum": 40,
+      "maximum": 55
+    }
+  },
+  {
     "name": "bandit",
     "beingType": "human",
     "sprite": "bandit_light",
@@ -189,6 +272,49 @@
     "armorValue": 15
   },
   {
+    "name": "bandit heavy",
+    "sprite": "bandit_heavy",
+    "beingType": "human",
+    "sanity": 25,
+    "healthRange": {
+      "minimum": 85,
+      "maximum": 125
+    },
+    "attackPowerRange": {
+      "minimum": 10,
+      "maximum": 12
+    },
+    "mana": {
+      "maximum": 30,
+      "regen": 2
+    },
+    "attackStrings": [
+      "headbutt",
+      "heavy swing"
+    ],
+    "animationStrings": {
+      "headbutt": "attack_1",
+      "heavy swing": "attack_1"
+    },
+    "drops": [
+      {
+        "item": "longsword",
+        "itemType": "melee",
+        "chance": 0.25
+      },
+      {
+        "item": "cheap iron chestpiece",
+        "itemType": "bodyArmor",
+        "chance": 0.25
+      }
+    ],
+    "goldDropRange": {
+      "minimum": 80,
+      "maximum": 100
+    },
+    "armorValue": 15
+  },
+  {
     "name": "huge knight",
     "beingType": "human",
     "sprite": "huge_knight",
@@ -215,6 +341,93 @@
       "maximum": 3000
     },
     "armorValue": 30
+  },
+  {
+    "name": "venomous spider",
+    "beingType": "beast",
+    "sprite": "spider_default_small",
+    "sanity": null,
+    "healthRange": {
+      "minimum": 25,
+      "maximum": 40
+    },
+    "attackPowerRange": {
+      "minimum": 4,
+      "maximum": 6
+    },
+    "mana": {
+      "maximum": 40,
+      "regen": 10
+    },
+    "attackStrings": [
+      "venomous bite"
+    ],
+    "animationStrings": {
+      "venomous bite": "attack_1"
+    },
+    "drops": [],
+    "goldDropRange": {
+      "minimum": 40,
+      "maximum": 50
+    }
+  },
+  {
+    "name": "giant venomous spider",
+    "beingType": "beast",
+    "sprite": "spider_default",
+    "sanity": null,
+    "healthRange": {
+      "minimum": 100,
+      "maximum": 140
+    },
+    "attackPowerRange": {
+      "minimum": 10,
+      "maximum": 15
+    },
+    "mana": {
+      "maximum": 40,
+      "regen": 10
+    },
+    "attackStrings": [
+      "venomous bite"
+    ],
+    "animationStrings": {
+      "venomous bite": "attack_1"
+    },
+    "drops": [],
+    "goldDropRange": {
+      "minimum": 40,
+      "maximum": 50
+    }
+  },
+  {
+    "name": "brood mother",
+    "beingType": "beast",
+    "sprite": "spider_default_brood",
+    "sanity": null,
+    "healthRange": {
+      "minimum": 100,
+      "maximum": 140
+    },
+    "attackPowerRange": {
+      "minimum": 10,
+      "maximum": 15
+    },
+    "mana": {
+      "maximum": 40,
+      "regen": 10
+    },
+    "attackStrings": [
+      "venomous bite"
+    ],
+    "animationStrings": {
+      "venomous bite": "attack_1"
+    },
+    "drops": [],
+    "goldDropRange": {
+      "minimum": 40,
+      "maximum": 50
+    }
   },
   {
     "name": "adept air mage",
@@ -294,6 +507,37 @@
       "maximum": 3000
     },
     "armorValue": 10
+  },
+  {
+    "name": "centaur",
+    "beingType": "demi-human",
+    "sprite": "centaur",
+    "sanity": 50,
+    "healthRange": {
+      "minimum": 120,
+      "maximum": 160
+    },
+    "attackPowerRange": {
+      "minimum": 10,
+      "maximum": 15
+    },
+    "mana": {
+      "maximum": 40,
+      "regen": 10
+    },
+    "attackStrings": [
+      "stampede",
+      "chop"
+    ],
+    "animationStrings": {
+      "chop": "attack_1",
+      "stampede": ""
+    },
+    "drops": [],
+    "goldDropRange": {
+      "minimum": 40,
+      "maximum": 50
+    }
   },
   {
     "name": "gryphon",

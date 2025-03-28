@@ -1025,12 +1025,16 @@ export const IAPModal = observer(
         coverScreen={true}
         deviceHeight={uiStore.dimensions.height}
         deviceWidth={uiStore.dimensions.width}
-        style={{ marginHorizontal: Math.max(insets.left, 8) }}
+        style={{ margin: 0 }}
       >
         <PulsingGradientWrapper
           style={{
-            maxHeight: uiStore.dimensions.height - insets.top - insets.bottom,
-            ...styles.modalContent,
+            maxHeight: uiStore.dimensions.height,
+            borderRadius: 12,
+            borderWidth: uiStore.colorScheme === "dark" ? 1 : 0,
+            borderColor: uiStore.colorScheme === "dark" ? "#71717a" : undefined,
+            paddingTop: uiStore.insets?.top,
+            paddingBottom: uiStore.insets?.bottom,
             width: "100%",
           }}
         >

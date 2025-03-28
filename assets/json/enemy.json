@@ -12,9 +12,10 @@
       "maximum": 30,
       "regen": 0
     },
-    "resistanceTable": {},
-    "damageTable": {},
+    "baseResistanceTable": {},
+    "baseDamageTable": {},
     "attackStrings": [],
+    "animationStrings": {},
     "drops": [
       {
         "item": "stick",
@@ -41,12 +42,12 @@
       "minimum": 20,
       "maximum": 50
     },
-    "resistanceTable": {
+    "baseResistanceTable": {
       "physical": 5,
       "poison": 10,
       "fire": -5
     },
-    "damageTable": {
+    "baseDamageTable": {
       "physical": 2
     },
     "mana": {
@@ -85,17 +86,25 @@
       "minimum": 10,
       "maximum": 20
     },
-    "attackPowerRange": {
-      "minimum": 3,
-      "maximum": 8
-    },
     "mana": {
       "maximum": 30,
       "regen": 5
     },
+    "baseResistanceTable": {
+      "physical": 0,
+      "poison": 10,
+      "fire": -10,
+      "lightning": -20
+    },
+    "baseDamageTable": {
+      "physical": 1
+    },
     "attackStrings": [
       "vampiric bite"
     ],
+    "animationStrings": {
+      "vampiric bite": "attack_1"
+    },
     "drops": [
       {
         "item": "bat wing",
@@ -122,13 +131,18 @@
       "minimum": 40,
       "maximum": 60
     },
-    "attackPowerRange": {
-      "minimum": 4,
-      "maximum": 8
-    },
     "mana": {
       "maximum": 50,
       "regen": 5
+    },
+    "baseResistanceTable": {
+      "physical": 15,
+      "poison": 30,
+      "cold": -5,
+      "holy": -50
+    },
+    "baseDamageTable": {
+      "physical": 5
     },
     "attackStrings": [
       "stab",
@@ -170,55 +184,30 @@
       "minimum": 30,
       "maximum": 50
     },
-    "attackPowerRange": {
-      "minimum": 4,
-      "maximum": 8
-    },
     "mana": {
       "maximum": 50,
       "regen": 5
     },
+    "baseResistanceTable": {
+      "physical": 15,
+      "poison": 30,
+      "cold": -5,
+      "holy": -50
+    },
+    "baseDamageTable": {
+      "magic": 5
+    },
     "attackStrings": [
-      "shoot"
+      "dark bolt"
     ],
     "animationStrings": {
-      "shoot": "attack_1"
+      "dark bolt": "attack_1"
     },
     "drops": [
       {
         "item": "bone",
         "itemType": "ingredient",
         "chance": 0.75
-      },
-      {
-        "item": "iron arrow",
-        "itemType": "arrow",
-        "chance": 0.5
-      },
-      {
-        "item": "iron arrow",
-        "itemType": "arrow",
-        "chance": 0.5
-      },
-      {
-        "item": "iron arrow",
-        "itemType": "arrow",
-        "chance": 0.5
-      },
-      {
-        "item": "iron arrow",
-        "itemType": "arrow",
-        "chance": 0.5
-      },
-      {
-        "item": "iron arrow",
-        "itemType": "arrow",
-        "chance": 0.5
-      },
-      {
-        "item": "short bow",
-        "itemType": "bow",
-        "chance": 0.075
       }
     ],
     "goldDropRange": {
@@ -252,6 +241,16 @@
       "grab": "attack_1",
       "zombie bite": "attack_1"
     },
+    "baseResistanceTable": {
+      "physical": 15,
+      "poison": 75,
+      "fire": 15,
+      "cold": 15,
+      "holy": -50
+    },
+    "baseDamageTable": {
+      "physical": 4
+    },
     "drops": [
       {
         "item": "chunk of flesh",
@@ -278,13 +277,19 @@
       "minimum": 30,
       "maximum": 55
     },
-    "attackPowerRange": {
-      "minimum": 0,
-      "maximum": 0
-    },
     "mana": {
       "maximum": 25,
       "regen": 5
+    },
+    "baseResistanceTable": {
+      "physical": 50,
+      "poison": 50,
+      "cold": 25,
+      "holy": -50,
+      "magic": -20
+    },
+    "baseDamageTable": {
+      "raw": 2
     },
     "attackStrings": [
       "wail"
@@ -308,18 +313,23 @@
     "name": "goblin",
     "sprite": "goblin",
     "beingType": "demi-human",
-    "sanity": null,
+    "sanity": 20,
     "healthRange": {
       "minimum": 50,
       "maximum": 70
     },
-    "attackPowerRange": {
-      "minimum": 5,
-      "maximum": 10
-    },
     "mana": {
       "maximum": 50,
       "regen": 5
+    },
+    "baseResistanceTable": {
+      "physical": 10,
+      "poison": -5,
+      "lightning": -5
+    },
+    "baseDamageTable": {
+      "physical": 6,
+      "poison": 3
     },
     "attackStrings": [
       "blunt cleave",
@@ -343,7 +353,7 @@
     "armorValue": 10
   },
   {
-    "name": "worg",
+    "name": "warg",
     "sprite": "wolf_black",
     "beingType": "beast",
     "sanity": null,
@@ -351,13 +361,17 @@
       "minimum": 40,
       "maximum": 70
     },
-    "attackPowerRange": {
-      "minimum": 10,
-      "maximum": 15
-    },
     "mana": {
       "maximum": 50,
       "regen": 5
+    },
+    "baseResistanceTable": {
+      "physical": 5,
+      "cold": 10,
+      "fire": -10
+    },
+    "baseDamageTable": {
+      "physical": 12
     },
     "attackStrings": [
       "bite",
@@ -398,13 +412,18 @@
       "minimum": 50,
       "maximum": 70
     },
-    "attackPowerRange": {
-      "minimum": 5,
-      "maximum": 10
-    },
     "mana": {
       "maximum": 50,
       "regen": 5
+    },
+    "baseResistanceTable": {
+      "lightning": 15,
+      "cold": -10,
+      "fire": -10
+    },
+    "baseDamageTable": {
+      "physical": 6,
+      "lightning": 4
     },
     "attackStrings": [
       "stab",
@@ -415,7 +434,7 @@
     "animationStrings": {
       "stab": "attack_1",
       "cleave": "attack_2",
-      "overhead slice": "attack_3",
+      "chop": "attack_3",
       "charged pierce": "attack_4"
     },
     "drops": [
@@ -454,13 +473,18 @@
       "minimum": 50,
       "maximum": 75
     },
-    "attackPowerRange": {
-      "minimum": 8,
-      "maximum": 10
-    },
     "mana": {
       "maximum": 50,
       "regen": 3
+    },
+    "baseResistanceTable": {
+      "physical": 15,
+      "poison": -15,
+      "cold": -10,
+      "fire": -10
+    },
+    "baseDamageTable": {
+      "physical": 16
     },
     "attackStrings": [
       "stab",
@@ -504,13 +528,18 @@
       "minimum": 85,
       "maximum": 125
     },
-    "attackPowerRange": {
-      "minimum": 10,
-      "maximum": 12
-    },
     "mana": {
       "maximum": 30,
       "regen": 2
+    },
+    "baseResistanceTable": {
+      "physical": 25,
+      "poison": -15,
+      "cold": -10,
+      "fire": -10
+    },
+    "baseDamageTable": {
+      "physical": 14
     },
     "attackStrings": [
       "headbutt",
@@ -547,13 +576,18 @@
       "minimum": 50,
       "maximum": 75
     },
-    "attackPowerRange": {
-      "minimum": 15,
-      "maximum": 20
-    },
     "mana": {
       "maximum": 40,
       "regen": 10
+    },
+    "baseResistanceTable": {
+      "poison": -15,
+      "cold": -10,
+      "fire": -10,
+      "holy": 5
+    },
+    "baseDamageTable": {
+      "cold": 25
     },
     "attackStrings": [
       "bonk",
@@ -578,13 +612,18 @@
       "minimum": 50,
       "maximum": 75
     },
-    "attackPowerRange": {
-      "minimum": 15,
-      "maximum": 20
-    },
     "mana": {
       "maximum": 40,
       "regen": 10
+    },
+    "baseResistanceTable": {
+      "poison": -15,
+      "cold": -10,
+      "fire": -10,
+      "holy": 5
+    },
+    "baseDamageTable": {
+      "fire": 25
     },
     "attackStrings": [
       "bonk",
@@ -609,13 +648,18 @@
       "minimum": 50,
       "maximum": 75
     },
-    "attackPowerRange": {
-      "minimum": 15,
-      "maximum": 20
-    },
     "mana": {
       "maximum": 40,
       "regen": 10
+    },
+    "baseResistanceTable": {
+      "poison": -15,
+      "cold": -10,
+      "fire": -10,
+      "holy": 5
+    },
+    "baseDamageTable": {
+      "physical": 30
     },
     "attackStrings": [
       "bonk",
@@ -640,13 +684,20 @@
       "minimum": 75,
       "maximum": 100
     },
-    "attackPowerRange": {
-      "minimum": 12,
-      "maximum": 16
-    },
     "mana": {
       "maximum": 40,
       "regen": 10
+    },
+    "baseResistanceTable": {
+      "physical": 10,
+      "poison": -15,
+      "cold": -10,
+      "fire": -10,
+      "holy": 5
+    },
+    "baseDamageTable": {
+      "physical": 20,
+      "raw": 10
     },
     "attackStrings": [
       "bonk",
@@ -671,13 +722,18 @@
       "minimum": 25,
       "maximum": 40
     },
-    "attackPowerRange": {
-      "minimum": 4,
-      "maximum": 6
-    },
     "mana": {
       "maximum": 40,
       "regen": 10
+    },
+    "baseResistanceTable": {
+      "poison": 50,
+      "cold": -10,
+      "lightning": -10,
+      "fire": -10
+    },
+    "baseDamageTable": {
+      "physical": 15
     },
     "attackStrings": [
       "bite"
@@ -700,13 +756,19 @@
       "minimum": 25,
       "maximum": 40
     },
-    "attackPowerRange": {
-      "minimum": 4,
-      "maximum": 6
-    },
     "mana": {
       "maximum": 40,
       "regen": 10
+    },
+    "baseResistanceTable": {
+      "poison": 75,
+      "cold": -10,
+      "lightning": -10,
+      "fire": -10
+    },
+    "baseDamageTable": {
+      "physical": 5,
+      "poison": 10
     },
     "attackStrings": [
       "venomous bite"
@@ -729,13 +791,18 @@
       "minimum": 100,
       "maximum": 140
     },
-    "attackPowerRange": {
-      "minimum": 10,
-      "maximum": 15
-    },
     "mana": {
       "maximum": 40,
       "regen": 10
+    },
+    "baseResistanceTable": {
+      "poison": 50,
+      "cold": -10,
+      "lightning": -10,
+      "fire": -10
+    },
+    "baseDamageTable": {
+      "physical": 25
     },
     "attackStrings": [
       "bite"
@@ -758,13 +825,19 @@
       "minimum": 100,
       "maximum": 140
     },
-    "attackPowerRange": {
-      "minimum": 10,
-      "maximum": 15
-    },
     "mana": {
       "maximum": 40,
       "regen": 10
+    },
+    "baseResistanceTable": {
+      "poison": 75,
+      "cold": -10,
+      "lightning": -10,
+      "fire": -10
+    },
+    "baseDamageTable": {
+      "physical": 10,
+      "poison": 20
     },
     "attackStrings": [
       "venomous bite"
@@ -787,13 +860,20 @@
       "minimum": 100,
       "maximum": 140
     },
-    "attackPowerRange": {
-      "minimum": 10,
-      "maximum": 15
-    },
     "mana": {
       "maximum": 40,
       "regen": 10
+    },
+    "baseResistanceTable": {
+      "physical": 25,
+      "cold": -15,
+      "poison": -5,
+      "holy": 50
+    },
+    "baseDamageTable": {
+      "physical": 10,
+      "poison": 15,
+      "magic": 5
     },
     "attackStrings": [
       "poisoned shot",
@@ -817,16 +897,20 @@
     "sprite": "harpy",
     "sanity": 100,
     "healthRange": {
-      "minimum": 100,
-      "maximum": 140
-    },
-    "attackPowerRange": {
-      "minimum": 10,
-      "maximum": 15
+      "minimum": 90,
+      "maximum": 130
     },
     "mana": {
       "maximum": 40,
       "regen": 10
+    },
+    "baseResistanceTable": {
+      "physical": 25,
+      "cold": -15,
+      "lightning": -25
+    },
+    "baseDamageTable": {
+      "physical": 40
     },
     "attackStrings": [
       "gust",
@@ -853,13 +937,18 @@
       "minimum": 120,
       "maximum": 160
     },
-    "attackPowerRange": {
-      "minimum": 10,
-      "maximum": 15
-    },
     "mana": {
       "maximum": 40,
       "regen": 10
+    },
+    "baseResistanceTable": {
+      "physical": 25,
+      "cold": -15,
+      "poison": -5,
+      "holy": 50
+    },
+    "baseDamageTable": {
+      "physical": 35
     },
     "attackStrings": [
       "stampede",
@@ -884,13 +973,18 @@
       "minimum": 120,
       "maximum": 160
     },
-    "attackPowerRange": {
-      "minimum": 10,
-      "maximum": 15
-    },
     "mana": {
       "maximum": 40,
       "regen": 10
+    },
+    "baseResistanceTable": {
+      "physical": 25,
+      "cold": -10,
+      "poison": -10,
+      "lightning": -10
+    },
+    "baseDamageTable": {
+      "physical": 45
     },
     "attackStrings": [
       "serrate",
@@ -924,6 +1018,51 @@
       "maximum": 40,
       "regen": 10
     },
+    "baseResistanceTable": {
+      "physical": 20,
+      "poison": -10
+    },
+    "baseDamageTable": {
+      "physical": 50
+    },
+    "attackStrings": [
+      "stab",
+      "pierce"
+    ],
+    "animationStrings": {
+      "stab": "attack_1",
+      "pierce": "attack_1"
+    },
+    "drops": [],
+    "goldDropRange": {
+      "minimum": 40,
+      "maximum": 50
+    },
+    "armorValue": 20
+  },
+  {
+    "name": "lizardman",
+    "beingType": "human",
+    "sprite": "lizardman",
+    "sanity": 50,
+    "healthRange": {
+      "minimum": 120,
+      "maximum": 160
+    },
+    "mana": {
+      "maximum": 40,
+      "regen": 10
+    },
+    "baseResistanceTable": {
+      "physical": 10,
+      "poison": 15,
+      "cold": 15,
+      "fire": 15
+    },
+    "baseDamageTable": {
+      "physical": 40,
+      "fire": 15
+    },
     "attackStrings": [
       "stab",
       "pierce"
@@ -945,16 +1084,22 @@
     "sprite": "mimic",
     "sanity": null,
     "healthRange": {
-      "minimum": 120,
-      "maximum": 160
-    },
-    "attackPowerRange": {
-      "minimum": 10,
-      "maximum": 15
+      "minimum": 50,
+      "maximum": 60
     },
     "mana": {
       "maximum": 40,
       "regen": 10
+    },
+    "baseResistanceTable": {
+      "physical": 10,
+      "poison": 15,
+      "cold": 15,
+      "fire": 15
+    },
+    "baseDamageTable": {
+      "physical": 10,
+      "raw": 5
     },
     "attackStrings": [
       "stomp"
@@ -964,8 +1109,8 @@
     },
     "drops": [],
     "goldDropRange": {
-      "minimum": 400,
-      "maximum": 500
+      "minimum": 100,
+      "maximum": 200
     },
     "armorValue": 20
   }

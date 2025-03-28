@@ -250,15 +250,18 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
 
     if (isDead && pathname !== "/DeathScreen") {
       router.replace("/DeathScreen");
-      wait(350).then(() => uiStore.markStoreAsLoaded("routing"));
+      wait(350).then(() => {
+        uiStore.markStoreAsLoaded("inventory");
+        uiStore.markStoreAsLoaded("routing");
+      });
       return;
     }
 
     if (dungeonStore.hasPersistedState) {
       router.replace("/DungeonLevel");
       wait(350).then(() => {
-        uiStore.markStoreAsLoaded("routing");
         uiStore.markStoreAsLoaded("inventory");
+        uiStore.markStoreAsLoaded("routing");
       });
       return;
     }
@@ -269,7 +272,12 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   useEffect(() => {
     const initializeApp = async () => {
       if (
-        fontLoaded && rootStore.constructed && firstLoad && audioStore
+        uiStore.storeLoadingStatus["inventory"] == true &&
+        uiStore.storeLoadingStatus["player"] == true &&
+        fontLoaded &&
+        rootStore.constructed &&
+        firstLoad &&
+        audioStore
           ? audioStore.isAmbientLoaded
           : true
       ) {
@@ -283,6 +291,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   }, [
     fontLoaded,
     rootStore.constructed,
+    uiStore.storeLoadingStatus,
     firstLoad,
     audioStore?.isAmbientLoaded,
   ]);

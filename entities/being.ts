@@ -114,18 +114,17 @@ export class Being {
     this.alive = props.alive ?? true;
     this.deathdate = props.deathdate ?? null;
 
-    this.allocatedSkillPoints =
-      props.allocatedSkillPoints ?? props.isPlayerCharacter
-        ? {
-            [Attribute.health]: 0,
-            [Attribute.mana]: 0,
-            [Attribute.sanity]: 0,
-            [Attribute.strength]: 0,
-            [Attribute.dexterity]: 0,
-            [Attribute.intelligence]: 0,
-            [Attribute.manaRegen]: 0,
-          }
-        : null;
+    this.allocatedSkillPoints = props.isPlayerCharacter
+      ? props.allocatedSkillPoints ?? {
+          [Attribute.health]: 0,
+          [Attribute.mana]: 0,
+          [Attribute.sanity]: 0,
+          [Attribute.strength]: 0,
+          [Attribute.dexterity]: 0,
+          [Attribute.intelligence]: 0,
+          [Attribute.manaRegen]: 0,
+        }
+      : null;
 
     this.equipment = props.equipment
       ? props.equipment
@@ -139,7 +138,7 @@ export class Being {
             slot: "one-hand",
             stats: { [Modifier.PhysicalDamage]: 1 },
             baseValue: 0,
-            itemClass: ItemClassType.Melee,
+            itemClass: ItemClassType.NULL,
             attacks: ["punch"],
             root: props.root,
           }),
@@ -418,7 +417,7 @@ export class Being {
       : 0;
 
     return (
-      (this.baseManaRegen + allocated * 10) * manaRegenMult +
+      (this.baseManaRegen + allocated) * manaRegenMult +
       fromEquipment +
       manaRegenFlat
     );
@@ -529,7 +528,6 @@ export class Being {
 
   //----------------------------------Strength-----------------------------------//
   get totalStrength() {
-    // needs conditionals added to it, at time of righting no conditions affect this stat
     const allocated = this.allocatedSkillPoints
       ? this.allocatedSkillPoints[Attribute.strength]
       : 0;
@@ -792,11 +790,11 @@ export class Being {
       for (const [_, item] of Object.entries(this.equipment)) {
         if (Array.isArray(item)) {
           baseDamage += usesWeapon
-            ? item[0].stats?.get(baseDamageModifier) || 0 // the base damage of an item is not added for spells that do not use weapons
+            ? item[0].stats?.get(baseDamageModifier) ?? 0 // the base damage of an item is not added for spells that do not use weapons
             : 0;
         } else if (item && item.stats) {
           baseDamage += usesWeapon
-            ? item.stats.get(baseDamageModifier) || 0
+            ? item.stats.get(baseDamageModifier) ?? 0
             : 0; // the base damage of an item is not added for spells that do not use weapons
           addedDamage += item.stats.get(addedDamageModifier) || 0;
           multiplier += item.stats.get(multiplierModifier) || 0;
@@ -1066,7 +1064,9 @@ export class Being {
     selfDamage: number;
     log: string;
   } {
-    const execute = this.conditions.find((cond) => cond.name == "execute");
+    const execute = this.conditions.find((cond) =>
+      cond.effect.includes("execute"),
+    );
     if (execute) {
       this.damageHealth({ attackerId: execute.placedbyID, damage: 9999 });
       return {

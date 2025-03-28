@@ -164,7 +164,6 @@ export class Enemy extends Creature {
   }
 
   private triggerPhaseTransition() {
-    // Check both phases before transitioning
     while (
       this.phases[this.currentPhase + 1] &&
       this.currentHealth / this.baseHealth <=
@@ -182,6 +181,9 @@ export class Enemy extends Creature {
       if (phase.attackStrings) {
         runInAction(() => (this.attackStrings = phase.attackStrings!));
       }
+      if (phase.animationStrings) {
+        runInAction(() => (this.animationStrings = phase.animationStrings));
+      }
       if (phase.manaRegen) {
         runInAction(() => (this.baseManaRegen = phase.manaRegen!));
       }
@@ -190,6 +192,14 @@ export class Enemy extends Creature {
           () =>
             (this.baseDamageTable = parseDamageTypeObject(
               phase.baseDamageTable,
+            )),
+        );
+      }
+      if (phase.baseResistanceTable) {
+        runInAction(
+          () =>
+            (this.baseResistanceTable = parseDamageTypeObject(
+              phase.baseResistanceTable,
             )),
         );
       }

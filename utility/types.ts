@@ -263,6 +263,7 @@ export enum ItemClassType {
   Arrow = "arrow",
   Staff = "staff",
   StoryItem = "storyItem",
+  NULL = "null",
 }
 
 export enum Personality {

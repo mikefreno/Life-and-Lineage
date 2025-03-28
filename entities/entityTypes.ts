@@ -145,10 +145,10 @@ export interface Phase {
   triggerHealth: number;
   sprite?: EnemyImageKeyOption;
   dialogue?: string;
-  attackPower?: number;
   baseArmor?: number;
   manaRegen?: number;
   attackStrings?: string[];
+  animationStrings: { [key: string]: AnimationOptions };
   baseDamageTable?: { [key: string]: number };
   baseResistanceTable?: { [key: string]: number };
 }

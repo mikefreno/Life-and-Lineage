@@ -1,0 +1,9 @@
+{
+  "enemies": {},
+  "bosses": {
+    "necromancer": [
+      "dark burst",
+      "phase[0].fireball"
+    ]
+  }
+}

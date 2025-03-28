@@ -470,6 +470,16 @@
     }
   },
   {
+    "name": "dark bolt",
+    "manaCost": 20,
+    "target": "single",
+    "baseHitChance": 1.0,
+    "damageTable": {
+      "poison": 3,
+      "physical": 3
+    }
+  },
+  {
     "name": "fire bolt",
     "manaCost": 20,
     "target": "single",

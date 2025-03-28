@@ -1118,7 +1118,7 @@ export class PlayerCharacter extends Character {
       rarity: Rarity.NORMAL,
       prefix: null,
       suffix: null,
-      itemClass: ItemClassType.Melee,
+      itemClass: ItemClassType.NULL,
       root: this.root,
       attacks: ["punch"],
     });
@@ -1636,10 +1636,10 @@ export class PlayerCharacter extends Character {
    * `Throws` if the user does not have enough blood orbs; only ever call if `hasEnoughBloodOrbs` returns true
    * Removes soonest to expire blood orbs first, removes as many orbs as possible
    */
-  public removeBloodOrbs(spell: Spell) {
-    const bloodOrbsNeeded = spell.buffs.filter(
-      (buff) => buff == "consume blood orb",
-    ).length;
+  public removeBloodOrbs(spell: Attack) {
+    const bloodOrbsNeeded =
+      spell.buffNames?.filter((buff) => buff == "consume blood orb").length ??
+      0;
 
     if (bloodOrbsNeeded <= 0) {
       return 1;
@@ -1668,13 +1668,13 @@ export class PlayerCharacter extends Character {
 
   //----------------------------------Physical Combat----------------------------------//
   get weaponAttacks() {
-    const attacks = this.equipment.mainHand.attachedAttacks;
-    const spells = this.equipment.mainHand.providedSpells ?? [];
+    const attacks = this.equipment?.mainHand.attachedAttacks ?? [];
+    const spells = this.equipment?.mainHand.providedSpells ?? [];
     return [...attacks, ...spells];
   }
 
   public useArrow() {
-    if (this.equipment.quiver && this.equipment.quiver.length > 0) {
+    if (this.equipment?.quiver && this.equipment.quiver.length > 0) {
       this.equipment.quiver = this.equipment.quiver.slice(0, -1);
     }
   }
@@ -1948,7 +1948,6 @@ export class PlayerCharacter extends Character {
       baseDexterity: json.baseDexterity,
       pregnancyDueDate: json.pregnancyDueDate,
       isPregnant: json.isPregnant,
-      //character refs
       parentIds: json.parentIds ?? [],
       childrenIds: json.childrenIds ?? [],
       partnerIds: json.partnerIds ?? [],

@@ -50,7 +50,8 @@ const AudioSettings = observer(() => {
             "ambient",
             audioStore.ambientMusicVolume,
           )}
-          {renderSlider("Sound Effects", "sfx", audioStore.soundEffectsVolume)}
+          {__DEV__ &&
+            renderSlider("Sound Effects", "sfx", audioStore.soundEffectsVolume)}
           {renderSlider("Combat Music", "combat", audioStore.combatMusicVolume)}
 
           <View style={styles.rowEvenly}>

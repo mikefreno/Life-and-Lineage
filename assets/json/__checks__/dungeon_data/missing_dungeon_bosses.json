@@ -1,21 +1,11 @@
 {
   "training grounds": [],
   "nearby cave": [],
-  "goblin cave": [
-    "warg"
-  ],
-  "bandit hideout": [
-    "bandit heavy"
-  ],
+  "goblin cave": [],
+  "bandit hideout": [],
   "frost spire fortress": [],
-  "infestation": [
-    "giant venomous spider",
-    "brood mother",
-    "venomous spider"
-  ],
-  "dark forest": [
-    "centaur"
-  ],
+  "infestation": [],
+  "dark forest": [],
   "ancient arena": [],
   "crystal labyrinthine - first excavation": [],
   "crystal labyrinthine - second excavation": [],

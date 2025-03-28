@@ -9,7 +9,6 @@ import Purchases, {
 } from "react-native-purchases";
 import { storage } from "@/utility/functions/storage";
 import { API_BASE_URL } from "@/config/config";
-import { convertToPlainObject } from "@sentry/core";
 import { isEmulatorSync } from "react-native-device-info";
 
 const NECRO_UNLOCK_IDs = [

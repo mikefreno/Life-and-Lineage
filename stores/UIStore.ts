@@ -202,7 +202,7 @@ export default class UIStore {
       preferedColorScheme: observable,
       vibrationEnabled: observable,
       healthWarning: observable,
-      storeLoadingStatus: observable,
+      storeLoadingStatus: observable.deep,
       totalLoadingSteps: observable,
       completedLoadingSteps: observable,
       systemColorScheme: observable,

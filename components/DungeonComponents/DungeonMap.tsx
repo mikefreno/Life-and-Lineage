@@ -154,8 +154,8 @@ export const DungeonMapControls = observer(() => {
           ...styles.notchMirroredLanscapePad,
         }}
       >
-        <ArrowButton direction="up" />
         <ArrowButton direction="left" />
+        <ArrowButton direction="up" />
         {dungeonStore.currentPosition.specialEncounter &&
           !dungeonStore.currentPosition.specialEncounter.activated && (
             <GenericRaisedButton
@@ -169,8 +169,8 @@ export const DungeonMapControls = observer(() => {
               Enter
             </GenericRaisedButton>
           )}
-        <ArrowButton direction="right" />
         <ArrowButton direction="down" />
+        <ArrowButton direction="right" />
       </View>
     );
   }
