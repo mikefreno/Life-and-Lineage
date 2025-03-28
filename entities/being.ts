@@ -801,6 +801,9 @@ export class Being {
         }
       }
     }
+    console.log(
+      `(${baseDamage} + ${addedDamage}) * ${multiplier} - ${usesWeapon}`,
+    );
 
     return (baseDamage + addedDamage) * multiplier;
   }
@@ -885,6 +888,7 @@ export class Being {
       this.baseDamageTable[DamageType.PHYSICAL] ?? 0,
       false,
     );
+    console.log(calc);
 
     return calc;
   }
@@ -1224,108 +1228,92 @@ export class Being {
     usesWeapon: boolean,
     target?: Being,
   ) {
-    if (target) {
-      switch (type) {
-        case DamageType.PHYSICAL:
-          return (
-            (usesWeapon
-              ? this.physicalDamage
-              : this.physicalDamageNoWeapon + attackDamage) *
-            (1 - target.physicalDamageReduction)
-          );
-        case DamageType.FIRE:
-          return (
-            (usesWeapon
-              ? this.fireDamage
-              : this.fireDamageNoWeapon + attackDamage) *
-            (1 - target.fireResistance)
-          );
-        case DamageType.COLD:
-          return (
-            (usesWeapon
-              ? this.coldDamage
-              : this.coldDamageNoWeapon + attackDamage) *
-            (1 - target.coldResistance)
-          );
-        case DamageType.LIGHTNING:
-          return (
-            (usesWeapon
-              ? this.lightningDamage
-              : this.lightningDamageNoWeapon + attackDamage) *
-            (1 - target.lightningResistance)
-          );
-        case DamageType.POISON:
-          return (
-            (usesWeapon
-              ? this.poisonDamage
-              : this.poisonDamageNoWeapon + attackDamage) *
-            (1 - target.poisonResistance)
-          );
-        case DamageType.HOLY:
-          return (
-            (usesWeapon
-              ? this.holyDamage
-              : this.holyDamageNoWeapon + attackDamage) *
-            (1 - target.holyResistance)
-          );
-        case DamageType.MAGIC:
-          return (
-            (usesWeapon
-              ? this.magicDamage
-              : this.magicDamageNoWeapon + attackDamage) *
-            (1 - target.magicResistance)
-          );
-        case DamageType.RAW:
-          return attackDamage * (isSpell ? this.magicPower : this.attackPower);
-      }
-    } else {
-      switch (type) {
-        case DamageType.PHYSICAL:
-          return (
-            (usesWeapon
-              ? this.physicalDamage
-              : this.physicalDamageNoWeapon + attackDamage) * this.attackPower
-          );
-        case DamageType.FIRE:
-          return (
-            (usesWeapon ? this.fireDamage : this.fireDamageNoWeapon) *
-              this.magicPower +
-            attackDamage
-          );
-        case DamageType.COLD:
-          return (
-            (usesWeapon ? this.coldDamage : this.coldDamageNoWeapon) *
-              this.magicPower +
-            attackDamage
-          );
-        case DamageType.LIGHTNING:
-          return (
-            (usesWeapon ? this.lightningDamage : this.lightningDamageNoWeapon) *
-              this.magicPower +
-            attackDamage
-          );
-        case DamageType.POISON:
-          return (
-            (usesWeapon ? this.poisonDamage : this.poisonDamageNoWeapon) *
-              this.magicPower +
-            attackDamage
-          );
-        case DamageType.HOLY:
-          return (
-            (usesWeapon ? this.holyDamage : this.holyDamageNoWeapon) *
-              this.magicPower +
-            attackDamage
-          );
-        case DamageType.MAGIC:
-          return (
-            (usesWeapon ? this.magicDamage : this.magicDamageNoWeapon) *
-              this.magicPower +
-            attackDamage
-          );
-        case DamageType.RAW:
-          return attackDamage * (isSpell ? this.magicPower : this.attackPower);
-      }
+    switch (type) {
+      case DamageType.PHYSICAL:
+        return (
+          ((usesWeapon
+            ? this.physicalDamage
+            : this.physicalDamageNoWeapon + attackDamage) *
+            this.attackPower +
+            attackDamage) *
+          (1 - (target ? target.magicResistance : 0))
+        );
+      case DamageType.FIRE:
+        return (
+          (usesWeapon ? this.fireDamage : this.fireDamageNoWeapon) *
+            this.magicPower +
+          attackDamage
+        );
+      case DamageType.COLD:
+        return (
+          (usesWeapon ? this.coldDamage : this.coldDamageNoWeapon) *
+            this.magicPower +
+          attackDamage
+        );
+      case DamageType.LIGHTNING:
+        return this.damageTypeCalc({
+          userWeaponDependantDamage: usesWeapon
+            ? this.poisonDamage
+            : this.poisonDamageNoWeapon,
+          userWeaponIndependantDamageModifier: this.magicPower,
+          attackIntrensicDamage: attackDamage,
+          targetResistanceModifier: target?.poisonResistance ?? 0,
+        });
+      case DamageType.POISON:
+        return this.damageTypeCalc({
+          userWeaponDependantDamage: usesWeapon
+            ? this.poisonDamage
+            : this.poisonDamageNoWeapon,
+          userWeaponIndependantDamageModifier: this.magicPower,
+          attackIntrensicDamage: attackDamage,
+          targetResistanceModifier: target?.poisonResistance ?? 0,
+        });
+      case DamageType.HOLY:
+        return this.damageTypeCalc({
+          userWeaponDependantDamage: usesWeapon
+            ? this.holyDamage
+            : this.holyDamageNoWeapon,
+          userWeaponIndependantDamageModifier: this.magicPower,
+          attackIntrensicDamage: attackDamage,
+          targetResistanceModifier: target?.holyResistance ?? 0,
+        });
+      case DamageType.MAGIC:
+        return this.damageTypeCalc({
+          userWeaponDependantDamage: usesWeapon
+            ? this.magicDamage
+            : this.magicDamageNoWeapon,
+          userWeaponIndependantDamageModifier: this.magicPower,
+          attackIntrensicDamage: attackDamage,
+          targetResistanceModifier: target?.magicResistance ?? 0,
+        });
+      case DamageType.RAW:
+        return this.damageTypeCalc({
+          userWeaponIndependantDamageModifier: isSpell
+            ? this.magicPower
+            : this.attackPower,
+          attackIntrensicDamage: attackDamage,
+          targetResistanceModifier: 0,
+        });
     }
+  }
+
+  private damageTypeCalc({
+    userWeaponDependantDamage = 0,
+    userWeaponIndependantDamageModifier,
+    attackIntrensicDamage,
+    targetResistanceModifier,
+  }: {
+    userWeaponDependantDamage?: number;
+    userWeaponIndependantDamageModifier: number;
+    attackIntrensicDamage: number;
+    targetResistanceModifier: number;
+  }) {
+    return (
+      userWeaponDependantDamage +
+      userWeaponIndependantDamageModifier *
+        attackIntrensicDamage *
+        (1 - targetResistanceModifier)
+    );
   }
 
   public calculateAttackDamage({

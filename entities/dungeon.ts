@@ -3,7 +3,11 @@ import { action, computed, makeObservable, observable, reaction } from "mobx";
 import { DungeonStore, saveDungeonInstance } from "../stores/DungeonStore";
 import enemiesJSON from "../assets/json/enemy.json";
 import bossesJSON from "../assets/json/bosses.json";
-import type { BeingType, ItemClassType } from "../utility/types";
+import {
+  DamageTypeToString,
+  type BeingType,
+  type ItemClassType,
+} from "../utility/types";
 import { ParallaxOptions } from "../components/DungeonComponents/Parallax";
 import { EnemyImageKeyOption, EnemyImageMap } from "../utility/enemyHelpers";
 import specialEncountersJSON from "../assets/json/specialEncounters.json";
@@ -281,8 +285,8 @@ export class DungeonLevel {
         currentHealth: hp,
         baseHealth: hp,
         currentSanity: enemyJSON.sanity,
-        baseDamageTable: enemyJSON.damageTable,
-        baseResistanceTable: enemyJSON.resistanceTable,
+        baseDamageTable: enemyJSON.baseDamageTable,
+        baseResistanceTable: enemyJSON.baseResistanceTable,
         baseSanity: enemyJSON.sanity,
         baseArmor: enemyJSON.armorValue,
         currentMana: enemyJSON.mana.maximum,
@@ -318,6 +322,12 @@ export class DungeonLevel {
         scaledBossJSON.health *= bossSpec.scaler;
         scaledBossJSON.mana.maximum *= bossSpec.scaler;
         scaledBossJSON.mana.regen *= bossSpec.scaler;
+        for (let i = 0; i++; i <= 7) {
+          if (scaledBossJSON.baseDamageTable[DamageTypeToString[i]]) {
+            scaledBossJSON.baseDamageTable[DamageTypeToString[i]] *=
+              bossSpec.scaler;
+          }
+        }
       }
 
       return new Enemy({
@@ -328,8 +338,8 @@ export class DungeonLevel {
         currentSanity: scaledBossJSON.sanity,
         baseSanity: scaledBossJSON.sanity,
         baseArmor: scaledBossJSON.armorValue,
-        baseDamageTable: enemyJSON.damageTable,
-        baseResistanceTable: enemyJSON.resistanceTable,
+        baseDamageTable: scaledBossJSON.baseDamageTable,
+        baseResistanceTable: scaledBossJSON.baseResistanceTable,
         currentMana: scaledBossJSON.mana.maximum,
         baseMana: scaledBossJSON.mana.maximum,
         baseManaRegen: scaledBossJSON.mana.regen,

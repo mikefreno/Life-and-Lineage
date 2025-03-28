@@ -460,6 +460,13 @@ export class Attack {
   }
 
   public use(targets: Being[]) {
+    //console.log(
+    //`${this.user.nameReference} - ${this.name} - ${
+    //this.damage(targets[0]).cumulativeDamage
+    //} - ${JSON.stringify(
+    //this.damage(targets[0]).damageMap,
+    //)} - ${JSON.stringify(this.damageTable)}`,
+    //);
     if (!this.canBeUsed.val) {
       // this shouldn't really ever be used(checked before use is called), here just in case
       throw new Error("used attack that was not valid... check before use!");
@@ -543,35 +550,53 @@ export class Attack {
           : (target as Creature | Character).nameReference;
 
       if (use.result === AttackUse.success && use.damages) {
-        returnString += `  • Dealt ${use.damages.total} total damage to ${targetName}:\n`;
+        returnString += `  • Dealt ${statRounding(
+          use.damages.total,
+        )} total damage to ${targetName}:\n`;
 
         if (use.damages.physical > 0) {
-          returnString += `    - ${use.damages.physical} physical damage\n`;
+          returnString += `    - ${statRounding(
+            use.damages.physical,
+          )} physical damage\n`;
         }
         if (use.damages.fire > 0) {
-          returnString += `    - ${use.damages.fire} fire damage\n`;
+          returnString += `    - ${statRounding(
+            use.damages.fire,
+          )} fire damage\n`;
         }
         if (use.damages.cold > 0) {
-          returnString += `    - ${use.damages.cold} cold damage\n`;
+          returnString += `    - ${statRounding(
+            use.damages.cold,
+          )} cold damage\n`;
         }
         if (use.damages.lightning > 0) {
-          returnString += `    - ${use.damages.lightning} lightning damage\n`;
+          returnString += `    - ${statRounding(
+            use.damages.lightning,
+          )} lightning damage\n`;
         }
         if (use.damages.poison > 0) {
-          returnString += `    - ${use.damages.poison} poison damage\n`;
+          returnString += `    - ${statRounding(
+            use.damages.poison,
+          )} poison damage\n`;
         }
         if (use.damages.holy > 0) {
-          returnString += `    - ${use.damages.holy} holy damage\n`;
+          returnString += `    - ${statRounding(
+            use.damages.holy,
+          )} holy damage\n`;
         }
         if (use.damages.magic > 0) {
-          returnString += `    - ${use.damages.magic} magic damage\n`;
+          returnString += `    - ${statRounding(
+            use.damages.magic,
+          )} magic damage\n`;
         }
         if (use.damages.raw > 0) {
-          returnString += `    - ${use.damages.raw} raw damage\n`;
+          returnString += `    - ${statRounding(use.damages.raw)} raw damage\n`;
         }
 
         if (use.damages.sanity > 0) {
-          returnString += `    - Caused ${use.damages.sanity} sanity damage\n`;
+          returnString += `    - Caused ${statRounding(
+            use.damages.sanity,
+          )} sanity damage\n`;
         }
 
         if (use.debuffs?.length) {
@@ -581,7 +606,7 @@ export class Attack {
         }
 
         if (use.healed) {
-          returnString += `    - Healed for ${use.healed}\n`;
+          returnString += `    - Healed for ${statRounding(use.healed)}\n`;
         }
       } else if (use.result === AttackUse.block) {
         returnString += `  • Attack was blocked by ${targetName}.\n`;
