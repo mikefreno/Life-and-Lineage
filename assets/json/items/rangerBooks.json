@@ -182,13 +182,6 @@
     "baseValue": 500000
   },
   {
-    "name": "forbidden beast mastery techniques vol. 2",
-    "type": "spell",
-    "teaches": "beast mastery",
-    "icon": "Book_3",
-    "baseValue": 1000000
-  },
-  {
     "name": "book of arcane shot",
     "type": "spell",
     "teaches": "arcane shot",

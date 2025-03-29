@@ -460,13 +460,6 @@ export class Attack {
   }
 
   public use(targets: Being[]) {
-    //console.log(
-    //`${this.user.nameReference} - ${this.name} - ${
-    //this.damage(targets[0]).cumulativeDamage
-    //} - ${JSON.stringify(
-    //this.damage(targets[0]).damageMap,
-    //)} - ${JSON.stringify(this.damageTable)}`,
-    //);
     if (!this.canBeUsed.val) {
       // this shouldn't really ever be used(checked before use is called), here just in case
       throw new Error("used attack that was not valid... check before use!");

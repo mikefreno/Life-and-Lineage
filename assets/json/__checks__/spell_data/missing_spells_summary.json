@@ -1,9 +1,7 @@
 {
   "missingSpells": {
     "mage": [],
-    "ranger": [
-      "beast mastery"
-    ],
+    "ranger": [],
     "paladin": [],
     "necromancer": []
   },
@@ -11,8 +9,6 @@
     "mage": [],
     "ranger": [],
     "paladin": [],
-    "necromancer": [
-      "bone prison"
-    ]
+    "necromancer": []
   }
 }

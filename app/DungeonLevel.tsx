@@ -1,16 +1,10 @@
 import React, { useLayoutEffect } from "react";
 import { ThemedView, Text } from "@/components/Themed";
-import {
-  type LayoutChangeEvent,
-  View,
-  Animated,
-  ScrollView,
-} from "react-native";
+import { type LayoutChangeEvent, View, Animated } from "react-native";
 import { useRef, useEffect, useState, useCallback } from "react";
 import { Pressable } from "react-native";
 import BattleTab from "@/components/DungeonComponents/BattleTab";
-import { toTitleCase, wait } from "@/utility/functions/misc";
-import ProgressBar from "@/components/ProgressBar";
+import { wait } from "@/utility/functions/misc";
 import { observer } from "mobx-react-lite";
 import TutorialModal from "@/components/TutorialModal";
 import GenericModal from "@/components/GenericModal";
@@ -26,7 +20,7 @@ import DungeonEnemyDisplay from "@/components/DungeonComponents/DungeonEnemyDisp
 import { DungeonMapRender } from "@/components/DungeonComponents/DungeonMap";
 import { StatsDisplay } from "@/components/StatsDisplay";
 import { useDraggableStore, useRootStore } from "@/hooks/stores";
-import { usePouch, useVibration } from "@/hooks/generic";
+import { usePouch } from "@/hooks/generic";
 import D20DieAnimation from "@/components/DieRollAnim";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { LinearGradientBlur } from "@/components/LinearGradientBlur";
@@ -55,7 +49,7 @@ const DungeonLevelScreen = observer(() => {
   const { getNormalizedSize, getNormalizedFontSize } = useScaling();
 
   const [battleTab, setBattleTab] = useState<
-    "attacksOrNavigation" | "equipment" | "log"
+    "attacksOrNavigation" | "equipment" | "log" | "minions"
   >("attacksOrNavigation");
   const [showLeftBehindItemsScreen, setShowLeftBehindItemsScreen] =
     useState<boolean>(false);
@@ -311,12 +305,19 @@ const DungeonLevelScreen = observer(() => {
                 {playerAnimationStore.textString}
               </Animated.Text>
             </View>
-            <BattleTab battleTab={battleTab} />
-            <BattleTabControls
-              battleTab={battleTab}
-              setBattleTab={setBattleTab}
-            />
-            <PlayerMinionSection />
+            <View
+              style={{
+                flex: 1,
+                flexDirection: uiStore.isLandscape ? "row" : "column",
+                ...styles.notchAvoidingLanscapePad,
+              }}
+            >
+              <BattleTab battleTab={battleTab} />
+              <BattleTabControls
+                battleTab={battleTab}
+                setBattleTab={setBattleTab}
+              />
+            </View>
           </View>
           <PlayerStatusForSecondary />
         </Parallax>
@@ -348,138 +349,3 @@ const DungeonLevelScreen = observer(() => {
 });
 
 export default DungeonLevelScreen;
-
-const PlayerMinionSection = observer(() => {
-  const { playerState, uiStore } = useRootStore();
-  const vibration = useVibration();
-
-  const { getNormalizedSize, getNormalizedFontSize } = useScaling();
-
-  const [currentMinionPage, setCurrentMinionPage] = useState(0);
-  const minionScrollViewRef = useRef<ScrollView>(null);
-  if (!playerState || playerState.minionsAndPets.length == 0) {
-    return null;
-  }
-
-  return (
-    <View>
-      <ScrollView
-        ref={minionScrollViewRef}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        style={{
-          width: "100%",
-          marginBottom: 5,
-        }}
-        contentContainerStyle={{
-          alignItems: "center",
-        }}
-        onScroll={(event) => {
-          const contentOffsetX = event.nativeEvent.contentOffset.x;
-          const pageIndex = Math.round(
-            contentOffsetX / uiStore.dimensions.width,
-          );
-          setCurrentMinionPage(pageIndex);
-        }}
-        scrollEventThrottle={16}
-      >
-        {Array.from({
-          length: Math.ceil(playerState.minionsAndPets.length / 2),
-        }).map((_, pageIndex) => (
-          <View
-            key={`page-${pageIndex}`}
-            style={{
-              width: uiStore.dimensions.width,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              paddingHorizontal: getNormalizedSize(10),
-            }}
-          >
-            {playerState.minionsAndPets[pageIndex * 2] && (
-              <View
-                style={{
-                  width: "48%",
-                  justifyContent: "center",
-                }}
-              >
-                <Text style={{ fontSize: getNormalizedFontSize(14) }}>
-                  {toTitleCase(
-                    playerState.minionsAndPets[pageIndex * 2].creatureSpecies,
-                  )}
-                </Text>
-                <ProgressBar
-                  filledColor="#ef4444"
-                  unfilledColor="#fee2e2"
-                  value={
-                    playerState.minionsAndPets[pageIndex * 2].currentHealth
-                  }
-                  maxValue={playerState.minionsAndPets[pageIndex * 2].maxHealth}
-                />
-              </View>
-            )}
-            {playerState.minionsAndPets[pageIndex * 2 + 1] && (
-              <View
-                style={{
-                  width: "48%",
-                  justifyContent: "center",
-                }}
-              >
-                <Text style={{ fontSize: getNormalizedFontSize(14) }}>
-                  {toTitleCase(
-                    playerState.minionsAndPets[pageIndex * 2 + 1]
-                      .creatureSpecies,
-                  )}
-                </Text>
-                <ProgressBar
-                  filledColor="#ef4444"
-                  unfilledColor="#fee2e2"
-                  value={
-                    playerState.minionsAndPets[pageIndex * 2 + 1].currentHealth
-                  }
-                  maxValue={
-                    playerState.minionsAndPets[pageIndex * 2 + 1].maxHealth
-                  }
-                />
-              </View>
-            )}
-          </View>
-        ))}
-      </ScrollView>
-      {playerState.minionsAndPets.length > 2 && (
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            paddingBottom: getNormalizedSize(8),
-          }}
-        >
-          {Array.from({
-            length: Math.ceil(playerState.minionsAndPets.length / 2),
-          }).map((_, index) => (
-            <Pressable
-              onPress={() => {
-                vibration({ style: "light" });
-                minionScrollViewRef.current?.scrollTo({
-                  x: index * uiStore.dimensions.width,
-                  animated: true,
-                });
-              }}
-              key={`indicator-${index}`}
-              style={{
-                width: getNormalizedSize(14),
-                height: getNormalizedSize(14),
-                borderRadius: 9999,
-                backgroundColor:
-                  currentMinionPage === index
-                    ? "#ffffff"
-                    : "rgba(255,255,255,0.3)",
-                marginHorizontal: getNormalizedSize(12),
-              }}
-            />
-          ))}
-        </View>
-      )}
-    </View>
-  );
-});

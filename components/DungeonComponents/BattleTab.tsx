@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from "react";
+import React, { useCallback, useRef } from "react";
 import { ThemedView, Text } from "@/components/Themed";
 import {
   Pressable,
@@ -7,6 +7,8 @@ import {
   Platform,
   TouchableWithoutFeedback,
   ScrollView,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
 } from "react-native";
 import { useEffect, useState } from "react";
 import GenericModal from "@/components/GenericModal";
@@ -25,17 +27,23 @@ import {
 } from "@/hooks/stores";
 import { observer } from "mobx-react-lite";
 import { tw, useStyles } from "@/hooks/styles";
-import { Enemy } from "@/entities/creatures";
+import { Enemy, Minion } from "@/entities/creatures";
 import GenericRaisedButton from "@/components/GenericRaisedButton";
 import { runInAction } from "mobx";
 import { Being } from "@/entities/being";
 import AttacksList from "./AttacksList";
+import { useScaling } from "@/hooks/scaling";
+import { toTitleCase } from "@/utility/functions/misc";
+import ProgressBar from "../ProgressBar";
+import ThemedCard from "../ThemedCard";
+import Colors from "@/constants/Colors";
+import { ClockIcon } from "@/assets/icons/SVGIcons";
 
 const BattleTab = observer(
   ({
     battleTab,
   }: {
-    battleTab: "attacksOrNavigation" | "equipment" | "log";
+    battleTab: "attacksOrNavigation" | "equipment" | "log" | "minions";
   }) => {
     const [attackDetails, setAttackDetails] = useState<Attack | null>(null);
     const [attackDetailsShowing, setAttackDetailsShowing] =
@@ -63,6 +71,7 @@ const BattleTab = observer(
     const { addItemToPouch } = usePouch();
     const { pass } = useCombatActions();
     const styles = useStyles();
+    const [rect, setRect] = useState<{ width: number; height: number }>();
 
     const [showEncounterResultModal, setShowEncounterResultModal] =
       useState(false);
@@ -164,7 +173,13 @@ const BattleTab = observer(
     };
 
     return (
-      <View style={{ flex: 1 }}>
+      <View
+        style={{ flex: 1 }}
+        onLayout={(e) => {
+          const rect = e.nativeEvent.layout;
+          setRect({ width: rect.width, height: rect.height });
+        }}
+      >
         <GenericModal
           isVisibleCondition={attackDetailsShowing}
           backFunction={() => setAttackDetailsShowing(false)}
@@ -320,7 +335,7 @@ const BattleTab = observer(
               />
             </View>
           </TouchableWithoutFeedback>
-        ) : (
+        ) : battleTab == "log" ? (
           <View
             style={{ flex: 1, ...tw.px2, ...styles.notchAvoidingLanscapePad }}
           >
@@ -358,6 +373,8 @@ const BattleTab = observer(
               )}
             </View>
           </View>
+        ) : (
+          rect && <PlayerMinionSection rect={rect} />
         )}
       </View>
     );
@@ -365,3 +382,212 @@ const BattleTab = observer(
 );
 
 export default BattleTab;
+
+const PlayerMinionSection = observer(
+  ({
+    rect,
+  }: {
+    rect: {
+      width: number;
+      height: number;
+    };
+  }) => {
+    const { playerState, uiStore } = useRootStore();
+    const vibration = useVibration();
+
+    const { getNormalizedSize } = useScaling();
+
+    const [currentMinionPage, setCurrentMinionPage] = useState(0);
+    const minionScrollViewRef = useRef<ScrollView>(null);
+    if (!playerState || playerState.minionsAndPets.length == 0) {
+      return null;
+    }
+
+    const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      if (uiStore.isLandscape) {
+        const contentOffsetX = event.nativeEvent.contentOffset.x;
+        const pageIndex = Math.round(contentOffsetX / rect.width);
+        setCurrentMinionPage(pageIndex);
+      } else {
+        const contentOffsetY = event.nativeEvent.contentOffset.y;
+        const pageIndex = Math.round(contentOffsetY / rect.height);
+        setCurrentMinionPage(pageIndex);
+      }
+    };
+
+    return (
+      <View
+        style={{
+          flex: 1,
+          flexDirection: uiStore.isLandscape ? "column" : "row",
+        }}
+      >
+        <ScrollView
+          ref={minionScrollViewRef}
+          horizontal={uiStore.isLandscape}
+          pagingEnabled
+          scrollEnabled={playerState.minionsAndPets.length > 2}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            alignItems: "center",
+          }}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+        >
+          {Array.from({
+            length: Math.ceil(playerState.minionsAndPets.length / 2),
+          }).map((_, pageIndex) => {
+            const leftMinion = playerState.minionsAndPets[pageIndex * 2];
+            const rightMinion = playerState.minionsAndPets[pageIndex * 2 + 1];
+
+            return (
+              <View
+                key={leftMinion.id}
+                style={{
+                  width:
+                    rect.width -
+                    (uiStore.isLandscape ? 0 : getNormalizedSize(16)),
+                  height:
+                    rect.height -
+                    (uiStore.isLandscape ? getNormalizedSize(16) : 0),
+                  flexDirection: uiStore.isLandscape ? "row" : "column",
+                  justifyContent: "space-between",
+                  paddingHorizontal: getNormalizedSize(10),
+                }}
+              >
+                <MinionCard minion={leftMinion} noRight={!rightMinion} />
+                <MinionCard minion={rightMinion} />
+              </View>
+            );
+          })}
+        </ScrollView>
+        {playerState.minionsAndPets.length > 2 && (
+          <View
+            style={{
+              flexDirection: uiStore.isLandscape ? "row" : "column",
+              justifyContent: "center",
+              alignContent: "center",
+              width: uiStore.isLandscape ? "100%" : getNormalizedSize(16),
+              height: uiStore.isLandscape ? getNormalizedSize(16) : "100%",
+            }}
+          >
+            {Array.from({
+              length: Math.ceil(playerState.minionsAndPets.length / 2),
+            }).map((_, index) => (
+              <Pressable
+                onPress={() => {
+                  vibration({ style: "light" });
+                  minionScrollViewRef.current?.scrollTo(
+                    uiStore.isLandscape
+                      ? {
+                          x: index * rect.width,
+                          animated: true,
+                        }
+                      : { y: index * rect.height },
+                  );
+                }}
+                key={`indicator-${index}`}
+                style={[
+                  uiStore.isLandscape
+                    ? { marginHorizontal: 4 }
+                    : { marginVertical: 4 },
+                  {
+                    width: getNormalizedSize(14),
+                    height: getNormalizedSize(14),
+                    borderRadius: 9999,
+                    backgroundColor:
+                      currentMinionPage === index
+                        ? "#ffffff"
+                        : "rgba(255,255,255,0.3)",
+                  },
+                ]}
+              />
+            ))}
+          </View>
+        )}
+      </View>
+    );
+  },
+);
+
+const MinionCard = observer(
+  ({ minion, noRight }: { minion: Minion | null; noRight?: boolean }) => {
+    const { uiStore } = useRootStore();
+    const styles = useStyles();
+    if (!minion) return;
+    return (
+      <ThemedCard
+        style={{
+          width: uiStore.isLandscape ? (noRight ? "100%" : "48%") : "100%",
+          justifyContent: "center",
+          paddingVertical: 6,
+        }}
+      >
+        <View
+          style={[
+            uiStore.isLandscape ? styles.rowBetween : styles.columnBetween,
+            { paddingBottom: 4 },
+          ]}
+        >
+          <View
+            style={
+              !uiStore.isLandscape && {
+                width: "100%",
+                flexDirection: "row",
+                justifyContent: "center",
+              }
+            }
+          >
+            <Text style={styles["text-xl"]}>
+              {toTitleCase(minion.creatureSpecies)}
+            </Text>
+            {minion.turnsLeftAlive < 100 && (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignSelf: "flex-end",
+                  paddingLeft: 4,
+                }}
+              >
+                <Text>{minion.turnsLeftAlive}</Text>
+                <ClockIcon
+                  height={uiStore.iconSizeSmall}
+                  width={uiStore.iconSizeSmall}
+                  color={Colors.dark.text}
+                />
+              </View>
+            )}
+          </View>
+          <View style={{ flexDirection: "row", marginVertical: "auto" }}>
+            {minion.attacks.map((attack) => (
+              <View
+                key={attack.name}
+                style={{
+                  padding: 2,
+                  borderColor: Colors[uiStore.colorScheme].border,
+                  borderWidth: 1,
+                  borderRadius: 4,
+                }}
+              >
+                <Text>{toTitleCase(attack.name)}</Text>
+                <Text>Damage: {attack.displayDamage.cumulativeDamage}</Text>
+                {attack.debuffNames &&
+                  attack.debuffNames.map((debuff) => (
+                    <Text key={debuff.name}>
+                      {toTitleCase(debuff.name)} - {debuff.chance * 100}% Chance
+                    </Text>
+                  ))}
+              </View>
+            ))}
+          </View>
+        </View>
+        <ProgressBar
+          filledColor="#ef4444"
+          unfilledColor="#fee2e2"
+          value={minion.currentHealth}
+          maxValue={minion.maxHealth}
+        />
+      </ThemedCard>
+    );
+  },
+);

@@ -1031,8 +1031,6 @@ export const IAPModal = observer(
           style={{
             maxHeight: uiStore.dimensions.height,
             borderRadius: 12,
-            borderWidth: uiStore.colorScheme === "dark" ? 1 : 0,
-            borderColor: uiStore.colorScheme === "dark" ? "#71717a" : undefined,
             paddingTop: uiStore.insets?.top,
             paddingBottom: uiStore.insets?.bottom,
             width: "100%",

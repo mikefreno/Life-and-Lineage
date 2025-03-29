@@ -69,10 +69,15 @@ export const useSmartExecution = (
   const isProcessingRef = useRef(false);
   const lastExecutionTimeRef = useRef(0);
   const baseThrottleTime = 8;
+  const maxThrottleTime = 100; // Add a cap to prevent extreme throttling
+  const stuckDetectionThreshold = 200; // Time in ms to detect "stuck" state
+  const consecutiveSlowExecutionsRef = useRef(0);
+  const maxConsecutiveSlowExecutions = 3;
 
   const clearQueue = useCallback(() => {
     queueRef.current = [];
     isProcessingRef.current = false;
+    consecutiveSlowExecutionsRef.current = 0;
   }, []);
 
   const enqueue = useCallback(
@@ -108,7 +113,30 @@ export const useSmartExecution = (
         }
 
         const executionTime = performance.now() - executionStart;
-        const dynamicThrottleTime = Math.max(baseThrottleTime, executionTime);
+
+        // Detect if we might be in a "stuck" state
+        if (executionTime > stuckDetectionThreshold) {
+          consecutiveSlowExecutionsRef.current++;
+        } else {
+          // Reset the counter if we have a fast execution
+          consecutiveSlowExecutionsRef.current = 0;
+        }
+
+        // Calculate dynamic throttle time with a cap
+        let dynamicThrottleTime = Math.min(
+          Math.max(baseThrottleTime, executionTime / 2), // Reduce the impact of execution time
+          maxThrottleTime,
+        );
+
+        // If we detect consecutive slow executions, gradually reduce throttle time
+        if (
+          consecutiveSlowExecutionsRef.current >= maxConsecutiveSlowExecutions
+        ) {
+          const reductionFactor = 0.7; // Reduce throttle time by 30%
+          dynamicThrottleTime *= reductionFactor;
+          // Reset counter after applying reduction
+          consecutiveSlowExecutionsRef.current = 1;
+        }
 
         if (timeSinceLastExecution < dynamicThrottleTime) {
           setTimeout(() => {
@@ -124,6 +152,7 @@ export const useSmartExecution = (
       })
       .catch((error) => {
         isProcessingRef.current = false;
+        consecutiveSlowExecutionsRef.current = 0;
         console.error("Task failed:", error);
         setTimeout(() => processQueue(), 0);
       });

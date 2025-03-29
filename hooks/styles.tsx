@@ -722,11 +722,13 @@ export const useStyles = () => {
       borderWidth: 1,
       borderColor: "#52525b",
     } as const,
-    battleTabControls: {
-      flexDirection: "row",
-      width: "100%",
-      justifyContent: "space-around",
-    } as const,
+    battleTabControls: uiStore.isLandscape
+      ? { flexDirection: "column" }
+      : ({
+          flexDirection: "row",
+          width: "100%",
+          justifyContent: "space-around",
+        } as const),
     inventoryFullText: {
       ...text["text-lg"],
       textAlign: "center",

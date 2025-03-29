@@ -149,7 +149,7 @@
   {
     "name": "book of bone prison",
     "type": "spell",
-    "teaches": "bone armor",
+    "teaches": "bone prison",
     "icon": "Book_2",
     "baseValue": 200000
   },

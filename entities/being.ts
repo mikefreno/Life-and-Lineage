@@ -801,9 +801,6 @@ export class Being {
         }
       }
     }
-    console.log(
-      `(${baseDamage} + ${addedDamage}) * ${multiplier} - ${usesWeapon}`,
-    );
 
     return (baseDamage + addedDamage) * multiplier;
   }
@@ -881,16 +878,13 @@ export class Being {
   }
 
   get physicalDamageNoWeapon(): number {
-    const calc = this.calculateTotalDamage(
+    return this.calculateTotalDamage(
       Modifier.PhysicalDamage,
       Modifier.PhysicalDamageAdded,
       Modifier.PhysicalDamageMultiplier,
       this.baseDamageTable[DamageType.PHYSICAL] ?? 0,
       false,
     );
-    console.log(calc);
-
-    return calc;
   }
 
   get fireDamageNoWeapon(): number {
