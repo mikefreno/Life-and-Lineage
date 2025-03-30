@@ -336,9 +336,7 @@ const BattleTab = observer(
             </View>
           </TouchableWithoutFeedback>
         ) : battleTab == "log" ? (
-          <View
-            style={{ flex: 1, ...tw.px2, ...styles.notchAvoidingLanscapePad }}
-          >
+          <View style={{ flex: 1, ...tw.px2 }}>
             <View style={styles.logContent}>
               {dungeonStore.logs.length === 0 ? (
                 <View style={{ marginVertical: "auto" }}>

@@ -423,7 +423,10 @@ const InventoryRender = observer(
         >
           {/* Regular Inventory Panel */}
           <View
-            style={[styles.notchAvoidingLanscapePad, { width: effectiveWidth }]}
+            style={[
+              screen !== "dungeon" && styles.notchAvoidingLanscapePad,
+              { width: effectiveWidth },
+            ]}
           >
             <View style={[styles.keyItemsText, { width: effectiveWidth }]}>
               <Text
@@ -450,7 +453,12 @@ const InventoryRender = observer(
 
           {/* Key Item Inventory Panel */}
           {playerState.keyItems.length > 0 && (
-            <View style={{ width: uiStore.dimensions.width }}>
+            <View
+              style={[
+                screen !== "dungeon" && styles.notchAvoidingLanscapePad,
+                { width: effectiveWidth },
+              ]}
+            >
               <View
                 style={[
                   styles.keyItemsText,

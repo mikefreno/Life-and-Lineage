@@ -50,6 +50,7 @@ export const VFXWrapper = observer(
       enemyStore.animationStoreMap.entries,
       enemyStore.animationStoreMap.keys,
       enemyStore.midpointUpdater,
+      uiStore.orientation,
     ]);
 
     return (

@@ -10,6 +10,7 @@ import { RootStore } from "./RootStore";
 import { Audio } from "expo-av";
 import { Sound } from "expo-av/build/Audio/Sound";
 import * as Sentry from "@sentry/react-native";
+import { AppState, AppStateStatus } from "react-native";
 
 const AMBIENT_TRACKS = {
   shops: require("../assets/music/shops.m4a"),
@@ -72,10 +73,14 @@ export class AudioStore {
     } | null;
   } = { trackIn: null, trackOut: null };
 
+  private appStateListener: any = null;
+  private appState: AppStateStatus = AppState.currentState;
+
   constructor({ root }: { root: RootStore }) {
     this.root = root;
     this.loadPersistedSettings();
 
+    this.setupAppStateListener();
     makeObservable(this, {
       masterVolume: observable,
       ambientMusicVolume: observable,
@@ -192,6 +197,100 @@ export class AudioStore {
       }
     } catch (error) {
       this.handleError("Failed to load audio resources", error);
+    }
+  }
+
+  private setupAppStateListener() {
+    try {
+      this.appState = AppState.currentState;
+      this.appStateListener = AppState.addEventListener(
+        "change",
+        this.handleAppStateChange,
+      );
+    } catch (error) {
+      this.handleError("Failed to setup AppState listener", error);
+    }
+  }
+
+  private handleAppStateChange = (nextAppState: AppStateStatus) => {
+    try {
+      if (
+        this.appState.match(/inactive|background/) &&
+        nextAppState === "active"
+      ) {
+        // App has come to the foreground
+        this.handleAppForeground();
+      } else if (
+        this.appState === "active" &&
+        nextAppState.match(/inactive|background/)
+      ) {
+        // App has gone to the background
+        this.handleAppBackground();
+      }
+
+      this.appState = nextAppState;
+    } catch (error) {
+      this.handleError("Error handling app state change", error);
+    }
+  };
+
+  private async handleAppBackground() {
+    try {
+      // Save current track state
+      if (this.currentTrack) {
+        const status = await this.currentTrack.sound.getStatusAsync();
+        if (status.isLoaded && status.isPlaying) {
+          // Store that we need to resume this track
+          storage.set(
+            "audio_background_state",
+            JSON.stringify({
+              trackName: this.currentTrack.name,
+              category: this.currentTrack.category,
+              wasPlaying: true,
+              timestamp: Date.now(),
+            }),
+          );
+
+          // Pause the track
+          await this.currentTrack.sound.pauseAsync();
+        }
+      }
+    } catch (error) {
+      this.handleError("Error handling app background", error);
+    }
+  }
+
+  private async handleAppForeground() {
+    try {
+      // Check if we need to resume playback
+      const storedState = storage.getString("audio_background_state");
+      if (storedState) {
+        const state = JSON.parse(storedState);
+
+        // Only resume if we went to background recently (within 30 minutes)
+        const thirtyMinutesInMs = 30 * 60 * 1000;
+        const isRecent = Date.now() - state.timestamp < thirtyMinutesInMs;
+
+        if (state.wasPlaying && isRecent) {
+          // If the current track matches what was playing, resume it
+          if (this.currentTrack && this.currentTrack.name === state.trackName) {
+            if (!this.muted) {
+              await this.currentTrack.sound.playAsync();
+            }
+          }
+          // Otherwise play the appropriate track
+          else if (state.category === "ambientMusic") {
+            this.playAmbient(state.trackName);
+          } else if (state.category === "combatMusic") {
+            this.playCombat(state.trackName);
+          }
+        }
+
+        // Clear the stored state
+        storage.delete("audio_background_state");
+      }
+    } catch (error) {
+      this.handleError("Error handling app foreground", error);
     }
   }
 
@@ -831,6 +930,11 @@ export class AudioStore {
             }
           }),
         );
+      }
+
+      if (this.appStateListener) {
+        this.appStateListener.remove();
+        this.appStateListener = null;
       }
 
       // Unload all ambient tracks

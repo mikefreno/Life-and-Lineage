@@ -10,6 +10,7 @@ import Purchases, {
 import { storage } from "@/utility/functions/storage";
 import { API_BASE_URL } from "@/config/config";
 import { isEmulatorSync } from "react-native-device-info";
+import { stringify } from "flatted";
 
 const NECRO_UNLOCK_IDs = [
   process.env.EXPO_PUBLIC_IOS_NECRO_ID,
@@ -72,6 +73,7 @@ export class IAPStore {
       purchasedTabs: observable,
 
       evaluateTransactions: action,
+      evaluateProductIds: action,
       evaluateCustomer: action,
       purchaseHandler: action,
 
@@ -146,7 +148,7 @@ export class IAPStore {
     );
   }
 
-  private evaluateProductIds(transactions: string[]) {
+  evaluateProductIds(transactions: string[]) {
     const messageReporting = [];
     let tabsPurchaseCounter = 0;
     for (const transaction of transactions) {
@@ -220,45 +222,20 @@ export class IAPStore {
       const validationToken = this.generateValidationToken(expiryDate, secret);
       storage.set("offlineValidationToken", validationToken);
 
-      if (this.rangerUnlocked) {
-        storage.set(
-          "rangerIAP",
-          JSON.stringify({
-            unlocked: true,
-            timestamp: currentTime,
-            tokenVersion: validationToken.substring(0, 8),
-          }),
-        );
-      }
+      const customerInfo = await Purchases.restorePurchases();
+      const serializedCustomerInfo = stringify({
+        nonSubscriptionTransactions: customerInfo.nonSubscriptionTransactions,
+        timestamp: currentTime,
+        tokenVersion: validationToken.substring(0, 8),
+      });
 
-      if (this.necromancerUnlocked) {
-        storage.set(
-          "necromancerIAP",
-          JSON.stringify({
-            unlocked: true,
-            timestamp: currentTime,
-            tokenVersion: validationToken.substring(0, 8),
-          }),
-        );
-      }
-
-      if (this.remoteSaveSpecificUnlock) {
-        storage.set(
-          "remoteSaveIAP",
-          JSON.stringify({
-            unlocked: true,
-            timestamp: currentTime,
-            tokenVersion: validationToken.substring(0, 8),
-          }),
-        );
-      }
+      storage.set("offlineCustomerInfo", serializedCustomerInfo);
     } catch (error) {
       console.log("Failed to persist offline data:", error);
     }
   }
 
   async hydrateOffline() {
-    //TODO need to serialize/hydrate tab count
     try {
       const validationToken = storage.getString("offlineValidationToken");
       if (!validationToken) return;
@@ -271,23 +248,15 @@ export class IAPStore {
         return;
       }
 
-      const rangerData = storage.getString("rangerIAP");
-      const necromancerData = storage.getString("necromancerIAP");
-      const remoteSaveData = storage.getString("remoteSaveIAP");
-
-      if (rangerData) {
-        const ranger = JSON.parse(rangerData);
-        this.rangerUnlocked = ranger.unlocked;
-      }
-
-      if (necromancerData) {
-        const necromancer = JSON.parse(necromancerData);
-        this.necromancerUnlocked = necromancer.unlocked;
-      }
-
-      if (remoteSaveData) {
-        const remoteSave = JSON.parse(remoteSaveData);
-        this.remoteSaveSpecificUnlock = remoteSave.unlocked;
+      const serializedCustomerInfo = storage.getString("offlineCustomerInfo");
+      if (serializedCustomerInfo) {
+        const storedData = JSON.parse(serializedCustomerInfo);
+        this.evaluateProductIds(
+          storedData.nonSubscriptionTransactions.map(
+            (transaction: PurchasesStoreTransaction) =>
+              transaction.productIdentifier,
+          ),
+        );
       }
     } catch (error) {
       console.log("Failed to hydrate offline data:", error);

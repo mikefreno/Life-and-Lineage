@@ -1005,21 +1005,11 @@ export const IAPModal = observer(
 
     return (
       <Modal
-        animationIn={uiStore.reduceMotion ? "fadeIn" : "slideInUp"}
-        animationOut={uiStore.reduceMotion ? "fadeOut" : "slideOutDown"}
-        animationInTiming={300}
-        animationOutTiming={300}
-        backdropTransitionOutTiming={300}
-        backdropTransitionInTiming={300}
-        backdropColor={
-          Platform.OS == "ios"
-            ? "#000000"
-            : uiStore.colorScheme == "light"
-            ? "#ffffffff"
-            : "#000000"
-        }
+        animationIn={"fadeInUpBig"}
+        animationOut={"fadeOutUpBig"}
+        animationInTiming={600}
+        animationOutTiming={600}
         isVisible={isVisibleCondition}
-        backdropOpacity={0.5}
         onBackButtonPress={backFunction}
         statusBarTranslucent={true}
         coverScreen={true}

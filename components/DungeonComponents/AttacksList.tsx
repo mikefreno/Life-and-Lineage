@@ -44,8 +44,6 @@ const AttacksList = observer(
       pass({ voluntary: true });
     }, [vibration, uiStore]);
 
-    const styles = useStyles();
-
     return (
       <FlatList
         key={uiStore.isLandscape ? "landscape" : "portrait"}
@@ -53,10 +51,7 @@ const AttacksList = observer(
         inverted
         indicatorStyle="white"
         persistentScrollbar
-        contentContainerStyle={[
-          styles.notchAvoidingLanscapePad,
-          { paddingHorizontal: "2%" },
-        ]}
+        contentContainerStyle={{ paddingHorizontal: "2%" }}
         numColumns={uiStore.isLandscape ? 2 : 1}
         keyExtractor={(item, index) =>
           item instanceof Attack ? `${item.name}-${index}` : `pass-${index}`
