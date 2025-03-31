@@ -9,7 +9,7 @@ import {
   AnimationOptions,
   AnimationSet,
   EnemyImageMap,
-} from "../utility/enemyHelpers";
+} from "@/utility/animation/enemy";
 import { useRootStore } from "@/hooks/stores";
 import { useStyles } from "@/hooks/styles";
 import { observer } from "mobx-react-lite";
@@ -187,7 +187,7 @@ export const AnimatedSprite = observer(
           case "attack_3":
           case "attack_4":
           case "attack_5":
-            animationStore.setProjectile(activeAnimationString);
+            animationStore.setCurrentAnimation(activeAnimationString);
             return;
 
           case "move":
@@ -256,6 +256,23 @@ export const AnimatedSprite = observer(
         });
       }
     }, [animationStore?.textString]);
+
+    useEffect(() => {
+      if (animationStore) {
+        const scaledWidth = currentDimensions.width * scale;
+        const scaledHeight = currentDimensions.height * scale;
+
+        animationStore.setRenderedDimensions({
+          width: scaledWidth,
+          height: scaledHeight,
+        });
+      }
+    }, [
+      currentDimensions.width,
+      currentDimensions.height,
+      scale,
+      animationStore,
+    ]);
 
     const shouldLoop = activeAnimationString === "idle";
 

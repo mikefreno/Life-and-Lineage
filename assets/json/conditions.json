@@ -619,12 +619,8 @@
     "effect": [
       "stealth"
     ],
-    "effectStyle": [
-      null
-    ],
-    "effectAmount": [
-      null
-    ],
+    "effectStyle": null,
+    "effectAmount": null,
     "icon": "hidden"
   },
   {
@@ -634,13 +630,20 @@
     "effect": [
       "remove stealth"
     ],
-    "effectStyle": [
-      null
-    ],
-    "effectAmount": [
-      null
-    ],
+    "effectStyle": null,
+    "effectAmount": null,
     "icon": null
+  },
+  {
+    "name": "siphon poison",
+    "style": "buff",
+    "turns": 5,
+    "effect": [
+      "siphon poison"
+    ],
+    "effectStyle": null,
+    "effectAmount": null,
+    "icon": "poison_heart"
   },
   {
     "name": "weaken",

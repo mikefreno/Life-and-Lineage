@@ -29,11 +29,21 @@ export function createDebuff({
     let sanityDamage: number[] = [];
 
     debuffObj.effect.forEach((eff, index) => {
-      if (eff === "health damage" && debuffObj.effectAmount[index] !== null) {
+      if (
+        eff === "health damage" &&
+        debuffObj.effectAmount &&
+        debuffObj.effectAmount[index] !== null
+      ) {
         let localHealthDmg = debuffObj.effectAmount[index] as number;
-        if (debuffObj.effectStyle[index] === "multiplier") {
+        if (
+          debuffObj.effectStyle &&
+          debuffObj.effectStyle[index] === "multiplier"
+        ) {
           localHealthDmg *= primaryAttackDamage;
-        } else if (debuffObj.effectStyle[index] === "percentage") {
+        } else if (
+          debuffObj.effectStyle &&
+          debuffObj.effectStyle[index] === "percentage"
+        ) {
           localHealthDmg *= enemyMaxHP;
         }
         healthDamage.push(localHealthDmg);
@@ -41,11 +51,21 @@ export function createDebuff({
         healthDamage.push(0);
       }
 
-      if (eff === "sanity damage" && debuffObj.effectAmount[index] !== null) {
+      if (
+        eff === "sanity damage" &&
+        debuffObj.effectAmount &&
+        debuffObj.effectAmount[index] !== null
+      ) {
         let localSanityDmg = debuffObj.effectAmount[index] as number;
-        if (debuffObj.effectStyle[index] === "multiplier") {
+        if (
+          debuffObj.effectStyle &&
+          debuffObj.effectStyle[index] === "multiplier"
+        ) {
           localSanityDmg *= primaryAttackDamage;
-        } else if (debuffObj.effectStyle[index] === "percentage") {
+        } else if (
+          debuffObj.effectStyle &&
+          debuffObj.effectStyle[index] === "percentage"
+        ) {
           localSanityDmg *= enemyMaxSanity ?? 0;
         }
         sanityDamage.push(localSanityDmg);
@@ -61,8 +81,8 @@ export function createDebuff({
       effect: debuffObj.effect,
       healthDamage: healthDamage,
       sanityDamage: sanityDamage,
-      effectStyle: debuffObj.effectStyle,
-      effectMagnitude: debuffObj.effectAmount,
+      effectStyle: debuffObj.effectStyle ?? [],
+      effectMagnitude: debuffObj.effectAmount ?? [],
       placedby: applierNameString,
       placedbyID: applierID,
       icon: debuffObj.icon,
@@ -102,11 +122,21 @@ export function createBuff({
     let sanityHeal: (number | null)[] = [];
 
     buffObj.effect.forEach((eff, index) => {
-      if (eff === "heal" && buffObj.effectAmount[index] !== null) {
+      if (
+        eff === "heal" &&
+        buffObj.effectAmount &&
+        buffObj.effectAmount[index] !== null
+      ) {
         let localHealthHeal = buffObj.effectAmount[index] as number;
-        if (buffObj.effectStyle[index] === "multiplier") {
+        if (
+          buffObj.effectStyle &&
+          buffObj.effectStyle[index] === "multiplier"
+        ) {
           localHealthHeal *= attackPower;
-        } else if (buffObj.effectStyle[index] === "percentage") {
+        } else if (
+          buffObj.effectStyle &&
+          buffObj.effectStyle[index] === "percentage"
+        ) {
           localHealthHeal *= maxHealth;
         }
         healthHeal.push(localHealthHeal);
@@ -114,11 +144,21 @@ export function createBuff({
         healthHeal.push(null);
       }
 
-      if (eff === "sanity heal" && buffObj.effectAmount[index] !== null) {
+      if (
+        eff === "sanity heal" &&
+        buffObj.effectAmount &&
+        buffObj.effectAmount[index] !== null
+      ) {
         let localSanityHeal = buffObj.effectAmount[index] as number;
-        if (buffObj.effectStyle[index] === "multiplier") {
+        if (
+          buffObj.effectStyle &&
+          buffObj.effectStyle[index] === "multiplier"
+        ) {
           localSanityHeal *= attackPower;
-        } else if (buffObj.effectStyle[index] === "percentage") {
+        } else if (
+          buffObj.effectStyle &&
+          buffObj.effectStyle[index] === "percentage"
+        ) {
           localSanityHeal *= maxSanity ?? 0;
         }
         sanityHeal.push(localSanityHeal);
@@ -135,8 +175,8 @@ export function createBuff({
       effect: buffObj.effect,
       healthDamage: healthHeal.map((heal) => (heal !== null ? -heal : 0)),
       sanityDamage: sanityHeal.map((heal) => (heal !== null ? -heal : 0)),
-      effectStyle: buffObj.effectStyle,
-      effectMagnitude: buffObj.effectAmount,
+      effectStyle: buffObj.effectStyle ?? [],
+      effectMagnitude: buffObj.effectAmount ?? [],
       placedby: applierNameString,
       placedbyID: applierID,
       icon: buffObj.icon,

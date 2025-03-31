@@ -55,10 +55,12 @@
       "regen": 5
     },
     "attackStrings": [
-      "bite"
+      "bite",
+      "claw"
     ],
     "animationStrings": {
-      "bite": "attack_1"
+      "bite": "attack_1",
+      "claw": "attack_2"
     },
     "drops": [
       {

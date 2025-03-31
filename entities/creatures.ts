@@ -36,9 +36,9 @@ import {
   PlayerClassOptions,
   parseDamageTypeObject,
 } from "../utility/types";
-import { getRandomInt } from "../utility/functions/misc";
+import { getRandomInt } from "@/utility/functions/misc";
 import { PlayerCharacter } from "./character";
-import { AnimationOptions } from "../utility/enemyHelpers";
+import { AnimationOptions } from "@/utility/animation/enemy";
 import {
   CreatureOptions,
   EnemyOptions,

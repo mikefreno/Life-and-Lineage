@@ -1,6 +1,6 @@
-export type VFXImageOptions = keyof typeof VFXImageMap;
+export type PlayerVFXImageOptions = keyof typeof PlayerVFXImageMap;
 
-export const VFXImageMap = {
+export const PlayerVFXImageMap = {
   fireMissile: {
     source: require("@/assets/vfx/fire/missile.webp"),
     height: 33,

@@ -124,7 +124,14 @@ const AttackItem = observer(
 
     const buttonText = useMemo(() => {
       if (playerState.isStunned) return "Stunned!";
-      if (isSpell) return canUse.val ? "Cast" : canUse.reason;
+      if (isSpell)
+        return canUse.val
+          ? attack.isAura
+            ? attack.auraIsActive
+              ? "Deactivate"
+              : "Activate"
+            : "Cast"
+          : canUse.reason;
       return "Attack";
     }, [isSpell, canUse, playerState.isStunned]);
 

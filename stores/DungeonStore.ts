@@ -31,7 +31,6 @@ export class DungeonStore {
   root: RootStore;
   dungeonInstances: DungeonInstance[];
 
-  // ethereal instance/level that is higher priority
   activityInstance: DungeonInstance | undefined;
   activityLevel: DungeonLevel | undefined;
 

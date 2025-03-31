@@ -1,7 +1,7 @@
 import { ColorValue } from "react-native";
 import type { Condition } from "@/entities/conditions";
-import { VFXImageOptions } from "@/utility/vfxmapping";
 import { Being } from "@/entities/being";
+import { PlayerVFXImageOptions } from "./animation/player";
 
 type StatEffect = {
   stat: "health" | "mana" | "sanity";
@@ -520,6 +520,7 @@ export type EffectOptions =
   | "revenge"
   | "blood magic consumable"
   | "execute"
+  | "siphon poison"
   | "stealth";
 
 export type EffectStyle = "multiplier" | "percentage" | "flat";
@@ -548,8 +549,8 @@ export type ConditionObjectType = {
   turns: number;
   trapSetupTime?: number;
   effect: EffectOptions[];
-  effectStyle: EffectStyle[];
-  effectAmount: number[];
+  effectStyle: EffectStyle[] | null;
+  effectAmount: number[] | null;
   icon: string;
   aura?: boolean;
 };
@@ -574,7 +575,7 @@ export type MerchantType =
 
 export type PlayerSpriteAnimationSet =
   | {
-      sprite: VFXImageOptions;
+      sprite: PlayerVFXImageOptions;
       style: "static";
       position: "enemy" | "field" | "self";
       retrigger?: boolean;
@@ -586,7 +587,7 @@ export type PlayerSpriteAnimationSet =
       repeat?: number;
     }
   | {
-      sprite: VFXImageOptions;
+      sprite: PlayerVFXImageOptions;
       style: "missile";
       position: "enemy";
       retrigger?: boolean;
@@ -599,7 +600,7 @@ export type PlayerSpriteAnimationSet =
       repeat?: number;
     }
   | {
-      sprite: VFXImageOptions;
+      sprite: PlayerVFXImageOptions;
       style: "span";
       position: "field" | "enemy";
       retrigger?: boolean;

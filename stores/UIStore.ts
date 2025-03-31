@@ -26,8 +26,10 @@ import {
 } from "expo-screen-orientation";
 import { hasNotch, isTablet, getDeviceType } from "react-native-device-info";
 import { baseNormalize, baseNormalizeForText } from "@/hooks/scaling";
+import { getRandomInt } from "@/utility/functions/misc";
 
 export const LOADING_TIPS: string[] = [
+  "Conditions will continue to tick outside of combat",
   "Remember to check your equipment before entering a dungeon",
   "Health potions can save your life in tough battles",
   "Some enemies are weak to certain types of damage",
@@ -35,9 +37,11 @@ export const LOADING_TIPS: string[] = [
   "Bosses rarely spawn near the dungeon entry",
   "You can flee from battles if you're outmatched",
   "Selling unused items can provide valuable gold",
-  "Some special encounters may have hidden rewards",
+  "Some special encounters may have hidden rewards, and dangers",
   "Not all treasures are worth the risk",
   "Keep an eye on your health during exploration",
+  "Deactivating an aura returns its mana cost",
+  "Old age will lead to dangerous ailments",
 ];
 
 export const BASE_WIDTH = 400;
@@ -78,7 +82,7 @@ export default class UIStore {
   constructed: boolean = false;
   totalLoadingSteps: number = 0;
   completedLoadingSteps: number = 0;
-  currentTipIndex: number = 0;
+  currentTipIndex: number = getRandomInt(0, LOADING_TIPS.length);
   progressIncrementing: boolean = false;
 
   iconSizeXL = baseNormalize(28);
@@ -441,9 +445,7 @@ export default class UIStore {
     const cycleTips = () => {
       if (!this.progressIncrementing) return;
       runInAction(
-        () =>
-          (this.currentTipIndex =
-            (this.currentTipIndex + 1) % LOADING_TIPS.length),
+        () => (this.currentTipIndex = getRandomInt(0, LOADING_TIPS.length + 1)),
       );
       setTimeout(cycleTips, 3000);
     };

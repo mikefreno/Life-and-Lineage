@@ -1,1 +1,1 @@
-Boss "necromancer" missing attacks: ["dark burst","phase[0].fireball"]
+Boss "necromancer" missing attacks: ["dark burst"]

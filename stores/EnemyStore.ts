@@ -13,10 +13,10 @@ import {
 import { EnemyAnimationStore } from "@/stores/EnemyAnimationStore";
 import enemiesJSON from "@/assets/json/enemy.json";
 import { BeingType, ItemClassType } from "@/utility/types";
-import { EnemyImageKeyOption } from "@/utility/enemyHelpers";
 import { Being } from "@/entities/being";
 import { Character } from "@/entities/character";
 import { getAnimatedSpriteForNPC } from "@/utility/functions/misc";
+import { EnemyImageKeyOption } from "@/utility/animation/enemy";
 
 export default class EnemyStore {
   enemies: Being[];
@@ -96,6 +96,8 @@ export default class EnemyStore {
       baseArmor: enemyJSON.armorValue,
       currentMana: enemyJSON.mana.maximum,
       baseMana: enemyJSON.mana.maximum,
+      baseDamageTable: enemyJSON.baseDamageTable,
+      baseResistanceTable: enemyJSON.baseResistanceTable,
       baseManaRegen: enemyJSON.mana.regen,
       goldDropRange: enemyJSON.goldDropRange,
       drops: enemyJSON.drops as {
@@ -111,7 +113,11 @@ export default class EnemyStore {
     this.enemies.push(enemy);
     this.animationStoreMap.set(
       enemy.id,
-      new EnemyAnimationStore({ root: this.root, sprite: enemy.sprite }),
+      new EnemyAnimationStore({
+        root: this.root,
+        sprite: enemy.sprite,
+        id: enemy.id,
+      }),
     );
     this.saveEnemy(enemy);
   }
@@ -145,7 +151,11 @@ export default class EnemyStore {
     this.enemies.push(enemy);
     this.animationStoreMap.set(
       enemy.id,
-      new EnemyAnimationStore({ root: this.root, sprite: enemy.sprite }),
+      new EnemyAnimationStore({
+        root: this.root,
+        sprite: enemy.sprite,
+        id: enemy.id,
+      }),
     );
     this.saveEnemy(enemy);
   }
@@ -178,7 +188,11 @@ export default class EnemyStore {
       }
       map.set(
         enemy.id,
-        new EnemyAnimationStore({ root: this.root, sprite: enemy.sprite }),
+        new EnemyAnimationStore({
+          root: this.root,
+          sprite: enemy.sprite,
+          id: enemy.id,
+        }),
       );
       enemies.push(enemy);
     });

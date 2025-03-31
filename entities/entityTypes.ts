@@ -1,4 +1,7 @@
-import { AnimationOptions, EnemyImageKeyOption } from "@/utility/enemyHelpers";
+import {
+  AnimationOptions,
+  EnemyImageKeyOption,
+} from "@/utility/animation/enemy";
 import {
   Attribute,
   BeingType,
@@ -34,6 +37,8 @@ export interface BeingOptions {
   };
 
   attackStrings?: string[];
+  animationStrings: { [key: string]: string };
+
   conditions?: Condition[];
 
   baseArmor?: number;
@@ -54,6 +59,7 @@ export interface BeingOptions {
 
   deathdate?: { year: number; week: number };
   alive?: boolean;
+  activeAuraConditionIds: { attackName: string; conditionIDs: string[] }[];
 
   root: RootStore;
 }

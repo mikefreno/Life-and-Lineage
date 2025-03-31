@@ -54,6 +54,8 @@ const TabLayout = observer(() => {
   const vibration = useVibration();
   const { getNormalizedSize } = useScaling();
 
+  const insets = useSafeAreaInsets();
+
   const tabBarLayout = useMemo(() => {
     const playerStatusHeight = uiStore.playerStatusCompactHeight ?? 0;
     const expandedPadding = uiStore.playerStatusExpandedOnAllRoutes
@@ -73,7 +75,6 @@ const TabLayout = observer(() => {
     uiStore.playerStatusExpandedOnAllRoutes,
     uiStore.expansionPadding,
   ]);
-  const insets = useSafeAreaInsets();
 
   const commonOptions = useMemo(
     () =>
@@ -193,7 +194,7 @@ const TabLayout = observer(() => {
               borderTopWidth: 0,
               position: "absolute",
               shadowColor: "transparent",
-              height: tabBarLayout.height,
+              height: tabBarLayout.height + insets.bottom / 4,
               paddingHorizontal: "2%",
               paddingTop: tabBarLayout.paddingTop,
             },

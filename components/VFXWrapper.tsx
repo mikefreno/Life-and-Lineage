@@ -1,9 +1,9 @@
 import { useScaling } from "@/hooks/scaling";
 import { useRootStore } from "@/hooks/stores";
 import { type EnemyAnimationStore } from "@/stores/EnemyAnimationStore";
+import { PlayerVFXImageMap } from "@/utility/animation/player";
 import { PlayerSpriteAnimationSet } from "@/utility/types";
 import { Vector2 } from "@/utility/Vec2";
-import { VFXImageMap } from "@/utility/vfxmapping";
 import { Canvas, useAnimatedImage, Image } from "@shopify/react-native-skia";
 import { toJS } from "mobx";
 import { observer } from "mobx-react-lite";
@@ -98,6 +98,7 @@ export const VFXWrapper = observer(
             key={store.id}
             store={store}
             playerOrigin={playerAnimationStore.playerOrigin}
+            headerHeight={headerHeight}
           />
         ))}
       </View>
@@ -118,18 +119,39 @@ const PlayerVFX = observer(
     playerOrigin: Vector2;
     headerHeight: number;
   }) => {
-    const { playerAnimationStore } = useRootStore();
+    const { playerState, playerAnimationStore } = useRootStore();
 
     const animation = useMemo(() => {
       if (
         playerAnimationStore.animationSet &&
         "sprite" in playerAnimationStore.animationSet
       ) {
-        return VFXImageMap[playerAnimationStore.animationSet.sprite];
+        return PlayerVFXImageMap[playerAnimationStore.animationSet.sprite];
       } else return null;
     }, [playerAnimationStore.animationSet]);
 
-    if (!playerAnimationStore.animationSet) return null;
+    const targetIDs = useMemo(() => {
+      if (
+        !playerAnimationStore.animationSet ||
+        !("glow" in playerAnimationStore.animationSet) ||
+        !playerAnimationStore.animationSet.position
+      ) {
+        return null;
+      }
+
+      const position = playerAnimationStore.animationSet.position;
+
+      if (position === "enemy") {
+        return enemyPositions.map((enemy) => enemy.enemyID);
+      } else if (position === "self" && playerState) {
+        return [playerState.id];
+      } else {
+        return null;
+      }
+    }, [playerAnimationStore.animationSet, enemyPositions]);
+
+    if (!playerAnimationStore.animationSet || !playerState) return null;
+
     return (
       <>
         {animation ? (
@@ -146,11 +168,13 @@ const PlayerVFX = observer(
           />
         ) : (
           "glow" in playerAnimationStore.animationSet && (
-            <PlayerGlowVFX
+            <GlowVFX
               glow={playerAnimationStore.animationSet.glow}
               duration={playerAnimationStore.animationSet.duration}
               onComplete={() => playerAnimationStore.clearAnimation()}
               headerHeight={headerHeight}
+              position={playerAnimationStore.animationSet.position}
+              targetIDs={targetIDs}
             />
           )
         )}
@@ -159,7 +183,6 @@ const PlayerVFX = observer(
   },
 );
 
-// Updated placement handlers using enhanced Vector2 methods
 const missilePlacementHandler = ({
   playerOrigin,
   normalized,
@@ -167,9 +190,7 @@ const missilePlacementHandler = ({
   playerOrigin: Vector2;
   normalized: { width: number; height: number };
 }): Vector2 => {
-  // Create an offset vector pointing up (for better visual alignment)
   const offset = Vector2.fromAngle(-Math.PI / 2, normalized.height * 0.1);
-  // Add the offset to player origin and then adjust for sprite center
   return playerOrigin
     .add(offset)
     .subtract(new Vector2(normalized.width / 2, normalized.height / 2));
@@ -190,16 +211,13 @@ const staticPlacementHandler = ({
 
   switch (position) {
     case "enemy":
-      // Place on the enemy position
       return targetPosition.subtract(centerOffset);
 
     case "field":
-      // Place in the center between playerOrigin and the target using midpoint
       return playerOrigin.midpoint(targetPosition).subtract(centerOffset);
 
     case "self":
     default:
-      // Place at playerOrigin with a slight upward offset for better visibility
       const selfOffset = Vector2.fromAngle(
         -Math.PI / 2,
         normalized.height * 0.5,
@@ -248,7 +266,6 @@ const PlayerSpriteVFX = ({
   const isMounted = useRef(true);
   const { memoizedCalculateRenderScaling } = useScaling();
 
-  // For missile animation
   const animXY = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
 
@@ -306,7 +323,6 @@ const PlayerSpriteVFX = ({
     }
   }, []);
 
-  // Clean up resources
   useEffect(() => {
     isMounted.current = true;
 
@@ -325,7 +341,6 @@ const PlayerSpriteVFX = ({
     };
   }, []);
 
-  // Handle frame animation
   useEffect(() => {
     if (!animatedImage) return;
 
@@ -360,7 +375,6 @@ const PlayerSpriteVFX = ({
     advanceFrame();
   }, [animatedImage, onComplete, safeSetCurrentFrame]);
 
-  // Handle missile movement animation using Vector2
   useEffect(() => {
     if (!animatedImage || set.style !== "missile") return;
 
@@ -507,19 +521,80 @@ const PlayerSpriteVFX = ({
   }
 };
 
-const PlayerGlowVFX = ({
+const GlowVFX = ({
   glow,
   duration = 1000,
   onComplete,
   headerHeight,
+  position = "field",
+  targetIDs,
 }: {
   glow: ColorValue;
   duration?: number;
   onComplete: (() => void) | null;
   headerHeight: number;
+  position: "enemy" | "field" | "self" | undefined;
+  targetIDs: string[] | null;
 }) => {
-  const { uiStore } = useRootStore();
+  const { uiStore, playerState, playerAnimationStore, enemyStore } =
+    useRootStore();
   const opacity = useRef(new Animated.Value(0)).current;
+
+  const targetData = useMemo(() => {
+    if (targetIDs == null || position === "field") {
+      return null;
+    }
+    if (playerState?.id === targetIDs[0]) {
+      const size = uiStore.dimensions.lesser * 0.3;
+
+      return {
+        left: playerAnimationStore.playerOrigin.x - size / 2,
+        top: playerAnimationStore.playerOrigin.y - size / 2,
+        height: size,
+        width: size,
+      };
+    }
+
+    let top = Number.MAX_SAFE_INTEGER;
+    let left = Number.MAX_SAFE_INTEGER;
+    let bottom = Number.MIN_SAFE_INTEGER;
+    let right = Number.MIN_SAFE_INTEGER;
+    let hasValidTarget = false;
+
+    for (const id of targetIDs) {
+      const store = enemyStore.getAnimationStore(id);
+      if (store?.spriteMidPoint && store.renderedDimensions) {
+        hasValidTarget = true;
+        const halfHeight = store.renderedDimensions.height / 2;
+        const halfWidth = store.renderedDimensions.width / 2;
+
+        const localTop = store.spriteMidPoint.y - halfHeight;
+        const localBottom = store.spriteMidPoint.y + halfHeight;
+        const localLeft = store.spriteMidPoint.x - halfWidth;
+        const localRight = store.spriteMidPoint.x + halfWidth;
+
+        top = Math.min(top, localTop);
+        bottom = Math.max(bottom, localBottom);
+        left = Math.min(left, localLeft);
+        right = Math.max(right, localRight);
+      }
+    }
+
+    if (hasValidTarget) {
+      const width = right - left;
+      const height = bottom - top;
+      const padding = Math.min(width, height) * 0.2; // 20% padding
+
+      return {
+        left: left - padding,
+        top: top - padding,
+        height: height + padding * 2,
+        width: width + padding * 2,
+      };
+    }
+
+    return null;
+  }, [targetIDs, position, playerState?.id, enemyStore.midpointUpdater]);
 
   useEffect(() => {
     Animated.timing(opacity, {
@@ -548,34 +623,74 @@ const PlayerGlowVFX = ({
     };
   }, []);
 
-  return (
-    <Animated.View
-      style={{
-        zIndex: 9999,
-        width: uiStore.dimensions.width,
-        height: uiStore.dimensions.height,
-        marginTop: -headerHeight,
-        position: "absolute",
-        backgroundColor: glow,
-        opacity: opacity,
-      }}
-    />
-  );
+  if (targetData) {
+    return (
+      <Animated.View
+        style={{
+          zIndex: 9999,
+          width: targetData.width,
+          height: targetData.height,
+          position: "absolute",
+          left: targetData.left,
+          top: targetData.top,
+          backgroundColor: glow,
+          opacity: opacity,
+          borderRadius: Math.max(targetData.width, targetData.height),
+        }}
+      />
+    );
+  } else {
+    return (
+      <Animated.View
+        style={{
+          zIndex: 9999,
+          width: uiStore.dimensions.width,
+          height: uiStore.dimensions.height,
+          marginTop: -headerHeight,
+          position: "absolute",
+          backgroundColor: glow,
+          opacity: opacity,
+        }}
+      />
+    );
+  }
 };
 
 const EnemyVFX = observer(
   ({
     store,
     playerOrigin,
+    headerHeight,
   }: {
     store: EnemyAnimationStore;
     playerOrigin: Vector2;
+    headerHeight: number;
   }) => {
-    if (!store.projectileSet || !store.spriteMidPoint) return null;
+    const { playerState } = useRootStore();
+
+    const targetIDs = useMemo(() => {
+      if (!store.activeGlow) return null;
+
+      switch (store.activeGlow.position) {
+        case "self":
+          return [store.id];
+        case "enemy":
+          return playerState ? [playerState.id] : null;
+        default:
+          return null;
+      }
+    }, [store.activeGlow, store.id, playerState?.id]);
+
+    if (
+      (!store.projectileSet && !store.activeGlow) ||
+      (!store.spriteMidPoint && store.activeGlow?.position !== "field")
+    ) {
+      return null;
+    }
 
     return (
       <>
-        {store.projectileSet.projectile && (
+        {store.projectileSet?.projectile && store.spriteMidPoint && (
           <ProjectileEffect
             projectile={store.projectileSet.projectile}
             enemyOrigin={store.spriteMidPoint}
@@ -584,6 +699,16 @@ const EnemyVFX = observer(
             onComplete={() => {
               store.clearProjectileSet();
             }}
+          />
+        )}
+        {store.activeGlow && (
+          <GlowVFX
+            glow={store.activeGlow.color}
+            duration={store.activeGlow.duration}
+            onComplete={() => store.clearGlow()}
+            headerHeight={headerHeight}
+            position={store.activeGlow.position}
+            targetIDs={targetIDs}
           />
         )}
       </>
@@ -630,20 +755,15 @@ const ProjectileEffect = ({
 
   const animXY = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
 
-  // Apply the same scaling logic as in AnimatedSprite
   const renderScaleCalc = memoizedCalculateRenderScaling(projectile.scale);
 
-  // Calculate container size based on screen dimensions
   const containerSize = uiStore.dimensions.lesser * 0.5;
 
-  // Calculate scale factors
   const scaleX = (containerSize / projectile.width) * renderScaleCalc;
   const scaleY = (containerSize / projectile.height) * renderScaleCalc;
 
-  // Use the smaller scale to maintain aspect ratio
   const scale = Math.min(scaleX, scaleY);
 
-  // Calculate normalized dimensions with proper scaling
   const normalized = useMemo(() => {
     return {
       height: projectile.height * scale,
@@ -651,7 +771,6 @@ const ProjectileEffect = ({
     };
   }, [projectile.height, projectile.width, scale]);
 
-  // Use Vector2 for projectile position with center offset
   const centerOffset = new Vector2(normalized.width / 2, normalized.height / 2);
   const [projectilePosition, setProjectilePosition] = useState<Vector2>(
     enemyOrigin.subtract(centerOffset),
@@ -684,38 +803,31 @@ const ProjectileEffect = ({
 
     animXY.setValue({ x: 0, y: 0 });
 
-    // Update projectile position with proper scaling
     setProjectilePosition(enemyOrigin.subtract(centerOffset));
 
-    // Calculate movement vector using Vector2
     const moveVector = playerOrigin.subtract(enemyOrigin);
 
-    // Create a bezier curve path for projectile
     const distance = moveVector.magnitude();
     const controlPoint = enemyOrigin
       .midpoint(playerOrigin)
-      .add(Vector2.fromAngle(-Math.PI / 2, distance * 0.2)); // Arc upward
+      .add(Vector2.fromAngle(-Math.PI / 2, distance * 0.2));
 
-    // Calculate points along the bezier curve
-    const steps = 10; // Number of points to sample
+    const steps = 10;
     const path = [];
 
     for (let i = 0; i <= steps; i++) {
       const t = i / steps;
-      // Use quadratic bezier curve for smooth arc motion
       const point = Vector2.quadraticBezier(
-        new Vector2(0, 0), // Start at origin (relative to current position)
-        controlPoint.subtract(enemyOrigin), // Control point (relative)
-        moveVector, // End point (relative)
+        new Vector2(0, 0),
+        controlPoint.subtract(enemyOrigin),
+        moveVector,
         t,
       );
       path.push(point);
     }
 
-    // Create a sequence of animations following the bezier path
     const segmentDuration = totalDuration / steps;
 
-    // Create the animation sequence
     const animations = path.map((point, index) => {
       return Animated.timing(animXY, {
         toValue: point.toObject(),
@@ -724,7 +836,6 @@ const ProjectileEffect = ({
       });
     });
 
-    // Run the sequence
     animationRef.current = Animated.sequence(animations);
 
     animationRef.current.start(({ finished }) => {
@@ -764,7 +875,6 @@ const ProjectileEffect = ({
 
   if (!projectileImage) return null;
 
-  // Calculate rotation angle to face the direction of movement
   const angle = enemyOrigin.angleBetweenDegrees(playerOrigin);
 
   return (
@@ -779,7 +889,6 @@ const ProjectileEffect = ({
           transform: [
             { translateX: animXY.x },
             { translateY: animXY.y },
-            // For sprites that face right by default, use the angle directly
             { rotate: `${angle}deg` },
           ],
         }}
@@ -840,20 +949,15 @@ const SplashEffect = ({
   const isMounted = useRef(true);
   const { memoizedCalculateRenderScaling } = useScaling();
 
-  // Apply the same scaling logic as in AnimatedSprite
   const renderScaleCalc = memoizedCalculateRenderScaling(splash.scale);
 
-  // Calculate container size based on screen dimensions
   const containerSize = uiStore.dimensions.lesser * 0.5;
 
-  // Calculate scale factors
   const scaleX = (containerSize / splash.width) * renderScaleCalc;
   const scaleY = (containerSize / splash.height) * renderScaleCalc;
 
-  // Use the smaller scale to maintain aspect ratio
   const scale = Math.min(scaleX, scaleY);
 
-  // Calculate normalized dimensions with proper scaling
   const normalized = useMemo(() => {
     return {
       height: splash.height * scale,
@@ -861,7 +965,6 @@ const SplashEffect = ({
     };
   }, [splash.height, splash.width, scale]);
 
-  // Use Vector2 for splash position with center offset
   const centerOffset = new Vector2(normalized.width / 2, normalized.height / 2);
   const splashPosition = splash.followsProjectile
     ? projectilePosition
@@ -876,7 +979,6 @@ const SplashEffect = ({
     const frameTotal = splashImage.getFrameCount();
     const frameDuration = splashImage.currentFrameDuration();
 
-    // Setup frame animation
     const animateFrames = () => {
       if (!isMounted.current || !splashImage) return;
 
@@ -884,11 +986,9 @@ const SplashEffect = ({
       frameCount = frameCount + 1;
       setSplashFrame(frameCount);
 
-      // Continue animation until we've gone through all frames
       if (frameCount < frameTotal) {
         frameTimerRef.current = setTimeout(animateFrames, frameDuration);
       } else {
-        // Animation complete
         if (onComplete) {
           onComplete();
         }

@@ -1952,6 +1952,8 @@ export class PlayerCharacter extends Character {
       childrenIds: json.childrenIds ?? [],
       partnerIds: json.partnerIds ?? [],
       knownCharacterIds: json.knownCharacterIds ?? [],
+      activeAuraConditionIds: json.activeAuraConditionIds,
+      animationStrings: {},
       root: json.root,
     });
     return player;

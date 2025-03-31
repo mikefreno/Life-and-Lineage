@@ -1,5 +1,5 @@
 import { Component } from "react";
-import { Text } from "@/components/Themed";
+import { Text, ThemedScrollView } from "@/components/Themed";
 import { ScrollView, View } from "react-native";
 import D20DieAnimation from "@/components/DieRollAnim";
 import GenericFlatButton from "@/components/GenericFlatButton";
@@ -66,7 +66,7 @@ function ErrorRender({ error }: { error: unknown }): React.ReactElement {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <ScrollView
+    <ThemedScrollView
       contentContainerStyle={{
         flex: 1,
         justifyContent: "space-evenly",
@@ -117,6 +117,6 @@ function ErrorRender({ error }: { error: unknown }): React.ReactElement {
           </>
         )}
       </View>
-    </ScrollView>
+    </ThemedScrollView>
   );
 }

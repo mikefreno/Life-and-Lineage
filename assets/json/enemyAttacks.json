@@ -134,6 +134,22 @@
     ]
   },
   {
+    "name": "kick",
+    "manaCost": 5,
+    "targets": "single",
+    "baseHitChance": 0.90,
+    "damageTable": {
+      "physical": 5,
+      "raw": 2
+    },
+    "debuffNames": [
+      {
+        "name": "stun",
+        "chance": 0.15
+      }
+    ]
+  },
+  {
     "name": "rock throw",
     "manaCost": 5,
     "targets": "single",
@@ -146,6 +162,38 @@
       {
         "name": "stun",
         "chance": 0.15
+      }
+    ]
+  },
+  {
+    "name": "rock spike",
+    "manaCost": 20,
+    "targets": "single",
+    "baseHitChance": 0.95,
+    "damageTable": {
+      "physical": 5,
+      "raw": 4
+    },
+    "debuffNames": [
+      {
+        "name": "bleed",
+        "chance": 0.65
+      }
+    ]
+  },
+  {
+    "name": "burial",
+    "manaCost": 75,
+    "targets": "single",
+    "baseHitChance": 0.95,
+    "damageTable": {
+      "physical": 5,
+      "raw": 20
+    },
+    "debuffNames": [
+      {
+        "name": "heavy stun",
+        "chance": 0.75
       }
     ]
   },
@@ -337,6 +385,23 @@
     ]
   },
   {
+    "name": "flurry",
+    "manaCost": 20,
+    "targets": "single",
+    "baseHitChance": 0.65,
+    "hitsPerTurn": 4,
+    "damageTable": {
+      "physical": 5,
+      "raw": 2
+    },
+    "debuffNames": [
+      {
+        "name": "stun",
+        "chance": 0.15
+      }
+    ]
+  },
+  {
     "name": "chop",
     "manaCost": 5,
     "targets": "single",
@@ -371,7 +436,7 @@
     "name": "punch",
     "manaCost": 5,
     "targets": "single",
-    "baseHitChance": 0.95,
+    "baseHitChance": 1.0,
     "damageTable": {
       "physical": 5
     }
@@ -467,6 +532,15 @@
     "baseHitChance": 0.95,
     "damageTable": {
       "physical": 6
+    }
+  },
+  {
+    "name": "pulse",
+    "manaCost": 10,
+    "target": "single",
+    "baseHitChance": 0.90,
+    "damageTable": {
+      "magic": 6
     }
   },
   {

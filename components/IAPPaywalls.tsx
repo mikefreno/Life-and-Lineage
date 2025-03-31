@@ -1,6 +1,12 @@
 import { useRootStore } from "@/hooks/stores";
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { Platform, Pressable, ScrollView, ViewStyle } from "react-native";
+import {
+  Platform,
+  Pressable,
+  ScrollView,
+  StatusBar,
+  ViewStyle,
+} from "react-native";
 import Modal from "react-native-modal";
 import { View, StyleSheet, Animated } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -981,6 +987,14 @@ export const IAPModal = observer(
       messageColor: string;
     } | null>(null);
     const [loadingPurchase, setLoadingPurchase] = useState<boolean>();
+
+    useEffect(() => {
+      if (isVisibleCondition) {
+        StatusBar.setBarStyle("light-content", true);
+      } else {
+        StatusBar.setBarStyle("default", true);
+      }
+    }, [isVisibleCondition]);
 
     const handleRestorePurchase = () => {
       vibration({ style: "light" });

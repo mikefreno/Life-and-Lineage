@@ -9,7 +9,7 @@ import {
   type ItemClassType,
 } from "../utility/types";
 import { ParallaxOptions } from "../components/DungeonComponents/Parallax";
-import { EnemyImageKeyOption, EnemyImageMap } from "../utility/enemyHelpers";
+import { EnemyImageKeyOption, EnemyImageMap } from "@/utility/animation/enemy";
 import specialEncountersJSON from "../assets/json/specialEncounters.json";
 import { Item, isStackable } from "./item";
 import { getRandomInt } from "../utility/functions/misc";
@@ -299,6 +299,7 @@ export class DungeonLevel {
           chance: number;
         }[],
         attackStrings: enemyJSON.attackStrings,
+        animationStrings: enemyJSON.animationStrings,
         sprite: sprite as EnemyImageKeyOption,
         root: this.parent.dungeonStore.root,
       });
@@ -344,6 +345,7 @@ export class DungeonLevel {
         baseMana: scaledBossJSON.mana.maximum,
         baseManaRegen: scaledBossJSON.mana.regen,
         attackStrings: scaledBossJSON.attackStrings,
+        animationStrings: scaledBossJSON.animationStrings,
         storyDrops: scaledBossJSON.storyDrops,
         goldDropRange: scaledBossJSON.goldDropRange,
         drops: scaledBossJSON.drops as {

@@ -1,4 +1,5 @@
 import enemiesJSON from "@/assets/json/enemy.json";
+import { ColorValue } from "react-native";
 
 // use after expanding set
 export const enemyImageOptionsPrinter = () => {
@@ -93,10 +94,14 @@ export type EnemyImageKeyOption =
 
 export const enemyOptions = enemiesJSON.map((json) => json.name);
 
-export type AnimationSet = {
+export type AnimationBase = {
   anim: any;
   sizeOverride?: { height: number; width: number };
   disablePreMovement?: boolean;
+  triggersScreenShake?: { when: "start" | "end"; duration: number };
+};
+
+export type AnimationWithProjectile = AnimationBase & {
   projectile?: {
     anim: any;
     height: number;
@@ -111,6 +116,19 @@ export type AnimationSet = {
     scale?: number;
   };
 };
+
+export type AnimationWithGlow = AnimationBase & {
+  glow: {
+    color: ColorValue;
+    position: "enemy" | "field" | "self";
+    duration?: number;
+  };
+};
+
+export type AnimationSet =
+  | AnimationBase
+  | AnimationWithProjectile
+  | AnimationWithGlow;
 
 export type AnimationOptions =
   | "attack_1"
@@ -618,11 +636,16 @@ export const EnemyImageMap: EnemyImageMapType = {
     sets: {
       attack_1: {
         anim: require("@/assets/monsters/Goblin_Mage/ATTACK_1.webp"),
-        projectile: require("@/assets/monsters/Goblin_Mage/PROJECTILE.webp"),
       },
       attack_2: {
         anim: require("@/assets/monsters/Goblin_Mage/ATTACK_2.webp"),
-        projectile: require("@/assets/monsters/Goblin_Mage/PROJECTILE.webp"),
+        disablePreMovement: true,
+        projectile: {
+          anim: require("@/assets/monsters/Goblin_Mage/PROJECTILE.webp"),
+          width: 20,
+          height: 20,
+          scale: 2,
+        },
       },
       death: {
         anim: require("@/assets/monsters/Goblin_Mage/DEATH.webp"),

@@ -11,15 +11,16 @@ import {
   AnimationOptions,
   EnemyImageMap,
   type EnemyImageKeyOption,
-} from "@/utility/enemyHelpers";
-import * as Crypto from "expo-crypto";
+  AnimationSet,
+} from "@/utility/animation/enemy";
 import { Vector2 } from "@/utility/Vec2";
+import { ColorValue } from "react-native";
 
 export const FPS = 10;
 export const MAX_ANIMATION_DURATION = 1000;
 
 export class EnemyAnimationStore {
-  id = Crypto.randomUUID();
+  id: string;
   textString: string | undefined = undefined;
   dialogue: { [key: number]: string } | null;
 
@@ -31,23 +32,12 @@ export class EnemyAnimationStore {
 
   animationQueue: AnimationOptions[];
   attacksThatSkipMovement: AnimationOptions[];
-  projectileMappings: {
-    [key in AnimationOptions]?: {
-      projectile?: {
-        anim: any;
-        height: number;
-        width: number;
-        scale?: number;
-      };
-      splash?: {
-        anim: any;
-        height: number;
-        width: number;
-        followsProjectile: boolean;
-        scale?: number;
-      };
-    };
+
+  animationDetails: {
+    [key in AnimationOptions]?: AnimationSet;
   };
+
+  currentAnimationDetails: AnimationSet | null = null;
 
   projectileSet: {
     projectile?: {
@@ -65,40 +55,53 @@ export class EnemyAnimationStore {
     };
   } | null = null;
 
+  activeGlow: {
+    color: ColorValue;
+    position: "enemy" | "field" | "self";
+    duration: number;
+  } | null = null;
+
   runningRNAnimation = false;
   isIdle: boolean = true;
+
+  renderedDimensions: { width: number; height: number };
 
   constructor({
     root,
     sprite,
+    id,
   }: {
     root: RootStore;
     sprite: EnemyImageKeyOption;
+    id: string;
   }) {
     this.root = root;
     this.enemySprite = sprite;
+    this.id = id;
     this.dialogue = null;
     this.animationQueue = ["idle", "spawn"];
+    const { width, height } = EnemyImageMap[sprite];
+    this.renderedDimensions = { width, height };
 
     const attacksThatSkipMovement: AnimationOptions[] = [];
-    const projectileMappings: {
-      [key in AnimationOptions]?: { projectile?: any; splash?: any };
+    const animationDetails: {
+      [key in AnimationOptions]?: AnimationSet;
     } = {};
 
     Object.entries(EnemyImageMap[sprite].sets).forEach(([k, v]) => {
-      if (v.disablePreMovement) {
-        attacksThatSkipMovement.push(k as AnimationOptions);
+      const animKey = k as AnimationOptions;
+      const animSet = v as AnimationSet;
+
+      if (animSet.disablePreMovement) {
+        attacksThatSkipMovement.push(animKey);
       }
-      if (v.projectile) {
-        projectileMappings[k as AnimationOptions] = {
-          projectile: v.projectile,
-          splash: v.splash,
-        };
-      }
+
+      // Store the animation set directly
+      animationDetails[animKey] = animSet;
     });
 
     this.attacksThatSkipMovement = attacksThatSkipMovement;
-    this.projectileMappings = projectileMappings;
+    this.animationDetails = animationDetails;
 
     makeObservable(this, {
       textString: observable,
@@ -106,16 +109,20 @@ export class EnemyAnimationStore {
       animationQueue: observable,
       runningRNAnimation: observable,
       isIdle: observable,
-      projectileMappings: observable,
       projectileSet: observable,
+      activeGlow: observable,
+      currentAnimationDetails: observable,
 
-      setProjectile: action,
+      setRenderedDimensions: action,
+      setCurrentAnimation: action,
       addToAnimationQueue: action,
       concludeAnimation: action,
       setSpriteMidPoint: action,
       setTextString: action,
       getAttackQueue: action,
       clearProjectileSet: action,
+      clearGlow: action,
+      handleScreenShake: action,
 
       notIdle: computed,
     });
@@ -148,11 +155,55 @@ export class EnemyAnimationStore {
     );
   }
 
-  setProjectile(activeAnimationString: AnimationOptions) {
-    const projectileSet = this.projectileMappings[activeAnimationString];
-    if (projectileSet) {
-      this.projectileSet = projectileSet;
+  setRenderedDimensions(arg0: { width: number; height: number }) {
+    this.renderedDimensions = arg0;
+  }
+
+  setCurrentAnimation(activeAnimationString: AnimationOptions) {
+    const animSet = this.animationDetails[activeAnimationString];
+
+    if (!animSet) return;
+
+    this.currentAnimationDetails = animSet;
+
+    if ("projectile" in animSet || "splash" in animSet) {
+      this.projectileSet = {
+        projectile: animSet.projectile,
+        splash: animSet.splash,
+      };
     }
+
+    if ("glow" in animSet) {
+      console.log("glowing");
+      this.activeGlow = {
+        ...animSet.glow,
+        duration: animSet.glow.duration || 1000,
+      };
+
+      if (this.activeGlow.duration) {
+        setTimeout(() => {
+          this.clearGlow();
+        }, this.activeGlow.duration);
+      }
+    }
+
+    this.handleScreenShake("start"); // check if we should run a screen shake
+  }
+
+  handleScreenShake(timing: "start" | "end") {
+    if (
+      this.currentAnimationDetails?.triggersScreenShake &&
+      this.currentAnimationDetails.triggersScreenShake.when === timing //is this the correct timing?
+    ) {
+      this.root.dungeonStore.screenShaker &&
+        this.root.dungeonStore.screenShaker(
+          this.currentAnimationDetails.triggersScreenShake.duration,
+        );
+    }
+  }
+
+  clearGlow() {
+    this.activeGlow = null;
   }
 
   get notIdle() {
@@ -166,6 +217,7 @@ export class EnemyAnimationStore {
       return ["move", anim, "move"];
     }
   }
+
   setMovementDuration(duration: number) {
     this.movementDuration = duration;
   }
@@ -187,9 +239,13 @@ export class EnemyAnimationStore {
   }
 
   concludeAnimation() {
+    this.handleScreenShake("end");
+
     if (this.animationQueue.length > 1) {
       this.animationQueue = this.animationQueue.slice(0, -1);
       this.runningRNAnimation = false;
+
+      this.currentAnimationDetails = null;
     } else if (this.animationQueue[0] !== "idle") {
       console.log("Animation Queue not as expected: ", this.animationQueue);
     }

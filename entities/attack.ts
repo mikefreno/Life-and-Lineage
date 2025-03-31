@@ -1,4 +1,3 @@
-import { AnimationOptions } from "@/utility/enemyHelpers";
 import {
   AttackUse,
   DamageType,
@@ -24,6 +23,7 @@ import { action, computed, makeObservable, observable } from "mobx";
 import { Being } from "@/entities/being";
 import { useStyles } from "@/hooks/styles";
 import AttackDetails from "@/components/AttackDetails";
+import { AnimationOptions } from "@/utility/animation/enemy";
 
 interface AttackOption {
   name: string;
@@ -48,6 +48,7 @@ interface AttackOption {
   element?: Element;
   proficiencyNeeded?: string | null;
   usesWeapon?: string;
+  remainingUses?: number | undefined;
 }
 
 export type PerTargetUse =
@@ -136,6 +137,7 @@ export class Attack {
     element,
     proficiencyNeeded,
     usesWeapon,
+    remainingUses,
   }: AttackOption) {
     this.name = name;
     this.manaCost = manaCost ?? 0;
@@ -153,13 +155,15 @@ export class Attack {
     this.rangerPetName = rangerPetName ?? null;
     this.maxTurnsActive = maxTurnsActive ?? 1;
     this.remainingTurnsActive = remainingTurnsActive ?? null;
-    this.isActive = isActive ?? false;
-    this.remainingUses = maxUses ?? null;
+    this.remainingUses = remainingUses ? remainingUses : maxUses ?? null;
     this.heldActiveTargets = heldActiveTargets ?? null;
     this.animation = animation ?? null;
     this.user = user;
     this.element = element ? StringToElement[element] : null;
     this.usesWeapon = usesWeapon ?? null;
+
+    //there are a few ways attacks are held active, depending on how they function, aura's
+    this.isActive = isActive ?? false;
 
     this.proficiencyNeeded = proficiencyNeeded
       ? StringToMastery[proficiencyNeeded]
@@ -175,12 +179,15 @@ export class Attack {
       debuffs: action,
 
       damage: action,
+      deactivateAura: action,
 
       displayDamage: computed,
       selfDamage: computed,
 
       canBeUsed: computed,
       userHasRequiredWeapon: computed,
+      isAura: computed,
+      auraIsActive: computed,
 
       use: action,
     });
@@ -205,6 +212,29 @@ export class Attack {
       }
     });
     return created;
+  }
+
+  get isAura() {
+    return !!this.buffs?.find((buff) => buff.aura);
+  }
+
+  get auraIsActive() {
+    if (!this.isAura) return false;
+    return !!this.user.activeAuraConditionIds.some(
+      (obj) => obj.attackName === this.name,
+    );
+  }
+
+  deactivateAura() {
+    this.user.restoreMana(this.manaCost);
+    const obj = this.user.activeAuraConditionIds.find(
+      (obj) => obj.attackName === this.name,
+    );
+    if (obj) {
+      obj.conditionIDs.forEach((id) => {
+        this.user.removeConditionById(id, this.name);
+      });
+    }
   }
 
   /**
@@ -297,6 +327,9 @@ export class Attack {
   get canBeUsed(): { val: true } | { val: false; reason: string } {
     if (this.user.isStunned) {
       return { val: false, reason: "Stunned" };
+    }
+    if (this.auraIsActive) {
+      return { val: true };
     }
     if (this.user.isSilenced && this.element !== null) {
       return { val: false, reason: "Silenced" };
@@ -459,10 +492,43 @@ export class Attack {
     };
   }
 
-  public use(targets: Being[]) {
+  public use(targets: Being[]): {
+    targetResults: {
+      target: Being;
+      use: PerTargetUse;
+    }[];
+    buffs: Condition[] | null;
+    log: string;
+    selfDamage: number;
+  } {
     if (!this.canBeUsed.val) {
       // this shouldn't really ever be used(checked before use is called), here just in case
       throw new Error("used attack that was not valid... check before use!");
+    }
+
+    if (this.isAura) {
+      if (this.auraIsActive) {
+        this.deactivateAura();
+        return {
+          targetResults: [],
+          buffs: [],
+          log: this.buildLogString([], [], []),
+          selfDamage: 0,
+        };
+      } else {
+        this.user.deactivateAuras();
+      }
+      this.user.useMana(this.manaCost);
+      this.user.addToActiveAuraConditionIds({
+        attackName: this.name,
+        conditionIDs: this.buffs!.map((buff) => buff.id),
+      });
+      return {
+        targetResults: [],
+        buffs: this.buffs,
+        log: this.buildLogString([], [], this.buffs),
+        selfDamage: 0,
+      };
     }
 
     if (!this.isActive && this.manaCost) {
@@ -517,7 +583,7 @@ export class Attack {
       this.heldActiveTargets = targets;
     }
 
-    const log = this.buildLogString(allTargetResult, minionSpecies);
+    const log = this.buildLogString(allTargetResult, minionSpecies, this.buffs);
 
     return {
       targetResults: allTargetResult,
@@ -533,6 +599,7 @@ export class Attack {
       use: PerTargetUse;
     }[],
     minionSpecies: string[] = [],
+    buffsAdded?: Condition[] | null,
   ): string {
     let returnString = `${this.user.nameReference} used ${this.name}.\n`;
 
@@ -590,6 +657,11 @@ export class Attack {
           returnString += `    - Caused ${statRounding(
             use.damages.sanity,
           )} sanity damage\n`;
+        }
+        if (buffsAdded?.length) {
+          returnString += `    - Applied: ${buffsAdded
+            .map((buff) => buff.name)
+            .join(", ")}\n`;
         }
 
         if (use.debuffs?.length) {
@@ -650,6 +722,7 @@ export class Attack {
       isActive: json.isActive,
       maxUses: json.maxUses,
       animation: json.animation,
+      remainingUses: json.remainingUses,
       user: user,
       element: json.element,
       proficiencyNeeded: json.proficiencyNeeded,

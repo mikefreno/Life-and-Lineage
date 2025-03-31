@@ -510,8 +510,7 @@
       "poison": 75
     },
     "buffNames": [
-      "protection aura",
-      "heal from poison"
+      "siphon poison"
     ],
     "debuffNames": [
       {

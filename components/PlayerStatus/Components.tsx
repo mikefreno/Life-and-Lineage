@@ -7,7 +7,11 @@ import {
   useVibration,
 } from "@/hooks/generic";
 import { radius, tw_base, useStyles } from "@/hooks/styles";
-import { AccelerationCurves, toTitleCase } from "@/utility/functions/misc";
+import {
+  AccelerationCurves,
+  statRounding,
+  toTitleCase,
+} from "@/utility/functions/misc";
 import { Attribute, AttributeToString, Modifier } from "@/utility/types";
 import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -367,11 +371,11 @@ export const ChangePopUp = ({
           ]}
         >
           {change.current > 0 ? "+" : ""}
-          {change.current}
+          {statRounding(change.current)}
           {change.cumulative !== change.current && (
             <>
               ({change.cumulative > 0 ? "+" : ""}
-              {change.cumulative})
+              {statRounding(change.cumulative)})
             </>
           )}
         </Text>

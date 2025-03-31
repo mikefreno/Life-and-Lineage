@@ -18,9 +18,9 @@ import GenericRaisedButton from "./GenericRaisedButton";
 import Slider from "@react-native-community/slider";
 import { flex, useStyles } from "@/hooks/styles";
 import { Entypo } from "@expo/vector-icons";
-import { enemyOptions } from "@/utility/enemyHelpers";
 import { Orientation } from "expo-screen-orientation";
 import { useScaling } from "@/hooks/scaling";
+import { enemyOptions } from "@/utility/animation/enemy";
 
 export const DevControls = observer(() => {
   const rootStore = useRootStore();

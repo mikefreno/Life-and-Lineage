@@ -487,7 +487,7 @@ export class AudioStore {
         await sound.setVolumeAsync(this.getEffectiveVolume("soundEffects"));
         await sound.replayAsync();
       } else {
-        console.error(`Sound effect ${id} not found`);
+        console.warn(`Sound effect ${id} not found`);
       }
     } catch (error) {
       this.handleError(`Failed to play sound effect ${id}`, error);
@@ -835,15 +835,14 @@ export class AudioStore {
         this.isRecovering = false;
       });
     } catch (error) {
-      console.error("Failed to recover audio system:", error);
+      //console.error("Failed to recover audio system:", error);
       this.logError("Failed to recover audio system", error);
 
-      // Final attempt - wait longer and try one more time
       try {
         await new Promise((resolve) => setTimeout(resolve, 3000));
         await this.initializeAudio();
       } catch (finalError) {
-        console.error("Final recovery attempt failed:", finalError);
+        //console.error("Final recovery attempt failed:", finalError);
         this.logError("Final audio recovery attempt failed", finalError);
       } finally {
         runInAction(() => {
@@ -860,7 +859,7 @@ export class AudioStore {
       return;
     }
 
-    console.error(`AudioStore error: ${message}`, error);
+    //console.error(`AudioStore error: ${message}`, error);
     this.logError(message, error);
 
     // Trigger recovery process

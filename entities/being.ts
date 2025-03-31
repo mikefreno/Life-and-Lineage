@@ -21,7 +21,6 @@ import {
   runInAction,
 } from "mobx";
 import { RootStore } from "@/stores/RootStore";
-import { EnemyImageKeyOption } from "@/utility/enemyHelpers";
 import { Item } from "@/entities/item";
 import {
   damageReduction,
@@ -36,8 +35,12 @@ import {
 } from "@/utility/functions/conditions";
 import { BeingOptions } from "@/entities/entityTypes";
 import { Attack, PerTargetUse } from "@/entities/attack";
-import { PlayerCharacter } from "@/entities/character";
-import { Enemy } from "@/entities/creatures";
+import { Character, PlayerCharacter } from "@/entities/character";
+import { Creature, Enemy } from "@/entities/creatures";
+import {
+  AnimationOptions,
+  EnemyImageKeyOption,
+} from "@/utility/animation/enemy";
 
 export class Being {
   readonly id: string;
@@ -66,6 +69,7 @@ export class Being {
   conditions: Condition[];
 
   attackStrings: string[];
+  animationStrings: { [key: string]: string };
   baseDamageTable: { [key in DamageType]?: number };
 
   alive: boolean;
@@ -79,7 +83,9 @@ export class Being {
     quiver: Item[] | null;
   } | null;
 
-  allocatedSkillPoints?: Record<Attribute, number> | null;
+  allocatedSkillPoints: Record<Attribute, number> | null | undefined;
+
+  activeAuraConditionIds: { attackName: string; conditionIDs: string[] }[];
 
   root: RootStore;
 
@@ -108,7 +114,9 @@ export class Being {
     this.baseArmor = props.baseArmor ?? 0; // Default base armor to 0 if not provided
     this.baseResistanceTable = parseDamageTypeObject(props.baseResistanceTable);
 
+    this.activeAuraConditionIds = props.activeAuraConditionIds ?? [];
     this.attackStrings = props.attackStrings ?? [];
+    this.animationStrings = props.animationStrings;
     this.baseDamageTable = parseDamageTypeObject(props.baseDamageTable);
 
     this.alive = props.alive ?? true;
@@ -159,6 +167,7 @@ export class Being {
       alive: observable,
       deathdate: observable,
       allocatedSkillPoints: observable,
+      activeAuraConditionIds: observable.deep,
 
       damageHealth: action,
       damageMana: action,
@@ -170,12 +179,15 @@ export class Being {
       regenMana: action,
 
       addCondition: action,
+      addToActiveAuraConditionIds: action,
       removeCondition: action,
+      removeConditionById: action,
       conditionTicker: action,
       removeDebuffs: action,
 
       changeBaseSanity: action,
       useMana: action,
+      deactivateAuras: action,
 
       damageTypeCalculation: action,
       calculateAttackDamage: action,
@@ -262,6 +274,10 @@ export class Being {
           runInAction(() => (this.currentHealth = this.maxHealth));
         }
       },
+    );
+    reaction(
+      () => this.activeAuraConditionIds,
+      () => console.log(this.activeAuraConditionIds),
     );
   }
 
@@ -964,6 +980,16 @@ export class Being {
     );
   }
 
+  public removeConditionById(conditionID: string, attackName: string) {
+    const filteredConds = this.conditions.filter(
+      (cond) => cond.id !== conditionID,
+    );
+    this.conditions = filteredConds;
+    this.activeAuraConditionIds = this.activeAuraConditionIds.filter(
+      (obj) => obj.attackName !== attackName,
+    );
+  }
+
   public removeDebuffs(amount: number) {
     const debuffArray = this.conditions.filter(
       (condition) =>
@@ -982,6 +1008,9 @@ export class Being {
     let undeadDeathCheck = -1;
     for (let i = this.conditions.length - 1; i >= 0; i--) {
       const { effect } = this.conditions[i].tick(this);
+      if (this.conditions[i].turns <= 0 && !this.conditions[i].aura) {
+        this.removeCondition(this.conditions[i]);
+      }
 
       if (effect.includes("destroy undead")) {
         undeadDeathCheck = getMagnitude(this.conditions[i].effectMagnitude);
@@ -992,6 +1021,20 @@ export class Being {
     }
   }
 
+  public deactivateAuras() {
+    this.attacks.forEach((attack) => attack.deactivateAura);
+  }
+
+  public addToActiveAuraConditionIds({
+    attackName,
+    conditionIDs,
+  }: {
+    attackName: string;
+    conditionIDs: string[];
+  }) {
+    this.activeAuraConditionIds.push({ attackName, conditionIDs });
+  }
+
   get isStunned() {
     const isStunned = getConditionEffectsOnMisc(this.conditions).isStunned;
     return isStunned;
@@ -1000,6 +1043,12 @@ export class Being {
   get isSilenced() {
     return this.conditions.some((condition) =>
       condition.effect.includes("silenced"),
+    );
+  }
+
+  get healsFromPoison() {
+    return !!this.conditions.some((cond) =>
+      cond.effect.includes("siphon poison"),
     );
   }
 
@@ -1015,12 +1064,18 @@ export class Being {
       );
       if (!foundAttack)
         throw new Error(
-          `No matching attack found for ${attackName} in creating a ${this.nameReference}`,
-        ); // name should be set before this
+          `No matching attack found for ${attackName} in creating a ${
+            (this as unknown as Character | Creature).nameReference
+          }`,
+        );
+      const animationSet = this.animationStrings
+        ? (this.animationStrings[attackName] as AnimationOptions)
+        : undefined;
       const builtAttack = new Attack({
         ...foundAttack,
         targets: foundAttack.targets as "area" | "single" | "dual",
-        user: this,
+        animation: animationSet,
+        user: this as unknown as Character | Creature,
       });
       builtAttacks.push(builtAttack);
     });
@@ -1393,6 +1448,7 @@ export class Being {
       baseArmor: json.baseArmor,
       baseResistanceTable: json.baseResistanceTable,
       attackStrings: json.attackStrings,
+      animationStrings: json.animationString,
       baseDamageTable: json.baseDamageTable,
       alive: json.alive,
       deathdate: json.deathdate,
@@ -1401,6 +1457,7 @@ export class Being {
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],
+      activeAuraConditionIds: json.activeAuraConditionIds,
       root: json.root,
     });
   }

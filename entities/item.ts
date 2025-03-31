@@ -245,7 +245,8 @@ export class Item {
     return true;
   }
 
-  //TODO
+  // Unlike the base class(`Being`), the player attacks animations are set into the spell&attacks.
+  // This is due to their attacks for enemies being sprite-based
   get providedSpells() {
     if (this.itemClass == ItemClassType.Wand) {
       const builtSpells: Attack[] = [];
@@ -290,6 +291,8 @@ export class Item {
     return Math.round(this.baseValue * (1.4 - affection / 250));
   }
 
+  // Unlike the base class(`Being`), the player attacks animations are set into the spell&attacks.
+  // This is due to their attacks for enemies being sprite-based
   get attachedAttacks() {
     const builtAttacks: Attack[] = [];
     this.attacks.forEach((attackString) => {

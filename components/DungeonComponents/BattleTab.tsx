@@ -459,17 +459,17 @@ const PlayerMinionSection = observer(
             );
           })}
         </ScrollView>
-        {playerState.minionsAndPets.length > 2 && (
-          <View
-            style={{
-              flexDirection: uiStore.isLandscape ? "row" : "column",
-              justifyContent: "center",
-              alignContent: "center",
-              width: uiStore.isLandscape ? "100%" : getNormalizedSize(16),
-              height: uiStore.isLandscape ? getNormalizedSize(16) : "100%",
-            }}
-          >
-            {Array.from({
+        <View
+          style={{
+            flexDirection: uiStore.isLandscape ? "row" : "column",
+            justifyContent: "center",
+            alignContent: "center",
+            width: uiStore.isLandscape ? "100%" : getNormalizedSize(16),
+            height: uiStore.isLandscape ? getNormalizedSize(16) : "100%",
+          }}
+        >
+          {playerState.minionsAndPets.length > 2 &&
+            Array.from({
               length: Math.ceil(playerState.minionsAndPets.length / 2),
             }).map((_, index) => (
               <Pressable
@@ -501,8 +501,7 @@ const PlayerMinionSection = observer(
                 ]}
               />
             ))}
-          </View>
-        )}
+        </View>
       </View>
     );
   },
@@ -517,8 +516,10 @@ const MinionCard = observer(
       <ThemedCard
         style={{
           width: uiStore.isLandscape ? (noRight ? "100%" : "48%") : "100%",
+          height: "100%",
           justifyContent: "center",
           paddingVertical: 6,
+          alignSelf: "center",
         }}
       >
         <View
@@ -556,7 +557,13 @@ const MinionCard = observer(
               </View>
             )}
           </View>
-          <View style={{ flexDirection: "row", marginVertical: "auto" }}>
+          <ScrollView
+            horizontal
+            contentContainerStyle={{
+              flexGrow: 1,
+              justifyContent: "center",
+            }}
+          >
             {minion.attacks.map((attack) => (
               <View
                 key={attack.name}
@@ -569,6 +576,7 @@ const MinionCard = observer(
               >
                 <Text>{toTitleCase(attack.name)}</Text>
                 <Text>Damage: {attack.displayDamage.cumulativeDamage}</Text>
+                <Text>{attack.baseHitChance * 100}% chance to hit.</Text>
                 {attack.debuffNames &&
                   attack.debuffNames.map((debuff) => (
                     <Text key={debuff.name}>
@@ -577,7 +585,7 @@ const MinionCard = observer(
                   ))}
               </View>
             ))}
-          </View>
+          </ScrollView>
         </View>
         <ProgressBar
           filledColor="#ef4444"

@@ -57,7 +57,11 @@ export default function SpellDetails({ spell }: { spell: Attack }) {
             {toTitleCase(spell.name)}
           </Text>
           <View style={[styles.rowCenter, { alignItems: "center" }]}>
-            <Text style={styles["text-md"]}>{spell.manaCost}</Text>
+            <Text style={styles["text-md"]}>
+              {spell.manaCost < 0
+                ? `(gain) ${spell.manaCost * -1}`
+                : spell.manaCost}
+            </Text>
             <Energy
               width={uiStore.iconSizeSmall}
               height={uiStore.iconSizeSmall}

@@ -1,4 +1,4 @@
-import { action, makeObservable, observable, reaction } from "mobx";
+import { action, makeObservable, observable } from "mobx";
 import * as Crypto from "expo-crypto";
 import { ConditionType, EffectOptions, EffectStyle } from "@/utility/types";
 import { Being } from "./being";
@@ -330,4 +330,5 @@ const conditionIconMap: { [key: string]: any } = {
   magic_shield: require("@/assets/images/conditions/magic_shield.png"),
   necrotic: require("@/assets/images/conditions/necrotic.png"),
   death_mark: require("@/assets/images/conditions/death_mark.png"),
+  poison_heart: require("@/assets/images/conditions/poison-heart.png"),
 };

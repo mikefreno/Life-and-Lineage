@@ -251,6 +251,7 @@ export class IAPStore {
       const serializedCustomerInfo = storage.getString("offlineCustomerInfo");
       if (serializedCustomerInfo) {
         const storedData = JSON.parse(serializedCustomerInfo);
+        if (!storedData.nonSubscriptionTransactions) return;
         this.evaluateProductIds(
           storedData.nonSubscriptionTransactions.map(
             (transaction: PurchasesStoreTransaction) =>
@@ -259,7 +260,6 @@ export class IAPStore {
         );
       }
     } catch (error) {
-      console.log("Failed to hydrate offline data:", error);
       this.clearPersistance();
     }
   }

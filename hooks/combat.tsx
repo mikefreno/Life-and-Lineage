@@ -7,7 +7,7 @@ import { Creature, Enemy, Minion } from "../entities/creatures";
 import { Character, PlayerCharacter } from "../entities/character";
 import { Attack, PerTargetUse } from "../entities/attack";
 import { useIsFocused } from "@react-navigation/native";
-import { AnimationOptions } from "@/utility/enemyHelpers";
+import { AnimationOptions } from "@/utility/animation/enemy";
 import { type Condition } from "@/entities/conditions";
 import { Being } from "@/entities/being";
 
@@ -35,9 +35,14 @@ const attackHandler = ({
   for (const res of attackResults.targetResults) {
     if ("damages" in res.use && res.use.damages) {
       res.target.damageHealth({
-        damage: res.use.damages.total,
+        damage:
+          res.use.damages.total -
+          (res.target.healsFromPoison ? res.use.damages.poison : 0),
         attackerId: user.id,
       });
+      if (res.target.healsFromPoison) {
+        res.target.restoreHealth(res.use.damages.poison);
+      }
       res.target.damageSanity(res.use.damages.sanity);
       if (res.use.debuffs) {
         res.use.debuffs.forEach((debuff) => res.target.addCondition(debuff));
@@ -161,9 +166,11 @@ export const useEnemyManagement = () => {
 
           //Indicates an attack took place (could be a miss!) (Null indicates a failure - either had an execution condition or was stunned)
           if (enemyAttackRes.targetResults) {
+            let potentialPoisonHeal = 0;
             for (const res of enemyAttackRes.targetResults) {
               switch (res.use.result) {
                 case AttackUse.success:
+                  potentialPoisonHeal += res.use.damages?.poison ?? 0;
                   animStore?.addToAnimationQueue(
                     animStore.getAttackQueue(
                       (enemyAttackRes.attack
@@ -200,6 +207,9 @@ export const useEnemyManagement = () => {
                   );
                   break;
               }
+            }
+            if (enemy.healsFromPoison) {
+              enemy.restoreHealth(potentialPoisonHeal);
             }
           }
 
@@ -270,6 +280,7 @@ export const useCombatActions = () => {
         });
       }
 
+      let potentialPoisonHeal = 0;
       for (const res of targetResults) {
         const animStore = enemyStore.getAnimationStore(res.target.id);
         switch (res.use.result) {
@@ -279,10 +290,12 @@ export const useCombatActions = () => {
             } else if (res.use.damages && res.use.damages.total > 0) {
               animStore?.addToAnimationQueue("hurt");
             }
+            potentialPoisonHeal += res.use.damages?.poison ?? 0;
             res.target.damageHealth({
               damage: res.use.damages?.total ?? 0,
               attackerId: attack.user.id,
             });
+
             res.target.damageSanity(res.use.damages?.sanity);
             break;
           case AttackUse.miss:
@@ -302,6 +315,9 @@ export const useCombatActions = () => {
             console.error("Player attack use returned lowEnergy fail");
             break;
         }
+      }
+      if (playerState?.healsFromPoison) {
+        playerState.restoreHealth(potentialPoisonHeal);
       }
       return log;
     },
@@ -367,11 +383,9 @@ export const useCombatActions = () => {
       };
 
       if (attack.animation && typeof attack.animation !== "string") {
-        // gather target ids, sans minions
         const targetIDs: string[] = [];
         targets.forEach((target) => {
           if (target instanceof Enemy || target instanceof Character) {
-            // minions have their own death handler
             targetIDs.push(target.id);
           }
         });
