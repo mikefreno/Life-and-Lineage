@@ -559,7 +559,7 @@
     "target": "single",
     "baseHitChance": 1.0,
     "damageTable": {
-      "fire": 6
+      "fire": 10
     },
     "debuffNames": [
       {

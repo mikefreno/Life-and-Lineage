@@ -470,7 +470,7 @@ export class DungeonStore {
   public openNextDungeonLevel(currentInstance: DungeonInstance) {
     const successfullLevelUnlock = currentInstance.unlockNextLevel();
     if (!successfullLevelUnlock) {
-      const unlockObjects: any[] = [];
+      const unlockObjects: typeof dungeonsJSON = [];
       currentInstance.unlocks.forEach((unlock) => {
         const matchingObj = dungeonsJSON.find((obj) => obj.name == unlock);
         if (matchingObj) {
@@ -478,9 +478,13 @@ export class DungeonStore {
         }
       });
       unlockObjects.forEach((obj) => {
-        const inst = DungeonInstance.fromJSON(obj);
-        this.dungeonInstances.push(inst);
-        _dungeonInstanceSave(inst);
+        if (obj.isComplete) {
+          const inst = DungeonInstance.fromJSON(obj);
+          this.dungeonInstances.push(inst);
+          _dungeonInstanceSave(inst);
+        } else {
+          this.root.showEndOfCompletedDungeonsMessage();
+        }
       });
     }
   }

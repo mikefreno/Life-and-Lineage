@@ -581,13 +581,27 @@
     "sprite": "pyromancer",
     "beingType": "human",
     "sanity": 100,
-    "health": 150,
-    "attackPower": 30,
+    "health": 180,
     "mana": {
       "maximum": 50,
       "regen": 10
     },
-    "attackStrings": [],
+    "baseResistanceTable": {
+      "physical": 10,
+      "poison": -15,
+      "cold": -10,
+      "fire": 50,
+      "holy": 5
+    },
+    "baseDamageTable": {
+      "fire": 40
+    },
+    "attackStrings": [
+      "fire bolt"
+    ],
+    "animationStrings": {
+      "fire bolt": "attack_1"
+    },
     "drops": [],
     "storyDrops": [],
     "goldDropRange": {
@@ -601,17 +615,19 @@
     "beingType": "demi-human",
     "sprite": "centaur",
     "sanity": 50,
-    "healthRange": {
-      "minimum": 120,
-      "maximum": 160
-    },
-    "attackPowerRange": {
-      "minimum": 10,
-      "maximum": 15
-    },
+    "health": 200,
     "mana": {
       "maximum": 40,
       "regen": 10
+    },
+    "baseResistanceTable": {
+      "physical": 15,
+      "poison": 20,
+      "cold": -5,
+      "holy": 25
+    },
+    "baseDamageTable": {
+      "physical": 45
     },
     "attackStrings": [
       "stampede",
@@ -619,7 +635,7 @@
     ],
     "animationStrings": {
       "chop": "attack_1",
-      "stampede": ""
+      "stampede": "attack_2"
     },
     "drops": [],
     "goldDropRange": {
@@ -632,13 +648,29 @@
     "sprite": "gryphon",
     "beingType": "beast",
     "sanity": null,
-    "health": 150,
-    "attackPower": 30,
+    "health": 225,
     "mana": {
-      "maximum": 50,
+      "maximum": 60,
       "regen": 10
     },
-    "attackStrings": [],
+    "baseResistanceTable": {
+      "physical": 15,
+      "poison": 20,
+      "cold": 10,
+      "holy": 25,
+      "lightning": -35
+    },
+    "baseDamageTable": {
+      "physical": 45
+    },
+    "attackStrings": [
+      "claw",
+      "wing buffet"
+    ],
+    "animationStrings": {
+      "claw": "attack_1",
+      "wing buffet": "attack_2"
+    },
     "drops": [],
     "storyDrops": [],
     "goldDropRange": {
@@ -652,13 +684,26 @@
     "sprite": "gladiator_ls",
     "beingType": "human",
     "sanity": 50,
-    "health": 150,
-    "attackPower": 30,
+    "health": 220,
     "mana": {
       "maximum": 50,
       "regen": 10
     },
-    "attackStrings": [],
+    "baseResistanceTable": {
+      "poison": -15,
+      "cold": -10,
+      "fire": -10,
+      "holy": 5
+    },
+    "baseDamageTable": {
+      "physical": 40
+    },
+    "attackStrings": [
+      "pierce"
+    ],
+    "animationStrings": {
+      "pierce": "attack_1"
+    },
     "drops": [],
     "storyDrops": [],
     "goldDropRange": {
@@ -672,13 +717,28 @@
     "sprite": "lizardman",
     "beingType": "demi-human",
     "sanity": null,
-    "health": 150,
-    "attackPower": 30,
+    "health": 180,
     "mana": {
       "maximum": 50,
       "regen": 10
     },
-    "attackStrings": [],
+    "baseResistanceTable": {
+      "poison": 35,
+      "cold": 70,
+      "fire": 30,
+      "holy": 5,
+      "lightning": -5
+    },
+    "baseDamageTable": {
+      "physical": 40,
+      "poison": 10
+    },
+    "attackStrings": [
+      "cleave"
+    ],
+    "animationStrings": {
+      "cleave": "attack_1"
+    },
     "drops": [],
     "storyDrops": [],
     "goldDropRange": {
@@ -692,13 +752,27 @@
     "sprite": "gladiator_hammer",
     "beingType": "human",
     "sanity": 50,
-    "health": 150,
-    "attackPower": 30,
+    "health": 295,
     "mana": {
       "maximum": 50,
       "regen": 10
     },
-    "attackStrings": [],
+    "baseResistanceTable": {
+      "poison": -15,
+      "cold": -10,
+      "fire": -10,
+      "holy": 5
+    },
+    "baseDamageTable": {
+      "physical": 40,
+      "raw": 15
+    },
+    "attackStrings": [
+      "heavy swing"
+    ],
+    "animationStrings": {
+      "heavy swing": "attack_1"
+    },
     "drops": [],
     "storyDrops": [],
     "goldDropRange": {
@@ -712,13 +786,26 @@
     "sprite": "gladiator_spear",
     "beingType": "human",
     "sanity": 50,
-    "health": 150,
-    "attackPower": 30,
+    "health": 270,
     "mana": {
       "maximum": 50,
       "regen": 10
     },
-    "attackStrings": [],
+    "baseResistanceTable": {
+      "poison": -15,
+      "cold": -10,
+      "fire": -10,
+      "holy": 5
+    },
+    "baseDamageTable": {
+      "physical": 55
+    },
+    "attackStrings": [
+      "pierce"
+    ],
+    "animationStrings": {
+      "pierce": "attack_1"
+    },
     "drops": [],
     "storyDrops": [],
     "goldDropRange": {
@@ -732,13 +819,26 @@
     "sprite": "gladiator_archer",
     "beingType": "human",
     "sanity": 50,
-    "health": 150,
-    "attackPower": 30,
+    "health": 245,
     "mana": {
       "maximum": 50,
       "regen": 10
     },
-    "attackStrings": [],
+    "baseResistanceTable": {
+      "poison": -15,
+      "cold": -10,
+      "fire": -10,
+      "holy": 5
+    },
+    "baseDamageTable": {
+      "physical": 55
+    },
+    "attackStrings": [
+      "shoot"
+    ],
+    "animationStrings": {
+      "shoot": "attack_1"
+    },
     "drops": [],
     "storyDrops": [],
     "goldDropRange": {
@@ -752,13 +852,29 @@
     "sprite": "gladiator_female",
     "beingType": "human",
     "sanity": 50,
-    "health": 150,
+    "health": 285,
     "attackPower": 30,
     "mana": {
       "maximum": 50,
       "regen": 10
     },
-    "attackStrings": [],
+    "baseResistanceTable": {
+      "poison": -15,
+      "cold": -10,
+      "fire": -10,
+      "holy": 15
+    },
+    "baseDamageTable": {
+      "physical": 60
+    },
+    "attackStrings": [
+      "cleave",
+      "stab"
+    ],
+    "animationStrings": {
+      "cleave": "attack_1",
+      "stab": "attack_2"
+    },
     "drops": [],
     "storyDrops": [],
     "goldDropRange": {

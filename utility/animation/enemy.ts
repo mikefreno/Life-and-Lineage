@@ -267,6 +267,9 @@ export const EnemyImageMap: EnemyImageMapType = {
       attack_1: {
         anim: require("@/assets/monsters/Centaur/ATTACK_1.webp"),
       },
+      attack_2: {
+        anim: require("@/assets/monsters/Centaur/MOVE.webp"),
+      },
       death: {
         anim: require("@/assets/monsters/Centaur/DEATH.webp"),
       },

@@ -1,8 +1,8 @@
-import conditions from "../../assets/json/conditions.json";
-import { Condition } from "../../entities/conditions";
-import sanityDebuffs from "../../assets/json/sanityDebuffs.json";
-import { ConditionObjectType, DamageType } from "../types";
-import { PlayerCharacter } from "../../entities/character";
+import conditions from "@/assets/json/conditions.json";
+import { Condition } from "@/entities/conditions";
+import sanityDebuffs from "@/assets/json/sanityDebuffs.json";
+import { ConditionObjectType, DamageType } from "@/utility/types";
+import { PlayerCharacter } from "@/entities/character";
 
 interface createDebuffDeps {
   debuffName: string;
@@ -189,7 +189,7 @@ export function createBuff({
 }
 
 export function lowSanityDebuffGenerator(playerState: PlayerCharacter) {
-  if (!playerState || playerState.currentSanity >= 0) return;
+  if (!playerState || playerState.currentSanity! >= 0) return;
 
   const roll = rollD20();
   if (roll < 16) return;
@@ -204,8 +204,8 @@ export function lowSanityDebuffGenerator(playerState: PlayerCharacter) {
 
   const { healthDamage, sanityDamage } = debuffObj.effect.reduce(
     (acc, effect, index) => {
-      const amount = debuffObj.effectAmount[index];
-      const style = debuffObj.effectStyle[index];
+      const amount = debuffObj.effectAmount ? debuffObj.effectAmount[index] : 0;
+      const style = debuffObj.effectStyle ? debuffObj.effectStyle[index] : 0;
       const isMultiplier = style === "multiplier" || style === "percentage";
 
       if (effect === "health damage" && amount !== null) {
@@ -218,7 +218,7 @@ export function lowSanityDebuffGenerator(playerState: PlayerCharacter) {
 
       if (effect === "sanity damage" && amount !== null) {
         acc.sanityDamage.push(
-          isMultiplier ? amount * sanityMultiplier : amount,
+          isMultiplier ? amount * (sanityMultiplier ?? 0) : amount,
         );
       } else {
         acc.sanityDamage.push(0);
@@ -236,8 +236,8 @@ export function lowSanityDebuffGenerator(playerState: PlayerCharacter) {
     effect: debuffObj.effect,
     healthDamage,
     sanityDamage,
-    effectStyle: debuffObj.effectStyle,
-    effectMagnitude: debuffObj.effectAmount,
+    effectStyle: debuffObj.effectStyle ?? [],
+    effectMagnitude: debuffObj.effectAmount ?? [],
     placedby: "low sanity",
     icon: debuffObj.icon,
     aura: debuffObj.aura,

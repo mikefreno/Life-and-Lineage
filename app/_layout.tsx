@@ -43,6 +43,8 @@ import { SCREEN_TRANSITION_TIMING } from "@/stores/UIStore";
 import { decode } from "base-64";
 import { useScaling } from "@/hooks/scaling";
 import Purchases, { LOG_LEVEL } from "react-native-purchases";
+import TutorialModal from "@/components/TutorialModal";
+import { TutorialOption } from "@/utility/types";
 global.atob = decode;
 
 export { ErrorBoundary } from "expo-router";
@@ -146,6 +148,8 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
     audioStore,
     shopsStore,
     iapStore,
+    showReachedEndOfCompletedDungeonsMessage,
+    closeReachedEndOfCompletedDungeonsMessage,
   } = rootStore;
   const styles = useStyles();
   const router = useRouter();
@@ -390,6 +394,20 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
           <ProjectedImage />
           <FleeModal />
           <BirthAnnouncementModal />
+          <TutorialModal
+            isFocused={true}
+            override={showReachedEndOfCompletedDungeonsMessage}
+            onCloseFunction={closeReachedEndOfCompletedDungeonsMessage}
+            tutorial={TutorialOption.reachedEndOfCompletedDungeons}
+            pageOne={{
+              title: "You have reached the end....",
+              body: "(for now)",
+            }}
+            pageTwo={{
+              title: "There is more to come",
+              body: "And we're excited for you to experience it!",
+            }}
+          />
           {__DEV__ && (
             <>
               <DevControls />

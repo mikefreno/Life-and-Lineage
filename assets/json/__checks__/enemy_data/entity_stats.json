@@ -4,7 +4,7 @@
   "enemiesWithMissingAttacks": 0,
   "bossesWithMissingAttacks": 1,
   "enemiesWithMissingFields": 0,
-  "bossesWithMissingFields": 9,
+  "bossesWithMissingFields": 0,
   "beingTypes": {
     "enemies": {
       "block o wood": 1,
@@ -31,12 +31,13 @@
       "fire": 2
     },
     "bosses": {
-      "physical": 11,
+      "physical": 19,
       "lightning": 1,
       "magic": 1,
-      "poison": 2,
+      "poison": 3,
       "cold": 1,
-      "raw": 1
+      "raw": 2,
+      "fire": 1
     }
   },
   "resistanceTypes": {
@@ -50,16 +51,16 @@
       "magic": 1
     },
     "bosses": {
-      "physical": 8,
-      "poison": 11,
-      "fire": 12,
-      "cold": 12,
-      "holy": 5,
-      "lightning": 4
+      "physical": 11,
+      "poison": 20,
+      "fire": 19,
+      "cold": 21,
+      "holy": 14,
+      "lightning": 6
     }
   },
   "averageEnemyHealth": 444.4074074074074,
-  "averageBossHealth": 151.42857142857142,
+  "averageBossHealth": 185.45454545454547,
   "averageGoldDrop": {
     "enemies": {
       "minimum": 58.51851851851852,
@@ -108,18 +109,18 @@
       "dark burst": 1,
       "raise skeleton": 1,
       "terrorize": 1,
-      "stab": 3,
-      "cleave": 1,
+      "stab": 4,
+      "cleave": 3,
       "chop": 2,
       "charged pierce": 1,
       "pulse": 1,
       "dark bolt": 1,
       "bite": 1,
-      "claw": 1,
+      "claw": 2,
       "pocket sand": 1,
       "serrate": 1,
       "headbutt": 1,
-      "heavy swing": 2,
+      "heavy swing": 3,
       "call backup": 1,
       "venomous bite": 2,
       "bonk": 2,
@@ -130,7 +131,11 @@
       "flurry": 1,
       "rock spike": 1,
       "burial": 1,
-      "stampede": 1
+      "fire bolt": 1,
+      "stampede": 1,
+      "wing buffet": 1,
+      "pierce": 2,
+      "shoot": 1
     }
   },
   "bossesWithPhases": 1,

@@ -1036,7 +1036,7 @@
     "name": "ancient arena",
     "id": 7,
     "difficulty": 8,
-    "isComplete": false,
+    "isComplete": true,
     "bgName": "dungeon",
     "levels": [
       {
@@ -1240,6 +1240,7 @@
     "name": "crystal labyrinthine - first excavation",
     "id": 7,
     "difficulty": 8,
+    "isComplete": false,
     "bgName": "CrystalCave_1",
     "levels": [
       {

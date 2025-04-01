@@ -345,6 +345,7 @@ export enum TutorialOption {
   firstBossKill,
   keyItem,
   relationships,
+  reachedEndOfCompletedDungeons,
 }
 
 export enum MasteryLevel {

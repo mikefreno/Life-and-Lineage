@@ -207,8 +207,6 @@ export class Attack {
       });
       if (newBuff) {
         created.push(newBuff);
-      } else {
-        throw new Error(`buff creation failure on ${this.name}`);
       }
     });
     return created;

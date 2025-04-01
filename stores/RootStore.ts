@@ -49,6 +49,8 @@ export class RootStore {
 
   includeDevAttacks: boolean = false;
 
+  showReachedEndOfCompletedDungeonsMessage: boolean = false;
+
   devActions: {
     action: (value: number) => void;
     name: string;
@@ -114,7 +116,10 @@ export class RootStore {
       devActions: observable,
       includeDevAttacks: observable,
       pathname: observable,
+      showReachedEndOfCompletedDungeonsMessage: observable,
 
+      showEndOfCompletedDungeonsMessage: action,
+      closeReachedEndOfCompletedDungeonsMessage: action,
       setPathname: action,
       hitDeathScreen: action,
       clearDeathScreen: action,
@@ -154,6 +159,12 @@ export class RootStore {
       }
     }
     return points;
+  }
+  showEndOfCompletedDungeonsMessage() {
+    this.showReachedEndOfCompletedDungeonsMessage = true;
+  }
+  closeReachedEndOfCompletedDungeonsMessage() {
+    this.showReachedEndOfCompletedDungeonsMessage = false;
   }
 
   addDevAction(
@@ -329,8 +340,8 @@ export class RootStore {
       effect: debuffObj.effect as EffectOptions[],
       healthDamage,
       sanityDamage,
-      effectStyle: debuffObj.effectStyle,
-      effectMagnitude: debuffObj.effectAmount,
+      effectStyle: debuffObj.effectStyle ?? [],
+      effectMagnitude: debuffObj.effectAmount ?? [],
       placedby: placedby,
       icon: debuffObj.icon,
       aura: debuffObj.aura,
@@ -345,10 +356,14 @@ export class RootStore {
     multiplier: number,
   ): number[] {
     return debuffObj.effect.map((effect, index) => {
-      if (effect !== damageType || debuffObj.effectAmount[index] === null)
+      if (
+        effect !== damageType ||
+        !debuffObj.effectAmount ||
+        debuffObj.effectAmount[index] === null
+      )
         return 0;
-      const amount = debuffObj.effectAmount[index]!;
-      const style = debuffObj.effectStyle[index];
+      const amount = debuffObj.effectAmount[index];
+      const style = debuffObj.effectStyle ? debuffObj.effectStyle[index] : 0;
       return style === "multiplier" || style === "percentage"
         ? amount * multiplier
         : amount;
