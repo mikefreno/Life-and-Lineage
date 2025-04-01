@@ -376,7 +376,7 @@ export const useCombatActions = () => {
               if (enemyStore.enemies.length > 0) {
                 enemyTurn();
               }
-            }, 500);
+            }, playerState.minionsAndPets.length * 1000);
           });
           playerState.endTurn();
         }, 500);

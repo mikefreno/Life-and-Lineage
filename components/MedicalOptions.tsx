@@ -35,6 +35,18 @@ const MedicalOption = observer(
     const isDark = uiStore.colorScheme === "dark";
     const styles = useStyles();
 
+    const isFill = useMemo(() => {
+      if (
+        healthRestore == "fill" ||
+        sanityRestore == "fill" ||
+        manaRestore == "fill" ||
+        removeDebuffs == "all"
+      ) {
+        return true;
+      }
+      return false;
+    }, [healthRestore, sanityRestore, manaRestore, removeDebuffs]);
+
     const { start, stop } = useAcceleratedAction(
       () => null, // Return null to indicate unlimited mode
       {
@@ -180,8 +192,9 @@ const MedicalOption = observer(
           </View>
         </View>
         <GenericRaisedButton
-          onPressIn={start}
-          onPressOut={stop}
+          onPressIn={isFill ? undefined : start}
+          onPressOut={isFill ? undefined : stop}
+          onPress={isFill ? visit : undefined}
           disabled={getDisabled.disabled}
           childrenWhenDisabled={getDisabled.message}
         >

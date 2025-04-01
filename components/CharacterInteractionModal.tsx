@@ -141,9 +141,13 @@ export const CharacterInteractionModal = observer(
               <View>
                 <View style={{ alignItems: "center" }}>
                   <Text>{character.age} years old</Text>
-                  <Text style={{ paddingHorizontal: 40, textAlign: "center" }}>
-                    Works as a {character.job}
-                  </Text>
+                  {character.age > 16 && (
+                    <Text
+                      style={{ paddingHorizontal: 40, textAlign: "center" }}
+                    >
+                      Works as a {character.job}
+                    </Text>
+                  )}
                   <View style={[flex.rowCenter, { width: "66%" }]}>
                     <View
                       style={{

@@ -7,6 +7,7 @@ import type { Item } from "@/entities/item";
 import { useRootStore } from "@/hooks/stores";
 import { tw_base, useStyles } from "@/hooks/styles";
 import GenericFlatButton from "@/components/GenericFlatButton";
+import { toTitleCase } from "@/utility/functions/misc";
 
 interface LeftBehindItemsModalProps {
   showLeftBehindItemsScreen: boolean;
@@ -65,7 +66,7 @@ export default function LeftBehindItemsModal({
       <>
         <Text
           style={{
-            ...styles.xl,
+            ...styles["text-xl"],
             textAlign: "center",
             color: "#ef4444",
             opacity: inventoryFullNotifier ? 1 : 0,
@@ -79,24 +80,25 @@ export default function LeftBehindItemsModal({
               <View key={item.id} style={styles.leftBehindItemRow}>
                 <View style={{ flexDirection: "row" }}>
                   <Image source={item.getItemIcon()} />
-                  <Text style={{ marginVertical: "auto" }}>{item.name}</Text>
+                  <Text style={{ marginVertical: "auto" }}>
+                    {toTitleCase(item.name)}
+                  </Text>
                 </View>
-                <Pressable
+                <GenericFlatButton
                   onPress={() => {
                     takeItemFromPouch(item);
                   }}
-                  style={styles.flatButtonContainer}
                 >
-                  <Text>Take</Text>
-                </Pressable>
+                  Take
+                </GenericFlatButton>
               </View>
             ))}
-            <Pressable
-              style={[styles.flatButtonContainer, { marginTop: 16 }]}
+            <GenericFlatButton
+              style={{ marginTop: 16 }}
               onPress={takeAllItemsFromPouch}
             >
-              <Text>Take All</Text>
-            </Pressable>
+              Take All
+            </GenericFlatButton>
           </>
         ) : (
           <ThemedView>

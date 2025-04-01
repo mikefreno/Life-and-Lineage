@@ -20,6 +20,7 @@ type TutorialPage = {
 type ITutorialModal = {
   isFocused: boolean;
   tutorial: TutorialOption;
+  secondaryCondition?: boolean;
   backFunction?: () => void;
   onCloseFunction?: () => void;
   pageOne: TutorialPage;
@@ -43,6 +44,7 @@ const TutorialModal = observer(
   ({
     isFocused,
     tutorial,
+    secondaryCondition = true,
     backFunction,
     onCloseFunction,
     pageOne,
@@ -82,6 +84,7 @@ const TutorialModal = observer(
       setShouldShow(
         override ||
           (stillOnPage &&
+            secondaryCondition &&
             !tutorialStore.tutorialsShown[tutorial] &&
             (tutorialStore.tutorialsEnabled ||
               tutorial === TutorialOption.firstBossKill)),

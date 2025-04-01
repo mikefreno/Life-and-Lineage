@@ -67,6 +67,9 @@ export class CharacterStore {
   }) {
     this.removeIndependentChild({ child, adopting: true });
     this.root.playerState?.adopt({ child, partner });
+    this.root.playerState?.spendGold(
+      Math.max(25_000, Math.floor(this.root.playerState.gold * 0.15)),
+    );
   }
 
   independantChildrenAgeCheck() {

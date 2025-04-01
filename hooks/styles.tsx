@@ -787,6 +787,7 @@ export const useStyles = () => {
       marginVertical: 8,
       flexDirection: "row",
       justifyContent: "space-between",
+      alignItems: "center",
     } as const,
     targetButton: {
       margin: 16,
@@ -1067,10 +1068,9 @@ export const useStyles = () => {
       paddingVertical: 8,
     } as const,
     adoptionCharacterContainer: {
-      flex: 1,
       flexDirection: "column",
       alignItems: "center",
-      width: "50%",
+      width: "48%",
     } as const,
     dialogueBox: {
       position: "absolute",

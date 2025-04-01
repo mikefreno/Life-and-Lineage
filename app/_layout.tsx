@@ -396,7 +396,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
           <BirthAnnouncementModal />
           <TutorialModal
             isFocused={true}
-            override={showReachedEndOfCompletedDungeonsMessage}
+            secondaryCondition={showReachedEndOfCompletedDungeonsMessage}
             onCloseFunction={closeReachedEndOfCompletedDungeonsMessage}
             tutorial={TutorialOption.reachedEndOfCompletedDungeons}
             pageOne={{

@@ -22,7 +22,7 @@ import GenericRaisedButton from "@/components/GenericRaisedButton";
 import { observer } from "mobx-react-lite";
 import GenericStrikeAround from "@/components/GenericStrikeAround";
 import { useRootStore } from "@/hooks/stores";
-import type { Character } from "@/entities/character";
+import { Character } from "@/entities/character";
 import { flex, tw_base, useStyles } from "../hooks/styles";
 import TutorialModal from "@/components/TutorialModal";
 import { useIsFocused } from "@react-navigation/native";
@@ -34,7 +34,7 @@ import { useScaling } from "@/hooks/scaling";
 
 const RelationshipsScreen = observer(() => {
   const styles = useStyles();
-  const { playerState, uiStore, characterStore } = useRootStore();
+  const { playerState, uiStore } = useRootStore();
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
     null,
   );
@@ -88,89 +88,6 @@ const RelationshipsScreen = observer(() => {
     },
   ];
 
-  function renderCharacter(character: Character) {
-    return (
-      <Pressable
-        style={{
-          ...styles.themedCard,
-          width: uiStore.dimensions.width / 2.5,
-          marginHorizontal: uiStore.dimensions.width * 0.05,
-          ...styles.columnBetween,
-          opacity: character.deathdate ? 0.5 : 1,
-          paddingVertical: tw_base[2],
-        }}
-        key={character.id}
-        disabled={!!character.deathdate}
-        onPress={() => {
-          setShowInteractionModal(true);
-          setSelectedCharacter(character);
-        }}
-      >
-        <Text
-          style={{
-            textAlign: "center",
-            ...styles["text-2xl"],
-            textDecorationLine: character.deathdate
-              ? "line-through"
-              : "underline",
-          }}
-          numberOfLines={2}
-        >
-          {character.fullName}
-        </Text>
-        <View style={{ width: "100%", height: "40%" }}>
-          <CharacterImage character={character} />
-        </View>
-        <View style={{ alignItems: "center" }}>
-          <Text style={styles["text-xl"]}>
-            {character.deathdate && "Died at "}
-            {character.age} Years Old
-          </Text>
-          <View
-            style={{
-              marginHorizontal: "auto",
-              paddingVertical: getNormalizedSize(4),
-            }}
-          >
-            <Text
-              style={{
-                textAlign: "center",
-                flexWrap: "wrap",
-                ...styles["text-lg"],
-              }}
-            >
-              {character.deathdate && "Was a "}
-              {character.job}
-            </Text>
-          </View>
-          {!character.deathdate && (
-            <View style={styles.affectionContainer}>
-              <View
-                style={{
-                  width: "75%",
-                  justifyContent: "center",
-                  paddingRight: 4,
-                }}
-              >
-                <ProgressBar
-                  value={Math.floor(character.affection * 4) / 4}
-                  minValue={-100}
-                  maxValue={100}
-                  filledColor="#dc2626"
-                  unfilledColor="#fca5a5"
-                />
-              </View>
-              <AffectionIcon
-                height={uiStore.iconSizeSmall}
-                width={uiStore.iconSizeSmall}
-              />
-            </View>
-          )}
-        </View>
-      </Pressable>
-    );
-  }
-
   const renderGroup = (title: string, data: Character[]) => {
     if (data.length === 0) return null;
 
@@ -194,7 +111,13 @@ const RelationshipsScreen = observer(() => {
             marginVertical: 4,
             height: uiStore.dimensions.lesser * 0.8,
           }}
-          renderItem={({ item }) => renderCharacter(item)}
+          renderItem={({ item }) => (
+            <RenderCharacter
+              character={item}
+              setShowInteractionModal={setShowInteractionModal}
+              setSelectedCharacter={setSelectedCharacter}
+            />
+          )}
           keyExtractor={(item) => item.id}
         />
       </View>
@@ -301,6 +224,7 @@ const RelationshipsScreen = observer(() => {
           isVisibleCondition={showingAdoptionModal}
           backFunction={() => setShowingAdoptionModal(false)}
           size={100}
+          scrollEnabled={true}
         >
           <View style={{ maxHeight: uiStore.dimensions.height * 0.75 }}>
             <Text style={[styles.adoptionTitle, styles["text-xl"]]}>
@@ -309,30 +233,15 @@ const RelationshipsScreen = observer(() => {
                 : "Independent Adoption"}
             </Text>
             {playerState.age >= 18 ? (
-              <FlatList
-                numColumns={2}
-                data={characterStore.independentChildren}
-                renderItem={({ item }) => (
-                  <View style={styles.adoptionCharacterContainer}>
-                    {renderCharacter(item)}
-                    <GenericRaisedButton
-                      onPress={() =>
-                        characterStore.adopt({
-                          child: item,
-                          partner: selectedCharacter ?? undefined,
-                        })
-                      }
-                    >
-                      Adopt
-                    </GenericRaisedButton>
-                  </View>
-                )}
-                keyExtractor={(item) => item.id}
+              <AdoptionList
+                partner={selectedCharacter}
+                setShowInteractionModal={setShowInteractionModal}
+                setSelectedCharacter={setSelectedCharacter}
               />
             ) : (
               <GenericStrikeAround>
                 <Text style={{ textAlign: "center" }}>
-                  You are not yet old enough to adopt
+                  {`You are not yet old enough to adopt\n(min age:24)`}
                 </Text>
               </GenericStrikeAround>
             )}
@@ -361,3 +270,173 @@ const RelationshipsScreen = observer(() => {
 });
 
 export default RelationshipsScreen;
+
+const AdoptionList = observer(
+  ({
+    partner,
+    setShowInteractionModal,
+    setSelectedCharacter,
+  }: {
+    partner: Character | null;
+    setShowInteractionModal: (val: boolean) => void;
+    setSelectedCharacter: (char: Character) => void;
+  }) => {
+    const { characterStore, playerState, uiStore } = useRootStore();
+    const [confirmationId, setConfirmationId] = useState<string | null>(null);
+    const styles = useStyles();
+    if (!playerState) return null;
+
+    return (
+      <ScrollView
+        contentContainerStyle={{
+          flexDirection: "row",
+          flexWrap: "wrap",
+          alignItems: "flex-start",
+          justifyContent: "flex-start",
+        }}
+      >
+        {characterStore.independentChildren.map((char) => {
+          const isConfirming = confirmationId === char.id;
+
+          return (
+            <View
+              key={char.id}
+              style={[
+                styles.adoptionCharacterContainer,
+                { height: uiStore.dimensions.height * 0.45 },
+              ]}
+            >
+              <RenderCharacter
+                character={char}
+                setShowInteractionModal={setShowInteractionModal}
+                setSelectedCharacter={setSelectedCharacter}
+              />
+              {!isConfirming ? (
+                <GenericRaisedButton
+                  onPress={() => setConfirmationId(char.id)}
+                >{`Adopt (cost: ${Math.max(
+                  25_000,
+                  Math.floor(playerState.gold * 0.15),
+                )})`}</GenericRaisedButton>
+              ) : (
+                <View style={styles.rowEvenly}>
+                  <GenericRaisedButton
+                    onPress={() =>
+                      characterStore.adopt({
+                        child: char,
+                        partner: partner ?? undefined,
+                      })
+                    }
+                  >
+                    Confirm
+                  </GenericRaisedButton>
+                  <GenericRaisedButton onPress={() => setConfirmationId(null)}>
+                    Cancel
+                  </GenericRaisedButton>
+                </View>
+              )}
+            </View>
+          );
+        })}
+      </ScrollView>
+    );
+  },
+);
+
+const RenderCharacter = observer(
+  ({
+    character,
+    setShowInteractionModal,
+    setSelectedCharacter,
+  }: {
+    character: Character;
+    setShowInteractionModal: (val: boolean) => void;
+    setSelectedCharacter: (char: Character) => void;
+  }) => {
+    const { uiStore } = useRootStore();
+    const styles = useStyles();
+    const { getNormalizedSize } = useScaling();
+    return (
+      <Pressable
+        style={{
+          ...styles.themedCard,
+          width: uiStore.dimensions.width / 2.5,
+          marginHorizontal: uiStore.dimensions.width * 0.05,
+          ...styles.columnBetween,
+          opacity: character.deathdate ? 0.5 : 1,
+          paddingVertical: tw_base[2],
+        }}
+        key={character.id}
+        disabled={!!character.deathdate}
+        onPress={() => {
+          setShowInteractionModal(true);
+          setSelectedCharacter(character);
+        }}
+      >
+        <Text
+          style={{
+            textAlign: "center",
+            ...styles["text-2xl"],
+            textDecorationLine: character.deathdate
+              ? "line-through"
+              : "underline",
+          }}
+          numberOfLines={2}
+        >
+          {character.fullName}
+        </Text>
+        <View style={{ width: "100%", height: "40%" }}>
+          <CharacterImage character={character} />
+        </View>
+        <View style={{ alignItems: "center" }}>
+          <Text style={styles["text-xl"]}>
+            {character.deathdate && "Died at "}
+            {character.age} Years Old
+          </Text>
+          {character.age > 16 && (
+            <View
+              style={{
+                marginHorizontal: "auto",
+                paddingVertical: getNormalizedSize(4),
+              }}
+            >
+              <Text
+                style={{
+                  textAlign: "center",
+                  flexWrap: "wrap",
+                  ...styles["text-lg"],
+                }}
+              >
+                {character.deathdate && "Was a "}
+                {character.job}
+              </Text>
+            </View>
+          )}
+          {!character.deathdate && (
+            <View style={styles.affectionContainer}>
+              <View
+                style={{
+                  width: "75%",
+                  justifyContent: "center",
+                  paddingRight: 4,
+                }}
+              >
+                <ProgressBar
+                  value={Math.floor(character.affection * 4) / 4}
+                  minValue={-100}
+                  maxValue={100}
+                  filledColor="#dc2626"
+                  unfilledColor="#fca5a5"
+                />
+              </View>
+              <AffectionIcon
+                height={uiStore.iconSizeSmall}
+                width={uiStore.iconSizeSmall}
+              />
+            </View>
+          )}
+        </View>
+      </Pressable>
+    );
+  },
+);
