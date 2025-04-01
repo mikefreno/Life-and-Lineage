@@ -51,7 +51,7 @@ const InAppPurchasePage = observer(() => {
       />
       <RemoteSavePaywall
         isVisibleCondition={showRemoteSavePurchase}
-        onClose={() => setShowStashPurchase(false)}
+        onClose={() => setShowRemoteSavePurchase(false)}
       />
       <StashPaywall
         isVisibleCondition={showStashPurchase}

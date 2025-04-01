@@ -795,10 +795,19 @@ export const RemoteSavePaywall = observer(
               styles["text-xl"],
               {
                 color: "#e5e7eb",
+                textAlign: "center",
               },
             ]}
           >
             Allows for cross device/platform saves
+          </Text>
+          <Text
+            style={{
+              color: "#e5e7eb",
+              textAlign: "center",
+            }}
+          >
+            Note: This is free with any other purchase
           </Text>
         </View>
       </IAPModal>

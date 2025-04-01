@@ -2,12 +2,12 @@
   {
     "name": "flying skull",
     "beingType": "undead",
-    "health": 20,
-    "resistanceTable": {
+    "health": 30,
+    "baseResistanceTable": {
       "poison": 10,
       "holy": -50
     },
-    "damageTable": {
+    "baseDamageTable": {
       "physical": 2
     },
     "mana": {
@@ -22,14 +22,14 @@
   {
     "name": "skeleton",
     "beingType": "undead",
-    "health": 40,
+    "health": 85,
     "baseStrength": 5,
-    "resistanceTable": {
+    "baseResistanceTable": {
       "poison": 10,
       "holy": -50
     },
-    "damageTable": {
-      "physical": 6
+    "baseDamageTable": {
+      "physical": 4
     },
     "mana": {
       "maximum": 50,
@@ -44,23 +44,41 @@
   {
     "name": "zombie",
     "beingType": "undead",
-    "health": 75,
+    "health": 175,
     "baseStrength": 8,
+    "baseResistanceTable": {
+      "poison": 10,
+      "fire": -20,
+      "cold": 20,
+      "holy": -75
+    },
+    "baseDamageTable": {
+      "physical": 12
+    },
     "mana": {
       "maximum": 50,
       "regen": 3
     },
     "attackStrings": [
-      "bite",
-      "claw"
+      "zombie bite",
+      "grab"
     ],
     "turns": 10
   },
   {
     "name": "wraith",
     "beingType": "undead",
-    "health": 60,
-    "baseStrength": 15,
+    "health": 120,
+    "baseIntelligence": 15,
+    "baseResistanceTable": {
+      "poison": 40,
+      "fire": -20,
+      "cold": 40,
+      "holy": -50
+    },
+    "baseDamageTable": {
+      "magic": 20
+    },
     "mana": {
       "maximum": 75,
       "regen": 8
@@ -74,8 +92,18 @@
   {
     "name": "death knight",
     "beingType": "undead",
-    "health": 150,
+    "health": 300,
     "baseStrength": 20,
+    "baseResistanceTable": {
+      "poison": 40,
+      "fire": 10,
+      "cold": 40,
+      "lightning": -20,
+      "holy": -75
+    },
+    "baseDamageTable": {
+      "physical": 35
+    },
     "mana": {
       "maximum": 100,
       "regen": 10
@@ -92,6 +120,17 @@
     "beingType": "undead",
     "health": 200,
     "baseStrength": 30,
+    "baseResistanceTable": {
+      "poison": 60,
+      "fire": 15,
+      "cold": 30,
+      "lightning": -20,
+      "holy": -75
+    },
+    "baseDamageTable": {
+      "physical": 20,
+      "magic": 32
+    },
     "mana": {
       "maximum": 150,
       "regen": 15
@@ -113,6 +152,15 @@
       "maximum": 50,
       "regen": 10
     },
+    "baseResistanceTable": {
+      "physical": 15,
+      "poison": -15,
+      "cold": -10,
+      "fire": -10
+    },
+    "baseDamageTable": {
+      "physical": 16
+    },
     "attackStrings": [
       "stab",
       "pocket sand",
@@ -130,6 +178,15 @@
       "maximum": 50,
       "regen": 10
     },
+    "baseResistanceTable": {
+      "physical": 15,
+      "poison": -15,
+      "cold": -10,
+      "fire": -10
+    },
+    "baseDamageTable": {
+      "physical": 24
+    },
     "attackStrings": [
       "stab",
       "frenzy"
@@ -144,6 +201,15 @@
     "mana": {
       "maximum": 50,
       "regen": 5
+    },
+    "baseResistanceTable": {
+      "physical": 5,
+      "lightning": -25,
+      "cold": 10,
+      "fire": -15
+    },
+    "baseDamageTable": {
+      "physical": 1
     },
     "attackStrings": [
       "pluck eye",
@@ -160,6 +226,14 @@
       "maximum": 50,
       "regen": 10
     },
+    "baseResistanceTable": {
+      "physical": 10,
+      "cold": 15,
+      "fire": -15
+    },
+    "baseDamageTable": {
+      "physical": 8
+    },
     "attackStrings": [
       "bite"
     ],
@@ -173,6 +247,14 @@
     "mana": {
       "maximum": 50,
       "regen": 3
+    },
+    "baseResistanceTable": {
+      "physical": 45,
+      "cold": 30,
+      "fire": -10
+    },
+    "baseDamageTable": {
+      "physical": 10
     },
     "attackStrings": [
       "bite",
@@ -188,6 +270,16 @@
     "mana": {
       "maximum": 100,
       "regen": 15
+    },
+    "baseResistanceTable": {
+      "physical": 45,
+      "cold": 30,
+      "fire": 75,
+      "lightning": -30
+    },
+    "baseDamageTable": {
+      "physical": 8,
+      "fire": 10
     },
     "attackStrings": [
       "bite",
@@ -205,6 +297,15 @@
       "maximum": 100,
       "regen": 10
     },
+    "baseResistanceTable": {
+      "physical": 45,
+      "cold": 30,
+      "fire": -15,
+      "lightning": -30
+    },
+    "baseDamageTable": {
+      "physical": 24
+    },
     "attackStrings": [
       "claw",
       "bite",
@@ -220,6 +321,16 @@
     "mana": {
       "maximum": 100,
       "regen": 10
+    },
+    "baseResistanceTable": {
+      "physical": 45,
+      "cold": 30,
+      "fire": 75,
+      "lightning": -30
+    },
+    "baseDamageTable": {
+      "physical": 22,
+      "fire": 20
     },
     "attackStrings": [
       "fire breath",

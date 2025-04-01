@@ -755,7 +755,28 @@
     "baseHitChance": 0.95,
     "damageTable": {
       "physical": 6
-    }
+    },
+    "debuffNames": [
+      {
+        "name": "stun",
+        "chance": 0.1
+      }
+    ]
+  },
+  {
+    "name": "fire breath",
+    "manaCost": 20,
+    "targets": "area",
+    "baseHitChance": 0.90,
+    "damageTable": {
+      "fire": 6
+    },
+    "debuffNames": [
+      {
+        "name": "burn",
+        "chance": 0.4
+      }
+    ]
   },
   {
     "name": "wing buffet",

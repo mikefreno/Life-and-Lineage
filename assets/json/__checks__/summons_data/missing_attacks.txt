@@ -1,2 +1,0 @@
-Summon "dragon welp" missing attacks: ["fire breath"]
-Summon "dragon" missing attacks: ["fire breath"]

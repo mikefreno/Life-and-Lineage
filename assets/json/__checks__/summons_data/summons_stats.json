@@ -1,7 +1,7 @@
 {
   "totalSummons": 14,
-  "summonsWithMissingAttacks": 2,
-  "summonsWithMissingFields": 12,
+  "summonsWithMissingAttacks": 0,
+  "summonsWithMissingFields": 0,
   "beingTypes": {
     "undead": 6,
     "human": 1,
@@ -9,21 +9,16 @@
     "beast": 4,
     "draconic": 2
   },
-  "averageHealth": 211.07142857142858,
+  "averageHealth": 237.14285714285714,
   "averageTurns": 510.57142857142856,
-  "resistanceTypes": {
-    "poison": 2,
-    "holy": 2
-  },
-  "damageTypes": {
-    "physical": 2
-  },
+  "resistanceTypes": {},
+  "damageTypes": {},
   "attackDistribution": {
     "head slam": 1,
     "stab": 3,
     "cleave": 1,
-    "bite": 6,
-    "claw": 2,
+    "zombie bite": 1,
+    "grab": 1,
     "life drain": 1,
     "terrorize": 1,
     "soul strike": 1,
@@ -37,7 +32,9 @@
     "frenzy": 1,
     "pluck eye": 1,
     "scratch": 4,
+    "bite": 5,
     "fire breath": 2,
+    "claw": 1,
     "wing buffet": 1
   }
 }

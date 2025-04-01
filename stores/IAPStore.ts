@@ -343,28 +343,28 @@ export class IAPStore {
   }
 
   getCustomersIAPs() {
-    if (!this.hasHydrated) {
-      if (isEmulatorSync()) {
-        this.hasHydrated = true;
-        //console.log("running on emulator");
-      } else {
-        if (this.root.authStore.isConnected) {
-          try {
-            Purchases.restorePurchases()
-              .then((val) => this.evaluateCustomer(val))
-              .catch((e) => {
-                if (e.toString() !== "Error: The receipt is not valid.") {
-                  console.error(e.toString());
-                }
-              })
-              .finally(() => (this.hasHydrated = true));
-          } catch (e) {
-            console.log("Error restoring purchases:", e);
-          }
-        } else {
-          this.hydrateOffline();
-        }
-      }
-    }
+    //if (!this.hasHydrated) {
+    //if (isEmulatorSync()) {
+    //this.hasHydrated = true;
+    ////console.log("running on emulator");
+    //} else {
+    //if (this.root.authStore.isConnected) {
+    //try {
+    //Purchases.restorePurchases()
+    //.then((val) => this.evaluateCustomer(val))
+    //.catch((e) => {
+    //if (e.toString() !== "Error: The receipt is not valid.") {
+    //console.error(e.toString());
+    //}
+    //})
+    //.finally(() => (this.hasHydrated = true));
+    //} catch (e) {
+    //console.log("Error restoring purchases:", e);
+    //}
+    //} else {
+    //this.hydrateOffline();
+    //}
+    //}
+    //}
   }
 }
