@@ -31,6 +31,9 @@ import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 import { BlurView } from "expo-blur";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useScaling } from "@/hooks/scaling";
+import GenericFlatButton from "@/components/GenericFlatButton";
+import Colors from "@/constants/Colors";
+import { useVibration } from "@/hooks/generic";
 
 const RelationshipsScreen = observer(() => {
   const styles = useStyles();
@@ -48,6 +51,7 @@ const RelationshipsScreen = observer(() => {
   const headerHeight = useHeaderHeight();
   const isFocused = useIsFocused();
   const { getNormalizedSize } = useScaling();
+  const vibration = useVibration();
 
   const characterGroups = [
     { title: "Children", data: playerState?.children || [] },
@@ -183,10 +187,15 @@ const RelationshipsScreen = observer(() => {
                     />
                   ),
             headerRight: (props) => (
-              <Pressable onPress={() => showAdoptionModal()}>
+              <Pressable
+                onPress={() => {
+                  vibration({ style: "light" });
+                  showAdoptionModal();
+                }}
+              >
                 <FontAwesome6
                   name="child-reaching"
-                  size={24}
+                  size={uiStore.iconSizeXL}
                   color={props.tintColor}
                 />
               </Pressable>
@@ -232,7 +241,7 @@ const RelationshipsScreen = observer(() => {
                 ? `Adopting with ${partnerName}`
                 : "Independent Adoption"}
             </Text>
-            {playerState.age >= 18 ? (
+            {playerState.age >= 24 ? (
               <AdoptionList
                 partner={selectedCharacter}
                 setShowInteractionModal={setShowInteractionModal}
@@ -312,15 +321,20 @@ const AdoptionList = observer(
                 setSelectedCharacter={setSelectedCharacter}
               />
               {!isConfirming ? (
-                <GenericRaisedButton
+                <GenericFlatButton
+                  disabled={
+                    playerState.gold <
+                    Math.max(25_000, Math.floor(playerState.gold * 0.15))
+                  }
                   onPress={() => setConfirmationId(char.id)}
                 >{`Adopt (cost: ${Math.max(
                   25_000,
                   Math.floor(playerState.gold * 0.15),
-                )})`}</GenericRaisedButton>
+                )})`}</GenericFlatButton>
               ) : (
-                <View style={styles.rowEvenly}>
-                  <GenericRaisedButton
+                <View style={styles.columnCenter}>
+                  <GenericFlatButton
+                    backgroundColor={Colors.light.tint}
                     onPress={() =>
                       characterStore.adopt({
                         child: char,
@@ -329,10 +343,13 @@ const AdoptionList = observer(
                     }
                   >
                     Confirm
-                  </GenericRaisedButton>
-                  <GenericRaisedButton onPress={() => setConfirmationId(null)}>
+                  </GenericFlatButton>
+                  <GenericFlatButton
+                    backgroundColor={Colors[uiStore.colorScheme].error}
+                    onPress={() => setConfirmationId(null)}
+                  >
                     Cancel
-                  </GenericRaisedButton>
+                  </GenericFlatButton>
                 </View>
               )}
             </View>

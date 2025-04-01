@@ -58,6 +58,24 @@ export const tabRouteIndexing = [
   "/medical",
   "/dungeon",
 ];
+export type LoadingStores =
+  | "statusBar"
+  | "inventory"
+  | "player"
+  | "time"
+  | "auth"
+  | "shops"
+  | "enemy"
+  | "dungeon"
+  | "character"
+  | "tutorial"
+  | "stash"
+  | "save"
+  | "audio"
+  | "ambient"
+  | "fonts"
+  | "routing"
+  | "iaps";
 
 export default class UIStore {
   root: RootStore;
@@ -101,7 +119,7 @@ export default class UIStore {
   playerStatusCompactHeight: number | undefined = undefined;
   playerStatusTop: number | undefined = undefined;
 
-  storeLoadingStatus: Record<string, boolean> = {
+  storeLoadingStatus: Record<LoadingStores, boolean> = {
     statusBar: false,
     inventory: false,
     player: false,
@@ -363,7 +381,9 @@ export default class UIStore {
     if (this.totalLoadingSteps === 0) {
       const keys = Object.keys(this.storeLoadingStatus);
       if (keys.length === 0) return 100;
-      const done = keys.filter((key) => this.storeLoadingStatus[key]).length;
+      const done = keys.filter(
+        (key) => this.storeLoadingStatus[key as LoadingStores],
+      ).length;
       return (done / keys.length) * 100;
     }
     return (this.completedLoadingSteps / this.totalLoadingSteps) * 100;
@@ -379,7 +399,7 @@ export default class UIStore {
     }
   }
 
-  markStoreAsLoaded(storeName: keyof typeof this.storeLoadingStatus) {
+  markStoreAsLoaded(storeName: LoadingStores) {
     this.storeLoadingStatus[storeName] = true;
   }
 

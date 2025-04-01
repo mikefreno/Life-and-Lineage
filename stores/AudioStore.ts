@@ -1,43 +1,57 @@
 import {
+  action,
   makeObservable,
   observable,
-  action,
   reaction,
   runInAction,
 } from "mobx";
-import { storage } from "../utility/functions/storage";
 import { RootStore } from "./RootStore";
-import { Audio } from "expo-av";
-import { Sound } from "expo-av/build/Audio/Sound";
-import * as Sentry from "@sentry/react-native";
-import { AppState, AppStateStatus } from "react-native";
+import { storage } from "@/utility/functions/storage";
+import {
+  AudioBuffer,
+  AudioBufferSourceNode,
+  AudioContext,
+  GainNode,
+} from "react-native-audio-api";
+import { Asset } from "expo-asset";
 
 const AMBIENT_TRACKS = {
-  shops: require("../assets/music/shops.m4a"),
-  combat: require("../assets/music/combat.m4a"),
-  old: require("../assets/music/ambient-old.m4a"),
-  middle: require("../assets/music/amibent-middle.m4a"),
-  young: require("../assets/music/ambient-young.m4a"),
-  dungeon: require("../assets/music/ambient-dungeon.m4a"),
+  shops: require("@/assets/music/shops.mp3"),
+  old: require("@/assets/music/ambient-old.mp3"),
+  middle: require("@/assets/music/ambient-middle.mp3"),
+  young: require("@/assets/music/ambient-young.mp3"),
+  dungeon: require("@/assets/music/ambient-dungeon.mp3"),
 };
+
+type AMBIENT_TRACK_OPTIONS = keyof typeof AMBIENT_TRACKS;
 
 const COMBAT_TRACKS = {
-  basic: require("../assets/music/combat.m4a"),
+  basic: require("@/assets/music/combat.mp3"),
 };
+
+type COMBAT_TRACK_OPTIONS = keyof typeof COMBAT_TRACKS;
 
 const SOUND_EFFECTS = {
-  bossHit: require("../assets/sfx/bossHit1.wav"),
-  hit: require("../assets/sfx/hitDamage1.wav"),
+  bossHit: require("@/assets/sfx/bossHit.mp3"),
+  //hit: require("@/assets/sfx/hitDamage.mp3"), // this track is causing errors
 };
 
-const DEFAULT_FADE = 1000;
-const FADE_INTERVAL = 50;
-const DEFAULT_FADE_STEPS = 20;
+type SFX_OPTIONS = keyof typeof SOUND_EFFECTS;
+
+type CrossFadeOptions =
+  | {
+      type: "ambient";
+      newTrack: AMBIENT_TRACK_OPTIONS;
+    }
+  | {
+      type: "combat";
+      newTrack: COMBAT_TRACK_OPTIONS;
+    };
+
+const DEFAULT_FADE = 2000;
 const GLOBAL_MULT = 0.8;
 
-const AUDIO_FOCUS_ERROR = "expo.modules.av.AudioFocusNotAcquiredException";
-const BACKGROUND_ERROR_MESSAGE =
-  "This experience is currently in the background";
+type TrackType = "ambient" | "combat" | "sfx";
 
 export class AudioStore {
   root: RootStore;
@@ -48,62 +62,54 @@ export class AudioStore {
   combatMusicVolume: number = 1;
   muted: boolean = false;
 
-  isSoundEffectsLoaded: boolean = false;
-  isAmbientLoaded: boolean = false;
-  isCombatLoaded: boolean = false;
+  currentAudioContext = new AudioContext();
+  currentPlayer: AudioBufferSourceNode | undefined = undefined;
+  currentEnvelope: GainNode | undefined = undefined;
+  storedTimeOnMute: number | undefined;
+  currentlyPlayingTrack:
+    | AMBIENT_TRACK_OPTIONS
+    | COMBAT_TRACK_OPTIONS
+    | undefined = undefined;
 
-  isRecovering: boolean = false;
+  outBoundAudioContext = new AudioContext();
+  outBoundPlayer: AudioBufferSourceNode | undefined = undefined;
 
-  private ambientPlayers: Map<string, Sound> = new Map();
-  private combatPlayers: Map<string, Sound> = new Map();
-  private soundEffects: Map<string, Sound> = new Map();
-
-  currentTrack: {
-    name: string;
-    sound: Sound;
-    category: "ambientMusic" | "combatMusic";
-  } | null = null;
-
-  private activeTransition: {
-    trackIn: { cancel: () => Promise<void>; sound: Sound; name: string } | null;
-    trackOut: {
-      cancel: () => Promise<void>;
-      sound: Sound;
-      name: string;
-    } | null;
-  } = { trackIn: null, trackOut: null };
-
-  private appStateListener: any = null;
-  private appState: AppStateStatus = AppState.currentState;
+  ambientTrackBuffers: Map<AMBIENT_TRACK_OPTIONS, AudioBuffer> = new Map();
+  combatTrackBuffers: Map<COMBAT_TRACK_OPTIONS, AudioBuffer> = new Map();
+  sfxTrackBuffers: Map<SFX_OPTIONS, AudioBuffer> = new Map();
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
     this.loadPersistedSettings();
+    this.initializeAudio();
 
-    this.setupAppStateListener();
     makeObservable(this, {
       masterVolume: observable,
       ambientMusicVolume: observable,
       soundEffectsVolume: observable,
       combatMusicVolume: observable,
       muted: observable,
-      isSoundEffectsLoaded: observable,
-      currentTrack: observable,
-      isAmbientLoaded: observable,
-      isCombatLoaded: observable,
-      isRecovering: observable,
 
-      loadAudioResources: action,
-      playAmbient: action,
-      playCombat: action,
-      playSfx: action,
-      setMuteValue: action,
-      setAudioLevel: action,
+      currentPlayer: observable,
+      outBoundPlayer: observable,
+
       cleanup: action,
-      recoverFromError: action,
+      crossFade: action,
+      setAudioLevel: action,
+      setMuteValue: action,
+      getEffectiveVolume: action,
     });
 
-    this.initializeAudio();
+    reaction(
+      () => [
+        this.masterVolume,
+        this.ambientMusicVolume,
+        this.soundEffectsVolume,
+        this.combatMusicVolume,
+        this.muted,
+      ],
+      () => this.persistSettings(),
+    );
 
     reaction(
       () => ({
@@ -116,35 +122,89 @@ export class AudioStore {
         try {
           this.parseLocationForRelevantTrack(current, previous);
         } catch (error) {
-          this.handleError("Error in location reaction", error);
-        }
-      },
-    );
-
-    reaction(
-      () => this.currentTrack?.name,
-      () => {
-        try {
-          this.setMuteValue(this.muted);
-        } catch (error) {
-          this.handleError("Error in mute reaction", error);
+          console.warn("Error in location reaction", error);
         }
       },
     );
   }
 
+  async initializeAudio() {
+    try {
+      const ambientBufferPromises = Object.entries(AMBIENT_TRACKS).map(
+        async ([key, source]) => {
+          try {
+            const asset = Asset.fromModule(source);
+            await asset.downloadAsync();
+            const buffer = await this.currentAudioContext.decodeAudioDataSource(
+              asset.localUri!,
+            );
+            return [key as AMBIENT_TRACK_OPTIONS, buffer] as const;
+          } catch (error) {
+            throw new Error(`Failed to decode ambient track: ${key}-${error}`);
+          }
+        },
+      );
+
+      const combatBufferPromises = Object.entries(COMBAT_TRACKS).map(
+        async ([key, source]) => {
+          try {
+            const asset = Asset.fromModule(source);
+            await asset.downloadAsync();
+            const buffer = await this.currentAudioContext.decodeAudioDataSource(
+              asset.localUri!,
+            );
+            return [key as COMBAT_TRACK_OPTIONS, buffer] as const;
+          } catch (error) {
+            throw new Error(`Failed to decode combat track: ${key}-${error}`);
+          }
+        },
+      );
+
+      const sfxBufferPromises = Object.entries(SOUND_EFFECTS).map(
+        async ([key, source]) => {
+          try {
+            const asset = Asset.fromModule(source);
+            await asset.downloadAsync();
+            const buffer = await this.currentAudioContext.decodeAudioDataSource(
+              asset.localUri!,
+            );
+            return [key as SFX_OPTIONS, buffer] as const;
+          } catch (error) {
+            throw new Error(`Failed to decode sfx: ${key}-${error}`);
+          }
+        },
+      );
+
+      const [loadedAmbientBuffers, loadedCombatBuffers, loadedSfxBuffers] =
+        await Promise.all([
+          Promise.all(ambientBufferPromises),
+          Promise.all(combatBufferPromises),
+          Promise.all(sfxBufferPromises),
+        ]);
+
+      this.ambientTrackBuffers = new Map(loadedAmbientBuffers);
+      this.combatTrackBuffers = new Map(loadedCombatBuffers);
+      this.sfxTrackBuffers = new Map(loadedSfxBuffers);
+
+      this.root.uiStore.markStoreAsLoaded("ambient");
+      this.parseLocationForRelevantTrack();
+    } catch (error) {
+      console.warn("Failed to initialize audio buffers", error);
+    }
+  }
+
   private parseLocationForRelevantTrack(current?: any, previous?: any) {
+    if (this.muted) return;
     try {
       if (!previous || !current) {
         if (this.root.dungeonStore.inCombat) {
-          this.playCombat("basic");
+          this.playCombat();
         } else {
           this.playAmbient();
         }
-      }
-      if (current.inCombat !== previous?.inCombat) {
+      } else if (current.inCombat !== previous?.inCombat) {
         if (current.inCombat) {
-          this.playCombat("basic");
+          this.playCombat();
         } else {
           this.playAmbient();
         }
@@ -158,547 +218,151 @@ export class AudioStore {
         this.playAmbient();
       }
     } catch (error) {
-      this.handleError("Error parsing location for track", error);
+      console.warn("Error parsing location for track", error);
     }
   }
 
-  private async initializeAudio() {
-    try {
-      await Audio.setAudioModeAsync({
-        playsInSilentModeIOS: true,
-        staysActiveInBackground: false,
-        shouldDuckAndroid: true,
-      });
-      await this.loadAudioResources();
-    } catch (error) {
-      this.handleError("Failed to initialize audio", error);
+  playAmbient() {
+    let selectedTrack: keyof typeof AMBIENT_TRACKS;
+    const playerAge = this.root.playerState?.age ?? 0;
+    if (this.root.dungeonStore.isInDungeon) {
+      selectedTrack = "dungeon";
+    } else if (this.root.shopsStore.inMarket) {
+      selectedTrack = "shops";
+    } else {
+      selectedTrack =
+        playerAge < 30 ? "young" : playerAge < 60 ? "middle" : "old";
     }
+    this.crossFade({ type: "ambient", newTrack: selectedTrack });
   }
 
-  async loadAudioResources() {
+  /**
+   * Currently only one combat track exists (basic), eventually, will select based on the current enemy or interface
+   */
+  playCombat() {
+    this.crossFade({ type: "combat", newTrack: "basic" });
+  }
+
+  async crossFade({ type, newTrack }: CrossFadeOptions) {
     try {
-      await Promise.all([
-        this.loadSoundEffects().then(() =>
-          runInAction(() => (this.isSoundEffectsLoaded = true)),
-        ),
-        this.loadAmbientTracks().then(() =>
+      let buffer: AudioBuffer | undefined;
+
+      switch (
+        type //sfx will not be crossfaded
+      ) {
+        case "ambient":
+          buffer = this.ambientTrackBuffers.get(newTrack);
+          break;
+        case "combat":
+          buffer = this.combatTrackBuffers.get(newTrack);
+          break;
+      }
+
+      if (!buffer) {
+        throw new Error(`No buffer found for ${type} track: ${newTrack}`);
+      }
+
+      if (this.currentPlayer && this.currentEnvelope) {
+        this.outBoundPlayer = this.currentPlayer;
+        const outboundEnvelope = this.currentEnvelope;
+
+        const tNow = this.currentAudioContext.currentTime;
+        outboundEnvelope.gain.linearRampToValueAtTime(
+          0,
+          tNow + DEFAULT_FADE / 1000,
+        );
+
+        setTimeout(() => {
           runInAction(() => {
-            this.isAmbientLoaded = true;
-            this.root.uiStore.markStoreAsLoaded("ambient");
-          }),
-        ),
-        this.loadCombatTracks().then(() =>
-          runInAction(() => (this.isCombatLoaded = true)),
-        ),
-      ]);
-
-      if (this.isAmbientLoaded) {
-        this.playAmbient();
-      }
-    } catch (error) {
-      this.handleError("Failed to load audio resources", error);
-    }
-  }
-
-  private setupAppStateListener() {
-    try {
-      this.appState = AppState.currentState;
-      this.appStateListener = AppState.addEventListener(
-        "change",
-        this.handleAppStateChange,
-      );
-    } catch (error) {
-      this.handleError("Failed to setup AppState listener", error);
-    }
-  }
-
-  private handleAppStateChange = (nextAppState: AppStateStatus) => {
-    try {
-      if (
-        this.appState.match(/inactive|background/) &&
-        nextAppState === "active"
-      ) {
-        // App has come to the foreground
-        this.handleAppForeground();
-      } else if (
-        this.appState === "active" &&
-        nextAppState.match(/inactive|background/)
-      ) {
-        // App has gone to the background
-        this.handleAppBackground();
-      }
-
-      this.appState = nextAppState;
-    } catch (error) {
-      this.handleError("Error handling app state change", error);
-    }
-  };
-
-  private async handleAppBackground() {
-    try {
-      // Save current track state
-      if (this.currentTrack) {
-        const status = await this.currentTrack.sound.getStatusAsync();
-        if (status.isLoaded && status.isPlaying) {
-          // Store that we need to resume this track
-          storage.set(
-            "audio_background_state",
-            JSON.stringify({
-              trackName: this.currentTrack.name,
-              category: this.currentTrack.category,
-              wasPlaying: true,
-              timestamp: Date.now(),
-            }),
-          );
-
-          // Pause the track
-          await this.currentTrack.sound.pauseAsync();
-        }
-      }
-    } catch (error) {
-      this.handleError("Error handling app background", error);
-    }
-  }
-
-  private async handleAppForeground() {
-    try {
-      // Check if we need to resume playback
-      const storedState = storage.getString("audio_background_state");
-      if (storedState) {
-        const state = JSON.parse(storedState);
-
-        // Only resume if we went to background recently (within 30 minutes)
-        const thirtyMinutesInMs = 30 * 60 * 1000;
-        const isRecent = Date.now() - state.timestamp < thirtyMinutesInMs;
-
-        if (state.wasPlaying && isRecent) {
-          // If the current track matches what was playing, resume it
-          if (this.currentTrack && this.currentTrack.name === state.trackName) {
-            if (!this.muted) {
-              await this.currentTrack.sound.playAsync();
-            }
-          }
-          // Otherwise play the appropriate track
-          else if (state.category === "ambientMusic") {
-            this.playAmbient(state.trackName);
-          } else if (state.category === "combatMusic") {
-            this.playCombat(state.trackName);
-          }
-        }
-
-        // Clear the stored state
-        storage.delete("audio_background_state");
-      }
-    } catch (error) {
-      this.handleError("Error handling app foreground", error);
-    }
-  }
-
-  private async loadSoundEffects() {
-    try {
-      const loadPromises = Object.entries(SOUND_EFFECTS).map(
-        async ([id, source]) => {
-          try {
-            const { sound } = await Audio.Sound.createAsync(source, {
-              volume: this.getEffectiveVolume("soundEffects"),
-            });
-            this.soundEffects.set(id, sound);
-          } catch (error) {
-            this.handleError(`Failed to load sound effect: ${id}`, error);
-          }
-        },
-      );
-      await Promise.all(loadPromises);
-    } catch (error) {
-      this.handleError("Failed to load sound effects", error);
-    }
-  }
-
-  private async loadAmbientTracks() {
-    try {
-      const loadPromises = Object.entries(AMBIENT_TRACKS).map(
-        async ([id, source]) => {
-          try {
-            const { sound } = await Audio.Sound.createAsync(source, {
-              volume: 0,
-              isLooping: true,
-            });
-            this.ambientPlayers.set(id, sound);
-          } catch (error) {
-            this.handleError(`Failed to load ambient track: ${id}`, error);
-          }
-        },
-      );
-      await Promise.all(loadPromises);
-    } catch (error) {
-      this.handleError("Failed to load ambient tracks", error);
-    }
-  }
-
-  private async loadCombatTracks() {
-    try {
-      const loadPromises = Object.entries(COMBAT_TRACKS).map(
-        async ([id, source]) => {
-          try {
-            const { sound } = await Audio.Sound.createAsync(source, {
-              volume: 0,
-              isLooping: true,
-            });
-            this.combatPlayers.set(id, sound);
-          } catch (error) {
-            this.handleError(`Failed to load combat track: ${id}`, error);
-          }
-        },
-      );
-      await Promise.all(loadPromises);
-    } catch (error) {
-      this.handleError("Failed to load combat tracks", error);
-    }
-  }
-
-  async playAmbient(track?: keyof typeof AMBIENT_TRACKS) {
-    if (!this.isAmbientLoaded) return;
-    try {
-      let selectedTrack = track;
-      if (!selectedTrack) {
-        const playerAge = this.root.playerState?.age ?? 0;
-        if (this.root.dungeonStore.isInDungeon) {
-          selectedTrack = "dungeon";
-        } else if (this.root.shopsStore.inMarket) {
-          selectedTrack = "shops";
-        } else {
-          selectedTrack =
-            playerAge < 30 ? "young" : playerAge < 60 ? "middle" : "old";
-        }
-      }
-
-      if (this.currentTrack?.name === selectedTrack) return;
-
-      const newSound = this.ambientPlayers.get(selectedTrack);
-      if (!newSound) {
-        throw new Error(`Ambient track ${selectedTrack} not found`);
-      }
-
-      //checks for active transitions
-      if (this.activeTransition.trackOut) {
-        // nothing special here, we just cancel this to make room for the new fade out
-        await this.activeTransition.trackOut.cancel();
-      }
-      // fade in tracks are the `this.currentTrack`, during transition, we use the transition cancel(which inits the special case) instead of starting a new fade directly
-      if (this.activeTransition.trackIn) {
-        this.activeTransition.trackIn.cancel();
-      } else if (this.currentTrack) {
-        const currentVolume = await this.getCurrentVolume(
-          this.currentTrack.sound,
-        );
-        this.fadeSound({
-          sound: this.currentTrack.sound,
-          soundCategory: "ambientMusic",
-          soundName: this.currentTrack.name,
-          startVolume: currentVolume,
-          directionality: "out",
-          duration: DEFAULT_FADE,
-        });
-      }
-
-      runInAction(() => {
-        this.currentTrack = {
-          name: selectedTrack,
-          sound: newSound,
-          category: "ambientMusic",
-        };
-      });
-
-      //start fade in of new track
-      this.fadeSound({
-        sound: this.currentTrack!.sound,
-        soundCategory: "ambientMusic",
-        soundName: selectedTrack,
-        startVolume: 0,
-        directionality: "in",
-        duration: DEFAULT_FADE,
-      });
-    } catch (error) {
-      this.handleError(`Failed to play ambient track`, error);
-    }
-  }
-
-  async playCombat(track: keyof typeof COMBAT_TRACKS) {
-    if (!this.isCombatLoaded) return;
-
-    try {
-      if (this.currentTrack?.name === track) return;
-
-      const newSound = this.combatPlayers.get(track);
-      if (!newSound) {
-        throw new Error(`Combat track ${track} not found`);
-      }
-
-      //checks for active transitions
-      if (this.activeTransition.trackOut) {
-        // nothing special here, we just cancel this to make room for the new fade out
-        await this.activeTransition.trackOut.cancel();
-      }
-      // fade in tracks are the `this.currentTrack`, during transition, we use the transition cancel(which inits the special case) instead of starting a new fade directly
-      if (this.activeTransition.trackIn) {
-        this.activeTransition.trackIn.cancel();
-      } else if (this.currentTrack) {
-        const currentVolume = await this.getCurrentVolume(
-          this.currentTrack.sound,
-        );
-        this.fadeSound({
-          sound: this.currentTrack.sound,
-          soundCategory: "combatMusic",
-          soundName: this.currentTrack.name,
-          startVolume: currentVolume,
-          directionality: "out",
-          duration: DEFAULT_FADE,
-        });
-      }
-
-      runInAction(() => {
-        this.currentTrack = {
-          name: track,
-          sound: newSound,
-          category: "combatMusic",
-        };
-      });
-
-      //start fade in of new track
-      this.fadeSound({
-        sound: this.currentTrack!.sound,
-        soundCategory: "combatMusic",
-        soundName: track,
-        startVolume: 0,
-        directionality: "in",
-        duration: DEFAULT_FADE,
-      });
-    } catch (error) {
-      this.handleError(`Failed to play combat track`, error);
-    }
-  }
-
-  async playSfx(id: keyof typeof SOUND_EFFECTS) {
-    if (!this.isSoundEffectsLoaded) return;
-
-    try {
-      const sound = this.soundEffects.get(id);
-      if (sound) {
-        await sound.setVolumeAsync(this.getEffectiveVolume("soundEffects"));
-        await sound.replayAsync();
-      } else {
-        console.warn(`Sound effect ${id} not found`);
-      }
-    } catch (error) {
-      this.handleError(`Failed to play sound effect ${id}`, error);
-    }
-  }
-
-  async getPlayingTracksCount() {
-    try {
-      let ambientCount = 0;
-      let combatCount = 0;
-
-      // Check ambient players
-      for (const sound of this.ambientPlayers.values()) {
-        const status = await sound.getStatusAsync();
-        if (status.isLoaded && status.isPlaying) ambientCount++;
-      }
-
-      // Check combat players
-      for (const sound of this.combatPlayers.values()) {
-        const status = await sound.getStatusAsync();
-        if (status.isLoaded && status.isPlaying) combatCount++;
-      }
-
-      return { ambientCount, combatCount };
-    } catch (error) {
-      this.handleError("Error getting playing tracks count", error);
-      return { ambientCount: 0, combatCount: 0 };
-    }
-  }
-
-  private async getCurrentVolume(sound: Sound): Promise<number> {
-    try {
-      const status = await sound.getStatusAsync();
-      return status.isLoaded ? status.volume : 0;
-    } catch (error) {
-      this.handleError("Error getting current volume", error);
-      return 0;
-    }
-  }
-
-  private async fadeSound({
-    sound,
-    soundCategory,
-    soundName,
-    duration = DEFAULT_FADE,
-    startVolume,
-    directionality,
-  }: {
-    sound: Sound;
-    soundCategory: "ambientMusic" | "combatMusic";
-    soundName: string;
-    duration: number;
-    startVolume: number;
-    directionality: "in" | "out";
-  }) {
-    // Check if sound is loaded before attempting to fade
-    try {
-      const status = await sound.getStatusAsync();
-      if (!status.isLoaded) {
-        console.warn(
-          `Cannot fade ${soundCategory} ${soundName}: Sound not loaded`,
-        );
-        return;
-      }
-    } catch (error) {
-      this.handleError(
-        `Error checking sound status for ${soundCategory} ${soundName}`,
-        error,
-      );
-      return;
-    }
-
-    let usingDefaults = duration === DEFAULT_FADE;
-    const targetVolume =
-      directionality === "in" ? this.getEffectiveVolume(soundCategory) : 0;
-
-    return this.withTimeout<void>(
-      new Promise(async (resolve, reject) => {
-        try {
-          if (directionality == "in") {
-            await sound.setVolumeAsync(0);
-            await sound.playAsync();
-          }
-
-          const steps = usingDefaults
-            ? DEFAULT_FADE_STEPS
-            : Math.max(Math.floor(duration / FADE_INTERVAL), 1);
-          const volumeStep = (targetVolume - startVolume) / steps;
-          let interrupt = false;
-          let isCleanedUp = false;
-          let currentStep = 0;
-
-          // Create cancel promise resolver
-          let cancelResolve: () => void;
-          const cancelPromise = new Promise<void>((resolve) => {
-            cancelResolve = resolve;
+            outboundEnvelope.disconnect();
+            this.outBoundPlayer?.stop();
+            this.outBoundPlayer?.disconnect();
+            this.outBoundPlayer = undefined;
           });
+        }, DEFAULT_FADE);
+      }
+      this.currentPlayer = this.currentAudioContext.createBufferSource();
+      this.currentPlayer.buffer = buffer;
 
-          const interval = setInterval(async () => {
-            if (interrupt) {
-              clearInterval(interval);
-              if (directionality === "in") {
-                // If interrupted while fading in, start fading out from current volume
-                const currentVolume = await this.getCurrentVolume(sound);
-                await this.fadeSound({
-                  sound,
-                  soundCategory,
-                  duration,
-                  soundName,
-                  startVolume: currentVolume,
-                  directionality: "out",
-                });
-              } else {
-                // If interrupted while fading out, just stop immediately
-                await sound.setVolumeAsync(0);
-                await sound.pauseAsync();
-              }
-              isCleanedUp = true;
-              cancelResolve();
-              resolve();
-              return;
-            }
+      this.currentEnvelope = this.currentAudioContext.createGain();
+      this.currentPlayer.connect(this.currentEnvelope);
+      this.currentEnvelope.connect(this.currentAudioContext.destination);
 
-            try {
-              // Set up cancel function if this is the first interval
-              if (currentStep === 0) {
-                if (directionality === "in") {
-                  this.activeTransition.trackIn = {
-                    cancel: async () => {
-                      interrupt = true;
-                      await new Promise<void>((resolve) => {
-                        const checkInterval = setInterval(() => {
-                          if (isCleanedUp) {
-                            clearInterval(checkInterval);
-                            resolve();
-                          }
-                        }, 10);
-                      });
-                      await cancelPromise;
-                    },
-                    sound,
-                    name: soundName,
-                  };
-                } else {
-                  this.activeTransition.trackOut = {
-                    cancel: async () => {
-                      interrupt = true;
-                      await new Promise<void>((resolve) => {
-                        const checkInterval = setInterval(() => {
-                          if (isCleanedUp) {
-                            clearInterval(checkInterval);
-                            resolve();
-                          }
-                        }, 10);
-                      });
-                      await cancelPromise;
-                    },
-                    sound,
-                    name: soundName,
-                  };
-                }
-              }
+      const tNow = this.currentAudioContext.currentTime;
+      this.currentEnvelope.gain.setValueAtTime(0, tNow);
+      this.currentEnvelope.gain.linearRampToValueAtTime(
+        this.getEffectiveVolume(type),
+        tNow + DEFAULT_FADE / 1000,
+      );
+      this.currentPlayer.loop = true;
 
-              // Calculate and set new volume
-              currentStep++;
-              const volume = startVolume + volumeStep * currentStep;
-              const clampedVolume = Math.max(0, Math.min(1, volume));
-              await sound.setVolumeAsync(clampedVolume);
+      if (this.storedTimeOnMute && newTrack == this.currentlyPlayingTrack) {
+        __DEV__ && console.log("skippin to:", this.storedTimeOnMute);
+        this.currentPlayer.start(0, this.storedTimeOnMute);
+        //clear stored info
+        this.storedTimeOnMute = undefined;
+      } else {
+        this.currentPlayer.start();
+      }
 
-              // Check if fade is complete
-              if (currentStep >= steps) {
-                clearInterval(interval);
-                if (directionality === "in") {
-                  this.activeTransition.trackIn = null;
-                } else {
-                  this.activeTransition.trackOut = null;
-                  await sound.pauseAsync();
-                }
-                isCleanedUp = true;
-                cancelResolve();
-                resolve();
-              }
-            } catch (error) {
-              clearInterval(interval);
-              if (directionality === "in") {
-                this.activeTransition.trackIn = null;
-              } else {
-                this.activeTransition.trackOut = null;
-              }
-              isCleanedUp = true;
-              cancelResolve();
-              reject(error);
-            }
-          }, FADE_INTERVAL);
-        } catch (error) {
-          reject(error);
-        }
-      }),
-      duration * 3,
-      `fade_${directionality}_${soundCategory}_${soundName}`,
+      this.currentlyPlayingTrack = newTrack;
+    } catch (error) {
+      console.warn("Error during crossfade:", error);
+    }
+  }
+
+  setAudioLevel(type: "master" | TrackType, value: number): void {
+    switch (type) {
+      case "master":
+        this.masterVolume = value;
+        break;
+      case "ambient":
+        this.ambientMusicVolume = value;
+        break;
+      case "sfx":
+        this.soundEffectsVolume = value;
+        break;
+      case "combat":
+        this.combatMusicVolume = value;
+        break;
+    }
+    this.updatePlayingAudioLevel();
+  }
+
+  private updatePlayingAudioLevel() {
+    if (!this.currentlyPlayingTrack) return;
+
+    const tNow = this.currentAudioContext.currentTime;
+    this.currentEnvelope?.gain.setValueAtTime(
+      this.getEffectiveVolume(
+        this.currentlyPlayingTrack in AMBIENT_TRACKS
+          ? "ambient"
+          : this.currentlyPlayingTrack in COMBAT_TRACKS
+          ? "combat"
+          : "sfx",
+      ),
+      tNow,
     );
   }
 
-  private getEffectiveVolume(
-    type: "ambientMusic" | "combatMusic" | "soundEffects",
-  ): number {
+  setMuteValue(val: boolean) {
+    this.muted = val;
+    if (val) {
+      this.storedTimeOnMute = this.currentAudioContext.currentTime;
+      this.currentPlayer?.stop();
+      this.currentPlayer?.disconnect();
+      this.currentPlayer = undefined;
+    } else {
+      this.parseLocationForRelevantTrack();
+    }
+  }
+
+  getEffectiveVolume(type: TrackType): number {
     try {
       const typeVolume =
-        type === "ambientMusic"
+        type === "ambient"
           ? this.ambientMusicVolume
-          : type === "combatMusic"
+          : type === "combat"
           ? this.combatMusicVolume
           : this.soundEffectsVolume;
       return this.muted
@@ -708,77 +372,8 @@ export class AudioStore {
             Math.max(0, typeVolume * this.masterVolume * GLOBAL_MULT),
           );
     } catch (error) {
-      this.handleError("Error calculating effective volume", error);
+      console.warn("Error calculating effective volume", error);
       return 0;
-    }
-  }
-
-  setMuteValue(muted: boolean) {
-    try {
-      this.muted = muted;
-
-      if (muted) {
-        if (this.currentTrack) {
-          this.currentTrack.sound
-            .pauseAsync()
-            .catch((error) =>
-              this.handleError("Error pausing current track", error),
-            );
-        }
-      } else {
-        if (this.currentTrack) {
-          this.currentTrack.sound
-            .playAsync()
-            .catch((error) =>
-              this.handleError("Error resuming current track", error),
-            );
-        }
-      }
-
-      this.updateAllVolumes();
-      this.persistSettings();
-    } catch (error) {
-      this.handleError("Error setting mute value", error);
-    }
-  }
-
-  setAudioLevel(type: "master" | "ambient" | "sfx" | "combat", level: number) {
-    try {
-      if (level >= 0 && level <= 1) {
-        switch (type) {
-          case "master":
-            this.masterVolume = level;
-            break;
-          case "ambient":
-            this.ambientMusicVolume = level;
-            break;
-          case "sfx":
-            this.soundEffectsVolume = level;
-            break;
-          case "combat":
-            this.combatMusicVolume = level;
-            break;
-        }
-        this.updateAllVolumes();
-        this.persistSettings();
-      }
-    } catch (error) {
-      this.handleError(`Error setting audio level for ${type}`, error);
-    }
-  }
-
-  private async updateAllVolumes() {
-    try {
-      if (this.currentTrack) {
-        await this.currentTrack.sound.setVolumeAsync(
-          this.getEffectiveVolume(this.currentTrack.category),
-        );
-      }
-      for (const sound of this.soundEffects.values()) {
-        await sound.setVolumeAsync(this.getEffectiveVolume("soundEffects"));
-      }
-    } catch (error) {
-      this.handleError("Error updating volumes", error);
     }
   }
 
@@ -794,8 +389,7 @@ export class AudioStore {
         this.muted = settings.muted ?? false;
       }
     } catch (error) {
-      this.handleError("Error loading persisted settings", error);
-      // Use defaults if settings can't be loaded
+      console.warn("Error loading persisted settings", error);
       this.masterVolume = 1;
       this.ambientMusicVolume = 1;
       this.soundEffectsVolume = 1;
@@ -815,203 +409,35 @@ export class AudioStore {
       };
       storage.set("audio_settings", JSON.stringify(settings));
     } catch (error) {
-      this.handleError("Error persisting settings", error);
+      console.warn("Error persisting settings", error);
     }
   }
-
-  async recoverFromError() {
-    if (this.isRecovering) return;
-
-    try {
-      runInAction(() => {
-        this.isRecovering = true;
-      });
-
-      this.cleanup();
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      await this.initializeAudio();
-
-      runInAction(() => {
-        this.isRecovering = false;
-      });
-    } catch (error) {
-      //console.error("Failed to recover audio system:", error);
-      this.logError("Failed to recover audio system", error);
-
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-        await this.initializeAudio();
-      } catch (finalError) {
-        //console.error("Final recovery attempt failed:", finalError);
-        this.logError("Final audio recovery attempt failed", finalError);
-      } finally {
-        runInAction(() => {
-          this.isRecovering = false;
-        });
-      }
-    }
-  }
-
-  private handleError(message: string, error: any) {
-    if (this.isBackgroundError(error)) {
-      // Background errors are expected, just log them
-      console.log(`Background audio error: ${message}`, error);
-      return;
-    }
-
-    //console.error(`AudioStore error: ${message}`, error);
-    this.logError(message, error);
-
-    // Trigger recovery process
-    this.recoverFromError();
-  }
-
-  private async withTimeout<T>(
-    promise: Promise<T>,
-    timeoutMs: number,
-    operation: string,
-  ) {
-    let timeoutId: NodeJS.Timeout;
-
-    const timeoutPromise = new Promise<T>((_, reject) => {
-      timeoutId = setTimeout(() => {
-        reject(
-          new Error(
-            `Audio operation "${operation}" timed out after ${timeoutMs}ms`,
-          ),
-        );
-      }, timeoutMs);
-    });
-
-    try {
-      const result = await Promise.race([promise, timeoutPromise]);
-      clearTimeout(timeoutId!);
-      return result;
-    } catch (error) {
-      clearTimeout(timeoutId!);
-      this.handleError(`Audio operation "${operation}" failed`, error);
-      // Reset state
-      runInAction(() => {
-        this.currentTrack = null;
-      });
-      this.parseLocationForRelevantTrack();
-    }
-  }
-
-  private isBackgroundError(error: any): boolean {
-    if (!error) return false;
-
-    // Check for the specific error message about audio focus
-    const errorMessage = error.message || error.toString();
-    return (
-      (typeof errorMessage === "string" &&
-        (errorMessage.includes(AUDIO_FOCUS_ERROR) ||
-          errorMessage.includes(BACKGROUND_ERROR_MESSAGE))) ||
-      error.name === AUDIO_FOCUS_ERROR
-    );
-  }
-
   cleanup() {
     try {
-      this.activeTransition = { trackIn: null, trackOut: null };
-
-      // Clean up all sound objects
-      const cleanupPromises: Promise<any>[] = [];
-
-      if (this.currentTrack) {
-        cleanupPromises.push(
-          this.currentTrack.sound.stopAsync().catch((e) => {
-            if (!this.isBackgroundError(e)) {
-              this.logError(
-                `Failed to stop current track: ${this.currentTrack?.name}`,
-                e,
-              );
-            }
-          }),
-        );
+      if (this.currentPlayer) {
+        this.currentPlayer.stop();
+        this.currentPlayer.disconnect();
+        this.currentPlayer = undefined;
       }
 
-      if (this.appStateListener) {
-        this.appStateListener.remove();
-        this.appStateListener = null;
+      if (this.currentEnvelope) {
+        this.currentEnvelope.disconnect();
+        this.currentEnvelope = undefined;
       }
 
-      // Unload all ambient tracks
-      this.ambientPlayers.forEach((sound, id) => {
-        cleanupPromises.push(
-          sound.unloadAsync().catch((e) => {
-            if (!this.isBackgroundError(e)) {
-              this.logError(`Failed to unload ambient track: ${id}`, e);
-            }
-          }),
-        );
-      });
+      if (this.outBoundPlayer) {
+        this.outBoundPlayer.stop();
+        this.outBoundPlayer.disconnect();
+        this.outBoundPlayer = undefined;
+      }
 
-      // Unload all combat tracks
-      this.combatPlayers.forEach((sound, id) => {
-        cleanupPromises.push(
-          sound.unloadAsync().catch((e) => {
-            if (!this.isBackgroundError(e)) {
-              this.logError(`Failed to unload combat track: ${id}`, e);
-            }
-          }),
-        );
-      });
+      this.ambientTrackBuffers.clear();
+      this.combatTrackBuffers.clear();
+      this.sfxTrackBuffers.clear();
 
-      // Unload all sound effects
-      this.soundEffects.forEach((sound, id) => {
-        cleanupPromises.push(
-          sound.unloadAsync().catch((e) => {
-            if (!this.isBackgroundError(e)) {
-              this.logError(`Failed to unload sound effect: ${id}`, e);
-            }
-          }),
-        );
-      });
-
-      // Clear maps
-      this.ambientPlayers.clear();
-      this.combatPlayers.clear();
-      this.soundEffects.clear();
-
-      runInAction(() => {
-        this.currentTrack = null;
-        this.isAmbientLoaded = false;
-        this.isCombatLoaded = false;
-        this.isSoundEffectsLoaded = false;
-      });
-
-      Promise.all(cleanupPromises).catch((e) => {
-        if (!this.isBackgroundError(e)) {
-          this.logError("Error during audio cleanup", e);
-        }
-      });
+      console.log("Audio store cleaned up");
     } catch (error) {
-      if (!this.isBackgroundError(error)) {
-        this.logError("Error during audio cleanup", error);
-      }
+      console.warn("Error cleaning up audio store:", error);
     }
-  }
-
-  private logError(message: string, error: any) {
-    console.warn(message, error);
-
-    Sentry.withScope((scope) => {
-      scope.setTag("component", "AudioStore");
-
-      scope.setContext("audioState", {
-        isAmbientLoaded: this.isAmbientLoaded,
-        isCombatLoaded: this.isCombatLoaded,
-        isSoundEffectsLoaded: this.isSoundEffectsLoaded,
-        currentTrack: this.currentTrack?.name || "none",
-        isRecovering: this.isRecovering,
-      });
-
-      if (error instanceof Error) {
-        Sentry.captureException(error);
-      } else {
-        Sentry.captureMessage(`${message}: ${JSON.stringify(error)}`);
-      }
-    });
   }
 }

@@ -14,7 +14,7 @@
       "usesAppleSignIn": true,
       "supportsTablet": true,
       "bundleIdentifier": "com.mikefrenodev.lineage",
-      "buildNumber": "4",
+      "buildNumber": "5",
       "entitlements": {
         "com.apple.developer.networking.wifi-info": true,
         "aps-environment": "development"
@@ -47,6 +47,20 @@
             "enableProguardInReleaseBuilds": true,
             "enableShrinkResourcesInReleaseBuilds": true
           }
+        }
+      ],
+      [
+        "expo-asset",
+        {
+          "assets": [
+            "./assets/music/ambient-middle.mp3",
+            "./assets/music/ambient-old.mp3",
+            "./assets/music/ambient-young.mp3",
+            "./assets/music/combat.mp3",
+            "./assets/music/shops.mp3",
+            "./assets/sfx/bossHit.mp3",
+            "./assets/sfx/hitDamage.mp3"
+          ]
         }
       ],
       [
@@ -86,7 +100,9 @@
           "iosUrlScheme": "com.googleusercontent.apps.976302581992-tbi6afmid4eq5dsn63t30kpfpdhjju8m"
         }
       ],
-      "expo-build-properties"
+      "expo-build-properties",
+      "expo-audio",
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true
@@ -106,3 +122,4 @@
     "owner": "mikefrenodev"
   }
 }
+

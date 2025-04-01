@@ -95,6 +95,9 @@ export class RootStore {
     this.shopsStore = new ShopStore({ root: this });
     this.uiStore.markStoreAsLoaded("shops");
 
+    this.audioStore = new AudioStore({ root: this });
+    this.uiStore.markStoreAsLoaded("audio");
+
     this.tutorialStore = new TutorialStore({ root: this });
     this.uiStore.markStoreAsLoaded("tutorial");
 
@@ -103,9 +106,6 @@ export class RootStore {
 
     this.saveStore = new SaveStore({ root: this });
     this.uiStore.markStoreAsLoaded("save");
-
-    this.audioStore = new AudioStore({ root: this });
-    this.uiStore.markStoreAsLoaded("audio");
 
     this.constructed = true;
 

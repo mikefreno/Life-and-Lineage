@@ -275,16 +275,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
 
   useEffect(() => {
     const initializeApp = async () => {
-      if (
-        uiStore.storeLoadingStatus["inventory"] == true &&
-        uiStore.storeLoadingStatus["player"] == true &&
-        fontLoaded &&
-        rootStore.constructed &&
-        firstLoad &&
-        audioStore
-          ? audioStore.isAmbientLoaded
-          : true
-      ) {
+      if (fontLoaded && rootStore.constructed && firstLoad) {
         uiStore.markStoreAsLoaded("fonts");
         handleRouting(playerState, rootStore, dungeonStore, pathname);
         setFirstLoad(false);
@@ -297,8 +288,11 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
     rootStore.constructed,
     uiStore.storeLoadingStatus,
     firstLoad,
-    audioStore?.isAmbientLoaded,
   ]);
+
+  useEffect(() => {
+    return () => audioStore.cleanup();
+  }, []);
 
   useEffect(() => {
     if (!firstLoad && playerState) {

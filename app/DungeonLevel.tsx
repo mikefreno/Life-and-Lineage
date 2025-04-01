@@ -34,6 +34,7 @@ import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 import { PLAYER_TEXT_STRING_DURATION } from "@/stores/PlayerAnimationStore";
 import Colors from "@/constants/Colors";
 import { useScaling } from "@/hooks/scaling";
+import { SCREEN_TRANSITION_TIMING } from "@/stores/UIStore";
 
 const DungeonLevelScreen = observer(() => {
   const { dungeonStore, uiStore, audioStore, playerAnimationStore } =
@@ -99,6 +100,7 @@ const DungeonLevelScreen = observer(() => {
     new Promise<void>((resolve) => {
       if (dungeonStore.currentMap && dungeonStore.currentPosition) {
         resolve();
+        uiStore.incrementLoadingStep();
       } else {
         const disposer = reaction(
           () => ({
@@ -109,38 +111,39 @@ const DungeonLevelScreen = observer(() => {
             if (map && position) {
               disposer();
               resolve();
+              uiStore.incrementLoadingStep();
             }
           },
         );
       }
     })
       .then(() => {
-        uiStore.incrementLoadingStep();
-        return new Promise<void>((resolve) => {
-          if (audioStore.isAmbientLoaded && audioStore.isSoundEffectsLoaded) {
-            resolve();
-          } else {
-            const disposer = reaction(
-              () => ({
-                ambient: audioStore.isAmbientLoaded,
-                combat: audioStore.isCombatLoaded,
-                sfx: audioStore.isSoundEffectsLoaded,
-              }),
-              ({ ambient, combat, sfx }) => {
-                if (ambient && combat && sfx) {
-                  disposer();
-                  resolve();
-                }
-              },
-            );
-          }
-        });
-      })
-      .then(() => {
-        uiStore.incrementLoadingStep();
-        wait(500).then(() => {
+        setTimeout(() => {
           uiStore.incrementLoadingStep();
-        });
+          return new Promise<void>((resolve) => {
+            if (
+              audioStore.ambientTrackBuffers.size > 0 &&
+              audioStore.combatTrackBuffers.size > 0
+            ) {
+              resolve();
+              uiStore.incrementLoadingStep();
+            } else {
+              setTimeout(() => {
+                if (
+                  audioStore.ambientTrackBuffers.size > 0 &&
+                  audioStore.combatTrackBuffers.size > 0
+                ) {
+                  resolve();
+                  uiStore.incrementLoadingStep();
+                } else {
+                  audioStore.cleanup();
+                  audioStore.initializeAudio();
+                  uiStore.incrementLoadingStep();
+                }
+              }, 1000);
+            }
+          });
+        }, SCREEN_TRANSITION_TIMING + 50);
       })
       .catch((error) => {
         uiStore.completeLoading();
