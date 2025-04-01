@@ -2,7 +2,7 @@
   "expo": {
     "name": "Lineage",
     "slug": "life-and-lineage",
-    "version": "0.9.0",
+    "version": "0.9.1",
     "orientation": "default",
     "icon": "assets/images/icon.png",
     "scheme": "lineageapp",
@@ -14,7 +14,7 @@
       "usesAppleSignIn": true,
       "supportsTablet": true,
       "bundleIdentifier": "com.mikefrenodev.lineage",
-      "buildNumber": "5",
+      "buildNumber": "0",
       "entitlements": {
         "com.apple.developer.networking.wifi-info": true,
         "aps-environment": "development"
@@ -26,7 +26,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.mikefrenodev.lineage",
-      "versionCode": 3,
+      "versionCode": 1,
       "googleServicesFile": "./google-services.json"
     },
     "web": {
@@ -35,34 +35,25 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      [
+        "expo-asset",
+        {
+          "assets": [
+            "./assets/music/shops.mp3",
+            "./assets/music/combat.mp3",
+            "./assets/music/ambient_young.mp3",
+            "./assets/music/ambient_old.mp3",
+            "./assets/music/ambient_middle.mp3",
+            "./assets/music/ambient_dungeon.mp3",
+            "./assets/sfx/boss_hit.mp3"
+          ]
+        }
+      ],
       "expo-sqlite",
       "expo-router",
       "react-native-edge-to-edge",
       "expo-apple-authentication",
       "./plugins/iap.js",
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "enableProguardInReleaseBuilds": true,
-            "enableShrinkResourcesInReleaseBuilds": true
-          }
-        }
-      ],
-      [
-        "expo-asset",
-        {
-          "assets": [
-            "./assets/music/ambient-middle.mp3",
-            "./assets/music/ambient-old.mp3",
-            "./assets/music/ambient-young.mp3",
-            "./assets/music/combat.mp3",
-            "./assets/music/shops.mp3",
-            "./assets/sfx/bossHit.mp3",
-            "./assets/sfx/hitDamage.mp3"
-          ]
-        }
-      ],
       [
         "expo-font",
         {
@@ -99,10 +90,7 @@
         {
           "iosUrlScheme": "com.googleusercontent.apps.976302581992-tbi6afmid4eq5dsn63t30kpfpdhjju8m"
         }
-      ],
-      "expo-build-properties",
-      "expo-audio",
-      "expo-asset"
+      ]
     ],
     "experiments": {
       "typedRoutes": true
@@ -115,7 +103,7 @@
         "projectId": "f4a10fdc-c377-4a37-8ad7-27685b89b4d9"
       }
     },
-    "runtimeVersion": "0.8.11",
+    "runtimeVersion": "0.9.1",
     "updates": {
       "url": "https://u.expo.dev/f4a10fdc-c377-4a37-8ad7-27685b89b4d9"
     },

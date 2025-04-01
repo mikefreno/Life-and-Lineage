@@ -17,10 +17,10 @@ import { Asset } from "expo-asset";
 
 const AMBIENT_TRACKS = {
   shops: require("@/assets/music/shops.mp3"),
-  old: require("@/assets/music/ambient-old.mp3"),
-  middle: require("@/assets/music/ambient-middle.mp3"),
-  young: require("@/assets/music/ambient-young.mp3"),
-  dungeon: require("@/assets/music/ambient-dungeon.mp3"),
+  old: require("@/assets/music/ambient_old.mp3"),
+  middle: require("@/assets/music/ambient_middle.mp3"),
+  young: require("@/assets/music/ambient_young.mp3"),
+  dungeon: require("@/assets/music/ambient_dungeon.mp3"),
 };
 
 type AMBIENT_TRACK_OPTIONS = keyof typeof AMBIENT_TRACKS;
@@ -32,8 +32,8 @@ const COMBAT_TRACKS = {
 type COMBAT_TRACK_OPTIONS = keyof typeof COMBAT_TRACKS;
 
 const SOUND_EFFECTS = {
-  bossHit: require("@/assets/sfx/bossHit.mp3"),
-  //hit: require("@/assets/sfx/hitDamage.mp3"), // this track is causing errors
+  bossHit: require("@/assets/sfx/boss_hit.mp3"),
+  //normalHit: require("@/assets/sfx/hit.mp3"), // this track is causing errors
 };
 
 type SFX_OPTIONS = keyof typeof SOUND_EFFECTS;
@@ -134,7 +134,9 @@ export class AudioStore {
         async ([key, source]) => {
           try {
             const asset = Asset.fromModule(source);
-            await asset.downloadAsync();
+            if (!asset.downloaded) {
+              await asset.downloadAsync();
+            }
             const buffer = await this.currentAudioContext.decodeAudioDataSource(
               asset.localUri!,
             );
@@ -149,7 +151,9 @@ export class AudioStore {
         async ([key, source]) => {
           try {
             const asset = Asset.fromModule(source);
-            await asset.downloadAsync();
+            if (!asset.downloaded) {
+              await asset.downloadAsync();
+            }
             const buffer = await this.currentAudioContext.decodeAudioDataSource(
               asset.localUri!,
             );
@@ -164,7 +168,9 @@ export class AudioStore {
         async ([key, source]) => {
           try {
             const asset = Asset.fromModule(source);
-            await asset.downloadAsync();
+            if (!asset.downloaded) {
+              await asset.downloadAsync();
+            }
             const buffer = await this.currentAudioContext.decodeAudioDataSource(
               asset.localUri!,
             );
