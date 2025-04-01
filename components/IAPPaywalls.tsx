@@ -36,6 +36,8 @@ import D20DieAnimation from "./DieRollAnim";
 import { runInAction } from "mobx";
 import React from "react";
 
+export const IAP_MODAL_ANIM_TIMING = 600;
+
 export const NecromancerPaywall = observer(
   ({
     isVisibleCondition,
@@ -1030,8 +1032,8 @@ export const IAPModal = observer(
       <Modal
         animationIn={"fadeInUpBig"}
         animationOut={"fadeOutUpBig"}
-        animationInTiming={600}
-        animationOutTiming={600}
+        animationInTiming={IAP_MODAL_ANIM_TIMING}
+        animationOutTiming={IAP_MODAL_ANIM_TIMING}
         isVisible={isVisibleCondition}
         onBackButtonPress={backFunction}
         statusBarTranslucent={true}

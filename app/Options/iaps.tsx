@@ -10,6 +10,7 @@ import {
   RemoteSavePaywall,
   DualPaywall,
   StashPaywall,
+  IAP_MODAL_ANIM_TIMING,
 } from "@/components/IAPPaywalls";
 import { useState } from "react";
 import { observer } from "mobx-react-lite";
@@ -34,7 +35,10 @@ const InAppPurchasePage = observer(() => {
         onClose={() => setShowNecromancerPurchase(false)}
         dualToggle={() => {
           setShowNecromancerPurchase(false);
-          setTimeout(() => setShowDualPurchase(true), 500);
+          setTimeout(
+            () => setShowDualPurchase(true),
+            IAP_MODAL_ANIM_TIMING + 50,
+          );
         }}
       />
       <RangerPaywall
@@ -42,7 +46,10 @@ const InAppPurchasePage = observer(() => {
         onClose={() => setShowRangerPurchase(false)}
         dualToggle={() => {
           setShowRangerPurchase(false);
-          setTimeout(() => setShowDualPurchase(true), 500);
+          setTimeout(
+            () => setShowDualPurchase(true),
+            IAP_MODAL_ANIM_TIMING + 50,
+          );
         }}
       />
       <DualPaywall

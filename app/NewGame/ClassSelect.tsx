@@ -24,6 +24,7 @@ import { tw_base, useStyles } from "@/hooks/styles";
 import NewGameMetaControls from "@/components/NewGameMetaControls";
 import {
   DualPaywall,
+  IAP_MODAL_ANIM_TIMING,
   NecromancerPaywall,
   RangerPaywall,
 } from "@/components/IAPPaywalls";
@@ -89,7 +90,10 @@ const SetClassScreen = observer(() => {
         dualToggle={() => {
           setShowNecroPaywall(false);
           setHeldForDual(PlayerClassOptions.necromancer);
-          setTimeout(() => setShowDualPaywall(true), 500);
+          setTimeout(
+            () => setShowDualPaywall(true),
+            IAP_MODAL_ANIM_TIMING + 50,
+          );
         }}
         isVisibleCondition={showNecroPaywall}
         onClose={() => {
@@ -104,7 +108,10 @@ const SetClassScreen = observer(() => {
         dualToggle={() => {
           setShowRangerPaywall(false);
           setHeldForDual(PlayerClassOptions.ranger);
-          setTimeout(() => setShowDualPaywall(true), 500);
+          setTimeout(
+            () => setShowDualPaywall(true),
+            IAP_MODAL_ANIM_TIMING + 50,
+          );
         }}
         isVisibleCondition={showRangerPaywall}
         onClose={() => {

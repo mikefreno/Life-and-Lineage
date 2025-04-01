@@ -379,7 +379,7 @@ export const useCombatActions = () => {
             }, playerState.minionsAndPets.length * 1000);
           });
           playerState.endTurn();
-        }, 500);
+        }, 1000);
       };
 
       if (attack.animation && typeof attack.animation !== "string") {
