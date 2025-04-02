@@ -81,7 +81,9 @@ export class AudioStore {
   constructor({ root }: { root: RootStore }) {
     this.root = root;
     this.loadPersistedSettings();
-    this.initializeAudio();
+    this.initializeAudio().then(() =>
+      this.root.uiStore.markStoreAsLoaded("audio"),
+    );
 
     makeObservable(this, {
       masterVolume: observable,
@@ -146,10 +148,28 @@ export class AudioStore {
           }
         }),
       );
-
       this.ambientTrackBuffers = new Map(loadedAmbientBuffers);
-
       this.root.uiStore.markStoreAsLoaded("ambient");
+
+      const loadedCombatBuffers = await Promise.all(
+        Object.entries(COMBAT_TRACKS).map(async ([key, source]) => {
+          try {
+            const asset = Asset.fromModule(source);
+            if (!asset.downloaded) {
+              await asset.downloadAsync();
+            }
+            const buffer = await this.currentAudioContext.decodeAudioDataSource(
+              asset.localUri!,
+            );
+            return [key as COMBAT_TRACK_OPTIONS, buffer] as const;
+          } catch (error) {
+            throw new Error(`Failed to decode ambient track: ${key}-${error}`);
+          }
+        }),
+      );
+      this.ambientTrackBuffers = new Map(loadedAmbientBuffers);
+      this.combatTrackBuffers = new Map(loadedCombatBuffers);
+
       this.parseLocationForRelevantTrack();
     } catch (error) {
       console.warn("Failed to initialize audio buffers", error);
