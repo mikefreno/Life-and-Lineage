@@ -8,7 +8,6 @@ import { reloadAppAsync } from "expo";
 import React, { ReactNode, useState } from "react";
 import * as Sentry from "@sentry/react-native";
 
-// Define types from Sentry
 type Extra = unknown;
 export type Extras = Record<string, Extra>;
 
@@ -64,9 +63,10 @@ function getErrorMessage(error: unknown): string {
 function ErrorRender({ error }: { error: unknown }): React.ReactElement {
   const root = useRootStore();
   const [expanded, setExpanded] = useState(false);
+  root.uiStore.clearDungeonColor();
 
   return (
-    <ThemedScrollView
+    <ScrollView
       contentContainerStyle={{
         flex: 1,
         justifyContent: "space-evenly",
@@ -117,6 +117,6 @@ function ErrorRender({ error }: { error: unknown }): React.ReactElement {
           </>
         )}
       </View>
-    </ThemedScrollView>
+    </ScrollView>
   );
 }

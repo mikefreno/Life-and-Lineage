@@ -36,7 +36,6 @@ const withCustomPermissions = (config) => {
     if (!config.modResults) {
       config.modResults = {};
     }
-    console.log(config.ios.entitlements);
 
     return config;
   });

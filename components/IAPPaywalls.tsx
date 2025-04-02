@@ -418,7 +418,7 @@ export const RangerPaywall = observer(
             ]}
           >
             <View style={[styles.rowEvenly, { width: "80%" }]}>
-              <AssassinationIcon height={80} width={80} />
+              <AssassinationIcon height={80} width={80} color={"#e5e7eb"} />
               <BeastMasteryIcon height={80} width={80} />
             </View>
             <View style={[styles.rowEvenly, { width: "80%" }]}>
@@ -599,7 +599,7 @@ export const DualPaywall = observer(
               justifyContent: "center",
             }}
           >
-            <AssassinationIcon height={80} width={80} />
+            <AssassinationIcon height={80} width={80} color={"#e5e7eb"} />
             <BeastMasteryIcon height={80} width={80} />
             <ArcaneIcon height={80} width={80} />
           </ScrollView>

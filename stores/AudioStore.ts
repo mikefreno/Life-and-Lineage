@@ -130,8 +130,8 @@ export class AudioStore {
 
   async initializeAudio() {
     try {
-      const ambientBufferPromises = Object.entries(AMBIENT_TRACKS).map(
-        async ([key, source]) => {
+      const loadedAmbientBuffers = await Promise.all(
+        Object.entries(AMBIENT_TRACKS).map(async ([key, source]) => {
           try {
             const asset = Asset.fromModule(source);
             if (!asset.downloaded) {
@@ -144,53 +144,10 @@ export class AudioStore {
           } catch (error) {
             throw new Error(`Failed to decode ambient track: ${key}-${error}`);
           }
-        },
+        }),
       );
-
-      const combatBufferPromises = Object.entries(COMBAT_TRACKS).map(
-        async ([key, source]) => {
-          try {
-            const asset = Asset.fromModule(source);
-            if (!asset.downloaded) {
-              await asset.downloadAsync();
-            }
-            const buffer = await this.currentAudioContext.decodeAudioDataSource(
-              asset.localUri!,
-            );
-            return [key as COMBAT_TRACK_OPTIONS, buffer] as const;
-          } catch (error) {
-            throw new Error(`Failed to decode combat track: ${key}-${error}`);
-          }
-        },
-      );
-
-      const sfxBufferPromises = Object.entries(SOUND_EFFECTS).map(
-        async ([key, source]) => {
-          try {
-            const asset = Asset.fromModule(source);
-            if (!asset.downloaded) {
-              await asset.downloadAsync();
-            }
-            const buffer = await this.currentAudioContext.decodeAudioDataSource(
-              asset.localUri!,
-            );
-            return [key as SFX_OPTIONS, buffer] as const;
-          } catch (error) {
-            throw new Error(`Failed to decode sfx: ${key}-${error}`);
-          }
-        },
-      );
-
-      const [loadedAmbientBuffers, loadedCombatBuffers, loadedSfxBuffers] =
-        await Promise.all([
-          Promise.all(ambientBufferPromises),
-          Promise.all(combatBufferPromises),
-          Promise.all(sfxBufferPromises),
-        ]);
 
       this.ambientTrackBuffers = new Map(loadedAmbientBuffers);
-      this.combatTrackBuffers = new Map(loadedCombatBuffers);
-      this.sfxTrackBuffers = new Map(loadedSfxBuffers);
 
       this.root.uiStore.markStoreAsLoaded("ambient");
       this.parseLocationForRelevantTrack();

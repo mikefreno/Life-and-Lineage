@@ -8,13 +8,15 @@
     "scheme": "lineageapp",
     "userInterfaceStyle": "automatic",
     "assetBundlePatterns": [
-      "**/*"
+      "**/*",
+      "./assets/music/*",
+      "./assets/sfx/*"
     ],
     "ios": {
       "usesAppleSignIn": true,
       "supportsTablet": true,
       "bundleIdentifier": "com.mikefrenodev.lineage",
-      "buildNumber": "0",
+      "buildNumber": "5",
       "entitlements": {
         "com.apple.developer.networking.wifi-info": true,
         "aps-environment": "development"
@@ -35,20 +37,6 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      [
-        "expo-asset",
-        {
-          "assets": [
-            "./assets/music/shops.mp3",
-            "./assets/music/combat.mp3",
-            "./assets/music/ambient_young.mp3",
-            "./assets/music/ambient_old.mp3",
-            "./assets/music/ambient_middle.mp3",
-            "./assets/music/ambient_dungeon.mp3",
-            "./assets/sfx/boss_hit.mp3"
-          ]
-        }
-      ],
       "expo-sqlite",
       "expo-router",
       "react-native-edge-to-edge",
@@ -90,6 +78,7 @@
         {
           "iosUrlScheme": "com.googleusercontent.apps.976302581992-tbi6afmid4eq5dsn63t30kpfpdhjju8m"
         }
+      ]
       ]
     ],
     "experiments": {
