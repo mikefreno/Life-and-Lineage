@@ -16,6 +16,7 @@ import { useVibration } from "@/hooks/generic";
 import { flex, useStyles } from "@/hooks/styles";
 import { runInAction } from "mobx";
 import Colors from "@/constants/Colors";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 const themeOptions = ["system", "light", "dark"];
 const vibrationOptions = ["full", "minimal", "none"];
@@ -257,52 +258,35 @@ export const AppSettings = observer(() => {
             </Text>
           </GenericStrikeAround>
           {authStore.isAuthenticated ? (
-            <>
-              <Text style={{ textAlign: "center", paddingVertical: 8 }}>
-                Logged in as: {authStore.getEmail()}
-              </Text>
-              <View style={{ ...flex.rowEvenly, width: "100%" }}>
-                <GenericFlatButton
-                  onPress={toggleRemoteSaveWindow}
-                  disabled={
-                    loadingDBInfo || !authStore.isConnectedAndInitialized
-                  }
-                >
-                  {loadingDBInfo ? (
-                    <D20DieAnimation size={20} keepRolling />
-                  ) : (
-                    "Make\n Cloud Save"
-                  )}
-                </GenericFlatButton>
-                <GenericFlatButton
-                  onPress={toggleRemoteLoadWindow}
-                  disabled={
-                    loadingDBInfo || !authStore.isConnectedAndInitialized
-                  }
-                >
-                  {loadingDBInfo ? (
-                    <D20DieAnimation size={20} keepRolling />
-                  ) : (
-                    "Load\n Cloud Save"
-                  )}
-                </GenericFlatButton>
-              </View>
-              <GenericRaisedButton onPress={logout}>
-                Sign Out
-              </GenericRaisedButton>
-            </>
+            <AccountManagement
+              toggleRemoteSaveWindow={toggleRemoteSaveWindow}
+              toggleRemoteLoadWindow={toggleRemoteLoadWindow}
+              loadingDBInfo={loadingDBInfo}
+              logout={logout}
+            />
           ) : (
             <>
               {!authStore.isConnectedAndInitialized && (
-                <Text
-                  style={{
-                    textAlign: "center",
-                    fontStyle: "italic",
-                    fontSize: 14,
-                  }}
-                >
-                  You are not connected to the internet
-                </Text>
+                <>
+                  <Text
+                    style={{
+                      textAlign: "center",
+                      fontStyle: "italic",
+                      fontSize: 14,
+                    }}
+                  >
+                    You are not connected to the internet
+                  </Text>
+                  <GenericFlatButton
+                    onPress={() => authStore.initializeNetInfo}
+                  >
+                    <FontAwesome6
+                      name="arrow-rotate-right"
+                      size={uiStore.iconSizeXL}
+                      color={Colors[uiStore.colorScheme].text}
+                    />
+                  </GenericFlatButton>
+                </>
               )}
               {iapStore.remoteSavesUnlocked ? (
                 <View style={{ ...flex.rowEvenly, width: "100%" }}>
@@ -437,3 +421,237 @@ export const AppSettings = observer(() => {
   );
 });
 export default AppSettings;
+
+const AccountManagement = observer(
+  ({
+    toggleRemoteSaveWindow,
+    toggleRemoteLoadWindow,
+    loadingDBInfo,
+    logout,
+  }: {
+    toggleRemoteSaveWindow: () => void;
+    toggleRemoteLoadWindow: () => void;
+    loadingDBInfo: boolean;
+    logout: () => void;
+  }) => {
+    const { authStore, uiStore } = useRootStore();
+    const styles = useStyles();
+
+    const [deletionStep, setDeletionStep] = useState<number>(0);
+    const [shouldEmailDump, setShouldEmailDump] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [deletionRequestResponse, setDeletionRequestResponse] = useState<
+      { ok: boolean; message: string } | undefined
+    >(undefined);
+
+    const handleDeletion = async ({
+      skipCron,
+      sendEmail,
+    }: {
+      skipCron: boolean;
+      sendEmail: boolean;
+    }) => {
+      setLoading(true);
+
+      const parse = await authStore.deleteAccount({
+        sendEmail,
+        skipCron,
+      });
+
+      setDeletionRequestResponse({ ok: parse.ok, message: parse.message });
+      setDeletionStep(0);
+      if (parse.ok) {
+        if (skipCron) {
+          await authStore.logout();
+        } else {
+          await authStore.deletionCheck();
+        }
+      }
+      setLoading(false);
+    };
+
+    const handleCancelation = async () => {
+      setLoading(true);
+
+      const parse = await authStore.deletionCancel();
+
+      setDeletionRequestResponse({ ok: parse.ok, message: parse.message });
+      setDeletionStep(0);
+      await authStore.deletionCheck();
+      setLoading(false);
+    };
+
+    if (loading) {
+      return (
+        <D20DieAnimation
+          keepRolling={true}
+          slowRoll={true}
+          showNumber={false}
+        />
+      );
+    }
+
+    return (
+      <>
+        <Text style={{ textAlign: "center", paddingVertical: 8 }}>
+          Logged in as: {authStore.getEmail()}
+        </Text>
+        {deletionStep === 0 ? (
+          <>
+            <View style={{ ...flex.rowEvenly, width: "100%" }}>
+              <GenericFlatButton
+                onPress={toggleRemoteSaveWindow}
+                disabled={loadingDBInfo || !authStore.isConnectedAndInitialized}
+              >
+                {loadingDBInfo ? (
+                  <D20DieAnimation size={20} keepRolling />
+                ) : (
+                  "Make\n Cloud Save"
+                )}
+              </GenericFlatButton>
+              <GenericFlatButton
+                onPress={toggleRemoteLoadWindow}
+                disabled={loadingDBInfo || !authStore.isConnectedAndInitialized}
+              >
+                {loadingDBInfo ? (
+                  <D20DieAnimation size={20} keepRolling />
+                ) : (
+                  "Load\n Cloud Save"
+                )}
+              </GenericFlatButton>
+            </View>
+            <View
+              style={[
+                styles.rowEvenly,
+                { alignItems: "center", width: "100%" },
+              ]}
+            >
+              <GenericRaisedButton
+                style={{ width: uiStore.dimensions.lesser * 0.45 }}
+                onPress={logout}
+              >
+                Sign Out
+              </GenericRaisedButton>
+              {authStore.deletionScheduled ? (
+                <GenericRaisedButton
+                  style={{ width: uiStore.dimensions.lesser * 0.45 }}
+                  onPress={handleCancelation}
+                  backgroundColor={Colors[uiStore.colorScheme].error}
+                  textColor="white"
+                >
+                  Cancel
+                </GenericRaisedButton>
+              ) : (
+                <GenericRaisedButton
+                  style={{ width: uiStore.dimensions.lesser * 0.45 }}
+                  vibrationStrength={"warning"}
+                  onPress={() => {
+                    setDeletionStep(1);
+                    setDeletionRequestResponse(undefined);
+                  }}
+                  backgroundColor={Colors[uiStore.colorScheme].error}
+                  textColor="white"
+                >{`Delete\nAccount`}</GenericRaisedButton>
+              )}
+            </View>
+            {authStore.deletionScheduled && (
+              <Text style={{ textAlign: "center" }}>
+                Deletion scheduled for: {authStore.deletionScheduled}
+              </Text>
+            )}
+          </>
+        ) : deletionStep === 1 ? (
+          <>
+            <Text style={{ textAlign: "center", ...styles["text-lg"] }}>
+              Would you like to receive an email containing your database dump?
+              (This will have all your save states - can be used to reinstate
+              your db if you decide to recreate an account)
+            </Text>
+            <View
+              style={[
+                styles.rowEvenly,
+                { alignItems: "center", width: "100%" },
+              ]}
+            >
+              <GenericRaisedButton
+                style={{ width: uiStore.dimensions.lesser * 0.45 }}
+                onPress={() => {
+                  setShouldEmailDump(true);
+                  setDeletionStep(2);
+                }}
+                backgroundColor={Colors[uiStore.colorScheme].interactive}
+                textColor="white"
+              >
+                {`Yes\n(recommended)`}
+              </GenericRaisedButton>
+              <GenericRaisedButton
+                style={{ width: uiStore.dimensions.lesser * 0.45 }}
+                onPress={() => setDeletionStep(2)}
+              >
+                {`Continue\nwithout`}
+              </GenericRaisedButton>
+            </View>
+          </>
+        ) : (
+          <>
+            <Text style={{ textAlign: "center", ...styles["text-lg"] }}>
+              By default, your account and database will be deleted in 24-48
+              hours, allowing you to cancel within that window. Would you
+              instead like to delete immediately?
+            </Text>
+            <View
+              style={[
+                styles.rowEvenly,
+                { alignItems: "center", width: "100%" },
+              ]}
+            >
+              <GenericRaisedButton
+                style={{ width: uiStore.dimensions.lesser * 0.45 }}
+                onPress={() =>
+                  handleDeletion({ skipCron: true, sendEmail: shouldEmailDump })
+                }
+              >
+                Yes
+              </GenericRaisedButton>
+              <GenericRaisedButton
+                style={{ width: uiStore.dimensions.lesser * 0.45 }}
+                onPress={() =>
+                  handleDeletion({
+                    skipCron: false,
+                    sendEmail: shouldEmailDump,
+                  })
+                }
+                backgroundColor={Colors[uiStore.colorScheme].interactive}
+                textColor="white"
+              >
+                No (recommended)
+              </GenericRaisedButton>
+            </View>
+          </>
+        )}
+        {deletionStep !== 0 && (
+          <GenericRaisedButton
+            style={{ width: uiStore.dimensions.lesser * 0.45 }}
+            onPress={() => {
+              setDeletionStep(0);
+            }}
+          >
+            Cancel
+          </GenericRaisedButton>
+        )}
+        {deletionRequestResponse && (
+          <Text
+            style={{
+              textAlign: "center",
+              color: deletionRequestResponse.ok
+                ? Colors[uiStore.colorScheme].success
+                : Colors[uiStore.colorScheme].error,
+            }}
+          >
+            {deletionRequestResponse.message}
+          </Text>
+        )}
+      </>
+    );
+  },
+);

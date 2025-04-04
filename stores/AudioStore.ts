@@ -417,8 +417,6 @@ export class AudioStore {
       this.ambientTrackBuffers.clear();
       this.combatTrackBuffers.clear();
       this.sfxTrackBuffers.clear();
-
-      console.log("Audio store cleaned up");
     } catch (error) {
       console.warn("Error cleaning up audio store:", error);
     }

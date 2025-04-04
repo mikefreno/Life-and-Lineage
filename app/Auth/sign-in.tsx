@@ -12,7 +12,6 @@ import { useEffect, useState } from "react";
 import GenericRaisedButton from "@/components/GenericRaisedButton";
 import { useRouter } from "expo-router";
 import { observer } from "mobx-react-lite";
-import { API_BASE_URL } from "@/config/config";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { GoogleIcon } from "@/assets/icons/SVGIcons";
 import D20DieAnimation from "@/components/DieRollAnim";
@@ -26,6 +25,7 @@ import { runInAction } from "mobx";
 import Colors from "@/constants/Colors";
 import { useVibration } from "@/hooks/generic";
 import { useScaling } from "@/hooks/scaling";
+import { reloadAppAsync } from "expo";
 
 const SignInScreen = observer(() => {
   const { authStore, uiStore } = useRootStore();
@@ -54,56 +54,19 @@ const SignInScreen = observer(() => {
 
   const attemptLogin = async () => {
     setAwaitingResponse(true);
-    const data = { email: emailAddress, password: password };
     try {
-      const res = await fetch(`${API_BASE_URL}/email/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+      const res = await authStore.emailSignIn({
+        email: emailAddress,
+        password: password,
       });
 
-      const result = await res.json();
-
-      if (!res.ok) {
-        if (res.status === 400) {
-          setError(result.message || "Bad request. Please check your input.");
-        } else if (res.status === 500) {
-          setError(
-            "An internal server error occurred. Please try again later.",
-          );
-        } else {
-          if (result.message === "Email not yet verified!") {
-            fetch(`${API_BASE_URL}/email/refresh/verification`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ email: emailAddress }),
-            });
-            setError(
-              result.message + " A new verification email has been sent",
-            );
-          } else {
-            setError(result.message || "An unexpected error occurred.");
-          }
-        }
-        return;
+      if (res.success) {
+        wait(500).then(() => {
+          router.dismissAll();
+          router.push("/Options");
+        });
       } else {
-        if (result.success) {
-          await authStore.login({
-            token: result.token,
-            email: result.email,
-            provider: "email",
-          });
-          wait(500).then(() => {
-            router.dismissAll();
-            router.push("/Options");
-          });
-        } else {
-          setError("Login failed for an unknown reason.");
-        }
+        setError(res.message);
       }
     } catch (e) {
       setError("Network error. Please check your connection and try again.");
@@ -127,11 +90,19 @@ const SignInScreen = observer(() => {
   const handleAppleSignIn = async () => {
     setAwaitingResponse(true);
     try {
-      await authStore.appleSignIn();
-      router.dismissAll();
-      router.push("/Options");
-    } catch (e) {
-      setError("Failed to sign in with Apple. Please try again.");
+      const res = await authStore.appleSignIn();
+
+      if (res == "success-201") {
+        reloadAppAsync();
+      } else if (res == "success-200") {
+        router.dismissAll();
+        router.push("/Options");
+      } else {
+        setError(res);
+      }
+      setAwaitingResponse(false);
+    } catch (error) {
+      setError("Failed to sign up with Apple. Please try again.");
     }
     setAwaitingResponse(false);
   };

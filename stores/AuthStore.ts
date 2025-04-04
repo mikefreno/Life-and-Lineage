@@ -1,4 +1,4 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, reaction, runInAction } from "mobx";
 import { jwtDecode } from "jwt-decode";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
@@ -42,6 +42,7 @@ export class AuthStore {
   private apple_user_string: string | null = null;
   private db_name: string | null = null;
   private db_token: string | null = null;
+  deletionScheduled: string | undefined;
   isConnected: boolean = false;
   private isInitialized: boolean = false;
   root: RootStore;
@@ -57,6 +58,15 @@ export class AuthStore {
     this.initializeGoogleSignIn();
 
     makeAutoObservable(this);
+
+    reaction(
+      () => this.isConnected,
+      () => {
+        if (this.isConnected) {
+          this.deletionCheck();
+        }
+      },
+    );
   }
 
   setAuthState = (
@@ -171,6 +181,8 @@ export class AuthStore {
             }
         }
       }
+
+      this.deletionCheck();
       this.setIsInitialized(true);
     } catch (error) {
       await this.logout();
@@ -192,8 +204,8 @@ export class AuthStore {
       const decodedToken: any = jwtDecode(token);
       if (decodedToken.exp < Date.now() / 1000) return false;
 
-      const response = await fetch(`${API_BASE_URL}/verify-token`, {
-        method: "POST",
+      const response = await fetch(`${API_BASE_URL}/email/refresh/token`, {
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -204,7 +216,7 @@ export class AuthStore {
         const data = await response.json();
         if (data.token) {
           storage.set("userToken", data.token);
-          this.token = data.token;
+          runInAction(() => (this.token = data.token));
         }
         return true;
       }
@@ -236,6 +248,7 @@ export class AuthStore {
       } catch (error) {}
 
       this.setAuthState(token ?? null, email, provider, appleUser);
+      this.deletionCheck();
     } catch (error) {}
   };
 
@@ -264,6 +277,9 @@ export class AuthStore {
     let email = credential.email;
     if (!email) {
       email = await this.appleEmailRetrieval(user);
+      if (!email) {
+        return `Failed to retrieve email, if you have created and deleted an account previously, you need to remove us from "Sign in with Apple".\nIn device settings>Apple Account>Sign in with Apple>Lineage>Delete`;
+      }
     }
 
     const res = await fetch(`${API_BASE_URL}/apple/registration`, {
@@ -276,6 +292,7 @@ export class AuthStore {
         userString: user,
       }),
     });
+
     if (res.status == 200 || res.status == 201) {
       const parse = await res.json();
       await this.login({
@@ -283,7 +300,7 @@ export class AuthStore {
         provider: "apple",
         appleUser: credential.user,
       });
-      return res.status;
+      return `success-${res.status}`;
     } else if (res.status == 400) {
       throw new Error("Missing user string");
     } else if (res.status == 418) {
@@ -318,6 +335,72 @@ export class AuthStore {
       throw new Error("Failure during sign-in");
     }
     return res.status;
+  };
+
+  emailSignIn = async (data: {
+    email: string;
+    password: string;
+  }): Promise<{ success: true } | { success: false; message: string }> => {
+    const res = await fetch(`${API_BASE_URL}/email/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      if (res.status === 400) {
+        return {
+          success: false,
+          message: result.message || "Bad request. Please check your input.",
+        };
+      } else if (res.status === 500) {
+        return {
+          success: false,
+          message:
+            result.message ||
+            "An internal server error occurred. Please try again later.",
+        };
+      } else {
+        if (result.message === "Email not yet verified!") {
+          fetch(`${API_BASE_URL}/email/refresh/verification`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email: data.email }),
+          });
+          return {
+            success: false,
+            message: result.message + " A new verification email has been sent",
+          };
+        } else {
+          return {
+            success: false,
+            message: result.message || "An unexpected error occurred.",
+          };
+        }
+      }
+    } else {
+      if (result.success) {
+        await this.login({
+          token: result.token,
+          email: result.email,
+          provider: "email",
+        });
+        return {
+          success: true,
+        };
+      } else {
+        return {
+          success: false,
+          message: "Login failed for an unknown reason.",
+        };
+      }
+    }
   };
 
   private checkAppleAuth = async (
@@ -480,6 +563,103 @@ export class AuthStore {
     }
     return null;
   };
+
+  async deleteAccount({
+    sendEmail,
+    skipCron,
+  }: {
+    sendEmail: boolean;
+    skipCron: boolean;
+  }) {
+    const apiUrl = `${API_BASE_URL}/database/deletion/init`;
+
+    const payload = {
+      email: this.email,
+      db_name: this.db_name,
+      db_token: this.db_token,
+      skip_cron: skipCron,
+      send_dump_target: sendEmail ? this.email : undefined,
+    };
+
+    return fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${
+          this.apple_user_string ? this.apple_user_string : this.token
+        }`,
+      },
+      body: JSON.stringify(payload),
+    })
+      .then(async (response) => {
+        return await response.json();
+      })
+      .catch((e) => console.error(e));
+  }
+
+  async deletionCheck() {
+    const apiUrl = `${API_BASE_URL}/database/deletion/check`;
+    const payload = {
+      email: this.email,
+    };
+
+    const res = await fetch(apiUrl, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    if (res.ok) {
+      const response = await res.json();
+
+      if (response.created_at) {
+        runInAction(() => {
+          const isoString = response.created_at.replace(" ", "T") + "Z";
+          const createdDate = new Date(
+            new Date(isoString).getTime() + 24 * 60 * 60 * 1000,
+          );
+          const todayMidnightUTC = new Date(
+            Date.UTC(
+              createdDate.getUTCFullYear(),
+              createdDate.getUTCMonth(),
+              createdDate.getUTCDate(),
+            ),
+          );
+
+          const nextUtcMidnight =
+            createdDate.getTime() >= todayMidnightUTC.getTime()
+              ? new Date(todayMidnightUTC.getTime() + 24 * 60 * 60 * 1000)
+              : todayMidnightUTC;
+
+          this.deletionScheduled = nextUtcMidnight.toLocaleString();
+        });
+      } else {
+        this.deletionScheduled = undefined;
+      }
+    } else {
+      this.deletionScheduled = undefined;
+    }
+  }
+
+  async deletionCancel() {
+    const apiUrl = `${API_BASE_URL}/database/deletion/cancel`;
+    const payload = {
+      email: this.email,
+    };
+
+    return fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${
+          this.apple_user_string ? this.apple_user_string : this.token
+        }`,
+      },
+      body: JSON.stringify(payload),
+    })
+      .then(async (response) => {
+        return await response.json();
+      })
+      .catch((e) => console.error(e));
+  }
 
   _debugLog = async () => {
     if (__DEV__) {

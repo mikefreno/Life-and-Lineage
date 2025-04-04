@@ -157,8 +157,16 @@ const SignUpScreen = observer(() => {
   const handleAppleSignUp = async () => {
     setAwaitingResponse(true);
     try {
-      await authStore.appleSignIn();
-      reloadAppAsync();
+      const res = await authStore.appleSignIn();
+
+      if (res == "success-201") {
+        reloadAppAsync();
+      } else if (res == "success-200") {
+        router.dismissAll();
+        router.push("/Options");
+      } else {
+        setError(res);
+      }
       setAwaitingResponse(false);
     } catch (error) {
       setError("Failed to sign up with Apple. Please try again.");
@@ -376,7 +384,13 @@ const SignUpScreen = observer(() => {
             </TouchableWithoutFeedback>
           </KeyboardAvoidingView>
         ) : (
-          <View style={{ paddingTop: uiStore.dimensions.height * 0.25 }}>
+          <View
+            style={{
+              height: "100%",
+              alignContent: "center",
+              justifyContent: "center",
+            }}
+          >
             <Text style={{ textAlign: "center", fontSize: 24 }}>
               A verification email has been sent! Check your email (and spam
               folder) to complete registration.
