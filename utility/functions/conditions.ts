@@ -1,8 +1,7 @@
-import conditions from "@/assets/json/conditions.json";
 import { Condition } from "@/entities/conditions";
-import sanityDebuffs from "@/assets/json/sanityDebuffs.json";
 import { ConditionObjectType, DamageType } from "@/utility/types";
 import { PlayerCharacter } from "@/entities/character";
+import { jsonServiceStore } from "@/stores/SingletonSource";
 
 interface createDebuffDeps {
   debuffName: string;
@@ -20,9 +19,9 @@ export function createDebuff({
   applierNameString,
   applierID,
 }: createDebuffDeps) {
-  const debuffObj = conditions.find(
-    (condition) => condition.name === debuffName,
-  ) as ConditionObjectType;
+  const debuffObj = jsonServiceStore
+    .readJsonFileSync("conditions")
+    .find((condition) => condition.name === debuffName) as ConditionObjectType;
 
   if (debuffObj) {
     let healthDamage: number[] = [];
@@ -113,9 +112,9 @@ export function createBuff({
   applierNameString,
   applierID,
 }: createBuffDeps) {
-  const buffObj = conditions.find(
-    (condition) => condition.name === buffName,
-  ) as ConditionObjectType;
+  const buffObj = jsonServiceStore
+    .readJsonFileSync("conditions")
+    .find((condition) => condition.name === buffName) as ConditionObjectType;
 
   if (buffObj) {
     let healthHeal: (number | null)[] = [];
@@ -194,8 +193,10 @@ export function lowSanityDebuffGenerator(playerState: PlayerCharacter) {
   const roll = rollD20();
   if (roll < 16) return;
 
-  const debuffObj = sanityDebuffs[
-    Math.floor(Math.random() * sanityDebuffs.length)
+  const debuffObj = jsonServiceStore.readJsonFileSync("sanityDebuffs")[
+    Math.floor(
+      Math.random() * jsonServiceStore.readJsonFileSync("sanityDebuffs").length,
+    )
   ] as ConditionObjectType;
 
   // Pre-calculate multipliers

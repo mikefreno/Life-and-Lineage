@@ -15,8 +15,6 @@ import { TimeStore } from "@/stores/TimeStore";
 import { CharacterStore } from "@/stores/CharacterStore";
 import { TutorialStore } from "@/stores/TutorialStore";
 import { Condition } from "@/entities/conditions";
-import sanityDebuffs from "@/assets/json/sanityDebuffs.json";
-import debilitations from "@/assets/json/debilitations.json";
 import { ConditionObjectType, EffectOptions } from "@/utility/types";
 import { StashStore } from "@/stores/StashStore";
 import { SaveStore } from "@/stores/SaveStore";
@@ -25,6 +23,8 @@ import { PlayerAnimationStore } from "@/stores/PlayerAnimationStore";
 import { flipCoin } from "@/utility/functions/misc";
 import { IAPStore } from "@/stores/IAPStore";
 import { reloadAppAsync } from "expo";
+import { JSONServiceStore } from "./JSONServiceStore";
+import { jsonServiceStore } from "./SingletonSource";
 
 export class RootStore {
   playerState: PlayerCharacter | null;
@@ -41,6 +41,7 @@ export class RootStore {
   saveStore: SaveStore;
   audioStore: AudioStore;
   iapStore: IAPStore;
+  JSONServiceStore: JSONServiceStore;
 
   constructed: boolean = false;
   atDeathScreen: boolean = false;
@@ -62,6 +63,11 @@ export class RootStore {
 
   constructor() {
     this.uiStore = new UIStore({ root: this });
+
+    this.authStore = new AuthStore({ root: this });
+    this.JSONServiceStore = new JSONServiceStore({ root: this });
+
+    this.uiStore.markStoreAsLoaded("auth");
     __DEV__ ?? this.uiStore.markStoreAsLoaded("inventory");
 
     this.time = new TimeStore({ root: this });
@@ -77,9 +83,6 @@ export class RootStore {
     this.playerAnimationStore = new PlayerAnimationStore({ root: this });
 
     this.uiStore.markStoreAsLoaded("player");
-
-    this.authStore = new AuthStore({ root: this });
-    this.uiStore.markStoreAsLoaded("auth");
 
     this.iapStore = new IAPStore({ root: this });
     this.uiStore.markStoreAsLoaded("iaps");
@@ -292,9 +295,9 @@ export class RootStore {
       const currentDebiliationNames = this.playerState?.debilitations.map(
         (deb) => deb.name,
       );
-      const availible = debilitations.filter(
-        (cond) => !currentDebiliationNames.includes(cond.name),
-      );
+      const availible = jsonServiceStore
+        .readJsonFileSync("debilitations")
+        .filter((cond) => !currentDebiliationNames.includes(cond.name));
       if (availible.length > 0) {
         const obj = availible[
           Math.floor(Math.random() * availible.length)
@@ -310,8 +313,11 @@ export class RootStore {
   }
 
   private getRandomSanityDebuff() {
-    return sanityDebuffs[
-      Math.floor(Math.random() * sanityDebuffs.length)
+    return jsonServiceStore.readJsonFileSync("sanityDebuffs")[
+      Math.floor(
+        Math.random() *
+          jsonServiceStore.readJsonFileSync("sanityDebuffs").length,
+      )
     ] as ConditionObjectType;
   }
 

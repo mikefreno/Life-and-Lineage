@@ -39,12 +39,12 @@ import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import PlatformDependantGestureWrapper from "@/components/PlatformDependantGestureWrapper";
 import { SCREEN_TRANSITION_TIMING } from "@/stores/UIStore";
-
 import { decode } from "base-64";
 import { useScaling } from "@/hooks/scaling";
-import Purchases, { LOG_LEVEL } from "react-native-purchases";
 import TutorialModal from "@/components/TutorialModal";
 import { TutorialOption } from "@/utility/types";
+import { initializePurchases } from "@/stores/SingletonSource";
+
 global.atob = decode;
 
 export { ErrorBoundary } from "expo-router";
@@ -117,6 +117,10 @@ const Root = () => {
     }
   }, [mainFontLoaded, error]);
 
+  useEffect(() => {
+    initializePurchases();
+  }, []);
+
   while (!mainFontLoaded) {
     return null;
   }
@@ -147,7 +151,6 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
     uiStore,
     audioStore,
     shopsStore,
-    iapStore,
     showReachedEndOfCompletedDungeonsMessage,
     closeReachedEndOfCompletedDungeonsMessage,
   } = rootStore;
@@ -218,22 +221,6 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   //}
   //}, [expoPushToken]);
   //
-
-  useEffect(() => {
-    Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
-
-    if (Platform.OS === "ios") {
-      Purchases.configure({ apiKey: process.env.EXPO_PUBLIC_RC_IOS as string });
-    } else if (Platform.OS === "android") {
-      Purchases.configure({
-        apiKey: process.env.EXPO_PUBLIC_RC_ANDROID as string,
-      });
-    }
-
-    Purchases.getOfferings()
-      .then((val) => iapStore.setOffering(val.current))
-      .catch((e) => console.error(e));
-  }, []);
 
   const handleRouting = (
     playerState: PlayerCharacter | null,

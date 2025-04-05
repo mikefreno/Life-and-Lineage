@@ -26,7 +26,6 @@ import { tw, useStyles } from "@/hooks/styles";
 import { runInAction } from "mobx";
 import Colors from "@/constants/Colors";
 import { useScaling } from "@/hooks/scaling";
-import { reloadAppAsync } from "expo";
 
 const SignUpScreen = observer(() => {
   const vibration = useVibration();
@@ -53,12 +52,8 @@ const SignUpScreen = observer(() => {
 
   useEffect(() => {
     if (authStore.isAuthenticated) {
-      const navigateToOptions = async () => {
-        router.dismissAll();
-        router.push("/Options");
-      };
-
-      navigateToOptions();
+      router.dismissAll();
+      router.push("/Options");
     }
   }, [authStore.isAuthenticated, router]);
 
@@ -146,7 +141,6 @@ const SignUpScreen = observer(() => {
     setAwaitingResponse(true);
     try {
       await authStore.googleSignIn();
-      reloadAppAsync();
       setAwaitingResponse(false);
     } catch (error) {
       setError("Failed to sign up with Google. Please try again.");
@@ -158,13 +152,8 @@ const SignUpScreen = observer(() => {
     setAwaitingResponse(true);
     try {
       const res = await authStore.appleSignIn();
-
-      if (res == "success-201") {
-        reloadAppAsync();
-      } else if (res == "success-200") {
-        router.dismissAll();
-        router.push("/Options");
-      } else {
+      console.log("recieve response");
+      if (res !== "success") {
         setError(res);
       }
       setAwaitingResponse(false);

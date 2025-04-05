@@ -25,7 +25,6 @@ import { runInAction } from "mobx";
 import Colors from "@/constants/Colors";
 import { useVibration } from "@/hooks/generic";
 import { useScaling } from "@/hooks/scaling";
-import { reloadAppAsync } from "expo";
 
 const SignInScreen = observer(() => {
   const { authStore, uiStore } = useRootStore();
@@ -52,7 +51,16 @@ const SignInScreen = observer(() => {
     }
   }, [password]);
 
-  const attemptLogin = async () => {
+  useEffect(() => {
+    if (authStore.isAuthenticated) {
+      wait(500).then(() => {
+        router.dismissAll();
+        router.push("/Options");
+      });
+    }
+  }, [authStore.isAuthenticated, router]);
+
+  const handleEmailLogin = async () => {
     setAwaitingResponse(true);
     try {
       const res = await authStore.emailSignIn({
@@ -60,12 +68,7 @@ const SignInScreen = observer(() => {
         password: password,
       });
 
-      if (res.success) {
-        wait(500).then(() => {
-          router.dismissAll();
-          router.push("/Options");
-        });
-      } else {
+      if (!res.success) {
         setError(res.message);
       }
     } catch (e) {
@@ -79,8 +82,6 @@ const SignInScreen = observer(() => {
     setAwaitingResponse(true);
     try {
       await authStore.googleSignIn();
-      router.dismissAll();
-      router.push("/Options");
     } catch (e) {
       setError("Failed to sign in with Google. Please try again.");
     }
@@ -91,18 +92,12 @@ const SignInScreen = observer(() => {
     setAwaitingResponse(true);
     try {
       const res = await authStore.appleSignIn();
-
-      if (res == "success-201") {
-        reloadAppAsync();
-      } else if (res == "success-200") {
-        router.dismissAll();
-        router.push("/Options");
-      } else {
+      if (res !== "success") {
         setError(res);
       }
       setAwaitingResponse(false);
     } catch (error) {
-      setError("Failed to sign up with Apple. Please try again.");
+      setError("Failed to sign in with Apple. Please try again.");
     }
     setAwaitingResponse(false);
   };
@@ -183,7 +178,7 @@ const SignInScreen = observer(() => {
                       disabled={
                         password.length == 0 || emailAddress.length == 0
                       }
-                      onPress={attemptLogin}
+                      onPress={handleEmailLogin}
                       backgroundColor={theme.interactive}
                       textColor={"white"}
                     >

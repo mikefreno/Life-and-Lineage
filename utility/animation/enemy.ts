@@ -1,4 +1,4 @@
-import enemiesJSON from "@/assets/json/enemy.json";
+import { jsonServiceStore } from "@/stores/SingletonSource";
 import { ColorValue } from "react-native";
 
 // use after expanding set
@@ -92,7 +92,9 @@ export type EnemyImageKeyOption =
   | "wolf_black"
   | "zombie";
 
-export const enemyOptions = enemiesJSON.map((json) => json.name);
+export const enemyOptions = jsonServiceStore
+  .readJsonFileSync("enemy")
+  .map((json) => json.name);
 
 export type AnimationBase = {
   anim: any;

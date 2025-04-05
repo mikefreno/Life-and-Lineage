@@ -149,43 +149,46 @@ export class IAPStore {
   }
 
   evaluateProductIds(transactions: string[]) {
-    const messageReporting = [];
+    const messageReporting: Set<string> = new Set();
     let tabsPurchaseCounter = 0;
     for (const transaction of transactions) {
       if (DUAL_CLASS_UNLOCK_IDs.includes(transaction)) {
         this.necromancerUnlocked = true;
         this.rangerUnlocked = true;
-        messageReporting.push("Ranger Unlocked!");
-        messageReporting.push("Necromancer Unlocked!");
-        messageReporting.push("Remote Saving Unlocked!");
+        messageReporting.add("Ranger Unlocked!");
+        messageReporting.add("Necromancer Unlocked!");
+        messageReporting.add("Remote Saving Unlocked!");
         continue;
       }
       if (RANGER_UNLOCK_IDs.includes(transaction)) {
         this.rangerUnlocked = true;
-        messageReporting.push("Ranger Unlocked!");
-        messageReporting.push("Remote Saving Unlocked!");
+        messageReporting.add("Ranger Unlocked!");
+        messageReporting.add("Remote Saving Unlocked!");
         continue;
       }
       if (NECRO_UNLOCK_IDs.includes(transaction)) {
         this.necromancerUnlocked = true;
-        messageReporting.push("Necromancer Unlocked!");
-        messageReporting.push("Remote Saving Unlocked!");
+        messageReporting.add("Necromancer Unlocked!");
+        messageReporting.add("Remote Saving Unlocked!");
         continue;
       }
       if (REMOTE_SAVES_UNLOCK_IDs.includes(transaction)) {
         this.remoteSaveSpecificUnlock = true;
-        messageReporting.push("Remote Saving Unlocked!");
+        messageReporting.add("Remote Saving Unlocked!");
         continue;
       }
       if (MORE_TABS_UNLOCK_IDs.includes(transaction)) {
         tabsPurchaseCounter++;
-        messageReporting.push("4 Stash tabs Added!");
         continue;
       }
     }
     this.purchasedTabs = tabsPurchaseCounter * 4;
     this.persistForOffline();
-    return messageReporting;
+    const messagesArray = Array.from(messageReporting);
+    for (let i = 0; i < tabsPurchaseCounter; i++) {
+      messagesArray.push("4 Stash tabs Added!");
+    }
+    return messagesArray;
   }
 
   purchaseHandler(val: MakePurchaseResult) {

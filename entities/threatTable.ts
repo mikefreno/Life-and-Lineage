@@ -1,4 +1,4 @@
-import { Being } from "./being";
+import { Being } from "@/entities/being";
 
 export class ThreatTable {
   private baseThreatPoints: Map<string, number>;

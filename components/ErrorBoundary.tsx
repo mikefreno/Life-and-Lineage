@@ -1,5 +1,5 @@
 import { Component } from "react";
-import { Text, ThemedScrollView } from "@/components/Themed";
+import { Text } from "@/components/Themed";
 import { ScrollView, View } from "react-native";
 import D20DieAnimation from "@/components/DieRollAnim";
 import GenericFlatButton from "@/components/GenericFlatButton";

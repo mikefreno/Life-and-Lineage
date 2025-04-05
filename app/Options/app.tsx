@@ -32,6 +32,8 @@ export const AppSettings = observer(() => {
   const [remoteSaves, setRemoteSaves] = useState<CheckpointRow[]>([]);
   const [saveName, setSaveName] = useState<string>("");
   const [loadingDBInfo, setLoadingDBInfo] = useState<boolean>(false);
+  const [showAccountDeletedMessage, setShowAccountDeletedMessage] =
+    useState(false);
 
   const vibration = useVibration();
   const styles = useStyles();
@@ -263,6 +265,7 @@ export const AppSettings = observer(() => {
               toggleRemoteLoadWindow={toggleRemoteLoadWindow}
               loadingDBInfo={loadingDBInfo}
               logout={logout}
+              setShowAccountDeletedMessage={setShowAccountDeletedMessage}
             />
           ) : (
             <>
@@ -313,6 +316,16 @@ export const AppSettings = observer(() => {
                 </GenericRaisedButton>
               )}
             </>
+          )}
+          {showAccountDeletedMessage && (
+            <Text
+              style={{
+                textAlign: "center",
+                color: Colors[uiStore.colorScheme].success,
+              }}
+            >
+              Your account has been successfully deleted.
+            </Text>
           )}
 
           <GenericStrikeAround>Select Color Theme</GenericStrikeAround>
@@ -428,11 +441,13 @@ const AccountManagement = observer(
     toggleRemoteLoadWindow,
     loadingDBInfo,
     logout,
+    setShowAccountDeletedMessage,
   }: {
     toggleRemoteSaveWindow: () => void;
     toggleRemoteLoadWindow: () => void;
     loadingDBInfo: boolean;
     logout: () => void;
+    setShowAccountDeletedMessage: (val: boolean) => void;
   }) => {
     const { authStore, uiStore } = useRootStore();
     const styles = useStyles();
@@ -462,6 +477,7 @@ const AccountManagement = observer(
       setDeletionStep(0);
       if (parse.ok) {
         if (skipCron) {
+          setShowAccountDeletedMessage(true);
           await authStore.logout();
         } else {
           await authStore.deletionCheck();

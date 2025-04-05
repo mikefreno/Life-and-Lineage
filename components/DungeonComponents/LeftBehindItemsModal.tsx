@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, View, Image } from "react-native";
+import { View, Image } from "react-native";
 import GenericModal from "@/components/GenericModal";
 import { ThemedView, Text } from "@/components/Themed";
 import { useLootState } from "@/providers/DungeonData";

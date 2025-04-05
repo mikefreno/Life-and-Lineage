@@ -34,8 +34,8 @@ import { Being } from "@/entities/being";
 import AttacksList from "./AttacksList";
 import { useScaling } from "@/hooks/scaling";
 import { toTitleCase } from "@/utility/functions/misc";
-import ProgressBar from "../ProgressBar";
-import ThemedCard from "../ThemedCard";
+import ProgressBar from "@/components/ProgressBar";
+import ThemedCard from "@/components/ThemedCard";
 import Colors from "@/constants/Colors";
 import { ClockIcon } from "@/assets/icons/SVGIcons";
 

@@ -21,7 +21,7 @@ import D20DieAnimation from "@/components/DieRollAnim";
 import type { Item } from "@/entities/item";
 import { Image } from "expo-image";
 import { StashDisplay } from "@/components/StashDisplay";
-import { useStyles } from "../../hooks/styles";
+import { useStyles } from "@/hooks/styles";
 import { useVibration } from "@/hooks/generic";
 import SeasonDisplay from "@/components/SeasonDisplay";
 import { useScaling } from "@/hooks/scaling";

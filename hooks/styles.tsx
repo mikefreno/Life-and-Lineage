@@ -1,6 +1,6 @@
 import { Platform, StyleSheet } from "react-native";
 import { useRootStore } from "./stores";
-import Colors from "../constants/Colors";
+import Colors from "@/constants/Colors";
 import { Orientation } from "expo-screen-orientation";
 import { useScaling } from "./scaling";
 

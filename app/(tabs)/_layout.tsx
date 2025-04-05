@@ -32,10 +32,10 @@ import {
 import { Text, ThemedView } from "@/components/Themed";
 import TutorialModal from "@/components/TutorialModal";
 import { useIsFocused } from "@react-navigation/native";
-import { Element, TutorialOption } from "../../utility/types";
+import { Element, TutorialOption } from "@/utility/types";
 import { useVibration } from "@/hooks/generic";
 import { useRootStore } from "@/hooks/stores";
-import { useStyles } from "../../hooks/styles";
+import { useStyles } from "@/hooks/styles";
 import { observer } from "mobx-react-lite";
 import { wait } from "@/utility/functions/misc";
 import { MaterialCommunityIcons } from "@expo/vector-icons";

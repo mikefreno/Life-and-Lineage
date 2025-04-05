@@ -4,11 +4,10 @@ import {
   getRandomName,
   getRandomPersonality,
 } from "./misc";
-import jobs from "../../assets/json/jobs.json";
-import names from "../../assets/json/names.json";
-import { Element, PlayerClassOptions } from "../types";
-import { Character, PlayerCharacter } from "../../entities/character";
-import type { RootStore } from "../../stores/RootStore";
+import { Element, PlayerClassOptions } from "@/utility/types";
+import { Character, PlayerCharacter } from "@/entities/character";
+import type { RootStore } from "@/stores/RootStore";
+import { jsonServiceStore } from "@/stores/SingletonSource";
 
 export function generateNewCharacter(root: RootStore) {
   const sex = flipCoin() == "Heads" ? "male" : "female";
@@ -19,11 +18,16 @@ export function generateNewCharacter(root: RootStore) {
 
   const newChar = new Character({
     sex: sex,
+
     firstName: name.firstName,
     lastName: name.lastName,
     birthdate: birthdate,
     job: job,
     personality: randomPersonality,
+    beingType: "human",
+    activeAuraConditionIds: [],
+    animationStrings: {},
+    ...getNPCBaseCombatStats(),
     root,
   });
   root.characterStore.addCharacter(newChar);
@@ -42,6 +46,10 @@ export function generateNewAdoptee(root: RootStore) {
     lastName: name.lastName,
     birthdate: birthdate,
     personality: randomPersonality,
+    beingType: "human",
+    activeAuraConditionIds: [],
+    animationStrings: {},
+    ...getNPCBaseCombatStats(),
     root,
   });
   root.characterStore.addCharacter(newChar);
@@ -49,12 +57,16 @@ export function generateNewAdoptee(root: RootStore) {
 }
 
 export function getRandomJobTitle(): string {
-  const randomIndex = Math.floor(Math.random() * jobs.length);
-  return jobs[randomIndex].title;
+  const randomIndex = Math.floor(
+    Math.random() * jsonServiceStore.readJsonFileSync("jobs").length,
+  );
+  return jsonServiceStore.readJsonFileSync("jobs")[randomIndex].title;
 }
 
 export function getSexFromName(firstName: string) {
-  const res = names.find((name) => name.firstName == firstName);
+  const res = jsonServiceStore
+    .readJsonFileSync("names")
+    .find((name) => name.firstName == firstName);
   return res?.sex ?? "male";
 }
 
@@ -126,6 +138,8 @@ export function createParent(
     affection: 85,
     birthdate: root.time.generateBirthDateInRange(32, 55),
     root,
+    activeAuraConditionIds: [],
+    animationStrings: {},
     ...getNPCBaseCombatStats(),
   });
   root.characterStore.addCharacter(parent);
@@ -164,6 +178,9 @@ export function createPlayerCharacter({
   const bday = root.time.generateBirthDateForAge(15);
 
   const basePlayerOptions = {
+    beingType: "human",
+    animationStrings: {},
+    activeAuraConditionIds: [],
     firstName,
     lastName,
     sex,

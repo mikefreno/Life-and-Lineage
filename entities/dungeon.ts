@@ -1,18 +1,18 @@
-import { Enemy, itemList } from "./creatures";
+import { Enemy, itemList } from "@/entities/creatures";
 import { action, computed, makeObservable, observable, reaction } from "mobx";
-import { DungeonStore, saveDungeonInstance } from "../stores/DungeonStore";
-import enemiesJSON from "../assets/json/enemy.json";
-import bossesJSON from "../assets/json/bosses.json";
+import { DungeonStore, saveDungeonInstance } from "@/stores/DungeonStore";
+import enemiesJSON from "@/assets/json/enemy.json";
+import bossesJSON from "@/assets/json/bosses.json";
 import {
   DamageTypeToString,
   type BeingType,
   type ItemClassType,
 } from "../utility/types";
-import { ParallaxOptions } from "../components/DungeonComponents/Parallax";
+import { ParallaxOptions } from "@/components/DungeonComponents/Parallax";
 import { EnemyImageKeyOption, EnemyImageMap } from "@/utility/animation/enemy";
-import specialEncountersJSON from "../assets/json/specialEncounters.json";
-import { Item, isStackable } from "./item";
-import { getRandomInt } from "../utility/functions/misc";
+import { Item, isStackable } from "@/entities/item";
+import { getRandomInt } from "@/utility/functions/misc";
+import { jsonServiceStore } from "@/stores/SingletonSource";
 
 interface DungeonLevelOptions {
   level: number;
@@ -429,9 +429,9 @@ export class SpecialEncounter {
     this.scaler = scaler;
     this.parentLevel = parent;
     this.activated = activated ?? false;
-    const encounter = specialEncountersJSON.find(
-      (encounter) => encounter.name === name,
-    );
+    const encounter = jsonServiceStore
+      .readJsonFileSync("specialEncounters")
+      .find((encounter) => encounter.name === name);
     if (!encounter) {
       throw new Error(`Special encounter details not found for: ${name}`);
     }

@@ -4,10 +4,11 @@ import * as AppleAuthentication from "expo-apple-authentication";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { Platform } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
-import { storage } from "../utility/functions/storage";
-import google_config from "../config/google_config";
-import { API_BASE_URL } from "../config/config";
+import { storage } from "@/utility/functions/storage";
+import google_config from "@/config/google_config";
+import { API_BASE_URL } from "@/config/config";
 import type { RootStore } from "./RootStore";
+import { reloadAppAsync } from "expo";
 
 type EmailLogin = {
   token: string;
@@ -247,9 +248,11 @@ export class AuthStore {
         appleUser && storage.set("appleUser", appleUser);
       } catch (error) {}
 
+      await this.deletionCheck();
       this.setAuthState(token ?? null, email, provider, appleUser);
-      this.deletionCheck();
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   logout = async () => {
@@ -300,7 +303,10 @@ export class AuthStore {
         provider: "apple",
         appleUser: credential.user,
       });
-      return `success-${res.status}`;
+      if (res.status == 201) {
+        setTimeout(() => reloadAppAsync("hang prevention"));
+      }
+      return "success";
     } else if (res.status == 400) {
       throw new Error("Missing user string");
     } else if (res.status == 418) {
@@ -426,9 +432,9 @@ export class AuthStore {
             return;
           }
 
-          this.login({ provider: "apple", email: email_opt, appleUser });
+          await this.login({ provider: "apple", email: email_opt, appleUser });
         } else {
-          this.login({ provider: "apple", email: email, appleUser });
+          await this.login({ provider: "apple", email: email, appleUser });
         }
       } else {
         await this.logout();
@@ -578,7 +584,7 @@ export class AuthStore {
       db_name: this.db_name,
       db_token: this.db_token,
       skip_cron: skipCron,
-      send_dump_target: sendEmail ? this.email : undefined,
+      send_dump_target: sendEmail && this.email,
     };
 
     return fetch(apiUrl, {

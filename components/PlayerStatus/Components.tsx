@@ -22,8 +22,8 @@ import {
   ScrollView,
   View,
 } from "react-native";
-import { Text } from "../Themed";
-import ProgressBar from "../ProgressBar";
+import { Text } from "@/components/Themed";
+import ProgressBar from "@/components/ProgressBar";
 import {
   ClockIcon,
   DexterityIcon,

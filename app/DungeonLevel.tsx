@@ -4,7 +4,6 @@ import { type LayoutChangeEvent, View, Animated } from "react-native";
 import { useRef, useEffect, useState, useCallback } from "react";
 import { Pressable } from "react-native";
 import BattleTab from "@/components/DungeonComponents/BattleTab";
-import { wait } from "@/utility/functions/misc";
 import { observer } from "mobx-react-lite";
 import TutorialModal from "@/components/TutorialModal";
 import GenericModal from "@/components/GenericModal";

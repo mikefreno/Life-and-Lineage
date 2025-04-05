@@ -1,25 +1,4 @@
 import { Condition } from "./conditions";
-import arrows from "../assets/json/items/arrows.json";
-import artifacts from "../assets/json/items/artifacts.json";
-import bodyArmors from "../assets/json/items/bodyArmor.json";
-import bows from "../assets/json/items/bows.json";
-import foci from "../assets/json/items/foci.json";
-import hats from "../assets/json/items/hats.json";
-import helmets from "../assets/json/items/helmets.json";
-import ingredients from "../assets/json/items/ingredients.json";
-import junk from "../assets/json/items/junk.json";
-import poisons from "../assets/json/items/poison.json";
-import potions from "../assets/json/items/potions.json";
-import robes from "../assets/json/items/robes.json";
-import shields from "../assets/json/items/shields.json";
-import wands from "../assets/json/items/wands.json";
-import melee from "../assets/json/items/melee.json";
-import staves from "../assets/json/items/staves.json";
-import necroBooks from "../assets/json/items/necroBooks.json";
-import paladinBooks from "../assets/json/items/paladinBooks.json";
-import mageBooks from "../assets/json/items/mageBooks.json";
-import rangerBooks from "../assets/json/items/rangerBooks.json";
-import storyItems from "../assets/json/items/storyItems.json";
 import { Item, isStackable } from "./item";
 import {
   action,
@@ -46,6 +25,7 @@ import {
   Phase,
 } from "./entityTypes";
 import { Being } from "./being";
+import { jsonServiceStore } from "@/stores/SingletonSource";
 
 /**
  * This class is used as a base class for `Enemy` and `Minion` and is not meant to be instantiated directly.
@@ -106,9 +86,7 @@ export class Enemy extends Creature {
     animationStrings,
     ...props
   }: EnemyOptions) {
-    super({
-      ...props,
-    });
+    super(props);
     this.minions = minions
       ? minions.map((minion: any) =>
           Minion.fromJSON({ ...minion, parent: this }),
@@ -237,7 +215,9 @@ export class Enemy extends Creature {
     let storyDrops: Item[] = [];
     if (bossFight && this.storyDrops) {
       this.storyDrops.forEach((drop) => {
-        const storyItemObj = storyItems.find((item) => item.name === drop.item);
+        const storyItemObj = jsonServiceStore
+          .readJsonFileSync("storyItems")
+          .find((item) => item.name === drop.item);
         if (storyItemObj) {
           const storyItem = Item.fromJSON({
             ...storyItemObj,
@@ -402,6 +382,7 @@ export class Enemy extends Creature {
       baseStrength: json.baseStrength,
       baseIntelligence: json.baseIntelligence,
       baseDexterity: json.baseDexterity,
+      activeAuraConditionIds: json.activeAuraConditionIds,
       minions: json.minions
         ? json.minions.map((minion: any) => Minion.fromJSON(minion))
         : [],
@@ -493,6 +474,7 @@ export class Minion extends Creature {
       baseManaRegen: json.baseManaRegen,
       baseDamageTable: json.baseDamageTable,
       baseResistanceTable: json.baseResistanceTable,
+      activeAuraConditionIds: json.activeAuraConditionIds,
       baseStrength: json.baseStrength,
       baseIntelligence: json.baseIntelligence,
       baseDexterity: json.baseDexterity,
@@ -501,6 +483,7 @@ export class Minion extends Creature {
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],
+      animationStrings: json.animationStrings,
       parent: json.parent,
       root: json.root,
     });
@@ -521,50 +504,50 @@ export function itemList(
 }[] {
   switch (itemType) {
     case ItemClassType.Artifact:
-      return artifacts;
+      return jsonServiceStore.readJsonFileSync("artifacts");
     case ItemClassType.Bow:
-      return bows;
+      return jsonServiceStore.readJsonFileSync("bows");
     case ItemClassType.Potion:
-      return potions;
+      return jsonServiceStore.readJsonFileSync("potions");
     case ItemClassType.Poison:
-      return poisons;
+      return jsonServiceStore.readJsonFileSync("poison");
     case ItemClassType.Junk:
-      return junk;
+      return jsonServiceStore.readJsonFileSync("junk");
     case ItemClassType.Ingredient:
-      return ingredients;
+      return jsonServiceStore.readJsonFileSync("ingredients");
     case ItemClassType.Wand:
-      return wands;
+      return jsonServiceStore.readJsonFileSync("wands");
     case ItemClassType.Focus:
-      return foci;
+      return jsonServiceStore.readJsonFileSync("foci");
     case ItemClassType.Melee:
-      return melee;
+      return jsonServiceStore.readJsonFileSync("melee");
     case ItemClassType.Shield:
-      return shields;
+      return jsonServiceStore.readJsonFileSync("shields");
     case ItemClassType.BodyArmor:
-      return bodyArmors;
+      return jsonServiceStore.readJsonFileSync("bodyArmor");
     case ItemClassType.Helmet:
-      return helmets;
+      return jsonServiceStore.readJsonFileSync("helmets");
     case ItemClassType.Robe:
-      return robes;
+      return jsonServiceStore.readJsonFileSync("robes");
     case ItemClassType.Hat:
-      return hats;
+      return jsonServiceStore.readJsonFileSync("hats");
     case ItemClassType.Book:
       switch (playerClass) {
         case "necromancer":
-          return necroBooks;
+          return jsonServiceStore.readJsonFileSync("necroBooks");
         case "mage":
-          return mageBooks;
+          return jsonServiceStore.readJsonFileSync("mageBooks");
         case "paladin":
-          return paladinBooks;
+          return jsonServiceStore.readJsonFileSync("paladinBooks");
         case "ranger":
-          return rangerBooks;
+          return jsonServiceStore.readJsonFileSync("rangerBooks");
       }
     case ItemClassType.Arrow:
-      return arrows;
+      return jsonServiceStore.readJsonFileSync("arrows");
     case ItemClassType.Staff:
-      return staves;
+      return jsonServiceStore.readJsonFileSync("staves");
     case ItemClassType.StoryItem:
-      return storyItems;
+      return jsonServiceStore.readJsonFileSync("storyItems");
     default:
       throw new Error("invalid itemType");
   }

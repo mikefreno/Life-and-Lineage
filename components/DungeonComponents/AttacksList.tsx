@@ -5,9 +5,9 @@ import { useRootStore, usePlayerStore } from "@/hooks/stores";
 import { useStyles } from "@/hooks/styles";
 import { Attack } from "@/entities/attack";
 import { useCombatActions } from "@/hooks/combat";
-import { Text, ThemedView } from "../Themed";
+import { Text, ThemedView } from "@/components/Themed";
 import { Energy, Regen } from "@/assets/icons/SVGIcons";
-import GenericRaisedButton from "../GenericRaisedButton";
+import GenericRaisedButton from "@/components/GenericRaisedButton";
 import { toTitleCase } from "@/utility/functions/misc";
 import { elementalColorMap } from "@/constants/Colors";
 

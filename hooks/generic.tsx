@@ -2,11 +2,11 @@ import { Platform, Animated } from "react-native";
 import * as Haptics from "expo-haptics";
 import { useEffect, useCallback, useRef, useState } from "react";
 import { useRootStore } from "./stores";
-import { useLootState } from "../providers/DungeonData";
-import type { Item } from "../entities/item";
-import { AccelerationCurves } from "../utility/functions/misc";
-import { DEFAULT_FADEOUT_TIME } from "../components/Themed";
-import type { PlayerCharacter } from "../entities/character";
+import { useLootState } from "@/providers/DungeonData";
+import type { Item } from "@/entities/item";
+import { AccelerationCurves } from "@/utility/functions/misc";
+import { DEFAULT_FADEOUT_TIME } from "@/components/Themed";
+import type { PlayerCharacter } from "@/entities/character";
 
 export const useVibration = () => {
   const { uiStore } = useRootStore();

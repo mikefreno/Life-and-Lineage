@@ -17,8 +17,7 @@ import GenericModal from "@/components/GenericModal";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { StatsDisplay } from "@/components/StatsDisplay";
 import { useStyles } from "@/hooks/styles";
-import { useVibration } from "@/hooks/generic";
-import { StashPaywall } from "./IAPPaywalls";
+import { StashPaywall } from "@/components/IAPPaywalls";
 import React from "react";
 
 type StashDisplayProps = {

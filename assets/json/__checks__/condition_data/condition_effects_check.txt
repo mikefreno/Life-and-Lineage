@@ -1,1 +1,0 @@
-Condition "remove stealth" has invalid effect: "remove stealth"

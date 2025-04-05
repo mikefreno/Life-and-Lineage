@@ -9,7 +9,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useRootStore } from "@/hooks/stores";
 import { Text, ThemedView } from "./Themed";
-import ThemedCard from "./ThemedCard";
+import ThemedCard from "@/components/ThemedCard";
 import { parse } from "flatted";
 import { Element, ElementToString } from "@/utility/types";
 import clearHistory, { toTitleCase, wait } from "@/utility/functions/misc";

@@ -18,7 +18,6 @@ import { AffectionIcon } from "@/assets/icons/SVGIcons";
 import GenericModal from "@/components/GenericModal";
 import { Stack } from "expo-router";
 import { FontAwesome6 } from "@expo/vector-icons";
-import GenericRaisedButton from "@/components/GenericRaisedButton";
 import { observer } from "mobx-react-lite";
 import GenericStrikeAround from "@/components/GenericStrikeAround";
 import { useRootStore } from "@/hooks/stores";

@@ -1,16 +1,10 @@
 import {
   createBuff,
   getConditionEffectsOnDefenses,
-} from "../utility/functions/conditions";
-import { Condition } from "./conditions";
-import { Item } from "./item";
-import jobsJSON from "../assets/json/jobs.json";
-import mageSpells from "../assets/json/mageSpells.json";
-import paladinSpells from "../assets/json/paladinSpells.json";
-import necroSpells from "../assets/json/necroSpells.json";
-import rangerSpells from "../assets/json/rangerSpells.json";
-import { Minion } from "./creatures";
-import summons from "../assets/json/summons.json";
+} from "@/utility/functions/conditions";
+import { Condition } from "@/entities/conditions";
+import { Item } from "@/entities/item";
+import { Minion } from "@/entities/creatures";
 import {
   action,
   makeObservable,
@@ -19,7 +13,7 @@ import {
   reaction,
   runInAction,
 } from "mobx";
-import { Investment } from "./investment";
+import { Investment } from "@/entities/investment";
 import {
   InvestmentType,
   InvestmentUpgrade,
@@ -33,7 +27,7 @@ import {
   Rarity,
   MerchantType,
   Modifier,
-} from "../utility/types";
+} from "@/utility/types";
 import {
   rollToLiveByAge,
   rollD20,
@@ -43,15 +37,18 @@ import {
   getAnimatedSpriteForNPC,
   getNPCBaseCombatStats,
   getRandomInt,
-} from "../utility/functions/misc";
-import storyItems from "../assets/json/items/storyItems.json";
-import { storage } from "../utility/functions/storage";
+} from "@/utility/functions/misc";
+import { storage } from "@/utility/functions/storage";
 import { stringify } from "flatted";
 import { throttle } from "lodash";
-import type { RootStore } from "../stores/RootStore";
-import { Being } from "./being";
-import { CharacterOptions, PlayerCharacterOptions } from "./entityTypes";
-import { Attack } from "./attack";
+import type { RootStore } from "@/stores/RootStore";
+import { Being } from "@/entities/being";
+import {
+  CharacterOptions,
+  PlayerCharacterOptions,
+} from "@/entities/entityTypes";
+import { Attack } from "@/entities/attack";
+import { jsonServiceStore } from "@/stores/SingletonSource";
 
 export interface JobData {
   title: string;
@@ -1225,7 +1222,7 @@ export class PlayerCharacter extends Character {
 
   private initJobs() {
     const tempMap = new Map();
-    for (const job of jobsJSON) {
+    for (const job of jsonServiceStore.readJsonFileSync("jobsJSON")) {
       tempMap.set(job.title, {
         ...job,
         cost: {
@@ -1312,12 +1309,12 @@ export class PlayerCharacter extends Character {
   get spells() {
     let spellList: any[] = [];
     if (this.playerClass == "paladin") {
-      spellList = paladinSpells;
+      spellList = jsonServiceStore.readJsonFileSync("paladinSpells");
     } else if (this.playerClass == "necromancer") {
-      spellList = necroSpells;
+      spellList = jsonServiceStore.readJsonFileSync("necroSpells");
     } else if (this.playerClass == "ranger") {
-      spellList = rangerSpells;
-    } else spellList = mageSpells;
+      spellList = jsonServiceStore.readJsonFileSync("rangerSpells");
+    } else spellList = jsonServiceStore.readJsonFileSync("mageSpells");
 
     let spells: Attack[] = [];
     this.knownSpells.forEach((spell) => {
@@ -1390,12 +1387,12 @@ export class PlayerCharacter extends Character {
     if (__DEV__) {
       let spellList;
       if (this.playerClass == "paladin") {
-        spellList = paladinSpells;
+        spellList = jsonServiceStore.readJsonFileSync("paladinSpells");
       } else if (this.playerClass == "necromancer") {
-        spellList = necroSpells;
+        spellList = jsonServiceStore.readJsonFileSync("necroSpells");
       } else if (this.playerClass == "ranger") {
-        spellList = rangerSpells;
-      } else spellList = mageSpells;
+        spellList = jsonServiceStore.readJsonFileSync("rangerSpells");
+      } else spellList = jsonServiceStore.readJsonFileSync("mageSpells");
 
       this.knownSpells = spellList.map((spell) => spell.name);
     }
@@ -1748,9 +1745,9 @@ export class PlayerCharacter extends Character {
    * Returns the species(name) of the created minion, adds the minion to the minion list
    */
   public createMinion(minionName: string) {
-    const minionObj = summons.find(
-      (summon) => summon.name.toLowerCase() == minionName.toLowerCase(),
-    );
+    const minionObj = jsonServiceStore
+      .readJsonFileSync("summons")
+      .find((summon) => summon.name.toLowerCase() == minionName.toLowerCase());
     if (!minionObj) {
       throw new Error(`Minion (${minionName}) not found!`);
     }
@@ -1975,7 +1972,7 @@ function deserializeJobs(serializedJobs: string) {
 
 function testKeyItems(root: RootStore) {
   const items: Item[] = [];
-  storyItems.forEach((obj) => {
+  jsonServiceStore.readJsonFileSync("storyItems").forEach((obj) => {
     items.push(
       Item.fromJSON({ ...obj, itemClass: ItemClassType.StoryItem, root }),
     );

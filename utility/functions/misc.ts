@@ -1,25 +1,3 @@
-import artifacts from "../../assets/json/items/artifacts.json";
-import arrows from "../../assets/json/items/arrows.json";
-import bows from "../../assets/json/items/bows.json";
-import bodyArmor from "../../assets/json/items/bodyArmor.json";
-import mageBooks from "../../assets/json/items/mageBooks.json";
-import necroBooks from "../../assets/json/items/necroBooks.json";
-import paladinBooks from "../../assets/json/items/paladinBooks.json";
-import rangerBooks from "../../assets/json/items/rangerBooks.json";
-import foci from "../../assets/json/items/foci.json";
-import hats from "../../assets/json/items/hats.json";
-import helmets from "../../assets/json/items/helmets.json";
-import ingredients from "../../assets/json/items/ingredients.json";
-import junk from "../../assets/json/items/junk.json";
-import poison from "../../assets/json/items/poison.json";
-import potions from "../../assets/json/items/potions.json";
-import robes from "../../assets/json/items/robes.json";
-import shields from "../../assets/json/items/shields.json";
-import staves from "../../assets/json/items/staves.json";
-import melee from "../../assets/json/items/melee.json";
-import wands from "../../assets/json/items/wands.json";
-import storyItems from "../../assets/json/items/storyItems.json";
-import names from "../../assets/json/names.json";
 import {
   DamageType,
   ItemClassType,
@@ -31,8 +9,9 @@ import {
   NavigationProp,
   NavigationState,
 } from "@react-navigation/native";
-import { Character } from "../../entities/character";
+import { Character } from "@/entities/character";
 import { FPS, MAX_ANIMATION_DURATION } from "@/stores/EnemyAnimationStore";
+import { jsonServiceStore } from "@/stores/SingletonSource";
 
 export const AccelerationCurves = {
   none: (t: number) => t,
@@ -79,124 +58,124 @@ const PERSONALITY_SETS: Record<
 > = {
   Male: {
     [Personality.AGGRESSIVE]: {
-      Elder: require("../../assets/images/heads/Male_Aggressive/Elder.png"),
-      Adult: require("../../assets/images/heads/Male_Aggressive/Adult.png"),
-      Youth: require("../../assets/images/heads/Male_Aggressive/Youth.png"),
+      Elder: require("@/assets/images/heads/Male_Aggressive/Elder.png"),
+      Adult: require("@/assets/images/heads/Male_Aggressive/Adult.png"),
+      Youth: require("@/assets/images/heads/Male_Aggressive/Youth.png"),
     },
     [Personality.ARROGANT]: {
-      Elder: require("../../assets/images/heads/Male_Arrogant/Elder.png"),
-      Adult: require("../../assets/images/heads/Male_Arrogant/Adult.png"),
-      Youth: require("../../assets/images/heads/Male_Arrogant/Youth.png"),
+      Elder: require("@/assets/images/heads/Male_Arrogant/Elder.png"),
+      Adult: require("@/assets/images/heads/Male_Arrogant/Adult.png"),
+      Youth: require("@/assets/images/heads/Male_Arrogant/Youth.png"),
     },
     [Personality.CALM]: {
-      Elder: require("../../assets/images/heads/Male_Calm/Elder.png"),
-      Adult: require("../../assets/images/heads/Male_Calm/Adult.png"),
-      Youth: require("../../assets/images/heads/Male_Calm/Youth.png"),
+      Elder: require("@/assets/images/heads/Male_Calm/Elder.png"),
+      Adult: require("@/assets/images/heads/Male_Calm/Adult.png"),
+      Youth: require("@/assets/images/heads/Male_Calm/Youth.png"),
     },
     [Personality.CREEPY]: {
-      Elder: require("../../assets/images/heads/Male_Creepy/Elder.png"),
-      Adult: require("../../assets/images/heads/Male_Creepy/Adult.png"),
-      Youth: require("../../assets/images/heads/Male_Creepy/Youth.png"),
+      Elder: require("@/assets/images/heads/Male_Creepy/Elder.png"),
+      Adult: require("@/assets/images/heads/Male_Creepy/Adult.png"),
+      Youth: require("@/assets/images/heads/Male_Creepy/Youth.png"),
     },
     [Personality.INCREDULOUS]: {
-      Elder: require("../../assets/images/heads/Male_Incredulous/Elder.png"),
-      Adult: require("../../assets/images/heads/Male_Incredulous/Adult.png"),
-      Youth: require("../../assets/images/heads/Male_Incredulous/Youth.png"),
+      Elder: require("@/assets/images/heads/Male_Incredulous/Elder.png"),
+      Adult: require("@/assets/images/heads/Male_Incredulous/Adult.png"),
+      Youth: require("@/assets/images/heads/Male_Incredulous/Youth.png"),
     },
     [Personality.INSANE]: {
-      Elder: require("../../assets/images/heads/Male_Insane/Elder.png"),
-      Adult: require("../../assets/images/heads/Male_Insane/Adult.png"),
-      Youth: require("../../assets/images/heads/Male_Insane/Youth.png"),
+      Elder: require("@/assets/images/heads/Male_Insane/Elder.png"),
+      Adult: require("@/assets/images/heads/Male_Insane/Adult.png"),
+      Youth: require("@/assets/images/heads/Male_Insane/Youth.png"),
     },
     [Personality.JOVIAL]: {
-      Elder: require("../../assets/images/heads/Male_Jovial/Elder.png"),
-      Adult: require("../../assets/images/heads/Male_Jovial/Adult.png"),
-      Youth: require("../../assets/images/heads/Male_Jovial/Youth.png"),
+      Elder: require("@/assets/images/heads/Male_Jovial/Elder.png"),
+      Adult: require("@/assets/images/heads/Male_Jovial/Adult.png"),
+      Youth: require("@/assets/images/heads/Male_Jovial/Youth.png"),
     },
     [Personality.OPEN]: {
-      Elder: require("../../assets/images/heads/Male_Open/Elder.png"),
-      Adult: require("../../assets/images/heads/Male_Open/Adult.png"),
-      Youth: require("../../assets/images/heads/Male_Open/Youth.png"),
+      Elder: require("@/assets/images/heads/Male_Open/Elder.png"),
+      Adult: require("@/assets/images/heads/Male_Open/Adult.png"),
+      Youth: require("@/assets/images/heads/Male_Open/Youth.png"),
     },
     [Personality.RESERVED]: {
-      Elder: require("../../assets/images/heads/Male_Reserved/Elder.png"),
-      Adult: require("../../assets/images/heads/Male_Reserved/Adult.png"),
-      Youth: require("../../assets/images/heads/Male_Reserved/Youth.png"),
+      Elder: require("@/assets/images/heads/Male_Reserved/Elder.png"),
+      Adult: require("@/assets/images/heads/Male_Reserved/Adult.png"),
+      Youth: require("@/assets/images/heads/Male_Reserved/Youth.png"),
     },
     [Personality.SILENT]: {
-      Elder: require("../../assets/images/heads/Male_Silent/Elder.png"),
-      Adult: require("../../assets/images/heads/Male_Silent/Adult.png"),
-      Youth: require("../../assets/images/heads/Male_Silent/Youth.png"),
+      Elder: require("@/assets/images/heads/Male_Silent/Elder.png"),
+      Adult: require("@/assets/images/heads/Male_Silent/Adult.png"),
+      Youth: require("@/assets/images/heads/Male_Silent/Youth.png"),
     },
     [Personality.WISE]: {
-      Elder: require("../../assets/images/heads/Male_Wise/Elder.png"),
-      Adult: require("../../assets/images/heads/Male_Wise/Adult.png"),
-      Youth: require("../../assets/images/heads/Male_Wise/Youth.png"),
+      Elder: require("@/assets/images/heads/Male_Wise/Elder.png"),
+      Adult: require("@/assets/images/heads/Male_Wise/Adult.png"),
+      Youth: require("@/assets/images/heads/Male_Wise/Youth.png"),
     },
   },
   Female: {
     [Personality.AGGRESSIVE]: {
-      Elder: require("../../assets/images/heads/Female_Aggressive/Elder.png"),
-      Adult: require("../../assets/images/heads/Female_Aggressive/Adult.png"),
-      Youth: require("../../assets/images/heads/Female_Aggressive/Youth.png"),
+      Elder: require("@/assets/images/heads/Female_Aggressive/Elder.png"),
+      Adult: require("@/assets/images/heads/Female_Aggressive/Adult.png"),
+      Youth: require("@/assets/images/heads/Female_Aggressive/Youth.png"),
     },
     [Personality.ARROGANT]: {
-      Elder: require("../../assets/images/heads/Female_Arrogant/Elder.png"),
-      Adult: require("../../assets/images/heads/Female_Arrogant/Adult.png"),
-      Youth: require("../../assets/images/heads/Female_Arrogant/Youth.png"),
+      Elder: require("@/assets/images/heads/Female_Arrogant/Elder.png"),
+      Adult: require("@/assets/images/heads/Female_Arrogant/Adult.png"),
+      Youth: require("@/assets/images/heads/Female_Arrogant/Youth.png"),
     },
     [Personality.CALM]: {
-      Elder: require("../../assets/images/heads/Female_Calm/Elder.png"),
-      Adult: require("../../assets/images/heads/Female_Calm/Adult.png"),
-      Youth: require("../../assets/images/heads/Female_Calm/Youth.png"),
+      Elder: require("@/assets/images/heads/Female_Calm/Elder.png"),
+      Adult: require("@/assets/images/heads/Female_Calm/Adult.png"),
+      Youth: require("@/assets/images/heads/Female_Calm/Youth.png"),
     },
     [Personality.CREEPY]: {
-      Elder: require("../../assets/images/heads/Female_Creepy/Elder.png"),
-      Adult: require("../../assets/images/heads/Female_Creepy/Adult.png"),
-      Youth: require("../../assets/images/heads/Female_Creepy/Youth.png"),
+      Elder: require("@/assets/images/heads/Female_Creepy/Elder.png"),
+      Adult: require("@/assets/images/heads/Female_Creepy/Adult.png"),
+      Youth: require("@/assets/images/heads/Female_Creepy/Youth.png"),
     },
     [Personality.INCREDULOUS]: {
-      Elder: require("../../assets/images/heads/Female_Incredulous/Elder.png"),
-      Adult: require("../../assets/images/heads/Female_Incredulous/Adult.png"),
-      Youth: require("../../assets/images/heads/Female_Incredulous/Youth.png"),
+      Elder: require("@/assets/images/heads/Female_Incredulous/Elder.png"),
+      Adult: require("@/assets/images/heads/Female_Incredulous/Adult.png"),
+      Youth: require("@/assets/images/heads/Female_Incredulous/Youth.png"),
     },
     [Personality.INSANE]: {
-      Elder: require("../../assets/images/heads/Female_Insane/Elder.png"),
-      Adult: require("../../assets/images/heads/Female_Insane/Adult.png"),
-      Youth: require("../../assets/images/heads/Female_Insane/Youth.png"),
+      Elder: require("@/assets/images/heads/Female_Insane/Elder.png"),
+      Adult: require("@/assets/images/heads/Female_Insane/Adult.png"),
+      Youth: require("@/assets/images/heads/Female_Insane/Youth.png"),
     },
     [Personality.JOVIAL]: {
-      Elder: require("../../assets/images/heads/Female_Jovial/Elder.png"),
-      Adult: require("../../assets/images/heads/Female_Jovial/Adult.png"),
-      Youth: require("../../assets/images/heads/Female_Jovial/Youth.png"),
+      Elder: require("@/assets/images/heads/Female_Jovial/Elder.png"),
+      Adult: require("@/assets/images/heads/Female_Jovial/Adult.png"),
+      Youth: require("@/assets/images/heads/Female_Jovial/Youth.png"),
     },
     [Personality.OPEN]: {
-      Elder: require("../../assets/images/heads/Female_Open/Elder.png"),
-      Adult: require("../../assets/images/heads/Female_Open/Adult.png"),
-      Youth: require("../../assets/images/heads/Female_Open/Youth.png"),
+      Elder: require("@/assets/images/heads/Female_Open/Elder.png"),
+      Adult: require("@/assets/images/heads/Female_Open/Adult.png"),
+      Youth: require("@/assets/images/heads/Female_Open/Youth.png"),
     },
     [Personality.RESERVED]: {
-      Elder: require("../../assets/images/heads/Female_Reserved/Elder.png"),
-      Adult: require("../../assets/images/heads/Female_Reserved/Adult.png"),
-      Youth: require("../../assets/images/heads/Female_Reserved/Youth.png"),
+      Elder: require("@/assets/images/heads/Female_Reserved/Elder.png"),
+      Adult: require("@/assets/images/heads/Female_Reserved/Adult.png"),
+      Youth: require("@/assets/images/heads/Female_Reserved/Youth.png"),
     },
     [Personality.SILENT]: {
-      Elder: require("../../assets/images/heads/Female_Silent/Elder.png"),
-      Adult: require("../../assets/images/heads/Female_Silent/Adult.png"),
-      Youth: require("../../assets/images/heads/Female_Silent/Youth.png"),
+      Elder: require("@/assets/images/heads/Female_Silent/Elder.png"),
+      Adult: require("@/assets/images/heads/Female_Silent/Adult.png"),
+      Youth: require("@/assets/images/heads/Female_Silent/Youth.png"),
     },
     [Personality.WISE]: {
-      Elder: require("../../assets/images/heads/Female_Wise/Elder.png"),
-      Adult: require("../../assets/images/heads/Female_Wise/Adult.png"),
-      Youth: require("../../assets/images/heads/Female_Wise/Youth.png"),
+      Elder: require("@/assets/images/heads/Female_Wise/Elder.png"),
+      Adult: require("@/assets/images/heads/Female_Wise/Adult.png"),
+      Youth: require("@/assets/images/heads/Female_Wise/Youth.png"),
     },
   },
 };
 
 const CHILD_IMAGES = {
-  boy: require("../../assets/images/heads/boy.png"),
-  girl: require("../../assets/images/heads/girl.png"),
-  toddler: require("../../assets/images/heads/toddler.png"),
+  boy: require("@/assets/images/heads/boy.png"),
+  girl: require("@/assets/images/heads/girl.png"),
+  toddler: require("@/assets/images/heads/toddler.png"),
 } as const;
 
 const AGE_THRESHOLDS = {
@@ -234,37 +213,38 @@ export function getItemJSONMap(
   playerClass: PlayerClassOptions,
 ): Record<ItemClassType, any[]> {
   return {
-    artifact: artifacts,
-    arrow: arrows,
-    bodyArmor: bodyArmor,
+    artifact: jsonServiceStore.readJsonFileSync("artifacts"),
+    arrow: jsonServiceStore.readJsonFileSync("arrows"),
+    bodyArmor: jsonServiceStore.readJsonFileSync("bodyArmor"),
     book: getClassSpecificBookList(playerClass),
-    bow: bows,
-    focus: foci,
-    hat: hats,
-    helmet: helmets,
-    ingredient: ingredients,
-    junk: junk,
-    poison: poison,
-    potion: potions,
-    robe: robes,
-    staff: staves,
-    shield: shields,
-    wand: wands,
-    melee: melee,
-    storyItem: storyItems,
+    bow: jsonServiceStore.readJsonFileSync("bows"),
+    focus: jsonServiceStore.readJsonFileSync("foci"),
+    hat: jsonServiceStore.readJsonFileSync("hats"),
+    helmet: jsonServiceStore.readJsonFileSync("helmets"),
+    ingredient: jsonServiceStore.readJsonFileSync("ingredients"),
+    junk: jsonServiceStore.readJsonFileSync("junk"),
+    poison: jsonServiceStore.readJsonFileSync("poison"),
+    potion: jsonServiceStore.readJsonFileSync("potions"),
+    robe: jsonServiceStore.readJsonFileSync("robes"),
+    staff: jsonServiceStore.readJsonFileSync("staves"),
+    shield: jsonServiceStore.readJsonFileSync("shields"),
+    wand: jsonServiceStore.readJsonFileSync("wands"),
+    melee: jsonServiceStore.readJsonFileSync("melee"),
+    storyItem: jsonServiceStore.readJsonFileSync("storyItems"),
+    null: [],
   };
 }
 
 export function getClassSpecificBookList(playerClass: PlayerClassOptions) {
   switch (playerClass) {
     case PlayerClassOptions.necromancer:
-      return necroBooks;
+      return jsonServiceStore.readJsonFileSync("necroBooks");
     case PlayerClassOptions.ranger:
-      return rangerBooks;
+      return jsonServiceStore.readJsonFileSync("rangerBooks");
     case PlayerClassOptions.paladin:
-      return paladinBooks;
+      return jsonServiceStore.readJsonFileSync("paladinBooks");
     default:
-      return mageBooks;
+      return jsonServiceStore.readJsonFileSync("mageBooks");
   }
 }
 
@@ -340,9 +320,11 @@ export const wait = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
 export function getRandomName(sex: string) {
-  const filteredNames = names.filter((name) => {
-    return name.sex == sex;
-  });
+  const filteredNames = jsonServiceStore
+    .readJsonFileSync("names")
+    .filter((name) => {
+      return name.sex == sex;
+    });
   const randomIndex = Math.floor(Math.random() * filteredNames.length);
   return {
     firstName: filteredNames[randomIndex].firstName,

@@ -4,7 +4,7 @@ import {
   MerchantType,
   PlayerClassOptions,
   Rarity,
-} from "../utility/types";
+} from "@/utility/types";
 import { ColorValue } from "react-native";
 
 // Core colors

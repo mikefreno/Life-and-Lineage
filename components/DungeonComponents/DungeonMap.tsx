@@ -1,5 +1,5 @@
 import Svg, { Rect } from "react-native-svg";
-import { Dimensions, View } from "react-native";
+import { View } from "react-native";
 import GenericRaisedButton from "@/components/GenericRaisedButton";
 import { TILE_SIZE } from "@/stores/DungeonStore";
 import { observer } from "mobx-react-lite";

@@ -7,7 +7,6 @@ import {
 } from "react";
 import type { Item } from "@/entities/item";
 import type { Attack } from "@/entities/attack";
-import type { Spell } from "@/entities/spell";
 import { wait } from "@/utility/functions/misc";
 import TutorialModal from "@/components/TutorialModal";
 import { TutorialOption } from "@/utility/types";
@@ -18,12 +17,12 @@ const CombatStateContext = createContext<
   | {
       showTargetSelection: {
         showing: boolean;
-        chosenAttack: Attack | Spell | null;
+        chosenAttack: Attack | null;
       };
       setShowTargetSelection: React.Dispatch<
         React.SetStateAction<{
           showing: boolean;
-          chosenAttack: Attack | Spell | null;
+          chosenAttack: Attack | null;
         }>
       >;
     }
@@ -85,7 +84,7 @@ const TutorialStateContext = createContext<
 const CombatStateProvider = ({ children }: { children: ReactNode }) => {
   const [showTargetSelection, setShowTargetSelection] = useState<{
     showing: boolean;
-    chosenAttack: Attack | Spell | null;
+    chosenAttack: Attack | null;
   }>({ showing: false, chosenAttack: null });
 
   return (

@@ -1,22 +1,16 @@
 import { useRootStore } from "@/hooks/stores";
 import { ReactNode, useEffect, useRef, useState } from "react";
-import {
-  Platform,
-  Pressable,
-  ScrollView,
-  StatusBar,
-  ViewStyle,
-} from "react-native";
+import { Pressable, ScrollView, StatusBar, ViewStyle } from "react-native";
 import Modal from "react-native-modal";
 import { View, StyleSheet, Animated } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useStyles } from "@/hooks/styles";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Image } from "expo-image";
-import { Text } from "./Themed";
+import { Text } from "@/components/Themed";
 import { useVibration } from "@/hooks/generic";
 import Purchases from "react-native-purchases";
-import GenericRaisedButton from "./GenericRaisedButton";
+import GenericRaisedButton from "@/components/GenericRaisedButton";
 import {
   ArcaneIcon,
   AssassinationIcon,

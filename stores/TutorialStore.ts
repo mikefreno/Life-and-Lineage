@@ -56,6 +56,7 @@ export class TutorialStore {
       [TutorialOption.firstBossKill]: false,
       [TutorialOption.keyItem]: false,
       [TutorialOption.relationships]: false,
+      [TutorialOption.reachedEndOfCompletedDungeons]: false,
     };
     this.tutorialsShown = defaultState;
     this.enableTutorials();
@@ -109,6 +110,7 @@ export class TutorialStore {
           [TutorialOption.firstBossKill]: false,
           [TutorialOption.keyItem]: false,
           [TutorialOption.relationships]: false,
+          [TutorialOption.reachedEndOfCompletedDungeons]: false,
         },
         tutorialsEnabled: true,
       };
@@ -131,6 +133,7 @@ export class TutorialStore {
         13: boolean;
         14: boolean;
         15: boolean;
+        16: boolean;
       };
       tutorialsEnabled: boolean;
     };

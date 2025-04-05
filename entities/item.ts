@@ -1,11 +1,3 @@
-import mageBooks from "../assets/json/items/mageBooks.json";
-import necroBooks from "../assets/json/items/necroBooks.json";
-import paladinBooks from "../assets/json/items/paladinBooks.json";
-import rangerBooks from "../assets/json/items/rangerBooks.json";
-import mageSpells from "../assets/json/mageSpells.json";
-import necroSpells from "../assets/json/necroSpells.json";
-import paladinSpells from "../assets/json/paladinSpells.json";
-import rangerSpells from "../assets/json/rangerSpells.json";
 import {
   Attribute,
   ItemClassType,
@@ -14,16 +6,14 @@ import {
   Modifier,
   Rarity,
   stringToModifier,
-} from "../utility/types";
-import { Attack } from "./attack";
-import attackObjects from "../assets/json/playerAttacks.json";
+} from "@/utility/types";
+import { Attack } from "@/entities/attack";
 import { action, computed, makeObservable, observable } from "mobx";
-import { Condition } from "./conditions";
-import { toTitleCase, wait } from "../utility/functions/misc";
-import type { RootStore } from "../stores/RootStore";
-import PREFIXES from "../assets/json/prefix.json";
-import SUFFIXES from "../assets/json/suffix.json";
+import { Condition } from "@/entities/conditions";
+import { toTitleCase, wait } from "@/utility/functions/misc";
+import type { RootStore } from "@/stores/RootStore";
 import * as Crypto from "expo-crypto";
+import { jsonServiceStore } from "@/stores/SingletonSource";
 
 interface ItemProps {
   id?: string;
@@ -251,10 +241,10 @@ export class Item {
     if (this.itemClass == ItemClassType.Wand) {
       const builtSpells: Attack[] = [];
       const combinedSpellJson = [
-        ...mageSpells,
-        ...necroSpells,
-        ...paladinSpells,
-        ...rangerSpells,
+        ...jsonServiceStore.readJsonFileSync("mageSpells"),
+        ...jsonServiceStore.readJsonFileSync("necroSpells"),
+        ...jsonServiceStore.readJsonFileSync("paladinSpells"),
+        ...jsonServiceStore.readJsonFileSync("rangerSpells"),
       ];
       this.attacks.forEach((attackString) => {
         const found = combinedSpellJson.find((obj) => obj.name == attackString);
@@ -296,7 +286,9 @@ export class Item {
   get attachedAttacks() {
     const builtAttacks: Attack[] = [];
     this.attacks.forEach((attackString) => {
-      const found = attackObjects.find((obj) => obj.name == attackString);
+      const found = jsonServiceStore
+        .readJsonFileSync("playerAttacks")
+        .find((obj) => obj.name == attackString);
       if (found && this.root.playerState) {
         builtAttacks.push(
           new Attack({
@@ -316,34 +308,42 @@ export class Item {
       let bookObj: any;
       switch (this.root.playerState?.playerClass) {
         case PlayerClassOptions.mage:
-          bookObj = mageBooks.find((book) => book.name == this.name);
-          spell = mageSpells.find(
-            (mageSpell) => bookObj?.teaches == mageSpell.name,
-          );
+          bookObj = jsonServiceStore
+            .readJsonFileSync("mageBooks")
+            .find((book) => book.name == this.name);
+          spell = jsonServiceStore
+            .readJsonFileSync("mageSpells")
+            .find((mageSpell) => bookObj?.teaches == mageSpell.name);
           if (spell) {
             return new Attack({ ...spell, user: this.root.playerState });
           }
         case PlayerClassOptions.necromancer:
-          bookObj = necroBooks.find((book) => book.name == this.name);
-          spell = necroSpells.find(
-            (necroSpell) => bookObj?.teaches == necroSpell.name,
-          );
+          bookObj = jsonServiceStore
+            .readJsonFileSync("necroBooks")
+            .find((book) => book.name == this.name);
+          spell = jsonServiceStore
+            .readJsonFileSync("necroSpells")
+            .find((necroSpell) => bookObj?.teaches == necroSpell.name);
           if (spell) {
             return new Attack({ ...spell, user: this.root.playerState });
           }
         case PlayerClassOptions.ranger:
-          bookObj = rangerBooks.find((book) => book.name == this.name);
-          spell = rangerSpells.find(
-            (paladinSpell) => bookObj?.teaches == paladinSpell.name,
-          );
+          bookObj = jsonServiceStore
+            .readJsonFileSync("rangerBooks")
+            .find((book) => book.name == this.name);
+          spell = jsonServiceStore
+            .readJsonFileSync("rangerSpells")
+            .find((paladinSpell) => bookObj?.teaches == paladinSpell.name);
           if (spell) {
             return new Attack({ ...spell, user: this.root.playerState });
           }
         case PlayerClassOptions.paladin:
-          bookObj = paladinBooks.find((book) => book.name == this.name);
-          spell = paladinSpells.find(
-            (paladinSpell) => bookObj?.teaches == paladinSpell.name,
-          );
+          bookObj = jsonServiceStore
+            .readJsonFileSync("paladinBooks")
+            .find((book) => book.name == this.name);
+          spell = jsonServiceStore
+            .readJsonFileSync("paladinSpells")
+            .find((paladinSpell) => bookObj?.teaches == paladinSpell.name);
           if (spell) {
             return new Attack({ ...spell, user: this.root.playerState });
           }
@@ -656,14 +656,28 @@ export class ItemRarityService {
     switch (rarity) {
       case Rarity.RARE:
         return {
-          prefix: this.getRandomAffix(PREFIXES as Affix[]),
-          suffix: this.getRandomAffix(SUFFIXES),
+          prefix: this.getRandomAffix(
+            jsonServiceStore.readJsonFileSync("prefix") as Affix[],
+          ),
+          suffix: this.getRandomAffix(
+            jsonServiceStore.readJsonFileSync("suffix"),
+          ),
         };
       case Rarity.MAGIC:
         // 50/50 chance for prefix or suffix
         return Math.random() < 0.5
-          ? { prefix: this.getRandomAffix(PREFIXES as Affix[]), suffix: null }
-          : { prefix: null, suffix: this.getRandomAffix(SUFFIXES) };
+          ? {
+              prefix: this.getRandomAffix(
+                jsonServiceStore.readJsonFileSync("prefix") as Affix[],
+              ),
+              suffix: null,
+            }
+          : {
+              prefix: null,
+              suffix: this.getRandomAffix(
+                jsonServiceStore.readJsonFileSync("suffix"),
+              ),
+            };
       default:
         return { prefix: null, suffix: null };
     }
@@ -758,75 +772,75 @@ export class ItemRarityService {
 }
 
 export const itemMap: { [key: string]: any } = {
-  Amber_Potion: require("../assets/images/items/Amber_Potion.png"),
-  Amber_Potion_2: require("../assets/images/items/Amber_Potion_2.png"),
-  Amber_Potion_3: require("../assets/images/items/Amber_Potion_3.png"),
-  Arrow: require("../assets/images/items/Arrow.png"),
-  Axe: require("../assets/images/items/Axe.png"),
-  Bag: require("../assets/images/items/Bag.png"),
-  Base_Robes: require("../assets/images/items/Robes_1.png"),
-  Bat_Wing: require("../assets/images/items/Bat_Wing.png"),
-  Black_Bow: require("../assets/images/items/Black_Bow.png"),
-  Blue_Potion: require("../assets/images/items/Blue_Potion.png"),
-  Blue_Potion_2: require("../assets/images/items/Blue_Potion_2.png"),
-  Blue_Potion_3: require("../assets/images/items/Blue_Potion_3.png"),
-  Bone: require("../assets/images/items/Bone.png"),
-  Book: require("../assets/images/items/Book.png"),
-  Book_2: require("../assets/images/items/Book_2.png"),
-  Book_3: require("../assets/images/items/Book_3.png"),
-  Bow: require("../assets/images/items/Bow.png"),
-  Chunk_of_Flesh: require("../assets/images/items/Chunk_of_Flesh.png"),
-  Egg: require("../assets/images/items/Egg.png"),
-  Emerald_Staff: require("../assets/images/items/Emerald_Staff.png"),
-  Fang: require("../assets/images/items/Fang.png"),
-  Focus_1: require("../assets/images/items/Focus_1.png"),
-  Feather: require("../assets/images/items/Feather.png"),
-  Goblet: require("../assets/images/items/Goblet.png"),
-  Goblin_Staff: require("../assets/images/items/Goblin_Staff.png"),
-  Golden_Hammer: require("../assets/images/items/Golden_Hammer.png"),
-  Golden_Sword: require("../assets/images/items/Golden_Sword.png"),
-  Great_Bow: require("../assets/images/items/Great_Bow.png"),
-  Green_Potion: require("../assets/images/items/Green_Potion.png"),
-  Green_Potion_2: require("../assets/images/items/Green_Potion_2.png"),
-  Green_Potion_3: require("../assets/images/items/Green_Potion_3.png"),
-  Hammer: require("../assets/images/items/Hammer.png"),
-  Harp_Bow: require("../assets/images/items/Harp_Bow.png"),
-  Helm: require("../assets/images/items/Helm.png"),
-  Iron_Armor: require("../assets/images/items/Iron_Armor.png"),
-  Iron_Boot: require("../assets/images/items/Iron_Boot.png"),
-  Iron_Helmet: require("../assets/images/items/Iron_Helmet.png"),
-  Iron_Shield: require("../assets/images/items/Iron_Shield.png"),
-  Iron_Sword: require("../assets/images/items/Iron_Sword.png"),
-  Knife: require("../assets/images/items/Knife.png"),
-  Leather_Armor: require("../assets/images/items/Leather_Armor.png"),
-  Leather_Boots: require("../assets/images/items/Leather_Boot.png"),
-  Leather_Helmet: require("../assets/images/items/Leather_Helmet.png"),
-  Magic_Wand: require("../assets/images/items/Magic_Wand.png"),
-  Monster_Egg: require("../assets/images/items/Monster_Egg.png"),
-  Monster_Eye: require("../assets/images/items/Monster_Eye.png"),
-  Monster_Meat: require("../assets/images/items/Monster_Meat.png"),
-  Paper: require("../assets/images/items/Paper.png"),
-  Patch_of_Fur: require("../assets/images/items/Patch_of_Fur.png"),
-  Purple_Potion: require("../assets/images/items/Purple_Potion.png"),
-  Purple_Potion_2: require("../assets/images/items/Purple_Potion_2.png"),
-  Purple_Potion_3: require("../assets/images/items/Purple_Potion_3.png"),
-  Rat_Tail: require("../assets/images/items/Rat_Tail.png"),
-  Red_Potion: require("../assets/images/items/Red_Potion.png"),
-  Red_Potion_2: require("../assets/images/items/Red_Potion_2.png"),
-  Red_Potion_3: require("../assets/images/items/Red_Potion_3.png"),
-  Ruby_Staff: require("../assets/images/items/Ruby_Staff.png"),
-  Sapphire_Staff: require("../assets/images/items/Sapphire_Staff.png"),
-  Scroll: require("../assets/images/items/Scroll.png"),
-  Silver_Sword: require("../assets/images/items/Silver_Sword.png"),
-  Skull: require("../assets/images/items/Skull.png"),
-  Slime_Gel: require("../assets/images/items/Slime_Gel.png"),
-  Topaz_Staff: require("../assets/images/items/Topaz_Staff.png"),
-  Torch: require("../assets/images/items/Torch.png"),
-  Wizard_Hat: require("../assets/images/items/Wizard_Hat.png"),
-  Wood_Log: require("../assets/images/items/Wood_Log.png"),
-  Wooden_Armor: require("../assets/images/items/Wooden_Armor.png"),
-  Wooden_Shield: require("../assets/images/items/Wooden_Shield.png"),
-  Wooden_Sword: require("../assets/images/items/Wooden_Sword.png"),
+  Amber_Potion: require("@/assets/images/items/Amber_Potion.png"),
+  Amber_Potion_2: require("@/assets/images/items/Amber_Potion_2.png"),
+  Amber_Potion_3: require("@/assets/images/items/Amber_Potion_3.png"),
+  Arrow: require("@/assets/images/items/Arrow.png"),
+  Axe: require("@/assets/images/items/Axe.png"),
+  Bag: require("@/assets/images/items/Bag.png"),
+  Base_Robes: require("@/assets/images/items/Robes_1.png"),
+  Bat_Wing: require("@/assets/images/items/Bat_Wing.png"),
+  Black_Bow: require("@/assets/images/items/Black_Bow.png"),
+  Blue_Potion: require("@/assets/images/items/Blue_Potion.png"),
+  Blue_Potion_2: require("@/assets/images/items/Blue_Potion_2.png"),
+  Blue_Potion_3: require("@/assets/images/items/Blue_Potion_3.png"),
+  Bone: require("@/assets/images/items/Bone.png"),
+  Book: require("@/assets/images/items/Book.png"),
+  Book_2: require("@/assets/images/items/Book_2.png"),
+  Book_3: require("@/assets/images/items/Book_3.png"),
+  Bow: require("@/assets/images/items/Bow.png"),
+  Chunk_of_Flesh: require("@/assets/images/items/Chunk_of_Flesh.png"),
+  Egg: require("@/assets/images/items/Egg.png"),
+  Emerald_Staff: require("@/assets/images/items/Emerald_Staff.png"),
+  Fang: require("@/assets/images/items/Fang.png"),
+  Focus_1: require("@/assets/images/items/Focus_1.png"),
+  Feather: require("@/assets/images/items/Feather.png"),
+  Goblet: require("@/assets/images/items/Goblet.png"),
+  Goblin_Staff: require("@/assets/images/items/Goblin_Staff.png"),
+  Golden_Hammer: require("@/assets/images/items/Golden_Hammer.png"),
+  Golden_Sword: require("@/assets/images/items/Golden_Sword.png"),
+  Great_Bow: require("@/assets/images/items/Great_Bow.png"),
+  Green_Potion: require("@/assets/images/items/Green_Potion.png"),
+  Green_Potion_2: require("@/assets/images/items/Green_Potion_2.png"),
+  Green_Potion_3: require("@/assets/images/items/Green_Potion_3.png"),
+  Hammer: require("@/assets/images/items/Hammer.png"),
+  Harp_Bow: require("@/assets/images/items/Harp_Bow.png"),
+  Helm: require("@/assets/images/items/Helm.png"),
+  Iron_Armor: require("@/assets/images/items/Iron_Armor.png"),
+  Iron_Boot: require("@/assets/images/items/Iron_Boot.png"),
+  Iron_Helmet: require("@/assets/images/items/Iron_Helmet.png"),
+  Iron_Shield: require("@/assets/images/items/Iron_Shield.png"),
+  Iron_Sword: require("@/assets/images/items/Iron_Sword.png"),
+  Knife: require("@/assets/images/items/Knife.png"),
+  Leather_Armor: require("@/assets/images/items/Leather_Armor.png"),
+  Leather_Boots: require("@/assets/images/items/Leather_Boot.png"),
+  Leather_Helmet: require("@/assets/images/items/Leather_Helmet.png"),
+  Magic_Wand: require("@/assets/images/items/Magic_Wand.png"),
+  Monster_Egg: require("@/assets/images/items/Monster_Egg.png"),
+  Monster_Eye: require("@/assets/images/items/Monster_Eye.png"),
+  Monster_Meat: require("@/assets/images/items/Monster_Meat.png"),
+  Paper: require("@/assets/images/items/Paper.png"),
+  Patch_of_Fur: require("@/assets/images/items/Patch_of_Fur.png"),
+  Purple_Potion: require("@/assets/images/items/Purple_Potion.png"),
+  Purple_Potion_2: require("@/assets/images/items/Purple_Potion_2.png"),
+  Purple_Potion_3: require("@/assets/images/items/Purple_Potion_3.png"),
+  Rat_Tail: require("@/assets/images/items/Rat_Tail.png"),
+  Red_Potion: require("@/assets/images/items/Red_Potion.png"),
+  Red_Potion_2: require("@/assets/images/items/Red_Potion_2.png"),
+  Red_Potion_3: require("@/assets/images/items/Red_Potion_3.png"),
+  Ruby_Staff: require("@/assets/images/items/Ruby_Staff.png"),
+  Sapphire_Staff: require("@/assets/images/items/Sapphire_Staff.png"),
+  Scroll: require("@/assets/images/items/Scroll.png"),
+  Silver_Sword: require("@/assets/images/items/Silver_Sword.png"),
+  Skull: require("@/assets/images/items/Skull.png"),
+  Slime_Gel: require("@/assets/images/items/Slime_Gel.png"),
+  Topaz_Staff: require("@/assets/images/items/Topaz_Staff.png"),
+  Torch: require("@/assets/images/items/Torch.png"),
+  Wizard_Hat: require("@/assets/images/items/Wizard_Hat.png"),
+  Wood_Log: require("@/assets/images/items/Wood_Log.png"),
+  Wooden_Armor: require("@/assets/images/items/Wooden_Armor.png"),
+  Wooden_Shield: require("@/assets/images/items/Wooden_Shield.png"),
+  Wooden_Sword: require("@/assets/images/items/Wooden_Sword.png"),
 };
 
 export const isStackable = (itemClass: ItemClassType) => {

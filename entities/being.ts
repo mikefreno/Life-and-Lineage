@@ -1,4 +1,3 @@
-import attacks from "@/assets/json/enemyAttacks.json";
 import {
   AttackUse,
   Attribute,
@@ -41,6 +40,7 @@ import {
   AnimationOptions,
   EnemyImageKeyOption,
 } from "@/utility/animation/enemy";
+import { jsonServiceStore } from "@/stores/SingletonSource";
 
 export class Being {
   readonly id: string;
@@ -1059,9 +1059,9 @@ export class Being {
   get attacks() {
     const builtAttacks: Attack[] = [];
     this.attackStrings.forEach((attackName) => {
-      const foundAttack = attacks.find(
-        (attackObj) => attackObj.name == attackName,
-      );
+      const foundAttack = jsonServiceStore
+        .readJsonFileSync("enemyAttacks")
+        .find((attackObj) => attackObj.name == attackName);
       if (!foundAttack)
         throw new Error(
           `No matching attack found for ${attackName} in creating a ${

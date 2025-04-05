@@ -3,7 +3,7 @@ import { View } from "react-native";
 import ProgressBar from "@/components/ProgressBar";
 import { observer } from "mobx-react-lite";
 import { AccelerationCurves, numberToRoman } from "@/utility/functions/misc";
-import GenericRaisedButton from "./GenericRaisedButton";
+import GenericRaisedButton from "@/components/GenericRaisedButton";
 import ThemedCard from "@/components/ThemedCard";
 import { Text } from "@/components/Themed";
 import { Coins, Energy, HealthIcon, Sanity } from "@/assets/icons/SVGIcons";

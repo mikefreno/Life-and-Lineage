@@ -1,6 +1,6 @@
 import React from "react";
 import { useRef, useState } from "react";
-import GenericModal from "./GenericModal";
+import GenericModal from "@/components/GenericModal";
 import { Dimensions, Pressable, View, Image } from "react-native";
 import { Text } from "@/components/Themed";
 import { toTitleCase } from "@/utility/functions/misc";

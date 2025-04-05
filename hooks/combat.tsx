@@ -1,11 +1,11 @@
 import { useCallback } from "react";
-import { AttackUse, TutorialOption } from "../utility/types";
-import { toTitleCase, wait } from "../utility/functions/misc";
-import { useLootState, useTutorialState } from "../providers/DungeonData";
+import { AttackUse, TutorialOption } from "@/utility/types";
+import { toTitleCase, wait } from "@/utility/functions/misc";
+import { useLootState, useTutorialState } from "@/providers/DungeonData";
 import { useRootStore } from "./stores";
-import { Creature, Enemy, Minion } from "../entities/creatures";
-import { Character, PlayerCharacter } from "../entities/character";
-import { Attack, PerTargetUse } from "../entities/attack";
+import { Creature, Enemy, Minion } from "@/entities/creatures";
+import { Character, PlayerCharacter } from "@/entities/character";
+import { Attack, PerTargetUse } from "@/entities/attack";
 import { useIsFocused } from "@react-navigation/native";
 import { AnimationOptions } from "@/utility/animation/enemy";
 import { type Condition } from "@/entities/conditions";
@@ -171,6 +171,7 @@ export const useEnemyManagement = () => {
               switch (res.use.result) {
                 case AttackUse.success:
                   potentialPoisonHeal += res.use.damages?.poison ?? 0;
+                  enemy.restoreHealth(res.use.healed ?? 0);
                   animStore?.addToAnimationQueue(
                     animStore.getAttackQueue(
                       (enemyAttackRes.attack
@@ -247,6 +248,7 @@ export const useCombatActions = () => {
           const animStore = enemyStore.getAnimationStore(res.target.id);
           switch (res.use.result) {
             case AttackUse.success:
+              minion.restoreHealth(res.use.healed ?? 0);
               animStore?.addToAnimationQueue("hurt");
               break;
             case AttackUse.miss:

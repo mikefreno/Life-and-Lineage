@@ -1,5 +1,5 @@
 import { action, makeObservable, observable } from "mobx";
-import { InvestmentUpgrade } from "../utility/types";
+import { InvestmentUpgrade } from "@/utility/types";
 import { PlayerCharacter } from "./character";
 
 interface InvestmentProps {

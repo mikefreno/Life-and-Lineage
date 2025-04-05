@@ -1,19 +1,17 @@
-import { Item, isStackable } from "./item";
-import shops from "../assets/json/shops.json";
-import greetings from "../assets/json/shopLines.json";
+import { Item, isStackable } from "@/entities/item";
 import { action, computed, makeObservable, observable, reaction } from "mobx";
-import { Character, PlayerCharacter } from "./character";
+import { Character, PlayerCharacter } from "@/entities/character";
 import {
   getRandomName,
   toTitleCase,
-  rollD20,
   getItemJSONMap,
   getClassSpecificBookList,
   getNPCBaseCombatStats,
 } from "../utility/functions/misc";
 import { ItemClassType, MerchantType, Personality } from "../utility/types";
-import { RootStore } from "../stores/RootStore";
-import { saveShop } from "../stores/ShopsStore";
+import { RootStore } from "@/stores/RootStore";
+import { saveShop } from "@/stores/ShopsStore";
+import { jsonServiceStore } from "@/stores/SingletonSource";
 
 interface ShopProps {
   baseGold: number;
@@ -97,14 +95,18 @@ export class Shop {
 
   public deathCheck() {
     if (this.shopKeeper.deathdate) {
-      const shopObj = shops.find((shop) => shop.type == this.archetype);
+      const shopObj = jsonServiceStore
+        .readJsonFileSync("shops")
+        .find((shop) => shop.type == this.archetype);
       if (!shopObj) throw new Error(`missing ${this.archetype} in json`);
       this.shopKeeper = generateShopKeeper(shopObj.type, this.root);
     }
   }
 
   public refreshInventory() {
-    const shopObj = shops.find((shop) => shop.type == this.archetype);
+    const shopObj = jsonServiceStore
+      .readJsonFileSync("shops")
+      .find((shop) => shop.type == this.archetype);
     if (shopObj) {
       const newCount = getRandomInt(
         shopObj.itemQuantityRange.minimum,
@@ -126,21 +128,30 @@ export class Shop {
     const playerFullName = this.root.playerState?.fullName || "";
     const personality = this.shopKeeper.personality || "wise";
 
-    if (!greetings[personality]) {
+    if (!jsonServiceStore.readJsonFileSync("shopLines")[personality]) {
       throw new Error(`No greetings defined for personality: ${personality}`);
     }
 
     let options;
     if (this.shopKeeper.affection > 90) {
-      options = greetings[personality]["very warm"];
+      options =
+        jsonServiceStore.readJsonFileSync("shopLines")[personality][
+          "very warm"
+        ];
     } else if (this.shopKeeper.affection > 75) {
-      options = greetings[personality].warm;
+      options =
+        jsonServiceStore.readJsonFileSync("shopLines")[personality].warm;
     } else if (this.shopKeeper.affection > 50) {
-      options = greetings[personality].positive;
+      options =
+        jsonServiceStore.readJsonFileSync("shopLines")[personality].positive;
     } else if (this.shopKeeper.affection > 25) {
-      options = greetings[personality]["slightly positive"];
+      options =
+        jsonServiceStore.readJsonFileSync("shopLines")[personality][
+          "slightly positive"
+        ];
     } else {
-      options = greetings[personality].neutral;
+      options =
+        jsonServiceStore.readJsonFileSync("shopLines")[personality].neutral;
     }
 
     if (!options || options.length === 0) {
@@ -397,7 +408,9 @@ export function generateShopKeeper(
   const name = getRandomName(sex);
   const birthdate = root.time.generateBirthDateInRange(25, 70);
   const job = toTitleCase(archetype);
-  const shopObj = shops.find((obj) => obj.type == archetype);
+  const shopObj = jsonServiceStore
+    .readJsonFileSync("shops")
+    .find((obj) => obj.type == archetype);
 
   // Get existing personalities with their sexes
   const existingPersonalitiesBySex = new Map<string, Personality[]>();

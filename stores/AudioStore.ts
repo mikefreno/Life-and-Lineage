@@ -62,7 +62,7 @@ export class AudioStore {
   combatMusicVolume: number = 1;
   muted: boolean = false;
 
-  currentAudioContext = new AudioContext();
+  currentAudioContext: AudioContext | undefined = undefined;
   currentPlayer: AudioBufferSourceNode | undefined = undefined;
   currentEnvelope: GainNode | undefined = undefined;
   storedTimeOnMute: number | undefined;
@@ -71,19 +71,27 @@ export class AudioStore {
     | COMBAT_TRACK_OPTIONS
     | undefined = undefined;
 
-  outBoundAudioContext = new AudioContext();
+  outBoundAudioContext: AudioContext | undefined = undefined;
   outBoundPlayer: AudioBufferSourceNode | undefined = undefined;
 
   ambientTrackBuffers: Map<AMBIENT_TRACK_OPTIONS, AudioBuffer> = new Map();
   combatTrackBuffers: Map<COMBAT_TRACK_OPTIONS, AudioBuffer> = new Map();
   sfxTrackBuffers: Map<SFX_OPTIONS, AudioBuffer> = new Map();
 
+  ranMutedStart: boolean;
+
   constructor({ root }: { root: RootStore }) {
     this.root = root;
-    this.loadPersistedSettings();
-    this.initializeAudio().then(() =>
-      this.root.uiStore.markStoreAsLoaded("audio"),
-    );
+    const muted = this.loadPersistedSettings();
+    if (!muted) {
+      this.ranMutedStart = false;
+      this.initializeAudio().then(() =>
+        this.root.uiStore.markStoreAsLoaded("audio"),
+      );
+    } else {
+      this.mutedStartOverride();
+      this.ranMutedStart = true;
+    }
 
     makeObservable(this, {
       masterVolume: observable,
@@ -130,7 +138,13 @@ export class AudioStore {
     );
   }
 
+  mutedStartOverride() {
+    this.root.uiStore.markStoreAsLoaded("audio");
+    this.root.uiStore.markStoreAsLoaded("ambient");
+  }
+
   async initializeAudio() {
+    console.log("initializing");
     try {
       const loadedAmbientBuffers = await Promise.all(
         Object.entries(AMBIENT_TRACKS).map(async ([key, source]) => {
@@ -138,6 +152,9 @@ export class AudioStore {
             const asset = Asset.fromModule(source);
             if (!asset.downloaded) {
               await asset.downloadAsync();
+            }
+            if (!this.currentAudioContext) {
+              this.currentAudioContext = new AudioContext();
             }
             const buffer = await this.currentAudioContext.decodeAudioDataSource(
               asset.localUri!,
@@ -157,6 +174,9 @@ export class AudioStore {
             const asset = Asset.fromModule(source);
             if (!asset.downloaded) {
               await asset.downloadAsync();
+            }
+            if (!this.currentAudioContext) {
+              this.currentAudioContext = new AudioContext();
             }
             const buffer = await this.currentAudioContext.decodeAudioDataSource(
               asset.localUri!,
@@ -249,7 +269,7 @@ export class AudioStore {
         this.outBoundPlayer = this.currentPlayer;
         const outboundEnvelope = this.currentEnvelope;
 
-        const tNow = this.currentAudioContext.currentTime;
+        const tNow = this.currentAudioContext!.currentTime;
         outboundEnvelope.gain.linearRampToValueAtTime(
           0,
           tNow + DEFAULT_FADE / 1000,
@@ -264,14 +284,14 @@ export class AudioStore {
           });
         }, DEFAULT_FADE);
       }
-      this.currentPlayer = this.currentAudioContext.createBufferSource();
+      this.currentPlayer = this.currentAudioContext!.createBufferSource();
       this.currentPlayer.buffer = buffer;
 
-      this.currentEnvelope = this.currentAudioContext.createGain();
+      this.currentEnvelope = this.currentAudioContext!.createGain();
       this.currentPlayer.connect(this.currentEnvelope);
-      this.currentEnvelope.connect(this.currentAudioContext.destination);
+      this.currentEnvelope.connect(this.currentAudioContext!.destination);
 
-      const tNow = this.currentAudioContext.currentTime;
+      const tNow = this.currentAudioContext!.currentTime;
       this.currentEnvelope.gain.setValueAtTime(0, tNow);
       this.currentEnvelope.gain.linearRampToValueAtTime(
         this.getEffectiveVolume(type),
@@ -280,7 +300,6 @@ export class AudioStore {
       this.currentPlayer.loop = true;
 
       if (this.storedTimeOnMute && newTrack == this.currentlyPlayingTrack) {
-        __DEV__ && console.log("skippin to:", this.storedTimeOnMute);
         this.currentPlayer.start(0, this.storedTimeOnMute);
         //clear stored info
         this.storedTimeOnMute = undefined;
@@ -315,7 +334,7 @@ export class AudioStore {
   private updatePlayingAudioLevel() {
     if (!this.currentlyPlayingTrack) return;
 
-    const tNow = this.currentAudioContext.currentTime;
+    const tNow = this.currentAudioContext!.currentTime;
     this.currentEnvelope?.gain.setValueAtTime(
       this.getEffectiveVolume(
         this.currentlyPlayingTrack in AMBIENT_TRACKS
@@ -328,14 +347,19 @@ export class AudioStore {
     );
   }
 
-  setMuteValue(val: boolean) {
+  async setMuteValue(val: boolean) {
     this.muted = val;
     if (val) {
-      this.storedTimeOnMute = this.currentAudioContext.currentTime;
+      this.storedTimeOnMute = this.currentAudioContext!.currentTime;
+      this.currentAudioContext!.close();
       this.currentPlayer?.stop();
       this.currentPlayer?.disconnect();
       this.currentPlayer = undefined;
     } else {
+      this.currentAudioContext = new AudioContext();
+      if (this.ranMutedStart) {
+        await this.initializeAudio();
+      }
       this.parseLocationForRelevantTrack();
     }
   }
@@ -360,7 +384,7 @@ export class AudioStore {
     }
   }
 
-  private loadPersistedSettings() {
+  private loadPersistedSettings(): boolean {
     try {
       const stored = storage.getString("audio_settings");
       if (stored) {
@@ -370,6 +394,7 @@ export class AudioStore {
         this.soundEffectsVolume = settings.sfx ?? 1;
         this.combatMusicVolume = settings.combat ?? 1;
         this.muted = settings.muted ?? false;
+        return settings.muted ?? false;
       }
     } catch (error) {
       console.warn("Error loading persisted settings", error);
@@ -379,6 +404,7 @@ export class AudioStore {
       this.combatMusicVolume = 1;
       this.muted = false;
     }
+    return false;
   }
 
   private persistSettings() {
