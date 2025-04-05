@@ -2,6 +2,7 @@
   {
     "name": "flying skull",
     "beingType": "undead",
+    "sprite": null,
     "health": 30,
     "baseResistanceTable": {
       "poison": 10,
@@ -23,6 +24,7 @@
     "name": "skeleton",
     "beingType": "undead",
     "health": 85,
+    "sprite": "skeleton",
     "baseStrength": 5,
     "baseResistanceTable": {
       "poison": 10,
@@ -45,6 +47,7 @@
     "name": "zombie",
     "beingType": "undead",
     "health": 175,
+    "sprite": "zombie",
     "baseStrength": 8,
     "baseResistanceTable": {
       "poison": 10,
@@ -69,6 +72,7 @@
     "name": "wraith",
     "beingType": "undead",
     "health": 120,
+    "sprite": "ghost",
     "baseIntelligence": 15,
     "baseResistanceTable": {
       "poison": 40,
@@ -94,6 +98,7 @@
     "beingType": "undead",
     "health": 300,
     "baseStrength": 20,
+    "sprite": null,
     "baseResistanceTable": {
       "poison": 40,
       "fire": 10,
@@ -120,6 +125,7 @@
     "beingType": "undead",
     "health": 200,
     "baseStrength": 30,
+    "sprite": null,
     "baseResistanceTable": {
       "poison": 60,
       "fire": 15,
@@ -147,6 +153,7 @@
     "beingType": "human",
     "sanity": 50,
     "health": 50,
+    "sprite": "bandit_light",
     "baseStrength": 8,
     "mana": {
       "maximum": 50,
@@ -173,6 +180,7 @@
     "beingType": "demi-human",
     "sanity": null,
     "health": 160,
+    "sprite": "goblin",
     "baseStrength": 15,
     "mana": {
       "maximum": 50,
@@ -196,6 +204,7 @@
   {
     "name": "raven",
     "beingType": "beast",
+    "sprite": null,
     "health": 50,
     "baseStrength": 2,
     "mana": {
@@ -219,6 +228,7 @@
   },
   {
     "name": "wolf",
+    "sprite": "wolf_black",
     "beingType": "beast",
     "health": 100,
     "baseStrength": 8,

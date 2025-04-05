@@ -1,5 +1,5 @@
 import { parse, stringify } from "flatted";
-import { Enemy } from "@/entities/creatures";
+import { Enemy, Minion } from "@/entities/creatures";
 import { storage } from "@/utility/functions/storage";
 import { RootStore } from "@/stores/RootStore";
 import {
@@ -202,8 +202,10 @@ export default class EnemyStore {
     if (!enemy.sprite) {
       if (enemy instanceof Character) {
         runInAction(() => (enemy.sprite = getAnimatedSpriteForNPC(enemy)));
+      } else if (enemy instanceof Minion) {
+        return; // avoid minions being at this level, should only be attached to Enemy
       } else {
-        throw new Error(`No sprite on ${enemy}`);
+        throw new Error(`No sprite on ${enemy.nameReference}`);
       }
     }
 
@@ -237,23 +239,30 @@ export default class EnemyStore {
     if (!storedIds) {
       return { enemies: [], map };
     }
-    const enemies: Enemy[] = [];
+    const enemies: Being[] = [];
     (parse(storedIds) as string[]).forEach((str) => {
       const retrieved = storage.getString(`enemy_${str}`);
       if (!retrieved) return;
-      const enemy = Enemy.fromJSON({ ...parse(retrieved), root: this.root });
-      if (!enemy.sprite) {
-        throw new Error(`No sprite on ${enemy}`);
+      const parsed = parse(retrieved);
+      if (!parsed.turnsLeftAlive) {
+        const enemy = Enemy.fromJSON({ ...parsed, root: this.root });
+        if (!enemy.sprite) {
+          if (enemy instanceof Minion) {
+            console.warn(`May want to add sprite to ${enemy.nameReference}`);
+          } else {
+            throw new Error(`No sprite on ${enemy.nameReference}`);
+          }
+        }
+        map.set(
+          enemy.id,
+          new EnemyAnimationStore({
+            root: this.root,
+            sprite: enemy.sprite,
+            id: enemy.id,
+          }),
+        );
+        enemies.push(enemy);
       }
-      map.set(
-        enemy.id,
-        new EnemyAnimationStore({
-          root: this.root,
-          sprite: enemy.sprite,
-          id: enemy.id,
-        }),
-      );
-      enemies.push(enemy);
     });
     return { enemies, map };
   }

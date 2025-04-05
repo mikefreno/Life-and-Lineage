@@ -149,7 +149,9 @@ const BattleTab = observer(
         let possibleTargets = enemyStore.enemies;
         enemyStore.enemies.forEach((enemy) => {
           if (enemy instanceof Enemy) {
-            enemy.minions.forEach((minion) => minion as Being);
+            enemy.minions.forEach((minion) =>
+              possibleTargets.push(minion as Being),
+            );
           }
         });
 
