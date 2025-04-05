@@ -43,7 +43,7 @@ import { decode } from "base-64";
 import { useScaling } from "@/hooks/scaling";
 import TutorialModal from "@/components/TutorialModal";
 import { TutorialOption } from "@/utility/types";
-import { initializePurchases } from "@/stores/SingletonSource";
+import Purchases, { LOG_LEVEL } from "react-native-purchases";
 
 global.atob = decode;
 
@@ -99,13 +99,13 @@ Sentry.init({
  */
 const Root = () => {
   const [mainFontLoaded, error] = useFonts({
-    PixelifySans: require("../assets/fonts/PixelifySans-Regular.ttf"),
+    PixelifySans: require("@/assets/fonts/PixelifySans-Regular.ttf"),
   });
 
   const [otherFontsLoaded] = useFonts({
-    Handwritten: require("../assets/fonts/Caveat-VariableFont_wght.ttf"),
-    Cursive: require("../assets/fonts/Tangerine-Regular.ttf"),
-    CursiveBold: require("../assets/fonts/Tangerine-Bold.ttf"),
+    Handwritten: require("@/assets/fonts/Caveat-VariableFont_wght.ttf"),
+    Cursive: require("@/assets/fonts/Tangerine-Regular.ttf"),
+    CursiveBold: require("@/assets/fonts/Tangerine-Bold.ttf"),
   });
 
   useEffect(() => {
@@ -116,10 +116,6 @@ const Root = () => {
       SplashScreen.hideAsync();
     }
   }, [mainFontLoaded, error]);
-
-  useEffect(() => {
-    initializePurchases();
-  }, []);
 
   while (!mainFontLoaded) {
     return null;
@@ -259,6 +255,35 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
 
     uiStore.markStoreAsLoaded("routing");
   };
+
+  useEffect(() => {
+    const initializePurchases = async () => {
+      try {
+        Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
+
+        if (Platform.OS === "ios") {
+          Purchases.configure({
+            apiKey: process.env.EXPO_PUBLIC_RC_IOS as string,
+          });
+        } else if (Platform.OS === "android") {
+          Purchases.configure({
+            apiKey: process.env.EXPO_PUBLIC_RC_ANDROID as string,
+          });
+        }
+
+        const offerings = await Purchases.getOfferings();
+        if (offerings.current) {
+          rootStore.iapStore.setOffering(offerings.current);
+        }
+
+        return true;
+      } catch (error) {
+        console.error("Failed to initialize purchases:", error);
+        return false;
+      }
+    };
+    initializePurchases();
+  }, []);
 
   useEffect(() => {
     const initializeApp = async () => {

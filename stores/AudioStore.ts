@@ -144,7 +144,6 @@ export class AudioStore {
   }
 
   async initializeAudio() {
-    console.log("initializing");
     try {
       const loadedAmbientBuffers = await Promise.all(
         Object.entries(AMBIENT_TRACKS).map(async ([key, source]) => {

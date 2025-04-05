@@ -1,15 +1,17 @@
 import React, { createContext, type ReactNode, useMemo } from "react";
-import { RootStore } from "@/stores/RootStore";
+import { RootStore } from "../stores/RootStore";
 import { type SharedValue, useSharedValue } from "react-native-reanimated";
-import { DraggableDataStore } from "@/stores/DraggableDataStore";
-import { rootStore } from "@/stores/SingletonSource";
+import { DraggableDataStore } from "../stores/DraggableDataStore";
 
-export const StoreContext = createContext<RootStore | undefined>(rootStore);
+export const StoreContext = createContext<RootStore | undefined>(undefined);
 
-const StoreProvider = ({ children }: { children: ReactNode }) => {
-  return (
-    <StoreContext.Provider value={rootStore}>{children}</StoreContext.Provider>
-  );
+let rootStoreInstance: RootStore | null = null;
+
+export const getRootStore = (): RootStore => {
+  if (!rootStoreInstance) {
+    rootStoreInstance = new RootStore();
+  }
+  return rootStoreInstance;
 };
 
 export const DragContext = createContext<
@@ -25,6 +27,14 @@ export const DragContext = createContext<
     }
   | undefined
 >(undefined);
+
+const StoreProvider = ({ children }: { children: ReactNode }) => {
+  const store = useMemo(() => getRootStore(), []);
+
+  return (
+    <StoreContext.Provider value={store}>{children}</StoreContext.Provider>
+  );
+};
 
 const DraggableDataProvider = ({ children }: { children: ReactNode }) => {
   const draggableClassStore = new DraggableDataStore();

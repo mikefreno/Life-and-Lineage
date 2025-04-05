@@ -275,10 +275,6 @@ export class Being {
         }
       },
     );
-    reaction(
-      () => this.activeAuraConditionIds,
-      () => console.log(this.activeAuraConditionIds),
-    );
   }
 
   //----------------------------------PlayerCharacter Specific----------------------------------//
