@@ -1060,7 +1060,7 @@ export class Being {
         .find((attackObj) => attackObj.name == attackName);
       if (!foundAttack)
         throw new Error(
-          `No matching attack found for ${attackName} in creating a ${
+          `No matching attack found for ${attackName} on ${
             (this as unknown as Character | Creature).nameReference
           }`,
         );
@@ -1157,6 +1157,8 @@ export class Being {
     const availableAttacks = this.attacks.filter(
       (attack) => attack.canBeUsed.val,
     );
+    runInAction(() => (this.currentMana = this.maxMana));
+    console.log(availableAttacks);
     if (availableAttacks.length > 0) {
       const { attack, numTargets } = this.chooseAttack(
         availableAttacks,
@@ -1184,6 +1186,7 @@ export class Being {
     }
   }
 
+  //TODO: needs to be re-evaluated
   protected chooseAttack(
     availableAttacks: Attack[],
     numberOfPotentialTargets: number,
@@ -1249,6 +1252,7 @@ export class Being {
 
       return { attack, priorityScore, numTargets };
     });
+    console.log(scoredAttacks);
 
     // Sort the attacks by priority score in descending order
     scoredAttacks.sort((a, b) => b.priorityScore - a.priorityScore);

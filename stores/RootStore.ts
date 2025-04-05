@@ -69,6 +69,9 @@ export class RootStore {
     this.authStore = new AuthStore({ root: this });
     this.JSONServiceStore = new JSONServiceStore({ root: this });
 
+    this.enemyStore = new EnemyStore({ root: this });
+    this.uiStore.markStoreAsLoaded("enemy");
+
     this.uiStore.markStoreAsLoaded("auth");
     __DEV__ ?? this.uiStore.markStoreAsLoaded("inventory");
 
@@ -99,9 +102,6 @@ export class RootStore {
     this.uiStore.markStoreAsLoaded("shops");
 
     this.audioStore = new AudioStore({ root: this });
-
-    this.enemyStore = new EnemyStore({ root: this });
-    this.uiStore.markStoreAsLoaded("enemy");
 
     this.tutorialStore = new TutorialStore({ root: this });
     this.uiStore.markStoreAsLoaded("tutorial");

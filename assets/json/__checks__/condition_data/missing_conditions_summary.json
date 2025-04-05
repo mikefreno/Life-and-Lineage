@@ -1,0 +1,14 @@
+{
+  "vampiric bite": {
+    "buffs": [],
+    "debuffs": [
+      "lifesteal"
+    ]
+  },
+  "life drain": {
+    "buffs": [],
+    "debuffs": [
+      "lifesteal"
+    ]
+  }
+}

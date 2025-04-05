@@ -403,6 +403,8 @@ const SingleAnimationSprite = React.memo(
     const isFirstFrameHeld = useRef(false);
     const isMounted = useRef(true);
 
+    const styles = useStyles();
+
     useEffect(() => {
       isMounted.current = true;
       return () => {

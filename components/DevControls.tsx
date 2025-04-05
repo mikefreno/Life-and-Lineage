@@ -20,7 +20,7 @@ import { flex, useStyles } from "@/hooks/styles";
 import { Entypo } from "@expo/vector-icons";
 import { Orientation } from "expo-screen-orientation";
 import { useScaling } from "@/hooks/scaling";
-import { enemyOptions } from "@/utility/animation/enemy";
+import { bossOptions, enemyOptions } from "@/utility/animation/enemy";
 
 export const DevControls = observer(() => {
   const rootStore = useRootStore();
@@ -293,7 +293,7 @@ const ActionSliders = ({
     step?: number;
     initVal?: number;
     stringInput?: boolean;
-    autocompleteType?: "enemyOptions";
+    autocompleteType?: "enemyOptions" | "bossOptions";
   }[];
   setScrollEnabled: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
@@ -334,6 +334,12 @@ const ActionSliders = ({
           setTextValue(text);
           if (action.autocompleteType === "enemyOptions") {
             const filtered = enemyOptions.filter((option) =>
+              option.toLowerCase().includes(text.toLowerCase()),
+            );
+            setFilteredOptions(filtered);
+            setShowDropdown(text.length > 0 && filtered.length > 0);
+          } else if (action.autocompleteType === "bossOptions") {
+            const filtered = bossOptions.filter((option) =>
               option.toLowerCase().includes(text.toLowerCase()),
             );
             setFilteredOptions(filtered);

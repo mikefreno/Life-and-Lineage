@@ -1,0 +1,87 @@
+[
+  {
+    "attack": {
+      "animation": "attack_1",
+      "baseHitChance": 1,
+      "buffNames": null,
+      "damageTable": [],
+      "debuffNames": null,
+      "element": null,
+      "heldActiveTargets": null,
+      "hitsPerTurn": 1,
+      "isActive": false,
+      "manaCost": 20,
+      "maxTurnsActive": 1,
+      "name": "dark burst",
+      "proficiencyNeeded": null,
+      "rangerPetName": null,
+      "remainingTurnsActive": null,
+      "remainingUses": null,
+      "sanityDamage": 0,
+      "selfDamageTable": null,
+      "summonNames": null,
+      "targets": "single",
+      "user": [],
+      "usesWeapon": null
+    },
+    "numTargets": 1,
+    "priorityScore": 15.783493164764542
+  },
+  {
+    "attack": {
+      "animation": "attack_2",
+      "baseHitChance": 1,
+      "buffNames": null,
+      "damageTable": [],
+      "debuffNames": null,
+      "element": null,
+      "heldActiveTargets": null,
+      "hitsPerTurn": 1,
+      "isActive": false,
+      "manaCost": 35,
+      "maxTurnsActive": 1,
+      "name": "raise skeleton",
+      "proficiencyNeeded": null,
+      "rangerPetName": null,
+      "remainingTurnsActive": null,
+      "remainingUses": null,
+      "sanityDamage": 0,
+      "selfDamageTable": null,
+      "summonNames": null,
+      "targets": "single",
+      "user": [],
+      "usesWeapon": null
+    },
+    "numTargets": 1,
+    "priorityScore": 12.341849072174648
+  },
+  {
+    "attack": {
+      "animation": "attack_3",
+      "baseHitChance": 0.85,
+      "buffNames": null,
+      "damageTable": {},
+      "debuffNames": [],
+      "element": null,
+      "heldActiveTargets": null,
+      "hitsPerTurn": 1,
+      "isActive": false,
+      "manaCost": 30,
+      "maxTurnsActive": 1,
+      "name": "terrorize",
+      "proficiencyNeeded": null,
+      "rangerPetName": null,
+      "remainingTurnsActive": null,
+      "remainingUses": null,
+      "sanityDamage": 10,
+      "selfDamageTable": null,
+      "summonNames": null,
+      "targets": "area",
+      "user": [],
+      "usesWeapon": null
+    },
+    "numTargets": 1,
+    "priorityScore": 14.426893966478023
+  }
+]
+

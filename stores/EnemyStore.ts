@@ -11,12 +11,12 @@ import {
   runInAction,
 } from "mobx";
 import { EnemyAnimationStore } from "@/stores/EnemyAnimationStore";
-import enemiesJSON from "@/assets/json/enemy.json";
 import { BeingType, ItemClassType } from "@/utility/types";
 import { Being } from "@/entities/being";
 import { Character } from "@/entities/character";
 import { getAnimatedSpriteForNPC } from "@/utility/functions/misc";
 import { EnemyImageKeyOption } from "@/utility/animation/enemy";
+import { jsonServiceStore } from "./SingletonSource";
 
 export default class EnemyStore {
   enemies: Being[];
@@ -65,16 +65,27 @@ export default class EnemyStore {
   }
 
   setupDevActions() {
-    this.root.addDevAction({
-      action: (value: string) => this._enemyTester(value.replaceAll("_", " ")),
-      name: "Enemy tester",
-      stringInput: true,
-      autocompleteType: "enemyOptions",
-    });
+    this.root.addDevAction([
+      {
+        action: (value: string) =>
+          this._enemyTester(value.replaceAll("_", " ")),
+        name: "Enemy tester",
+        stringInput: true,
+        autocompleteType: "enemyOptions",
+      },
+      {
+        action: (value: string) => this._bossTester(value.replaceAll("_", " ")),
+        name: "Boss tester",
+        stringInput: true,
+        autocompleteType: "bossOptions",
+      },
+    ]);
   }
   //TODO
   _enemyTester(val: string) {
-    let enemyJSON = enemiesJSON.find((json) => json.name == val);
+    let enemyJSON = jsonServiceStore
+      .readJsonFileSync("enemy")
+      .find((json) => json.name == val);
     if (!enemyJSON) {
       console.error(`invalid enemy name: ${val}`);
       return;
@@ -106,7 +117,55 @@ export default class EnemyStore {
         chance: number;
       }[],
       attackStrings: enemyJSON.attackStrings,
+      animationStrings: enemyJSON.animationStrings,
       sprite: enemyJSON.sprite as EnemyImageKeyOption,
+      root: this.root,
+    });
+
+    this.enemies.push(enemy);
+    this.animationStoreMap.set(
+      enemy.id,
+      new EnemyAnimationStore({
+        root: this.root,
+        sprite: enemy.sprite,
+        id: enemy.id,
+      }),
+    );
+    this.saveEnemy(enemy);
+  }
+
+  _bossTester(val: string) {
+    let bossJSON = jsonServiceStore
+      .readJsonFileSync("bosses")
+      .find((json) => json.name == val);
+    if (!bossJSON) {
+      console.error(`invalid enemy name: ${val}`);
+      return;
+    }
+
+    this.clearEnemyList();
+    const enemy = new Enemy({
+      beingType: bossJSON.beingType as BeingType,
+      creatureSpecies: bossJSON.name,
+      currentHealth: bossJSON.health,
+      baseHealth: bossJSON.health,
+      currentSanity: bossJSON.sanity,
+      baseSanity: bossJSON.sanity,
+      baseArmor: bossJSON.armorValue,
+      currentMana: bossJSON.mana.maximum,
+      baseMana: bossJSON.mana.maximum,
+      baseDamageTable: bossJSON.baseDamageTable,
+      baseResistanceTable: bossJSON.baseResistanceTable,
+      baseManaRegen: bossJSON.mana.regen,
+      goldDropRange: bossJSON.goldDropRange,
+      drops: bossJSON.drops as {
+        item: string;
+        itemType: ItemClassType;
+        chance: number;
+      }[],
+      attackStrings: bossJSON.attackStrings,
+      animationStrings: bossJSON.animationStrings,
+      sprite: bossJSON.sprite as EnemyImageKeyOption,
       root: this.root,
     });
 

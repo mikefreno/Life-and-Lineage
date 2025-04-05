@@ -1,0 +1,51 @@
+{
+  "totalEnemies": 27,
+  "totalBosses": 23,
+  "enemiesWithMissingAttacks": 0,
+  "bossesWithMissingAttacks": 0,
+  "enemiesWithMissingFields": 0,
+  "bossesWithMissingFields": 2,
+  "beingTypes": {
+    "block o wood": 1,
+    "beast": 7,
+    "undead": 4,
+    "demi-human": 6,
+    "human": 9
+  },
+  "averageHealth": 444.4074074074074,
+  "averageGoldDrop": {
+    "minimum": 58.51851851851852,
+    "maximum": 78.88888888888889
+  },
+  "attackDistribution": {
+    "bite": 4,
+    "vampiric bite": 1,
+    "stab": 6,
+    "cleave": 2,
+    "dark bolt": 1,
+    "grab": 1,
+    "zombie bite": 1,
+    "wail": 1,
+    "blunt cleave": 1,
+    "heavy swing": 2,
+    "claw": 2,
+    "chop": 2,
+    "charged pierce": 1,
+    "pocket sand": 1,
+    "serrate": 2,
+    "headbutt": 1,
+    "bonk": 4,
+    "frost": 1,
+    "fire bolt": 1,
+    "gust": 2,
+    "rock toss": 1,
+    "venomous bite": 2,
+    "poisoned shot": 1,
+    "maddening shot": 1,
+    "shoot": 1,
+    "dive": 1,
+    "stampede": 1,
+    "pierce": 2,
+    "stomp": 1
+  }
+}

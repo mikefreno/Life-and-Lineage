@@ -96,6 +96,10 @@ export const enemyOptions = jsonServiceStore
   .readJsonFileSync("enemy")
   .map((json) => json.name);
 
+export const bossOptions = jsonServiceStore
+  .readJsonFileSync("bosses")
+  .map((json) => json.name);
+
 export type AnimationBase = {
   anim: any;
   sizeOverride?: { height: number; width: number };
@@ -980,6 +984,8 @@ export const EnemyImageMap: EnemyImageMapType = {
     },
     height: 128,
     width: 160,
+    topOffset: -15,
+    renderScale: 2.5,
     mirror: true,
   },
   npc_man: {

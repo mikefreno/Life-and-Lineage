@@ -445,7 +445,7 @@
     "name": "call backup",
     "manaCost": 30,
     "damageTable": {},
-    "summons": [
+    "summonNames": [
       "bandit"
     ]
   },
@@ -453,7 +453,7 @@
     "name": "raise skeleton",
     "damageTable": {},
     "manaCost": 35,
-    "summons": [
+    "summonNames": [
       "skeleton"
     ]
   },
@@ -541,6 +541,16 @@
     "baseHitChance": 0.90,
     "damageTable": {
       "magic": 6
+    }
+  },
+  {
+    "name": "dark burst",
+    "manaCost": 15,
+    "target": "area",
+    "baseHitChance": 1.0,
+    "damageTable": {
+      "poison": 2,
+      "physical": 1
     }
   },
   {

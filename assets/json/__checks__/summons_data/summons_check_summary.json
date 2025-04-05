@@ -1,0 +1,12 @@
+{
+  "missingSummons": {
+    "ranger": [],
+    "necromancer": []
+  },
+  "missingSummonAttacks": {},
+  "unusedSummons": [
+    "zombie",
+    "bandit",
+    "hobgoblin"
+  ]
+}

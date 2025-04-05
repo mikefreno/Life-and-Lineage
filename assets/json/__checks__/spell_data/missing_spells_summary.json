@@ -1,0 +1,14 @@
+{
+  "missingSpells": {
+    "mage": [],
+    "ranger": [],
+    "paladin": [],
+    "necromancer": []
+  },
+  "spellsWithoutBooks": {
+    "mage": [],
+    "ranger": [],
+    "paladin": [],
+    "necromancer": []
+  }
+}

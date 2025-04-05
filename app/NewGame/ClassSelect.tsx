@@ -139,6 +139,14 @@ const SetClassScreen = observer(() => {
           title: "Welcome To Life and Lineage!",
           body: "Let's start with selecting your class...",
         }}
+        pageTwo={{
+          title: "A quick note from the dev...",
+          body: "Thanks for trying out Lineage! The game is not yet fully complete, with PvP, and Codex(meta information of the game, for instance how the damage system works) currently being implemented.",
+        }}
+        pageThree={{
+          title: "A (quick) note from the dev...",
+          body: "Most importantly(and impactfully) the game is quite unbalanced. This will be continuously be improved via hotfix(no app storeupdate required).",
+        }}
       />
       <GenericModal
         isVisibleCondition={showTutorialReset}

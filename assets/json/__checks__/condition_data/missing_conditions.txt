@@ -1,0 +1,2 @@
+Attack "vampiric bite" missing conditions: {"buffs":[],"debuffs":["lifesteal"]}
+Attack "life drain" missing conditions: {"buffs":[],"debuffs":["lifesteal"]}
