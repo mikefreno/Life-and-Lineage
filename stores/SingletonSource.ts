@@ -209,7 +209,6 @@ class JSONService {
     }
 
     this.initialized = true;
-    console.log("JSON cache initialized with bundled data");
   }
 
   // Synchronous read method - available immediately
@@ -344,7 +343,6 @@ class JSONService {
     return jsonMap[filename];
   }
 
-  // Method to update JSON data (can be called from anywhere)
   updateJsonData<T extends JSONFileOptionsType>(
     filename: T,
     data: JSONFileTypeMap[T],
@@ -352,11 +350,9 @@ class JSONService {
     if (!data) return;
 
     try {
-      // Update caches
       this.jsonCache[filename] = data;
       this.storage.set(`json_${filename}`, JSON.stringify(data));
 
-      // Also try to write to file system (async but we don't wait)
       const filePath = this.getJsonPath(filename);
       FileSystem.writeAsStringAsync(
         filePath,

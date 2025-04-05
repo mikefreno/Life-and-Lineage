@@ -180,34 +180,38 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   );
   const notificationListener = useRef<Notifications.EventSubscription>();
   const responseListener = useRef<Notifications.EventSubscription>();
+
   useEffect(() => {
     if (fontLoaded) {
-      wait(500).then(() => {
-        registerForPushNotificationsAsync()
-          .then((token) => setExpoPushToken(token ?? ""))
-          .catch((error: any) => setExpoPushToken(`${error}`));
+      const notificationFlow = () => {
+        wait(500).then(() => {
+          registerForPushNotificationsAsync()
+            .then((token) => setExpoPushToken(token ?? ""))
+            .catch((error: any) => setExpoPushToken(`${error}`));
 
-        notificationListener.current =
-          Notifications.addNotificationReceivedListener((notification) => {
-            setNotification(notification);
-          });
+          notificationListener.current =
+            Notifications.addNotificationReceivedListener((notification) => {
+              setNotification(notification);
+            });
 
-        responseListener.current =
-          Notifications.addNotificationResponseReceivedListener(
-            (response) => {},
-          );
-
-        return () => {
-          notificationListener.current &&
-            Notifications.removeNotificationSubscription(
-              notificationListener.current,
+          responseListener.current =
+            Notifications.addNotificationResponseReceivedListener(
+              (response) => {},
             );
-          responseListener.current &&
-            Notifications.removeNotificationSubscription(
-              responseListener.current,
-            );
-        };
-      });
+
+          return () => {
+            notificationListener.current &&
+              Notifications.removeNotificationSubscription(
+                notificationListener.current,
+              );
+            responseListener.current &&
+              Notifications.removeNotificationSubscription(
+                responseListener.current,
+              );
+          };
+        });
+      };
+      __DEV__ && notificationFlow();
     }
   }, [fontLoaded]);
 

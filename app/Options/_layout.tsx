@@ -130,18 +130,23 @@ export default function OptionsLayout() {
       <Tabs.Screen
         name="Codex/index"
         options={{
-          href: null,
+          href: __DEV__ ? undefined : null, //TODO: when codex is done
           headerShown: false,
           title: "Codex",
           tabBarLabelStyle: { fontFamily: "PixelifySans" },
           tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="book-open-variant" color={color} />
+            <MaterialCommunityIcons
+              name="book-open-variant"
+              color={color}
+              size={uiStore.iconSizeXL}
+            />
           ),
         }}
       />
       <Tabs.Screen
         name="pvp"
         options={{
+          href: __DEV__ ? undefined : null, //TODO: when pvp is done
           headerShown: false,
           title: "PVP",
           tabBarIconStyle: {

@@ -78,13 +78,13 @@ const PVPOptions = observer(() => {
                 { paddingLeft: 4, paddingTop: 4, paddingBottom: 8 },
               ]}
             >
-              Currently: {playerState?.pvpName ?? playerState?.fullName}
+              Currently: {pvpStore?.pvpName ?? playerState?.fullName}
             </Text>
             <GenericRaisedButton
               onPress={() =>
                 runInAction(() => {
                   if (playerState) {
-                    playerState.pvpName = pvpNameInput;
+                    pvpStore.pvpName = pvpNameInput;
                   }
                 })
               }

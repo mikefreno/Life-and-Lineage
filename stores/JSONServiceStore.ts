@@ -226,6 +226,8 @@ export class JSONServiceStore {
         jsonServiceStore.updateJsonData("otherOptions", data.otherOptions);
       if (data.sanityOptions)
         jsonServiceStore.updateJsonData("sanityOptions", data.sanityOptions);
+      if (data.pvpRewards)
+        jsonServiceStore.updateJsonData("pvpRewards", data.pvpRewards);
 
       this.retrievedMisc = true;
     } catch (error) {
