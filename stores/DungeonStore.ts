@@ -45,7 +45,6 @@ export class DungeonStore {
   fightingBoss: boolean = false;
   movementQueued: boolean = false;
   fleeModalShowing: boolean = false;
-  pvpUnlocked: boolean = false;
   private isProcessingMovement: boolean = false;
   logs: string[] = [];
 

@@ -12,6 +12,7 @@ const enemy_route = `${api_base}/enemies`;
 const item_route = `${api_base}/items`;
 const misc_route = `${api_base}/misc`;
 
+// Interface for API responses
 interface ApiResponse {
   ok: boolean;
   [key: string]: any;
@@ -25,14 +26,10 @@ export class JSONServiceStore {
   retrievedEnemies = false;
   retrievedItems = false;
   retrievedMisc = false;
-  lastUpdateTimestamp = 0;
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
     makeAutoObservable(this);
-
-    // Load persistence state
-    this.loadPersistenceState();
 
     reaction(
       () => this.root.authStore.isConnected,
@@ -42,41 +39,6 @@ export class JSONServiceStore {
         }
       },
     );
-  }
-
-  loadPersistenceState() {
-    try {
-      const persistedState = jsonServiceStore.getPersistedState();
-      if (persistedState) {
-        this.retrievedAttacks = persistedState.retrievedAttacks || false;
-        this.retrievedConditions = persistedState.retrievedConditions || false;
-        this.retrievedDungeons = persistedState.retrievedDungeons || false;
-        this.retrievedEnemies = persistedState.retrievedEnemies || false;
-        this.retrievedItems = persistedState.retrievedItems || false;
-        this.retrievedMisc = persistedState.retrievedMisc || false;
-        this.lastUpdateTimestamp = persistedState.lastUpdateTimestamp || 0;
-      }
-    } catch (error) {
-      console.error("Error loading persistence state:", error);
-    }
-  }
-
-  // Save persistence state to storage
-  savePersistenceState() {
-    try {
-      const state = {
-        retrievedAttacks: this.retrievedAttacks,
-        retrievedConditions: this.retrievedConditions,
-        retrievedDungeons: this.retrievedDungeons,
-        retrievedEnemies: this.retrievedEnemies,
-        retrievedItems: this.retrievedItems,
-        retrievedMisc: this.retrievedMisc,
-        lastUpdateTimestamp: this.lastUpdateTimestamp,
-      };
-      jsonServiceStore.savePersistedState(state);
-    } catch (error) {
-      console.error("Error saving persistence state:", error);
-    }
   }
 
   // Proxy method to the service for synchronous access
@@ -91,25 +53,14 @@ export class JSONServiceStore {
 
   async runAll(): Promise<void> {
     try {
-      // Check if we need to update based on time (e.g., once per day)
-      const now = Date.now();
-      const oneDayMs = 24 * 60 * 60 * 1000;
-      const shouldUpdate = now - this.lastUpdateTimestamp > oneDayMs;
-
-      if (shouldUpdate || !this.isAllDataRetrieved) {
-        await Promise.all([
-          this.getAndUpdateAttacks(),
-          this.getAndUpdateConditions(),
-          this.getAndUpdateDungeons(),
-          this.getAndUpdateEnemies(),
-          this.getAndUpdateItems(),
-          this.getAndUpdateMisc(),
-        ]);
-
-        // Update timestamp and save state
-        this.lastUpdateTimestamp = now;
-        this.savePersistenceState();
-      }
+      await Promise.all([
+        this.getAndUpdateAttacks(),
+        this.getAndUpdateConditions(),
+        this.getAndUpdateDungeons(),
+        this.getAndUpdateEnemies(),
+        this.getAndUpdateItems(),
+        this.getAndUpdateMisc(),
+      ]);
     } catch (error) {
       console.error("Error updating JSON files:", error);
     }
@@ -146,7 +97,6 @@ export class JSONServiceStore {
         jsonServiceStore.updateJsonData("summons", data.summons);
 
       this.retrievedAttacks = true;
-      this.savePersistenceState();
     } catch (error) {
       console.error("Error updating attack files:", error);
     }
@@ -168,7 +118,6 @@ export class JSONServiceStore {
         jsonServiceStore.updateJsonData("sanityDebuffs", data.sanityDebuffs);
 
       this.retrievedConditions = true;
-      this.savePersistenceState();
     } catch (error) {
       console.error("Error updating condition files:", error);
     }
@@ -191,7 +140,6 @@ export class JSONServiceStore {
         );
 
       this.retrievedDungeons = true;
-      this.savePersistenceState();
     } catch (error) {
       console.error("Error updating dungeon files:", error);
     }
@@ -211,7 +159,6 @@ export class JSONServiceStore {
         jsonServiceStore.updateJsonData("enemyAttacks", data.enemyAttacks);
 
       this.retrievedEnemies = true;
-      this.savePersistenceState();
     } catch (error) {
       console.error("Error updating enemy files:", error);
     }
@@ -253,7 +200,6 @@ export class JSONServiceStore {
       if (data.suffix) jsonServiceStore.updateJsonData("suffix", data.suffix);
 
       this.retrievedItems = true;
-      this.savePersistenceState();
     } catch (error) {
       console.error("Error updating item files:", error);
     }
@@ -282,7 +228,6 @@ export class JSONServiceStore {
         jsonServiceStore.updateJsonData("sanityOptions", data.sanityOptions);
 
       this.retrievedMisc = true;
-      this.savePersistenceState();
     } catch (error) {
       console.error("Error updating misc files:", error);
     }

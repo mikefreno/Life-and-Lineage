@@ -25,6 +25,7 @@ import { IAPStore } from "@/stores/IAPStore";
 import { reloadAppAsync } from "expo";
 import { JSONServiceStore } from "./JSONServiceStore";
 import { jsonServiceStore } from "./SingletonSource";
+import { PVPStore } from "./PVPStore";
 
 export class RootStore {
   playerState: PlayerCharacter | null;
@@ -42,6 +43,7 @@ export class RootStore {
   audioStore: AudioStore;
   iapStore: IAPStore;
   JSONServiceStore: JSONServiceStore;
+  pvpStore: PVPStore;
 
   constructed: boolean = false;
   atDeathScreen: boolean = false;
@@ -109,6 +111,8 @@ export class RootStore {
 
     this.saveStore = new SaveStore({ root: this });
     this.uiStore.markStoreAsLoaded("save");
+
+    this.pvpStore = new PVPStore({ root: this });
 
     this.constructed = true;
 

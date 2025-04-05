@@ -140,6 +140,25 @@ export default function OptionsLayout() {
         }}
       />
       <Tabs.Screen
+        name="pvp"
+        options={{
+          headerShown: false,
+          title: "PVP",
+          tabBarIconStyle: {
+            width: uiStore.iconSizeXL,
+            height: uiStore.iconSizeXL,
+            marginRight: uiStore.isLandscape ? 16 : 0,
+          },
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons
+              name="sword-cross"
+              size={uiStore.iconSizeXL}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="Codex/[...slug]"
         options={{
           href: null,

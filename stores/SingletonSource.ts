@@ -56,6 +56,7 @@ import jobs from "@/assets/json/jobs.json";
 import manaOptions from "@/assets/json/medicalOptions/manaOptions.json";
 import otherOptions from "@/assets/json/medicalOptions/otherOptions.json";
 import sanityOptions from "@/assets/json/medicalOptions/sanityOptions.json";
+import pvpRewards from "@/assets/json/pvpRewards.json";
 
 // Uncovered files
 import deathMessages from "@/assets/json/deathMessages.json";
@@ -116,6 +117,7 @@ export const JSONFileOptions = [
   "manaOptions",
   "otherOptions",
   "sanityOptions",
+  "pvpRewards",
   // Uncovered files
   "deathMessages",
   "names",
@@ -126,87 +128,108 @@ export const JSONFileOptions = [
 
 export type JSONFileOptionsType = (typeof JSONFileOptions)[number];
 
-// Persistence state interface
-interface PersistenceState {
-  retrievedAttacks: boolean;
-  retrievedConditions: boolean;
-  retrievedDungeons: boolean;
-  retrievedEnemies: boolean;
-  retrievedItems: boolean;
-  retrievedMisc: boolean;
-  lastUpdateTimestamp: number;
-}
+// Create type mapping for JSON files
+export type JSONFileTypeMap = {
+  // Attack route files
+  mageBooks: typeof mageBooks;
+  mageSpells: typeof mageSpells;
+  necroBooks: typeof necroBooks;
+  necroSpells: typeof necroSpells;
+  paladinBooks: typeof paladinBooks;
+  paladinSpells: typeof paladinSpells;
+  playerAttacks: typeof playerAttacks;
+  rangerBooks: typeof rangerBooks;
+  rangerSpells: typeof rangerSpells;
+  summons: typeof summons;
+  // Conditions route files
+  conditions: typeof conditions;
+  debilitations: typeof debilitations;
+  sanityDebuffs: typeof sanityDebuffs;
+  // Dungeon route files
+  dungeons: typeof dungeons;
+  specialEncounters: typeof specialEncounters;
+  // Enemy route files
+  bosses: typeof bosses;
+  enemy: typeof enemy;
+  enemyAttacks: typeof enemyAttacks;
+  // Item route files
+  arrows: typeof arrows;
+  artifacts: typeof artifacts;
+  bodyArmor: typeof bodyArmor;
+  bows: typeof bows;
+  foci: typeof foci;
+  hats: typeof hats;
+  helmets: typeof helmets;
+  ingredients: typeof ingredients;
+  junk: typeof junk;
+  melee: typeof melee;
+  poison: typeof poison;
+  potions: typeof potions;
+  robes: typeof robes;
+  shields: typeof shields;
+  staves: typeof staves;
+  storyItems: typeof storyItems;
+  wands: typeof wands;
+  prefix: typeof prefix;
+  suffix: typeof suffix;
+  // Misc route files
+  activities: typeof activities;
+  healthOptions: typeof healthOptions;
+  investments: typeof investments;
+  jobs: typeof jobs;
+  manaOptions: typeof manaOptions;
+  otherOptions: typeof otherOptions;
+  sanityOptions: typeof sanityOptions;
+  pvpRewards: typeof pvpRewards;
+  // Uncovered files
+  deathMessages: typeof deathMessages;
+  names: typeof names;
+  qualifications: typeof qualifications;
+  shopLines: typeof shopLines;
+  shops: typeof shops;
+};
 
 // Standalone JSON service that doesn't depend on MobX or RootStore
 class JSONService {
   private storage = new MMKV({ id: "json-service" });
-  private jsonCache: Record<string, any> = {};
+  private jsonCache: Partial<JSONFileTypeMap> = {};
   private initialized = false;
-  private persistenceKey = "json_persistence_state";
 
   constructor() {
+    // Initialize the cache with bundled data
     this.initializeCache();
   }
 
+  // Initialize cache with bundled data
   private initializeCache(): void {
-    // Check if we have persisted data first
     for (const key of JSONFileOptions) {
-      const storedData = this.storage.getString(`json_${key}`);
-      if (storedData) {
-        try {
-          this.jsonCache[key] = JSON.parse(storedData);
-        } catch (error) {
-          console.error(`Error parsing stored JSON for ${key}:`, error);
-          this.loadDefaultJson(key);
-        }
-      } else {
-        this.loadDefaultJson(key);
-      }
+      const originalData = this.getOriginalJson(key);
+      this.jsonCache[key] = originalData;
+      this.storage.set(`json_${key}`, JSON.stringify(originalData));
     }
 
     this.initialized = true;
+    console.log("JSON cache initialized with bundled data");
   }
 
-  private loadDefaultJson(key: JSONFileOptionsType): void {
-    const originalData = this.getOriginalJson(key);
-    this.jsonCache[key] = originalData;
-    this.storage.set(`json_${key}`, JSON.stringify(originalData));
-  }
-
-  // Get persistence state
-  getPersistedState(): PersistenceState | null {
-    const storedState = this.storage.getString(this.persistenceKey);
-    if (storedState) {
-      try {
-        return JSON.parse(storedState) as PersistenceState;
-      } catch (error) {
-        console.error("Error parsing persistence state:", error);
-        return null;
-      }
-    }
-    return null;
-  }
-
-  // Save persistence state
-  savePersistedState(state: PersistenceState): void {
-    this.storage.set(this.persistenceKey, JSON.stringify(state));
-  }
-
-  readJsonFileSync(filename: JSONFileOptionsType): any {
+  // Synchronous read method - available immediately
+  readJsonFileSync<T extends JSONFileOptionsType>(
+    filename: T,
+  ): JSONFileTypeMap[T] {
     if (!this.initialized) {
       console.warn("JSONService not fully initialized yet");
     }
 
     // First check in-memory cache for fastest access
     if (this.jsonCache[filename]) {
-      return this.jsonCache[filename];
+      return this.jsonCache[filename] as JSONFileTypeMap[T];
     }
 
     // Then check MMKV storage
     const storedData = this.storage.getString(`json_${filename}`);
     if (storedData) {
       try {
-        const data = JSON.parse(storedData);
+        const data = JSON.parse(storedData) as JSONFileTypeMap[T];
         this.jsonCache[filename] = data; // Update in-memory cache
         return data;
       } catch (error) {
@@ -218,18 +241,20 @@ class JSONService {
     const originalData = this.getOriginalJson(filename);
     this.jsonCache[filename] = originalData; // Cache it
     this.storage.set(`json_${filename}`, JSON.stringify(originalData));
-    return originalData;
+    return originalData as JSONFileTypeMap[T];
   }
 
   // Asynchronous read method (for completeness)
-  async readJsonFile(filename: JSONFileOptionsType): Promise<any> {
+  async readJsonFile<T extends JSONFileOptionsType>(
+    filename: T,
+  ): Promise<JSONFileTypeMap[T]> {
     try {
       const path = this.getJsonPath(filename);
       const fileInfo = await FileSystem.getInfoAsync(path);
 
       if (fileInfo.exists) {
         const content = await FileSystem.readAsStringAsync(path);
-        const data = JSON.parse(content);
+        const data = JSON.parse(content) as JSONFileTypeMap[T];
 
         // Update caches
         this.jsonCache[filename] = data;
@@ -252,17 +277,78 @@ class JSONService {
   }
 
   // Helper method to get original bundled JSON
-  getOriginalJson(filename: JSONFileOptionsType): any {
+  getOriginalJson<T extends JSONFileOptionsType>(
+    filename: T,
+  ): JSONFileTypeMap[T] {
     // Map filename to the imported JSON
-    const jsonMap: Record<string, any> = {
-      // All mappings remain the same...
+    const jsonMap: JSONFileTypeMap = {
+      // Attack route files
+      mageBooks,
+      mageSpells,
+      necroBooks,
+      necroSpells,
+      paladinBooks,
+      paladinSpells,
+      playerAttacks,
+      rangerBooks,
+      rangerSpells,
+      summons,
+      // Conditions route files
+      conditions,
+      debilitations,
+      sanityDebuffs,
+      // Dungeon route files
+      dungeons,
+      specialEncounters,
+      // Enemy route files
+      bosses,
+      enemy,
+      enemyAttacks,
+      // Item route files
+      arrows,
+      artifacts,
+      bodyArmor,
+      bows,
+      foci,
+      hats,
+      helmets,
+      ingredients,
+      junk,
+      melee,
+      poison,
+      potions,
+      robes,
+      shields,
+      staves,
+      storyItems,
+      wands,
+      prefix,
+      suffix,
+      // Misc route files
+      activities,
+      healthOptions,
+      investments,
+      jobs,
+      manaOptions,
+      otherOptions,
+      sanityOptions,
+      pvpRewards,
+      // Uncovered files
+      deathMessages,
+      names,
+      qualifications,
+      shopLines,
+      shops,
     };
 
-    return jsonMap[filename] || {};
+    return jsonMap[filename];
   }
 
   // Method to update JSON data (can be called from anywhere)
-  updateJsonData(filename: JSONFileOptionsType, data: any): void {
+  updateJsonData<T extends JSONFileOptionsType>(
+    filename: T,
+    data: JSONFileTypeMap[T],
+  ): void {
     if (!data) return;
 
     try {

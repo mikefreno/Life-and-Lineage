@@ -1,6 +1,6 @@
 import { useFonts } from "expo-font";
 import { Stack, usePathname, useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { Platform, Pressable, View, StyleSheet, UIManager } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
@@ -44,6 +44,11 @@ import { useScaling } from "@/hooks/scaling";
 import TutorialModal from "@/components/TutorialModal";
 import { TutorialOption } from "@/utility/types";
 import Purchases, { LOG_LEVEL } from "react-native-purchases";
+import { API_BASE_URL } from "@/config/config";
+import { registerForPushNotificationsAsync } from "@/utility/functions/notifications";
+import * as Notifications from "expo-notifications";
+import { HeaderBackButton } from "@react-navigation/elements";
+import { useVibration } from "@/hooks/generic";
 
 global.atob = decode;
 
@@ -147,6 +152,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
     uiStore,
     audioStore,
     shopsStore,
+    pvpStore,
     showReachedEndOfCompletedDungeonsMessage,
     closeReachedEndOfCompletedDungeonsMessage,
   } = rootStore;
@@ -160,63 +166,64 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   }, [insets]);
 
   const [firstLoad, setFirstLoad] = useState(true);
+  const vibration = useVibration();
 
   const pathname = usePathname();
   const [showBirthModal, setShowBirthModal] = useState(false);
   const [newbornBaby, setNewbornBaby] = useState<Character | null>(null);
   const { getNormalizedSize } = useScaling();
 
-  //const [expoPushToken, setExpoPushToken] = useState("");
-  //const [sentToken, setSentToken] = useState(false);
-  //const [_, setNotification] = useState<Notifications.Notification | undefined>(
-  //undefined,
-  //);
-  //const notificationListener = useRef<Notifications.EventSubscription>();
-  //const responseListener = useRef<Notifications.EventSubscription>();
-  //useEffect(() => {
-  //if (fontLoaded) {
-  //wait(500).then(() => {
-  //registerForPushNotificationsAsync()
-  //.then((token) => setExpoPushToken(token ?? ""))
-  //.catch((error: any) => setExpoPushToken(`${error}`));
+  const [expoPushToken, setExpoPushToken] = useState("");
+  const [sentToken, setSentToken] = useState(false);
+  const [_, setNotification] = useState<Notifications.Notification | undefined>(
+    undefined,
+  );
+  const notificationListener = useRef<Notifications.EventSubscription>();
+  const responseListener = useRef<Notifications.EventSubscription>();
+  useEffect(() => {
+    if (fontLoaded) {
+      wait(500).then(() => {
+        registerForPushNotificationsAsync()
+          .then((token) => setExpoPushToken(token ?? ""))
+          .catch((error: any) => setExpoPushToken(`${error}`));
 
-  //notificationListener.current =
-  //Notifications.addNotificationReceivedListener((notification) => {
-  //setNotification(notification);
-  //});
+        notificationListener.current =
+          Notifications.addNotificationReceivedListener((notification) => {
+            setNotification(notification);
+          });
 
-  //responseListener.current =
-  //Notifications.addNotificationResponseReceivedListener(
-  //(response) => {},
-  //);
+        responseListener.current =
+          Notifications.addNotificationResponseReceivedListener(
+            (response) => {},
+          );
 
-  //return () => {
-  //notificationListener.current &&
-  //Notifications.removeNotificationSubscription(
-  //notificationListener.current,
-  //);
-  //responseListener.current &&
-  //Notifications.removeNotificationSubscription(
-  //responseListener.current,
-  //);
-  //};
-  //});
-  //}
-  //}, [fontLoaded]);
+        return () => {
+          notificationListener.current &&
+            Notifications.removeNotificationSubscription(
+              notificationListener.current,
+            );
+          responseListener.current &&
+            Notifications.removeNotificationSubscription(
+              responseListener.current,
+            );
+        };
+      });
+    }
+  }, [fontLoaded]);
 
-  //useEffect(() => {
-  //if (expoPushToken && !sentToken) {
-  //fetch(`${API_BASE_URL}/tokens`, {
-  //method: "POST",
-  //headers: {
-  //"Content-Type": "application/json",
-  //},
-  //body: JSON.stringify({ token: expoPushToken }),
-  //});
-  //setSentToken(true);
-  //}
-  //}, [expoPushToken]);
-  //
+  useEffect(() => {
+    if (expoPushToken && !sentToken) {
+      fetch(`${API_BASE_URL}/tokens`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token: expoPushToken }),
+      });
+      setSentToken(true);
+      pvpStore.setExpoPushToken(expoPushToken);
+    }
+  }, [expoPushToken]);
 
   const handleRouting = (
     playerState: PlayerCharacter | null,
@@ -621,6 +628,38 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                     />
                   </View>
                 ),
+              }}
+            />
+            <Stack.Screen
+              name="PVPArena"
+              options={{
+                headerTitleStyle: {
+                  fontFamily: "PixelifySans",
+                  fontSize: getNormalizedSize(22),
+                },
+                headerTransparent: true,
+                headerBackground: () => (
+                  <View style={[StyleSheet.absoluteFill, styles.diffuse]}>
+                    <BlurView
+                      intensity={50}
+                      style={[StyleSheet.absoluteFill]}
+                      tint={uiStore.colorScheme}
+                    />
+                  </View>
+                ),
+                headerLeft: ({ tintColor }) => (
+                  <HeaderBackButton
+                    onPress={() => {
+                      vibration({ style: "light" });
+                      router.replace("/(tabs)/dungeon");
+                    }}
+                    tintColor={tintColor}
+                    displayMode="generic"
+                    style={{ marginLeft: -16 }}
+                  />
+                ),
+                headerRight: () => <AudioToggleButton />,
+                title: "PvP Home",
               }}
             />
             <Stack.Screen

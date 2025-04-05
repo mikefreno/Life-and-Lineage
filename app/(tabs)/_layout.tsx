@@ -46,7 +46,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 const TabLayout = observer(() => {
   const isFocused = useIsFocused();
   const root = useRootStore();
-  const { playerState, uiStore, dungeonStore } = root;
+  const { playerState, uiStore, dungeonStore, pvpStore } = root;
   const [showPVPInfoModal, setShowPVPInfoModal] = useState(false);
 
   const styles = useStyles();
@@ -128,7 +128,12 @@ const TabLayout = observer(() => {
         <View>
           <Text style={[styles["text-xl"], { textAlign: "center" }]}>
             PVP is currently locked, progress and complete the{" "}
-            <Text style={{ color: Colors[uiStore.colorScheme].health }}>
+            <Text
+              style={[
+                styles["text-xl"],
+                { color: Colors[uiStore.colorScheme].health },
+              ]}
+            >
               Ancient Arena
             </Text>{" "}
             dungeon to unlock!
@@ -455,13 +460,9 @@ const TabLayout = observer(() => {
                 ? () => (
                     <Pressable
                       onPress={() => {
-                        if (dungeonStore.pvpUnlocked) {
-                          uiStore.setTotalLoadingSteps(3);
-                          vibration({ style: "warning" });
-                          wait(100).then(() => {
-                            router.replace(`/DungeonLevel`);
-                            uiStore.incrementLoadingStep();
-                          });
+                        if (pvpStore.playerCanEngageInPvP || __DEV__) {
+                          vibration({ style: "light" });
+                          router.replace("/PVPArena");
                         } else {
                           setShowPVPInfoModal(true);
                         }

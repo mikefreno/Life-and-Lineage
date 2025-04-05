@@ -464,6 +464,7 @@ export class PlayerCharacter extends Character {
   investments: Investment[];
 
   debilitations: Condition[]; // debuffs due to old age
+  pvpName: string | undefined;
 
   constructor({
     playerClass,
@@ -481,6 +482,7 @@ export class PlayerCharacter extends Character {
     keyItems,
     jobs,
     debilitations,
+    pvpName,
     ...props
   }: PlayerCharacterOptions) {
     super({
@@ -516,6 +518,7 @@ export class PlayerCharacter extends Character {
     this.debilitations = debilitations ?? [];
 
     this.investments = investments ?? [];
+    this.pvpName = pvpName;
 
     __DEV__ && this.setupDevActions();
 
@@ -590,6 +593,8 @@ export class PlayerCharacter extends Character {
       bossDefeated: action,
 
       gameTurnHandler: action,
+
+      pvpName: observable,
     });
 
     reaction(
