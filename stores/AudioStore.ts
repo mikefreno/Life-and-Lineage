@@ -407,7 +407,7 @@ export class AudioStore {
       if (this.currentPlayer) {
         this.currentPlayer.stop();
         this.currentPlayer.disconnect();
-        this.currentPlayer = undefined;
+        runInAction(() => (this.currentPlayer = undefined));
       }
     } else {
       this.currentAudioContext = new AudioContext();

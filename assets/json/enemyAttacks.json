@@ -31,12 +31,18 @@
   },
   {
     "name": "bite",
-    "manaCost": 10,
+    "manaCost": 8,
     "targets": "single",
-    "baseHitChance": 0.95,
+    "baseHitChance": 1.0,
     "damageTable": {
       "physical": 5
-    }
+    },
+    "debuffNames": [
+      {
+        "name": "diseased",
+        "chance": 0.10
+      }
+    ]
   },
   {
     "name": "zombie bite",
@@ -50,7 +56,7 @@
     "debuffNames": [
       {
         "name": "diseased",
-        "chance": 0.05
+        "chance": 0.50
       }
     ]
   },
@@ -738,7 +744,7 @@
     "name": "claw",
     "manaCost": 10,
     "targets": "single",
-    "baseHitChance": 0.90,
+    "baseHitChance": 0.95,
     "damageTable": {
       "physical": 6
     },

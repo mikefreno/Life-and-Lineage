@@ -1196,7 +1196,6 @@ export class Being {
     numberOfPotentialTargets: number,
   ): { attack: Attack; numTargets: number } {
     const scoredAttacks = availableAttacks.map((attack) => {
-      const damage = attack.displayDamage;
       const numTargets =
         attack.targets === "area"
           ? numberOfPotentialTargets
@@ -1205,7 +1204,7 @@ export class Being {
             ? 2
             : 1
           : 1;
-      const totalDamage = damage.cumulativeDamage * numTargets;
+      const totalDamage = attack.displayDamage.cumulativeDamage * numTargets;
       const heal = attack.buffs?.filter((buff) => buff.effect.includes("heal"));
       const nonHealBuffCount =
         attack.buffs?.filter((buff) => !buff.effect.includes("heal")).length ??
@@ -1214,12 +1213,10 @@ export class Being {
       const summonCount = attack.summonNames?.length ?? 0;
       const healthPercentage = this.currentHealth / this.baseHealth;
 
-      // Calculate the priority score
-      let priorityScore = totalDamage;
+      let priorityScore = totalDamage * attack.baseHitChance;
 
-      // Add bonus for buffs and debuffs
-      priorityScore += nonHealBuffCount * 1.25; // adjust the multiplier as needed
-      priorityScore += debuffCount * 1.25; // adjust the multiplier as needed
+      priorityScore += nonHealBuffCount * 1.25;
+      priorityScore += debuffCount * 1.25;
 
       if (heal && healthPercentage < 0.85) {
         if (healthPercentage > 0.5) {
@@ -1228,7 +1225,6 @@ export class Being {
           priorityScore * 10;
         }
       }
-      // Add bonus for summons based on HP and current count
       if (summonCount > 0 && this instanceof Enemy) {
         if (healthPercentage > 0.75) {
           if (this.minions.length === 0) {
@@ -1252,7 +1248,7 @@ export class Being {
       }
 
       // Add a small random factor to introduce randomness
-      priorityScore += Math.random() * 1.25;
+      priorityScore += (Math.random() / 5) * priorityScore;
 
       return { attack, priorityScore, numTargets };
     });

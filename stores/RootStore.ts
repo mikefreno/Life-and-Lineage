@@ -26,8 +26,6 @@ import { reloadAppAsync } from "expo";
 import { JSONServiceStore } from "./JSONServiceStore";
 import { jsonServiceStore } from "./SingletonSource";
 import { PVPStore } from "./PVPStore";
-import Purchases, { LOG_LEVEL } from "react-native-purchases";
-import { Platform } from "react-native";
 
 export class RootStore {
   playerState: PlayerCharacter | null;
@@ -66,7 +64,6 @@ export class RootStore {
   }[] = [];
 
   constructor() {
-    console.log("calling root constructor");
     this.uiStore = new UIStore({ root: this });
 
     this.authStore = new AuthStore({ root: this });
