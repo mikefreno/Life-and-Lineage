@@ -23,7 +23,7 @@
   {
     "name": "skeleton",
     "beingType": "undead",
-    "health": 85,
+    "health": 55,
     "sprite": "skeleton",
     "baseStrength": 5,
     "baseResistanceTable": {
@@ -46,7 +46,7 @@
   {
     "name": "zombie",
     "beingType": "undead",
-    "health": 175,
+    "health": 105,
     "sprite": "zombie",
     "baseStrength": 8,
     "baseResistanceTable": {
@@ -71,7 +71,7 @@
   {
     "name": "wraith",
     "beingType": "undead",
-    "health": 120,
+    "health": 100,
     "sprite": "ghost",
     "baseIntelligence": 15,
     "baseResistanceTable": {
@@ -96,7 +96,7 @@
   {
     "name": "death knight",
     "beingType": "undead",
-    "health": 300,
+    "health": 200,
     "baseStrength": 20,
     "sprite": null,
     "baseResistanceTable": {
@@ -123,7 +123,7 @@
   {
     "name": "lich",
     "beingType": "undead",
-    "health": 200,
+    "health": 175,
     "baseStrength": 30,
     "sprite": null,
     "baseResistanceTable": {
@@ -275,7 +275,7 @@
   {
     "name": "dragon welp",
     "beingType": "draconic",
-    "health": 350,
+    "health": 225,
     "baseStrength": 15,
     "mana": {
       "maximum": 100,
@@ -301,7 +301,7 @@
   {
     "name": "griffon",
     "beingType": "beast",
-    "health": 500,
+    "health": 300,
     "baseStrength": 25,
     "mana": {
       "maximum": 100,
@@ -326,7 +326,7 @@
   {
     "name": "dragon",
     "beingType": "draconic",
-    "health": 1000,
+    "health": 500,
     "baseStrength": 30,
     "mana": {
       "maximum": 100,

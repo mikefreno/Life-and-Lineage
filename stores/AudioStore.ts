@@ -1,5 +1,6 @@
 import {
   action,
+  computed,
   makeObservable,
   observable,
   reaction,
@@ -53,14 +54,25 @@ const GLOBAL_MULT = 0.8;
 
 type TrackType = "ambient" | "combat" | "sfx";
 
+const scheduleTask =
+  typeof requestIdleCallback !== "undefined"
+    ? requestIdleCallback
+    : (callback: (deadline: any) => void) =>
+        setTimeout(() => {
+          callback({
+            timeRemaining: () => Number.MAX_VALUE,
+          });
+        }, 1);
+
 export class AudioStore {
   root: RootStore;
-
   masterVolume: number = 1;
   ambientMusicVolume: number = 1;
   soundEffectsVolume: number = 1;
   combatMusicVolume: number = 1;
   muted: boolean = false;
+  private initializationPromise: Promise<void> | null = null;
+  isInitializing: boolean = false;
 
   currentAudioContext: AudioContext | undefined = undefined;
   currentPlayer: AudioBufferSourceNode | undefined = undefined;
@@ -82,12 +94,18 @@ export class AudioStore {
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
-    const muted = this.loadPersistedSettings();
-    if (!muted) {
+    const { muted, master, ambient, combat, sfx } =
+      this.loadPersistedSettings();
+    this.muted = muted;
+    this.masterVolume = master;
+    this.ambientMusicVolume = ambient;
+    this.combatMusicVolume = combat;
+    this.soundEffectsVolume = sfx;
+
+    if (!this.muted) {
       this.ranMutedStart = false;
-      this.initializeAudio().then(() =>
-        this.root.uiStore.markStoreAsLoaded("audio"),
-      );
+      this.initializeAudio();
+      this.root.uiStore.markStoreAsLoaded("audio");
     } else {
       this.mutedStartOverride();
       this.ranMutedStart = true;
@@ -99,15 +117,15 @@ export class AudioStore {
       soundEffectsVolume: observable,
       combatMusicVolume: observable,
       muted: observable,
-
+      isInitializing: observable,
       currentPlayer: observable,
       outBoundPlayer: observable,
-
       cleanup: action,
       crossFade: action,
       setAudioLevel: action,
       setMuteValue: action,
       getEffectiveVolume: action,
+      initializationInProgress: computed,
     });
 
     reaction(
@@ -138,65 +156,96 @@ export class AudioStore {
     );
   }
 
+  get initializationInProgress(): boolean {
+    return this.isInitializing;
+  }
+
   mutedStartOverride() {
     this.root.uiStore.markStoreAsLoaded("audio");
     this.root.uiStore.markStoreAsLoaded("ambient");
   }
 
-  async initializeAudio() {
-    try {
-      const loadedAmbientBuffers = await Promise.all(
-        Object.entries(AMBIENT_TRACKS).map(async ([key, source]) => {
-          try {
-            const asset = Asset.fromModule(source);
-            if (!asset.downloaded) {
-              await asset.downloadAsync();
-            }
-            if (!this.currentAudioContext) {
-              this.currentAudioContext = new AudioContext();
-            }
-            const buffer = await this.currentAudioContext.decodeAudioDataSource(
-              asset.localUri!,
-            );
-            return [key as AMBIENT_TRACK_OPTIONS, buffer] as const;
-          } catch (error) {
-            throw new Error(`Failed to decode ambient track: ${key}-${error}`);
-          }
-        }),
-      );
-      this.ambientTrackBuffers = new Map(loadedAmbientBuffers);
-      this.root.uiStore.markStoreAsLoaded("ambient");
-
-      const loadedCombatBuffers = await Promise.all(
-        Object.entries(COMBAT_TRACKS).map(async ([key, source]) => {
-          try {
-            const asset = Asset.fromModule(source);
-            if (!asset.downloaded) {
-              await asset.downloadAsync();
-            }
-            if (!this.currentAudioContext) {
-              this.currentAudioContext = new AudioContext();
-            }
-            const buffer = await this.currentAudioContext.decodeAudioDataSource(
-              asset.localUri!,
-            );
-            return [key as COMBAT_TRACK_OPTIONS, buffer] as const;
-          } catch (error) {
-            throw new Error(`Failed to decode ambient track: ${key}-${error}`);
-          }
-        }),
-      );
-      this.ambientTrackBuffers = new Map(loadedAmbientBuffers);
-      this.combatTrackBuffers = new Map(loadedCombatBuffers);
-
-      this.parseLocationForRelevantTrack();
-    } catch (error) {
-      console.warn("Failed to initialize audio buffers", error);
+  initializeAudio() {
+    if (this.muted || this.initializationPromise) {
+      return;
     }
+
+    runInAction(() => {
+      this.isInitializing = true;
+    });
+
+    this.initializationPromise = new Promise((resolve) => {
+      scheduleTask(() => {
+        const loadTracks = async () => {
+          try {
+            const loadedAmbientPromises = Object.entries(AMBIENT_TRACKS).map(
+              async ([key, source]) => {
+                const asset = Asset.fromModule(source);
+                if (!asset.downloaded) {
+                  await asset.downloadAsync();
+                }
+                if (!this.currentAudioContext) {
+                  this.currentAudioContext = new AudioContext();
+                }
+                const buffer =
+                  await this.currentAudioContext.decodeAudioDataSource(
+                    asset.localUri!,
+                  );
+                return [key as AMBIENT_TRACK_OPTIONS, buffer] as const;
+              },
+            );
+
+            const loadedCombatPromises = Object.entries(COMBAT_TRACKS).map(
+              async ([key, source]) => {
+                const asset = Asset.fromModule(source);
+                if (!asset.downloaded) {
+                  await asset.downloadAsync();
+                }
+                if (!this.currentAudioContext) {
+                  this.currentAudioContext = new AudioContext();
+                }
+                const buffer =
+                  await this.currentAudioContext.decodeAudioDataSource(
+                    asset.localUri!,
+                  );
+                return [key as COMBAT_TRACK_OPTIONS, buffer] as const;
+              },
+            );
+
+            const [loadedAmbientBuffers, loadedCombatBuffers] =
+              await Promise.all([
+                Promise.all(loadedAmbientPromises),
+                Promise.all(loadedCombatPromises),
+              ]);
+
+            runInAction(() => {
+              this.ambientTrackBuffers = new Map(loadedAmbientBuffers);
+              this.combatTrackBuffers = new Map(loadedCombatBuffers);
+            });
+
+            this.root.uiStore.markStoreAsLoaded("ambient");
+            this.parseLocationForRelevantTrack();
+          } catch (error) {
+            console.warn("Failed to initialize audio buffers", error);
+          } finally {
+            this.initializationPromise = null;
+            runInAction(() => {
+              this.isInitializing = false;
+            });
+            resolve();
+          }
+        };
+
+        loadTracks();
+      });
+    });
+
+    return this.initializationPromise;
   }
 
   private parseLocationForRelevantTrack(current?: any, previous?: any) {
     if (this.muted) return;
+
     try {
       if (!previous || !current) {
         if (this.root.dungeonStore.inCombat) {
@@ -245,13 +294,11 @@ export class AudioStore {
     this.crossFade({ type: "combat", newTrack: "basic" });
   }
 
-  async crossFade({ type, newTrack }: CrossFadeOptions) {
+  crossFade({ type, newTrack }: CrossFadeOptions) {
     try {
       let buffer: AudioBuffer | undefined;
 
-      switch (
-        type //sfx will not be crossfaded
-      ) {
+      switch (type) {
         case "ambient":
           buffer = this.ambientTrackBuffers.get(newTrack);
           break;
@@ -283,9 +330,9 @@ export class AudioStore {
           });
         }, DEFAULT_FADE);
       }
+
       this.currentPlayer = this.currentAudioContext!.createBufferSource();
       this.currentPlayer.buffer = buffer;
-
       this.currentEnvelope = this.currentAudioContext!.createGain();
       this.currentPlayer.connect(this.currentEnvelope);
       this.currentEnvelope.connect(this.currentAudioContext!.destination);
@@ -300,7 +347,6 @@ export class AudioStore {
 
       if (this.storedTimeOnMute && newTrack == this.currentlyPlayingTrack) {
         this.currentPlayer.start(0, this.storedTimeOnMute);
-        //clear stored info
         this.storedTimeOnMute = undefined;
       } else {
         this.currentPlayer.start();
@@ -347,19 +393,29 @@ export class AudioStore {
   }
 
   async setMuteValue(val: boolean) {
-    this.muted = val;
+    if (this.initializationPromise) {
+      await this.initializationPromise;
+    }
+
+    runInAction(() => {
+      this.muted = val;
+    });
+
     if (val) {
-      this.storedTimeOnMute = this.currentAudioContext!.currentTime;
-      this.currentAudioContext!.close();
-      this.currentPlayer?.stop();
-      this.currentPlayer?.disconnect();
-      this.currentPlayer = undefined;
+      this.storedTimeOnMute = this.currentAudioContext?.currentTime;
+      await this.currentAudioContext?.close();
+      if (this.currentPlayer) {
+        this.currentPlayer.stop();
+        this.currentPlayer.disconnect();
+        this.currentPlayer = undefined;
+      }
     } else {
       this.currentAudioContext = new AudioContext();
       if (this.ranMutedStart) {
         await this.initializeAudio();
+      } else {
+        this.parseLocationForRelevantTrack();
       }
-      this.parseLocationForRelevantTrack();
     }
   }
 
@@ -383,27 +439,27 @@ export class AudioStore {
     }
   }
 
-  private loadPersistedSettings(): boolean {
+  private loadPersistedSettings() {
+    let master = 1;
+    let ambient = 1;
+    let sfx = 1;
+    let combat = 1;
+    let muted = false;
+
     try {
       const stored = storage.getString("audio_settings");
       if (stored) {
         const settings = JSON.parse(stored);
-        this.masterVolume = settings.master ?? 1;
-        this.ambientMusicVolume = settings.ambient ?? 1;
-        this.soundEffectsVolume = settings.sfx ?? 1;
-        this.combatMusicVolume = settings.combat ?? 1;
-        this.muted = settings.muted ?? false;
-        return settings.muted ?? false;
+        master = settings.master ?? 1;
+        ambient = settings.ambient ?? 1;
+        sfx = settings.sfx ?? 1;
+        combat = settings.combat ?? 1;
+        muted = settings.muted ?? false;
       }
     } catch (error) {
       console.warn("Error loading persisted settings", error);
-      this.masterVolume = 1;
-      this.ambientMusicVolume = 1;
-      this.soundEffectsVolume = 1;
-      this.combatMusicVolume = 1;
-      this.muted = false;
     }
-    return false;
+    return { master, ambient, sfx, combat, muted };
   }
 
   private persistSettings() {
@@ -420,6 +476,7 @@ export class AudioStore {
       console.warn("Error persisting settings", error);
     }
   }
+
   cleanup() {
     try {
       if (this.currentPlayer) {

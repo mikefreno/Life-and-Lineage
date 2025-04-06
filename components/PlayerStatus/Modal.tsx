@@ -227,6 +227,7 @@ export const PlayerStatusModal = observer(() => {
             <Pressable
               disabled={playerState.root.dungeonStore.inCombat}
               onPress={() => {
+                //TODO: REMOVE Reference to future release once implemented
                 setRespeccing(!respeccing);
                 vibration({ style: "light", essential: true });
               }}

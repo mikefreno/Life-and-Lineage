@@ -158,6 +158,7 @@ export interface Phase {
   animationStrings: { [key: string]: AnimationOptions };
   baseDamageTable?: { [key: string]: number };
   baseResistanceTable?: { [key: string]: number };
+  health?: number;
 }
 
 export interface EnemyOptions extends CreatureOptions {

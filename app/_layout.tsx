@@ -1,6 +1,6 @@
 import { useFonts } from "expo-font";
 import { Stack, usePathname, useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { Platform, Pressable, View, StyleSheet, UIManager } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
@@ -43,12 +43,9 @@ import { decode } from "base-64";
 import { useScaling } from "@/hooks/scaling";
 import TutorialModal from "@/components/TutorialModal";
 import { TutorialOption } from "@/utility/types";
-import Purchases, { LOG_LEVEL } from "react-native-purchases";
-import { API_BASE_URL } from "@/config/config";
-import { registerForPushNotificationsAsync } from "@/utility/functions/notifications";
-import * as Notifications from "expo-notifications";
 import { HeaderBackButton } from "@react-navigation/elements";
 import { useVibration } from "@/hooks/generic";
+import D20DieAnimation from "@/components/DieRollAnim";
 
 global.atob = decode;
 
@@ -152,7 +149,6 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
     uiStore,
     audioStore,
     shopsStore,
-    pvpStore,
     showReachedEndOfCompletedDungeonsMessage,
     closeReachedEndOfCompletedDungeonsMessage,
   } = rootStore;
@@ -172,62 +168,6 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   const [showBirthModal, setShowBirthModal] = useState(false);
   const [newbornBaby, setNewbornBaby] = useState<Character | null>(null);
   const { getNormalizedSize } = useScaling();
-
-  const [expoPushToken, setExpoPushToken] = useState("");
-  const [sentToken, setSentToken] = useState(false);
-  const [_, setNotification] = useState<Notifications.Notification | undefined>(
-    undefined,
-  );
-  const notificationListener = useRef<Notifications.EventSubscription>();
-  const responseListener = useRef<Notifications.EventSubscription>();
-
-  useEffect(() => {
-    if (fontLoaded) {
-      const notificationFlow = () => {
-        wait(500).then(() => {
-          registerForPushNotificationsAsync()
-            .then((token) => setExpoPushToken(token ?? ""))
-            .catch((error: any) => setExpoPushToken(`${error}`));
-
-          notificationListener.current =
-            Notifications.addNotificationReceivedListener((notification) => {
-              setNotification(notification);
-            });
-
-          responseListener.current =
-            Notifications.addNotificationResponseReceivedListener(
-              (response) => {},
-            );
-
-          return () => {
-            notificationListener.current &&
-              Notifications.removeNotificationSubscription(
-                notificationListener.current,
-              );
-            responseListener.current &&
-              Notifications.removeNotificationSubscription(
-                responseListener.current,
-              );
-          };
-        });
-      };
-      __DEV__ && notificationFlow();
-    }
-  }, [fontLoaded]);
-
-  useEffect(() => {
-    if (expoPushToken && !sentToken) {
-      fetch(`${API_BASE_URL}/tokens`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token: expoPushToken }),
-      });
-      setSentToken(true);
-      pvpStore.setExpoPushToken(expoPushToken);
-    }
-  }, [expoPushToken]);
 
   const handleRouting = (
     playerState: PlayerCharacter | null,
@@ -268,31 +208,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   };
 
   useEffect(() => {
-    const initializePurchases = async () => {
-      try {
-        Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
-
-        if (Platform.OS === "ios") {
-          Purchases.configure({
-            apiKey: process.env.EXPO_PUBLIC_RC_IOS as string,
-          });
-        } else if (Platform.OS === "android") {
-          Purchases.configure({
-            apiKey: process.env.EXPO_PUBLIC_RC_ANDROID as string,
-          });
-        }
-
-        const offerings = await Purchases.getOfferings();
-        if (offerings.current) {
-          rootStore.iapStore.setOffering(offerings.current);
-        }
-
-        return true;
-      } catch (error) {
-        console.error("Failed to initialize purchases:", error);
-        return false;
-      }
-    };
+    const initializePurchases = async () => {};
     initializePurchases();
   }, []);
 
@@ -686,6 +602,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                 headerLeft: () => (
                   <Pressable
                     onPress={() => {
+                      vibration({ style: "light" });
                       dungeonStore.setFleeModalShowing(true);
                     }}
                   >
@@ -757,16 +674,26 @@ export default Sentry.wrap(Root);
 
 const AudioToggleButton = observer(() => {
   const { audioStore, uiStore } = useRootStore();
+  const vibration = useVibration();
 
   return (
     <Pressable
       onPress={() => {
-        audioStore.setMuteValue(!audioStore.muted);
+        if (!audioStore.isInitializing) {
+          vibration({ style: "light" });
+          audioStore.setMuteValue(!audioStore.muted);
+        }
       }}
       accessibilityRole="button"
       accessibilityLabel={`Toggle audio ${audioStore.muted ? "on" : "off"}`}
     >
-      {audioStore.muted ? (
+      {audioStore.isInitializing ? (
+        <D20DieAnimation
+          keepRolling
+          showNumber={false}
+          size={uiStore.iconSizeXL}
+        />
+      ) : audioStore.muted ? (
         <MaterialIcons
           name="music-off"
           size={uiStore.iconSizeXL}

@@ -1,5 +1,4 @@
 import React, { useLayoutEffect } from "react";
-import { ThemedView, Text } from "@/components/Themed";
 import { type LayoutChangeEvent, View, Animated } from "react-native";
 import { useRef, useEffect, useState, useCallback } from "react";
 import { Pressable } from "react-native";
@@ -211,11 +210,9 @@ const DungeonLevelScreen = observer(() => {
               chosenAttack: null,
             });
           }}
+          scrollEnabled={true}
         >
-          <ThemedView>
-            <Text style={{ width: "100%" }}>Choose Your Target</Text>
-            <TargetSelection />
-          </ThemedView>
+          <TargetSelection />
         </GenericModal>
         <View
           style={{

@@ -450,7 +450,6 @@ export class DungeonStore {
 
     enemies.forEach((enemy) => this.root.enemyStore.addToEnemyList(enemy));
 
-    // Validation
     if (this.root.enemyStore.enemies.length === 0) {
       console.error("Failed to add enemies to enemy store");
       this.inCombat = false;

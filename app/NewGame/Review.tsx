@@ -58,7 +58,6 @@ export default function NewGameReview() {
         classSelection,
         allocatedStats,
       });
-
       await root.newGame(player);
       vibration({ style: "success" });
       wait(250).then(() => clearHistory(navigation));
@@ -128,7 +127,6 @@ interface StatAllocationProps {
   onStatsAllocated: (stats: BaseStats, remainingPoints: number) => void;
 }
 
-// Type for stat increments/decrements
 type StatIncrements = {
   [K in StatKey]: number;
 };

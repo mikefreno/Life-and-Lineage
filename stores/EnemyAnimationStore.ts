@@ -174,7 +174,6 @@ export class EnemyAnimationStore {
     }
 
     if ("glow" in animSet) {
-      console.log("glowing");
       this.activeGlow = {
         ...animSet.glow,
         duration: animSet.glow.duration || 1000,
@@ -241,14 +240,19 @@ export class EnemyAnimationStore {
   concludeAnimation() {
     this.handleScreenShake("end");
 
-    if (this.animationQueue.length > 1) {
-      this.animationQueue = this.animationQueue.slice(0, -1);
-      this.runningRNAnimation = false;
-
-      this.currentAnimationDetails = null;
-    } else if (this.animationQueue[0] !== "idle") {
-      console.log("Animation Queue not as expected: ", this.animationQueue);
-    }
+    runInAction(() => {
+      if (this.animationQueue.length > 1) {
+        this.animationQueue = this.animationQueue.slice(0, -1);
+        this.runningRNAnimation = false;
+        this.currentAnimationDetails = null;
+      } else if (this.animationQueue[0] !== "idle") {
+        console.warn("Animation Queue not as expected: ", this.animationQueue);
+        // Reset to safe state
+        this.animationQueue = ["idle"];
+        this.runningRNAnimation = false;
+        this.currentAnimationDetails = null;
+      }
+    });
   }
 
   setSpriteMidPoint(pos: { x: number; y: number }) {

@@ -348,6 +348,7 @@ export class DungeonLevel {
         animationStrings: scaledBossJSON.animationStrings,
         storyDrops: scaledBossJSON.storyDrops,
         goldDropRange: scaledBossJSON.goldDropRange,
+        phases: scaledBossJSON.phases,
         drops: scaledBossJSON.drops as {
           item: string;
           itemType: ItemClassType;
@@ -575,6 +576,7 @@ export class SpecialEncounter {
           baseManaRegen: enemyJSON.mana.regen,
           goldDropRange: enemyJSON.goldDropRange,
           drops: enemyJSON.drops,
+          phases: enemyJSON.phases,
           attackStrings: enemyJSON.attackStrings,
           sprite: enemyJSON.sprite as EnemyImageKeyOption,
           enemyStore: root.enemyStore,

@@ -1,4 +1,4 @@
-import { Flask, Potion } from "@/assets/icons/SVGIcons";
+import { BookOpen, Flask, Potion } from "@/assets/icons/SVGIcons";
 import Colors from "@/constants/Colors";
 
 export const PvPRewardIcons = ({
@@ -14,6 +14,10 @@ export const PvPRewardIcons = ({
     case "flask":
       return (
         <Flask color={Colors[colorScheme].text} height={size} width={size} />
+      );
+    case "book":
+      return (
+        <BookOpen color={Colors[colorScheme].text} height={size} width={size} />
       );
     case "potion":
       return (

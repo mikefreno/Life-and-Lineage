@@ -146,14 +146,8 @@ const BattleTab = observer(
     const attackHandler = (attack: Attack) => {
       if (enemyStore.enemies.length > 0) {
         vibration({ style: "light" });
-        let possibleTargets = enemyStore.enemies;
-        enemyStore.enemies.forEach((enemy) => {
-          if (enemy instanceof Enemy) {
-            enemy.minions.forEach((minion) =>
-              possibleTargets.push(minion as Being),
-            );
-          }
-        });
+
+        const possibleTargets = enemyStore.allBeings;
 
         const attackHitsAllTargets =
           attack.targets === "area" ||

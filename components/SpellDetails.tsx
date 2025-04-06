@@ -17,8 +17,9 @@ import { useStyles } from "@/hooks/styles";
 import GenericStrikeAround from "@/components/GenericStrikeAround";
 import { Attack } from "@/entities/attack";
 import { DamageTypeRender } from "./DamageTypeRender";
+import { observer } from "mobx-react-lite";
 
-export default function SpellDetails({ spell }: { spell: Attack }) {
+const SpellDetails = observer(({ spell }: { spell: Attack }) => {
   if (spell.element === null) return;
 
   const { uiStore } = useRootStore();
@@ -175,7 +176,8 @@ export default function SpellDetails({ spell }: { spell: Attack }) {
       </View>
     </View>
   );
-}
+});
+export default SpellDetails;
 
 const HealingRender = ({ amount }: { amount: number }) => {
   const styles = useStyles();

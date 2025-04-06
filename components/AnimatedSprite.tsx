@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { View } from "react-native";
 import { Canvas, useAnimatedImage, Image } from "@shopify/react-native-skia";
 import Animated, {
@@ -96,7 +102,12 @@ export const AnimatedSprite = observer(
           activeAnimationString: "idle" as AnimationOptions,
           activeSpriteAnimationString: "idle" as AnimationOptions,
         };
-      }, [animationStore?.animationQueue, enemyData.sets]);
+      }, [
+        animationStore?.animationQueue,
+        enemyData.sets,
+        enemy.animationStrings,
+        enemy.phase,
+      ]);
 
     const moveAnimationImage = enemyData.sets.move?.anim
       ? useAnimatedImage(enemyData.sets.move.anim)
@@ -343,7 +354,7 @@ export const AnimatedSprite = observer(
               onAnimationComplete={handleAnimationComplete}
               isLooping={shouldLoop}
               onFrameCountReady={handleFrameCountReady}
-              key={`${enemy?.id}`}
+              key={`${enemy?.id}_${enemy?.sprite}`}
               topOffset={enemyData.topOffset}
             />
           </Animated.View>
@@ -403,15 +414,31 @@ const SingleAnimationSprite = React.memo(
     const isFirstFrameHeld = useRef(false);
     const isMounted = useRef(true);
 
-    const styles = useStyles();
+    const cleanup = useCallback(() => {
+      if (animationTimerRef.current) {
+        clearTimeout(animationTimerRef.current);
+        animationTimerRef.current = null;
+      }
+      if (firstFrameHoldTimerRef.current) {
+        clearTimeout(firstFrameHoldTimerRef.current);
+        firstFrameHoldTimerRef.current = null;
+      }
+      if (animatedImage) {
+        animatedImage.dispose();
+      }
+    }, [animatedImage]);
 
     useEffect(() => {
       isMounted.current = true;
       return () => {
         animatedImage?.dispose();
+        cleanup();
         isMounted.current = false;
       };
     }, []);
+    useEffect(() => {
+      return () => cleanup();
+    }, [source, cleanup]);
 
     const safeSetCurrentFrame = (frame: number) => {
       if (isMounted.current) {
@@ -548,23 +575,22 @@ const SingleAnimationSprite = React.memo(
       return null;
     }
 
-    try {
-      return (
-        <Canvas style={{ width, height, position: "absolute" }}>
-          <Image
-            image={animatedImage.getCurrentFrame()}
-            x={0}
-            y={0}
-            width={width}
-            height={height}
-            fit="contain"
-          />
-        </Canvas>
-      );
-    } catch (error) {
-      console.error("Error rendering animation frame:", error);
-      return null;
-    }
+    return (
+      <View style={{ width, height, position: "absolute" }}>
+        {isMounted.current && (
+          <Canvas style={{ width, height, position: "absolute" }}>
+            <Image
+              image={animatedImage.getCurrentFrame()}
+              x={0}
+              y={0}
+              width={width}
+              height={height}
+              fit="contain"
+            />
+          </Canvas>
+        )}
+      </View>
+    );
   },
 );
 
@@ -596,13 +622,19 @@ const SpriteAnimationManager = React.memo(
       return Object.entries(spriteSet).map(([key]) => key as AnimationOptions);
     }, [spriteSet]);
 
+    // Add a key that changes when the spriteSet changes
+    const spriteSetKey = useMemo(() => {
+      return Object.keys(spriteSet).join("_");
+    }, [spriteSet]);
+
     return (
       <View
         style={{ width, height, marginTop: topOffset ? `${topOffset}%` : 0 }}
+        key={spriteSetKey}
       >
         {validAnimations.map((animKey) => (
           <SingleAnimationSprite
-            key={animKey}
+            key={`${spriteSetKey}_${animKey}`}
             animationOption={currentAnimation}
             source={spriteSet[animKey]?.anim}
             width={width}

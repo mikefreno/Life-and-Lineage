@@ -1170,7 +1170,11 @@ export const EnemyImageMap: EnemyImageMapType = {
       idle: {
         anim: require("@/assets/monsters/Reaper/IDLE.webp"),
       },
+      move: {
+        anim: require("@/assets/monsters/Reaper/DODGE.webp"),
+      },
     },
+    renderScale: 1.5,
     height: 100,
     width: 100,
     mirror: true,

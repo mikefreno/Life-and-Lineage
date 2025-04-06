@@ -192,6 +192,11 @@ export class Being {
       damageTypeCalculation: action,
       calculateAttackDamage: action,
 
+      baseDamageTable: observable,
+      baseResistanceTable: observable,
+      attackStrings: observable,
+      animationStrings: observable,
+      baseArmor: observable,
       maxHealth: computed,
       maxMana: computed,
       maxSanity: computed,
@@ -1158,7 +1163,6 @@ export class Being {
       (attack) => attack.canBeUsed.val,
     );
     runInAction(() => (this.currentMana = this.maxMana));
-    console.log(availableAttacks);
     if (availableAttacks.length > 0) {
       const { attack, numTargets } = this.chooseAttack(
         availableAttacks,
@@ -1252,7 +1256,6 @@ export class Being {
 
       return { attack, priorityScore, numTargets };
     });
-    console.log(scoredAttacks);
 
     // Sort the attacks by priority score in descending order
     scoredAttacks.sort((a, b) => b.priorityScore - a.priorityScore);
@@ -1279,13 +1282,14 @@ export class Being {
   ) {
     switch (type) {
       case DamageType.PHYSICAL:
+        const baseDamage = usesWeapon
+          ? this.physicalDamage
+          : this.physicalDamageNoWeapon;
+
         return (
-          ((usesWeapon
-            ? this.physicalDamage
-            : this.physicalDamageNoWeapon + attackDamage) *
-            this.attackPower +
-            attackDamage) *
-          (1 - (target ? target.magicResistance : 0))
+          (baseDamage + attackDamage) * // Add these together first
+          this.attackPower * // Then multiply by attack power
+          (1 - (target ? target.physicalDamageReduction : 0)) // Finally apply reduction
         );
       case DamageType.FIRE:
         return (

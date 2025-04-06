@@ -216,6 +216,9 @@ export const useEnemyManagement = () => {
 
           dungeonStore.addLog(enemyAttackRes.log);
 
+          if (enemy instanceof Enemy) {
+            enemy.checkPhaseTransitions();
+          }
           enemyMinionsTurn(enemy.minions, enemy, playerState!);
 
           setTimeout(() => {
@@ -364,11 +367,15 @@ export const useCombatActions = () => {
 
         // skip in case of killed enemy
         targets.forEach((target) => {
-          if (
-            target.currentHealth <= 0 &&
-            (target instanceof Enemy || target instanceof Character)
-          ) {
-            enemyDeathHandler(target);
+          if (target.currentHealth <= 0) {
+            if (target instanceof Enemy) {
+              const transitionHappened = target.checkPhaseTransitions(); // this will catch 0 hp phase transitions
+              if (!transitionHappened) {
+                enemyDeathHandler(target);
+              }
+            } else if (target instanceof Creature) {
+              enemyDeathHandler(target);
+            }
           }
         });
 

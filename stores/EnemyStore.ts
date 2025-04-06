@@ -44,6 +44,7 @@ export default class EnemyStore {
       clearEnemyList: action,
       _enemyTester: action,
       enemyTurnOngoing: computed,
+      allBeings: computed,
     });
 
     reaction(
@@ -163,6 +164,7 @@ export default class EnemyStore {
         itemType: ItemClassType;
         chance: number;
       }[],
+      phases: bossJSON.phases,
       attackStrings: bossJSON.attackStrings,
       animationStrings: bossJSON.animationStrings,
       sprite: bossJSON.sprite as EnemyImageKeyOption,
@@ -179,6 +181,22 @@ export default class EnemyStore {
       }),
     );
     this.saveEnemy(enemy);
+  }
+
+  get allBeings(): Being[] {
+    const beingSet = new Map<string, Being>();
+
+    this.enemies.forEach((enemy) => {
+      beingSet.set(enemy.id, enemy);
+
+      if (enemy instanceof Enemy) {
+        enemy.minions.forEach((minion) => {
+          beingSet.set(minion.id, minion);
+        });
+      }
+    });
+
+    return Array.from(beingSet.values());
   }
 
   get enemyTurnOngoing() {
@@ -203,7 +221,7 @@ export default class EnemyStore {
       if (enemy instanceof Character) {
         runInAction(() => (enemy.sprite = getAnimatedSpriteForNPC(enemy)));
       } else if (enemy instanceof Minion) {
-        return; // avoid minions being at this level, should only be attached to Enemy
+        console.warn(`May want to add sprite to ${enemy.nameReference}`);
       } else {
         throw new Error(`No sprite on ${enemy.nameReference}`);
       }
@@ -239,30 +257,23 @@ export default class EnemyStore {
     if (!storedIds) {
       return { enemies: [], map };
     }
-    const enemies: Being[] = [];
+    const enemies: Enemy[] = [];
     (parse(storedIds) as string[]).forEach((str) => {
       const retrieved = storage.getString(`enemy_${str}`);
       if (!retrieved) return;
-      const parsed = parse(retrieved);
-      if (!parsed.turnsLeftAlive) {
-        const enemy = Enemy.fromJSON({ ...parsed, root: this.root });
-        if (!enemy.sprite) {
-          if (enemy instanceof Minion) {
-            console.warn(`May want to add sprite to ${enemy.nameReference}`);
-          } else {
-            throw new Error(`No sprite on ${enemy.nameReference}`);
-          }
-        }
-        map.set(
-          enemy.id,
-          new EnemyAnimationStore({
-            root: this.root,
-            sprite: enemy.sprite,
-            id: enemy.id,
-          }),
-        );
-        enemies.push(enemy);
+      const enemy = Enemy.fromJSON({ ...parse(retrieved), root: this.root });
+      if (!enemy.sprite) {
+        throw new Error(`No sprite on ${enemy.nameReference}`);
       }
+      map.set(
+        enemy.id,
+        new EnemyAnimationStore({
+          root: this.root,
+          sprite: enemy.sprite,
+          id: enemy.id,
+        }),
+      );
+      enemies.push(enemy);
     });
     return { enemies, map };
   }

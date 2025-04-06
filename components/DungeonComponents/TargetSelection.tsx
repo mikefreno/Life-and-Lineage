@@ -4,27 +4,22 @@ import ProgressBar from "@/components/ProgressBar";
 import { toTitleCase } from "@/utility/functions/misc";
 import { useCombatState } from "@/providers/DungeonData";
 import { useCombatActions } from "@/hooks/combat";
-import { Creature, Enemy } from "@/entities/creatures";
+import { Creature } from "@/entities/creatures";
 import { useRootStore } from "@/hooks/stores";
 import { AnimatedSprite } from "@/components/AnimatedSprite";
 import { flex, useStyles } from "@/hooks/styles";
-import { useRef } from "react";
-import { Being } from "@/entities/being";
+import { useRef, useState } from "react";
 import { Character } from "@/entities/character";
+import { observer } from "mobx-react-lite";
+import React from "react";
+import { Being } from "@/entities/being";
 
-export default function TargetSelectionRender() {
+const TargetSelectionRender = observer(() => {
   const styles = useStyles();
   const { enemyStore } = useRootStore();
   const { showTargetSelection, setShowTargetSelection } = useCombatState();
   const { useAttack } = useCombatActions();
-
-  let targets: Being[] = enemyStore.enemies;
-
-  enemyStore.enemies.forEach((enemy) => {
-    if (enemy instanceof Enemy) {
-      enemy.minions.forEach((minion) => targets.push(minion));
-    }
-  });
+  const [firstTarget, setFirstTarget] = useState<Being | null>(null);
 
   const animationValues = useRef(new Map());
 
@@ -53,63 +48,88 @@ export default function TargetSelectionRender() {
     }).start();
   };
 
-  return (
-    <View
-      style={{
-        marginVertical: "auto",
-      }}
-    >
-      {targets.map((target) => {
-        const scaleAnim = getAnimationValue(target.id);
+  const handleSelection = (target: Being) => {
+    if (showTargetSelection.chosenAttack?.targets == "dual") {
+      if (!firstTarget) {
+        setFirstTarget(firstTarget);
+      } else if (firstTarget.equals(target.id)) {
+        setFirstTarget(null);
+      } else {
+        useAttack({
+          attack: showTargetSelection.chosenAttack,
+          targets: [firstTarget, target],
+        });
+        setShowTargetSelection({
+          showing: false,
+          chosenAttack: null,
+        });
+      }
+    } else {
+      useAttack({
+        attack: showTargetSelection.chosenAttack,
+        targets: [target],
+      });
+      setShowTargetSelection({
+        showing: false,
+        chosenAttack: null,
+      });
+    }
+  };
 
-        return (
-          <Animated.View
-            key={target.id}
-            style={{
-              transform: [{ scale: scaleAnim }],
-              marginBottom: 8,
-            }}
-          >
-            <Pressable
-              onPressIn={() => handlePressIn(target.id)}
-              onPressOut={() => handlePressOut(target.id)}
-              onPress={() => {
-                if (showTargetSelection.chosenAttack) {
-                  useAttack({
-                    attack: showTargetSelection.chosenAttack,
-                    targets,
-                  });
-                  setShowTargetSelection({
-                    showing: false,
-                    chosenAttack: null,
-                  });
-                }
+  return (
+    <>
+      <Text style={{ width: "100%" }}>
+        {showTargetSelection.chosenAttack?.targets == "single"
+          ? "Choose Your Target"
+          : "Choose Your Targets"}
+      </Text>
+      <View
+        style={{
+          marginVertical: "auto",
+        }}
+      >
+        {enemyStore.allBeings.map((target) => {
+          const scaleAnim = getAnimationValue(target.id);
+
+          return (
+            <Animated.View
+              key={target.id}
+              style={{
+                transform: [{ scale: scaleAnim }],
+                marginBottom: 8,
               }}
-              style={styles.targetButton}
             >
-              <View style={flex.rowEvenly}>
-                <View style={{ marginVertical: "auto" }}>
-                  <AnimatedSprite enemy={target} />
+              <Pressable
+                onPressIn={() => handlePressIn(target.id)}
+                onPressOut={() => handlePressOut(target.id)}
+                onPress={() => handleSelection(target)}
+                style={styles.targetButton}
+              >
+                <View style={flex.rowEvenly}>
+                  <View style={{ marginVertical: "auto" }}>
+                    <AnimatedSprite enemy={target} />
+                  </View>
+                  <View style={[styles.myAuto, { width: "33%" }]}>
+                    <Text style={{ textAlign: "center" }}>
+                      {toTitleCase(
+                        (target as Creature | Character).nameReference,
+                      )}
+                    </Text>
+                    <ProgressBar
+                      filledColor="#ef4444"
+                      unfilledColor="#fee2e2"
+                      value={target.currentHealth}
+                      maxValue={target.maxHealth}
+                      displayNumber={false}
+                    />
+                  </View>
                 </View>
-                <View style={[styles.myAuto, { width: "33%" }]}>
-                  <Text style={{ textAlign: "center" }}>
-                    {toTitleCase(
-                      (target as Creature | Character).nameReference,
-                    )}
-                  </Text>
-                  <ProgressBar
-                    filledColor="#ef4444"
-                    unfilledColor="#fee2e2"
-                    value={target.currentHealth}
-                    maxValue={target.maxHealth}
-                    displayNumber={false}
-                  />
-                </View>
-              </View>
-            </Pressable>
-          </Animated.View>
-        );
-      })}
-    </View>
+              </Pressable>
+            </Animated.View>
+          );
+        })}
+      </View>
+    </>
   );
-}
+});
+export default TargetSelectionRender;

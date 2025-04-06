@@ -119,7 +119,7 @@
     ],
     "animation": {
       "sprite": "bloodSimpleBolts",
-      "style": "static",
+      "style": "span",
       "position": "enemy"
     }
   },

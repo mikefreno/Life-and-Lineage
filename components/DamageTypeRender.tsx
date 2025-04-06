@@ -10,8 +10,9 @@ import {
   Sword,
   Winter,
 } from "@/assets/icons/SVGIcons";
+import { observer } from "mobx-react-lite";
 
-export const DamageTypeRender = ({ type }: { type: DamageType }) => {
+export const DamageTypeRender = observer(({ type }: { type: DamageType }) => {
   const { uiStore } = useRootStore();
 
   switch (type) {
@@ -59,4 +60,4 @@ export const DamageTypeRender = ({ type }: { type: DamageType }) => {
         <Raw height={uiStore.iconSizeSmall} width={uiStore.iconSizeSmall} />
       );
   }
-};
+});

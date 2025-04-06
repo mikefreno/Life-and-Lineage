@@ -2,6 +2,7 @@ import { action, computed, makeObservable, observable, reaction } from "mobx";
 import { RootStore } from "@/stores/RootStore";
 import Purchases, {
   CustomerInfo,
+  LOG_LEVEL,
   MakePurchaseResult,
   PurchasesOffering,
   PurchasesStoreProduct,
@@ -11,6 +12,7 @@ import { storage } from "@/utility/functions/storage";
 import { API_BASE_URL } from "@/config/config";
 import { isEmulatorSync } from "react-native-device-info";
 import { stringify } from "flatted";
+import { Platform } from "react-native";
 
 const NECRO_UNLOCK_IDs = [
   process.env.EXPO_PUBLIC_IOS_NECRO_ID,
@@ -55,6 +57,23 @@ export class IAPStore {
   constructor({ root }: { root: RootStore }) {
     this.root = root;
     this.getCustomersIAPs();
+    Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
+
+    if (Platform.OS === "ios") {
+      Purchases.configure({
+        apiKey: process.env.EXPO_PUBLIC_RC_IOS as string,
+      });
+    } else if (Platform.OS === "android") {
+      Purchases.configure({
+        apiKey: process.env.EXPO_PUBLIC_RC_ANDROID as string,
+      });
+    }
+
+    Purchases.getOfferings()
+      .then((val) => this.root.iapStore.setOffering(val.current))
+      .then(() => {
+        this.root.uiStore.markStoreAsLoaded("iaps");
+      });
 
     makeObservable(this, {
       rangerUnlocked: observable,

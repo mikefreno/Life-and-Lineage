@@ -76,9 +76,12 @@
     },
     "phases": [
       {
-        "triggerHealth": 0.5,
+        "triggerHealth": 0,
+        "health": 70,
         "sprite": "reaper",
-        "dialogue": "Witness my true power!",
+        "dialogue": {
+          "1": "Witness my true power!"
+        },
         "baseResistanceTable": {
           "physical": 15,
           "poison": 50,

@@ -15,7 +15,7 @@ import {
   PlayerClassOptions,
   parseDamageTypeObject,
 } from "../utility/types";
-import { getRandomInt } from "@/utility/functions/misc";
+import { getRandomInt, wait } from "@/utility/functions/misc";
 import { PlayerCharacter } from "./character";
 import { AnimationOptions } from "@/utility/animation/enemy";
 import {
@@ -111,6 +111,7 @@ export class Enemy extends Creature {
       removeMinion: action,
       getDrops: action,
       currentPhase: observable,
+      checkPhaseTransitions: action,
     });
 
     reaction(
@@ -126,69 +127,95 @@ export class Enemy extends Creature {
         }
       },
     );
-
-    reaction(
-      () => this.currentHealth,
-      () => {
-        if (
-          this.phases[this.currentPhase + 1] &&
-          this.currentHealth / this.maxHealth <=
-            this.phases[this.currentPhase + 1].triggerHealth
-        ) {
-          this.triggerPhaseTransition();
-        }
-      },
-    );
   }
 
-  private triggerPhaseTransition() {
-    while (
-      this.phases[this.currentPhase + 1] &&
-      this.currentHealth / this.baseHealth <=
-        this.phases[this.currentPhase + 1].triggerHealth
-    ) {
-      this.currentPhase++;
-      const phase = this.phases[this.currentPhase];
+  private updatePhaseProperties(phase: Phase) {
+    // First, get the animation store to properly handle animation cleanup
+    const animationStore = this.root?.enemyStore.getAnimationStore(this.id);
 
+    if (animationStore) {
+      // Reset animation state before changing properties
+      animationStore.concludeAnimation();
+      animationStore.clearProjectileSet();
+      animationStore.clearGlow();
+
+      // Queue idle animation to ensure proper state
+      runInAction(() => {
+        animationStore.animationQueue = ["idle"];
+        animationStore.isIdle = true;
+      });
+    }
+
+    // Now update the properties
+    runInAction(() => {
+      if (phase.health) {
+        this.currentHealth = phase.health;
+        this.baseHealth = phase.health;
+      }
       if (phase.sprite) {
-        runInAction(() => (this.sprite = phase.sprite!));
+        this.sprite = phase.sprite;
       }
       if (phase.baseArmor) {
-        runInAction(() => (this.baseArmor = phase.baseArmor!));
+        this.baseArmor = phase.baseArmor;
       }
       if (phase.attackStrings) {
-        runInAction(() => (this.attackStrings = phase.attackStrings!));
+        this.attackStrings = phase.attackStrings;
       }
       if (phase.animationStrings) {
-        runInAction(() => (this.animationStrings = phase.animationStrings));
+        this.animationStrings = phase.animationStrings;
       }
       if (phase.manaRegen) {
-        runInAction(() => (this.baseManaRegen = phase.manaRegen!));
+        this.baseManaRegen = phase.manaRegen;
       }
       if (phase.baseDamageTable) {
-        runInAction(
-          () =>
-            (this.baseDamageTable = parseDamageTypeObject(
-              phase.baseDamageTable,
-            )),
-        );
+        this.baseDamageTable = parseDamageTypeObject(phase.baseDamageTable);
       }
       if (phase.baseResistanceTable) {
-        runInAction(
-          () =>
-            (this.baseResistanceTable = parseDamageTypeObject(
-              phase.baseResistanceTable,
-            )),
+        this.baseResistanceTable = parseDamageTypeObject(
+          phase.baseResistanceTable,
         );
       }
+    });
 
-      if (phase.dialogue && this.root) {
-        const animationStore = this.root.enemyStore.getAnimationStore(this.id);
-        if (animationStore) {
-          runInAction(() => (animationStore.dialogue = phase.dialogue));
+    if (phase.dialogue && animationStore) {
+      runInAction(() => {
+        animationStore.dialogue = phase.dialogue;
+      });
+    }
+  }
+
+  checkPhaseTransitions(): boolean {
+    const currentHealthPercentage = this.currentHealth / this.maxHealth;
+    const nextPhaseIndex = this.currentPhase + 1;
+
+    if (
+      this.phases[nextPhaseIndex] &&
+      currentHealthPercentage <= this.phases[nextPhaseIndex].triggerHealth
+    ) {
+      let targetPhase = nextPhaseIndex;
+      for (let i = nextPhaseIndex; i < this.phases.length; i++) {
+        if (currentHealthPercentage <= this.phases[i].triggerHealth) {
+          targetPhase = i;
+        } else {
+          break;
         }
       }
+
+      const updatePhases = async () => {
+        for (let i = nextPhaseIndex; i <= targetPhase; i++) {
+          runInAction(() => {
+            this.currentPhase = i;
+          });
+          this.updatePhaseProperties(this.phases[i]);
+          await wait(50);
+        }
+      };
+
+      updatePhases();
+      return true;
     }
+
+    return false;
   }
 
   /**
@@ -197,6 +224,7 @@ export class Enemy extends Creature {
    * @returns {Object} - An object indicating the result of the turn, including the chosen attack.
    */
   public takeTurn({ player }: { player: PlayerCharacter }) {
+    this.checkPhaseTransitions();
     return this._takeTurn({
       targets: [player],
       nameReference: this.nameReference,
@@ -331,6 +359,7 @@ export class Enemy extends Creature {
       baseDamageTable: minionObj.baseDamageTable,
       baseResistanceTable: minionObj.baseResistanceTable,
       beingType: minionObj.beingType as BeingType,
+      sprite: minionObj.sprite,
       root: this.root,
       parent: this,
     });
@@ -464,6 +493,7 @@ export class Minion extends Creature {
     const minion = new Minion({
       id: json.id,
       beingType: json.beingType,
+      sprite: json.sprite,
       creatureSpecies: json.creatureSpecies,
       currentHealth: json.currentHealth,
       baseHealth: json.baseHealth,

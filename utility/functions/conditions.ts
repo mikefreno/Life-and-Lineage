@@ -401,6 +401,9 @@ export function getConditionEffectsOnDefenses(suppliedConditions: Condition[]) {
   };
 }
 
+/**
+ * No conditions affect resistances currently. This will throw
+ */
 export function getConditionEffectsOnResistances(
   suppliedConditions: Condition[],
 ) {

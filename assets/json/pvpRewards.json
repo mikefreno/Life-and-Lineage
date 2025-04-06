@@ -8,6 +8,13 @@
   },
   {
     "id": 2,
+    "name": "tome of knowledge",
+    "price": 15,
+    "icon": "book",
+    "description": "provides 1 skill point"
+  },
+  {
+    "id": 3,
     "name": "potion of undeath",
     "price": 20,
     "icon": "potion",

@@ -421,6 +421,8 @@ export class Character extends Being {
       pregnancyDueDate: json.pregnancyDueDate,
       isPregnant: json.isPregnant,
       knownCharacterIds: json.knownCharacterIds ?? [],
+      animationStrings: {},
+      activeAuraConditionIds: [],
       root: json.root,
       ...getNPCBaseCombatStats(),
     });
@@ -1222,7 +1224,7 @@ export class PlayerCharacter extends Character {
 
   private initJobs() {
     const tempMap = new Map();
-    for (const job of jsonServiceStore.readJsonFileSync("jobsJSON")) {
+    for (const job of jsonServiceStore.readJsonFileSync("jobs")) {
       tempMap.set(job.title, {
         ...job,
         cost: {
@@ -1766,6 +1768,7 @@ export class PlayerCharacter extends Character {
       baseDamageTable: minionObj.baseDamageTable,
       baseResistanceTable: minionObj.baseResistanceTable,
       beingType: minionObj.beingType as BeingType,
+      sprite: minionObj.sprite,
       root: this.root,
       parent: this,
     });

@@ -40,7 +40,7 @@ export default function SetSex() {
         isFocused={isFocused}
         pageOne={{
           title: "This game focuses around the passage of time.",
-          body: "Almost everything will move the game clock forward, aging the characters in the game. At a certain point it will be nearly impossible to stay alive.",
+          body: "Almost everything will move the game clock forward, aging the characters in the game(including you!). At a certain point it will be nearly impossible to stay alive.",
         }}
         pageTwo={{
           body: "However, if you have a child, you can live on through the child, retaining much of what has been achieved in your previous life.",

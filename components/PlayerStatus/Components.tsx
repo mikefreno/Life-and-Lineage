@@ -787,81 +787,81 @@ const ConditionCard = ({
   );
 };
 
-export const StatDisplay = ({
-  modifier,
-  value,
-}: {
-  modifier: Modifier;
-  value: number;
-}) => {
-  const statInfo = statMapping[modifier];
-  const Icon = statInfo.icon;
-  const styles = useStyles();
-  const { uiStore } = useRootStore();
-  const theme = Colors[uiStore.colorScheme];
+export const StatDisplay = observer(
+  ({ modifier, value }: { modifier: Modifier; value: number }) => {
+    const statInfo = statMapping[modifier];
+    const Icon = statInfo.icon;
+    const styles = useStyles();
+    const { uiStore } = useRootStore();
+    const theme = Colors[uiStore.colorScheme];
 
-  return (
-    <View
-      style={{
-        ...styles.my2,
-        ...styles.p2,
-        ...radius.lg,
-        backgroundColor: theme.secondary,
-      }}
-    >
-      <View style={{ ...styles.rowCenter }}>
-        <Icon height={uiStore.iconSizeSmall} width={uiStore.iconSizeSmall} />
-        <Text style={styles.ml2}>{getTotalValue(modifier, value)}</Text>
-      </View>
-      <Text
+    return (
+      <View
         style={{
-          ...styles.textCenter,
-          ...styles["text-sm"],
-          ...styles.mt1,
+          ...styles.my2,
+          ...styles.p2,
+          ...radius.lg,
+          backgroundColor: theme.secondary,
         }}
       >
-        {statInfo.description}
-      </Text>
-    </View>
-  );
-};
-
-export const StatCategory = ({
-  category,
-  stats,
-}: {
-  category: "offensive" | "defensive";
-  stats: Map<Modifier, number>;
-}) => {
-  const styles = useStyles();
-  if (!stats.size || stats.size == 0) {
-    return (
-      <View style={[styles.columnCenter, { flex: 1 }]}>
+        <View style={{ ...styles.rowCenter }}>
+          <Icon height={uiStore.iconSizeSmall} width={uiStore.iconSizeSmall} />
+          <Text style={styles.ml2}>{getTotalValue(modifier, value)}</Text>
+        </View>
         <Text
           style={{
-            textAlign: "center",
-            color: "#6b7280",
-            fontStyle: "italic",
+            ...styles.textCenter,
+            ...styles["text-sm"],
+            ...styles.mt1,
           }}
         >
-          No {category} stats from equipment
+          {statInfo.description}
         </Text>
       </View>
     );
-  }
+  },
+);
 
-  return (
-    <ScrollView style={{ flex: 1 }}>
-      {Array.from(stats).map(([modifier, value]) => {
-        if (!value || value <= 0) {
-          return null;
-        }
+export const StatCategory = observer(
+  ({
+    category,
+    stats,
+  }: {
+    category: "offensive" | "defensive";
+    stats: Map<Modifier, number>;
+  }) => {
+    const styles = useStyles();
+    if (!stats.size || stats.size == 0) {
+      return (
+        <View style={[styles.columnCenter, { flex: 1 }]}>
+          <Text
+            style={{
+              textAlign: "center",
+              color: "#6b7280",
+              fontStyle: "italic",
+            }}
+          >
+            No {category} stats from equipment
+          </Text>
+        </View>
+      );
+    }
 
-        return <StatDisplay key={modifier} modifier={modifier} value={value} />;
-      })}
-    </ScrollView>
-  );
-};
+    return (
+      <ScrollView style={{ flex: 1 }}>
+        {Array.from(stats).map(([modifier, value]) => {
+          if (!value || value <= 0) {
+            return null;
+          }
+
+          return (
+            <StatDisplay key={modifier} modifier={modifier} value={value} />
+          );
+        })}
+      </ScrollView>
+    );
+  },
+);
 
 export const ColorAndPlatformDependantBlur = observer(
   ({ children, home = true }: { children: ReactNode; home?: boolean }) => {

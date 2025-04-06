@@ -145,7 +145,7 @@ const SetClassScreen = observer(() => {
         }}
         pageThree={{
           title: "A (quick) note from the dev...",
-          body: "Most importantly(and impactfully) the game is quite unbalanced. This will be continuously be improved via hotfix(no app storeupdate required).",
+          body: "Most importantly(and impactfully) the game is quite unbalanced. This will be continuously improved via hotfix(no app storeupdate required).",
         }}
       />
       <GenericModal

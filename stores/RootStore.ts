@@ -26,6 +26,8 @@ import { reloadAppAsync } from "expo";
 import { JSONServiceStore } from "./JSONServiceStore";
 import { jsonServiceStore } from "./SingletonSource";
 import { PVPStore } from "./PVPStore";
+import Purchases, { LOG_LEVEL } from "react-native-purchases";
+import { Platform } from "react-native";
 
 export class RootStore {
   playerState: PlayerCharacter | null;
@@ -64,6 +66,7 @@ export class RootStore {
   }[] = [];
 
   constructor() {
+    console.log("calling root constructor");
     this.uiStore = new UIStore({ root: this });
 
     this.authStore = new AuthStore({ root: this });
@@ -89,9 +92,6 @@ export class RootStore {
 
     this.uiStore.markStoreAsLoaded("player");
 
-    this.iapStore = new IAPStore({ root: this });
-    this.uiStore.markStoreAsLoaded("iaps");
-
     this.dungeonStore = new DungeonStore({ root: this });
     this.uiStore.markStoreAsLoaded("dungeon");
 
@@ -100,7 +100,6 @@ export class RootStore {
 
     this.shopsStore = new ShopStore({ root: this });
     this.uiStore.markStoreAsLoaded("shops");
-
     this.audioStore = new AudioStore({ root: this });
 
     this.tutorialStore = new TutorialStore({ root: this });
@@ -113,7 +112,9 @@ export class RootStore {
     this.uiStore.markStoreAsLoaded("save");
 
     this.pvpStore = new PVPStore({ root: this });
-
+    this.iapStore = new IAPStore({
+      root: this,
+    });
     this.constructed = true;
 
     makeObservable(this, {

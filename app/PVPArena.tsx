@@ -8,14 +8,17 @@ import { useVibration } from "@/hooks/generic";
 import { useRootStore } from "@/hooks/stores";
 import { useStyles } from "@/hooks/styles";
 import { jsonServiceStore } from "@/stores/SingletonSource";
-import { toTitleCase } from "@/utility/functions/misc";
+import { toTitleCase, wait } from "@/utility/functions/misc";
 import { PvPRewardIcons } from "@/utility/pvp";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { observer } from "mobx-react-lite";
-import React from "react";
+import React, { useRef } from "react";
 import { useEffect, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
+import { API_BASE_URL } from "@/config/config";
+import { registerForPushNotificationsAsync } from "@/utility/functions/notifications";
+import * as Notifications from "expo-notifications";
 
 const PVPArena = observer(() => {
   const { pvpStore, uiStore } = useRootStore();
@@ -23,6 +26,59 @@ const PVPArena = observer(() => {
   const header = useHeaderHeight();
   const [showPvPInfoModal, setShowPvPInfoModal] = useState<boolean>(false);
   const vibration = useVibration();
+  const [expoPushToken, setExpoPushToken] = useState("");
+  const [sentToken, setSentToken] = useState(false);
+  const [_, setNotification] = useState<Notifications.Notification | undefined>(
+    undefined,
+  );
+  const notificationListener = useRef<Notifications.EventSubscription>();
+  const responseListener = useRef<Notifications.EventSubscription>();
+
+  useEffect(() => {
+    const notificationFlow = () => {
+      wait(500).then(() => {
+        registerForPushNotificationsAsync()
+          .then((token) => setExpoPushToken(token ?? ""))
+          .catch((error: any) => setExpoPushToken(`${error}`));
+
+        notificationListener.current =
+          Notifications.addNotificationReceivedListener((notification) => {
+            setNotification(notification);
+          });
+
+        responseListener.current =
+          Notifications.addNotificationResponseReceivedListener(
+            (response) => {},
+          );
+
+        return () => {
+          notificationListener.current &&
+            Notifications.removeNotificationSubscription(
+              notificationListener.current,
+            );
+          responseListener.current &&
+            Notifications.removeNotificationSubscription(
+              responseListener.current,
+            );
+        };
+      });
+    };
+    notificationFlow();
+  }, []);
+
+  useEffect(() => {
+    if (expoPushToken && !sentToken) {
+      fetch(`${API_BASE_URL}/tokens`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token: expoPushToken }),
+      });
+      setSentToken(true);
+      pvpStore.setExpoPushToken(expoPushToken);
+    }
+  }, [expoPushToken]);
 
   useEffect(() => {
     pvpStore.sendPlayerToAPI();

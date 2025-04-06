@@ -152,7 +152,6 @@ const SignUpScreen = observer(() => {
     setAwaitingResponse(true);
     try {
       const res = await authStore.appleSignIn();
-      console.log("recieve response");
       if (res !== "success") {
         setError(res);
       }
