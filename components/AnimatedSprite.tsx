@@ -20,7 +20,6 @@ import { useRootStore } from "@/hooks/stores";
 import { useStyles } from "@/hooks/styles";
 import { observer } from "mobx-react-lite";
 import { runInAction } from "mobx";
-import { useHeaderHeight } from "@react-navigation/elements";
 import Colors from "@/constants/Colors";
 import { useReanimatedAnimations } from "@/hooks/animation";
 import { Being } from "@/entities/being";
@@ -29,7 +28,6 @@ import { useScaling } from "@/hooks/scaling";
 export const AnimatedSprite = observer(
   ({ enemy, glow }: { enemy: Being; glow?: SharedValue<number> }) => {
     const spriteContainerRef = useRef<View>(null);
-    const headerHeight = useHeaderHeight();
     const measurementAttempts = useRef(0);
     const [frameCount, setFrameCount] = useState(0);
     const { uiStore, playerAnimationStore, enemyStore } = useRootStore();
@@ -41,7 +39,7 @@ export const AnimatedSprite = observer(
             if (width > 0 && height > 0) {
               animationStore.setSpriteMidPoint({
                 x: pageX + width / 2,
-                y: pageY - headerHeight + height / 2,
+                y: pageY - uiStore.headerHeight + height / 2,
               });
               measurementAttempts.current = 0;
             } else if (measurementAttempts.current < 5) {
@@ -311,7 +309,6 @@ export const AnimatedSprite = observer(
 
       return {
         shadowColor: "#7fff00",
-        shadowOffset: { width: 0, height: 0 },
         shadowOpacity: glow.value,
         shadowRadius: 10,
         elevation: glow.value * 8,

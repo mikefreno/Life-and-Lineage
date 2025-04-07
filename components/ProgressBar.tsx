@@ -38,7 +38,7 @@ const ProgressBar = ({
   removeAtZero = false,
   showMax = false,
   animationDuration = 300,
-  skipInitialAnimation = true,
+  skipInitialAnimation = Platform.OS == "android" ? false : true,
   containerStyle = undefined,
 }: ProgressBarProps) => {
   const width = useSharedValue(0);

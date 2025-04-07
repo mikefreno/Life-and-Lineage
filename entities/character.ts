@@ -580,6 +580,7 @@ export class PlayerCharacter extends Character {
       investments: observable,
       adopt: action,
 
+      minonsAndPetsHealthMap: computed,
       baseInventory: observable,
       addToInventory: action,
       addToKeyItems: action,
@@ -1854,6 +1855,21 @@ export class PlayerCharacter extends Character {
   //----------------------------------Misc----------------------------------//
   get minionsAndPets(): Minion[] {
     return this.minions.concat(this.rangerPet ? [this.rangerPet] : []);
+  }
+
+  get minonsAndPetsHealthMap(): Map<
+    string,
+    { health: number; turnsLeftAlive: number }
+  > {
+    const newMap: Map<string, { health: number; turnsLeftAlive: number }> =
+      new Map();
+    for (const minion of this.minionsAndPets) {
+      newMap.set(minion.id, {
+        health: minion.currentHealth,
+        turnsLeftAlive: minion.turnsLeftAlive,
+      });
+    }
+    return newMap;
   }
 
   public getMedicalService(

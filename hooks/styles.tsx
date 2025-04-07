@@ -674,10 +674,6 @@ export const useStyles = () => {
       alignItems: "center",
       borderRadius: 6,
     } as const,
-    equipmentStatsSection: {
-      width: "50%",
-      marginHorizontal: 4,
-    } as const,
     // ---- Attack Details ---- //
     attackDetailsContainer: {
       flex: 1,

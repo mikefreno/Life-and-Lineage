@@ -1302,11 +1302,11 @@ export class Being {
       case DamageType.LIGHTNING:
         return this.damageTypeCalc({
           userWeaponDependantDamage: usesWeapon
-            ? this.poisonDamage
-            : this.poisonDamageNoWeapon,
+            ? this.lightningDamage
+            : this.lightningDamageNoWeapon,
           userWeaponIndependantDamageModifier: this.magicPower,
           attackIntrensicDamage: attackDamage,
-          targetResistanceModifier: target?.poisonResistance ?? 0,
+          targetResistanceModifier: target?.lightningResistance ?? 0,
         });
       case DamageType.POISON:
         return this.damageTypeCalc({

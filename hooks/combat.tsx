@@ -170,6 +170,26 @@ export const useEnemyManagement = () => {
             for (const res of enemyAttackRes.targetResults) {
               switch (res.use.result) {
                 case AttackUse.success:
+                  setTimeout(
+                    () => {
+                      if (res.target.id === playerState?.id) {
+                        if (
+                          (res.use.damages?.total ?? 0) >=
+                            res.target.maxHealth &&
+                          dungeonStore.screenShaker
+                        ) {
+                          dungeonStore.screenShaker(300);
+                        } else if (
+                          (res.use.damages?.total ?? 0) >=
+                            res.target.maxHealth / 2 &&
+                          dungeonStore.screenShaker
+                        ) {
+                          dungeonStore.screenShaker(150);
+                        }
+                      }
+                    },
+                    animStore?.movementDuration ?? 1000,
+                  );
                   potentialPoisonHeal += res.use.damages?.poison ?? 0;
                   enemy.restoreHealth(res.use.healed ?? 0);
                   animStore?.addToAnimationQueue(
@@ -290,6 +310,17 @@ export const useCombatActions = () => {
         const animStore = enemyStore.getAnimationStore(res.target.id);
         switch (res.use.result) {
           case AttackUse.success:
+            if (
+              (res.use.damages?.total ?? 0) >= res.target.maxHealth &&
+              dungeonStore.screenShaker
+            ) {
+              dungeonStore.screenShaker(300);
+            } else if (
+              (res.use.damages?.total ?? 0) >= res.target.maxHealth / 2 &&
+              dungeonStore.screenShaker
+            ) {
+              dungeonStore.screenShaker(150);
+            }
             if ((res.use.damages?.total ?? 0) >= res.target.currentHealth) {
               animStore?.addToAnimationQueue("death");
             } else if (res.use.damages && res.use.damages.total > 0) {

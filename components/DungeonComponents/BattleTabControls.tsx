@@ -1,9 +1,9 @@
-import { View, Pressable, DimensionValue } from "react-native";
+import { View, Pressable, Animated } from "react-native";
 import { Text } from "@/components/Themed";
 import { useVibration } from "@/hooks/generic";
 import { useRootStore } from "@/hooks/stores";
 import { useStyles } from "@/hooks/styles";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useScaling } from "@/hooks/scaling";
 import { observer } from "mobx-react-lite";
 
@@ -15,12 +15,24 @@ interface BattleTabControlsProps {
     >,
   ) => void;
 }
+
 const BattleTabControls = observer(
   ({ battleTab, setBattleTab }: BattleTabControlsProps) => {
     const styles = useStyles();
     const vibration = useVibration();
     const { dungeonStore, uiStore, playerState } = useRootStore();
     const { getNormalizedSize } = useScaling();
+    const [storedHealthMap, setStoredHealthMap] = useState<
+      Map<
+        string,
+        {
+          health: number;
+          turnsLeftAlive: number;
+        }
+      >
+    >(new Map());
+
+    const minionFlashValue = useState(new Animated.Value(0))[0];
 
     const getBackgroundColor = (
       tab: "attacksOrNavigation" | "equipment" | "log" | "minions",
@@ -28,20 +40,59 @@ const BattleTabControls = observer(
       backgroundColor: battleTab === tab ? "rgba(39, 39, 42, 0.5)" : undefined,
     });
 
-    const tabsSize =
-      playerState && playerState.minionsAndPets.length > 0 ? "25%" : "33%";
+    const minionFlashInterpolation = minionFlashValue.interpolate({
+      inputRange: [0, 1],
+      outputRange: [
+        getBackgroundColor("minions").backgroundColor ?? "transparent",
+        "rgba(180,30,30,0.4)",
+      ],
+    });
+
+    const flashMinionTab = () => {
+      Animated.sequence([
+        Animated.timing(minionFlashValue, {
+          toValue: 1,
+          duration: 350,
+          useNativeDriver: false,
+        }),
+        Animated.delay(100),
+        Animated.timing(minionFlashValue, {
+          toValue: 0,
+          duration: 350,
+          useNativeDriver: false,
+        }),
+      ]).start();
+    };
+
+    useEffect(() => {
+      if (playerState && playerState.minionsAndPets.length > 0) {
+        if (storedHealthMap.size > 0) {
+          for (const [k, v] of storedHealthMap) {
+            const minionInQuestion = playerState.minonsAndPetsHealthMap.get(k);
+            if (!minionInQuestion && v.turnsLeftAlive > 1) {
+              flashMinionTab();
+            } else if (!minionInQuestion) {
+            } else if (minionInQuestion?.health < v.health) {
+              flashMinionTab();
+            }
+          }
+        }
+
+        setStoredHealthMap(playerState.minonsAndPetsHealthMap);
+      }
+    }, [playerState?.minonsAndPetsHealthMap]);
 
     const attacksOrNavigationStyle = useMemo(
       () =>
         uiStore.isLandscape
           ? ({
-              height: tabsSize,
+              flex: 1,
               paddingHorizontal: getNormalizedSize(10),
               justifyContent: "center" as const,
               ...getBackgroundColor("attacksOrNavigation"),
             } as const)
           : ({
-              width: tabsSize,
+              flex: 1,
               paddingVertical: getNormalizedSize(10),
               ...getBackgroundColor("attacksOrNavigation"),
             } as const),
@@ -52,13 +103,13 @@ const BattleTabControls = observer(
       () =>
         uiStore.isLandscape
           ? ({
-              height: tabsSize as DimensionValue,
+              flex: 1,
               paddingHorizontal: getNormalizedSize(10),
               justifyContent: "center",
               ...getBackgroundColor("equipment"),
             } as const)
           : ({
-              width: tabsSize as DimensionValue,
+              flex: 1,
               paddingVertical: getNormalizedSize(10),
               ...getBackgroundColor("equipment"),
             } as const),
@@ -69,38 +120,21 @@ const BattleTabControls = observer(
       () =>
         uiStore.isLandscape
           ? ({
-              height: tabsSize,
+              flex: 1,
               paddingHorizontal: getNormalizedSize(10),
               justifyContent: "center",
               ...getBackgroundColor("log"),
             } as const)
           : ({
-              width: tabsSize,
+              flex: 1,
               paddingVertical: getNormalizedSize(10),
               ...getBackgroundColor("log"),
-            } as const),
-      [battleTab, getBackgroundColor],
-    );
-
-    const minonsStyle = useMemo(
-      () =>
-        uiStore.isLandscape
-          ? ({
-              height: tabsSize,
-              paddingHorizontal: getNormalizedSize(10),
-              justifyContent: "center",
-              ...getBackgroundColor("minions"),
-            } as const)
-          : ({
-              width: tabsSize,
-              paddingVertical: getNormalizedSize(10),
-              ...getBackgroundColor("minions"),
             } as const),
       [battleTab, getBackgroundColor],
     );
 
     return (
-      <View style={styles.battleTabControls}>
+      <View style={[styles.battleTabControls]}>
         <Pressable
           style={attacksOrNavigationStyle}
           onPress={() => {
@@ -124,17 +158,30 @@ const BattleTabControls = observer(
           </Text>
         </Pressable>
         {playerState && playerState.minionsAndPets.length > 0 && (
-          <Pressable
-            style={minonsStyle}
-            onPress={() => {
-              vibration({ style: "light" });
-              setBattleTab("minions");
-            }}
+          <Animated.View
+            style={[
+              { backgroundColor: minionFlashInterpolation, flex: 1 },
+              uiStore.isLandscape
+                ? {
+                    paddingHorizontal: getNormalizedSize(10),
+                    justifyContent: "center",
+                  }
+                : {
+                    paddingVertical: getNormalizedSize(10),
+                  },
+            ]}
           >
-            <Text style={{ textAlign: "center", ...styles["text-lg"] }}>
-              Minions
-            </Text>
-          </Pressable>
+            <Pressable
+              onPress={() => {
+                vibration({ style: "light" });
+                setBattleTab("minions");
+              }}
+            >
+              <Text style={{ textAlign: "center", ...styles["text-lg"] }}>
+                Minions
+              </Text>
+            </Pressable>
+          </Animated.View>
         )}
         <Pressable
           style={logStyle}
@@ -156,4 +203,5 @@ const BattleTabControls = observer(
     );
   },
 );
+
 export default BattleTabControls;

@@ -4,7 +4,6 @@ import { View, ScrollView } from "react-native";
 import { observer } from "mobx-react-lite";
 import ProgressBar from "@/components/ProgressBar";
 import TutorialModal from "@/components/TutorialModal";
-import { useHeaderHeight } from "@react-navigation/elements";
 import GenericStrikeAround from "@/components/GenericStrikeAround";
 import {
   Element,
@@ -21,7 +20,6 @@ import { useRootStore } from "@/hooks/stores";
 import { useStyles } from "@/hooks/styles";
 
 const SpellsScreen = observer(() => {
-  const header = useHeaderHeight();
   const { playerState, uiStore } = useRootStore();
   const styles = useStyles();
 
@@ -157,7 +155,7 @@ const SpellsScreen = observer(() => {
         }}
       />
       {playerState?.spells && playerState.spells.length > 0 ? (
-        <View style={{ paddingTop: header + 20, flex: 1 }}>
+        <View style={{ paddingTop: uiStore.headerHeight + 20, flex: 1 }}>
           <GenericStrikeAround containerStyles={{ paddingHorizontal: 8 }}>
             Known Spells
           </GenericStrikeAround>

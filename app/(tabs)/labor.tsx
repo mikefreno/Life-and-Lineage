@@ -6,7 +6,6 @@ import { toTitleCase } from "@/utility/functions/misc";
 import { useRouter } from "expo-router";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "@/components/TutorialModal";
-import { useHeaderHeight } from "@react-navigation/elements";
 import { TutorialOption } from "@/utility/types";
 import { observer } from "mobx-react-lite";
 import { Text } from "@/components/Themed";
@@ -50,7 +49,6 @@ const LaborScreen = observer(() => {
     );
   }, [playerState?.jobs]);
 
-  const headerHeight = useHeaderHeight();
   const isFocused = useIsFocused();
 
   if (playerState) {
@@ -97,7 +95,7 @@ const LaborScreen = observer(() => {
         </GenericModal>
         <ScrollView
           contentContainerStyle={{
-            paddingTop: headerHeight,
+            paddingTop: uiStore.headerHeight,
             paddingBottom: uiStore.bottomBarHeight,
             width: "90%",
             marginHorizontal: "auto",

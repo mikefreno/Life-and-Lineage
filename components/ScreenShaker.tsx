@@ -38,7 +38,6 @@ export const ScreenShaker = ({ children }: { children: ReactNode }) => {
       const numShakes = Math.floor(duration / 50);
       const shakeSequence = [];
 
-      // Reset to 0 first
       shakeAnimation.setValue(0);
 
       shakeSequence.push(
@@ -67,7 +66,6 @@ export const ScreenShaker = ({ children }: { children: ReactNode }) => {
         }),
       );
 
-      // Run the sequence
       Animated.sequence(shakeSequence).start(() => {
         setIsShaking(false);
         shakeAnimation.setValue(0);
@@ -76,7 +74,6 @@ export const ScreenShaker = ({ children }: { children: ReactNode }) => {
     [isShaking, shakeAnimation],
   );
 
-  // Create interpolated values for translation using the deterministic patterns
   const translateX = shakeAnimation.interpolate({
     inputRange: Array.from({ length: 100 }, (_, i) => i),
     outputRange: xOutputRange,

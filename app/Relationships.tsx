@@ -28,7 +28,6 @@ import { useIsFocused } from "@react-navigation/native";
 import { TutorialOption } from "@/utility/types";
 import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 import { BlurView } from "expo-blur";
-import { useHeaderHeight } from "@react-navigation/elements";
 import { useScaling } from "@/hooks/scaling";
 import GenericFlatButton from "@/components/GenericFlatButton";
 import Colors from "@/constants/Colors";
@@ -47,7 +46,6 @@ const RelationshipsScreen = observer(() => {
     useState<boolean>(false);
   const [partnerName, setPartnerName] = useState<string>();
 
-  const headerHeight = useHeaderHeight();
   const isFocused = useIsFocused();
   const { getNormalizedSize } = useScaling();
   const vibration = useVibration();
@@ -265,7 +263,7 @@ const RelationshipsScreen = observer(() => {
         />
         <ScrollView
           contentContainerStyle={{
-            paddingTop: headerHeight,
+            paddingTop: uiStore.headerHeight,
             paddingBottom: uiStore.playerStatusHeightSecondary,
           }}
         >

@@ -14,7 +14,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "@/components/TutorialModal";
 import { toTitleCase, wait } from "@/utility/functions/misc";
-import { useHeaderHeight } from "@react-navigation/elements";
 import { observer } from "mobx-react-lite";
 import ThemedCard from "@/components/ThemedCard";
 import { TutorialOption } from "@/utility/types";
@@ -47,7 +46,6 @@ const DungeonScreen = observer(() => {
 
   const vibration = useVibration();
   const isFocused = useIsFocused();
-  const headerHeight = useHeaderHeight();
   const styles = useStyles();
 
   useEffect(() => {
@@ -189,7 +187,7 @@ const DungeonScreen = observer(() => {
         style={[
           styles.warningContainer,
           {
-            marginTop: headerHeight,
+            marginTop: uiStore.headerHeight,
           },
         ]}
         onLayout={handleLayout}
@@ -210,7 +208,7 @@ const DungeonScreen = observer(() => {
         style={[
           {
             flex: 1,
-            paddingTop: headerHeight + blurHeaderHeight,
+            paddingTop: uiStore.headerHeight + blurHeaderHeight,
             paddingHorizontal: tw_base[2],
             ...styles.notchAvoidingLanscapeMargin,
           },
@@ -220,7 +218,7 @@ const DungeonScreen = observer(() => {
           <>
             <View
               style={{
-                marginTop: headerHeight + blurHeaderHeight + tw_base[1],
+                marginTop: uiStore.headerHeight + blurHeaderHeight + tw_base[1],
                 position: "absolute",
                 zIndex: 10,
               }}
@@ -390,7 +388,7 @@ const DungeonScreen = observer(() => {
             height: `${100 * sorted.length}%`,
             paddingHorizontal: 12,
           }}
-          style={{ marginTop: -(headerHeight + blurHeaderHeight) }}
+          style={{ marginTop: -(uiStore.headerHeight + blurHeaderHeight) }}
         >
           {sorted.map((dungeonInstance, dungeonInstanceIdx) => (
             <ThemedCard

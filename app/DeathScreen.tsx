@@ -27,7 +27,6 @@ import {
 import { useRootStore } from "@/hooks/stores";
 import { useVibration } from "@/hooks/generic";
 import { Item } from "@/entities/item";
-import { useHeaderHeight } from "@react-navigation/elements";
 import CheckpointModal from "@/components/CheckpointModal";
 import { flex, tw, useStyles } from "@/hooks/styles";
 import { observer } from "mobx-react-lite";
@@ -48,7 +47,6 @@ const DeathScreen = observer(() => {
   const root = useRootStore();
   const { playerState, uiStore } = root;
   const vibration = useVibration();
-  const header = useHeaderHeight();
   const styles = useStyles();
   const router = useRouter();
 
@@ -71,14 +69,13 @@ const DeathScreen = observer(() => {
     if (nextLife && selectedClass && selectedBlessing && playerState) {
       const inventory = [
         ...playerState.inventory,
-        playerState.equipment.mainHand.name.toLowerCase() !== "unarmored"
-          ? playerState.equipment.mainHand
+        playerState.equipment?.mainHand.name.toLowerCase() !== "unarmored"
+          ? playerState.equipment?.mainHand
           : null,
-        playerState.equipment.body,
-        playerState.equipment.head,
-        playerState.equipment.offHand,
+        playerState.equipment?.body,
+        playerState.equipment?.head,
+        playerState.equipment?.offHand,
       ].filter((item): item is Item => item !== null);
-      //@ts-ignore
       const newCharacter = new PlayerCharacter({
         firstName: nextLife.firstName,
         lastName: nextLife.lastName,
@@ -169,9 +166,11 @@ const DeathScreen = observer(() => {
           onClose={() => setIsCheckpointModalVisible(false)}
           allowSaving={false}
         />
-        <View style={[styles.centeredContainer, { top: -header }]}>
+        <View
+          style={[styles.centeredContainer, { top: -uiStore.headerHeight }]}
+        >
           <Text style={styles.deathMessage}>
-            {playerState.currentSanity > -50
+            {playerState.currentSanity! > -50
               ? deathMessage
               : "You have gone insane"}
           </Text>

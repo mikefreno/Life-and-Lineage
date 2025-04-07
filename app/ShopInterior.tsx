@@ -14,7 +14,6 @@ import { useEffect, useRef, useState } from "react";
 import { useIsFocused } from "@react-navigation/native";
 import { observer } from "mobx-react-lite";
 import TutorialModal from "@/components/TutorialModal";
-import { useHeaderHeight } from "@react-navigation/elements";
 import InventoryRender from "@/components/InventoryRender";
 import { StatsDisplay } from "@/components/StatsDisplay";
 import { AffectionIcon, Coins } from "@/assets/icons/SVGIcons";
@@ -85,7 +84,6 @@ const ShopInteriorScreen = observer(() => {
 
   const [inventoryFullNotifier, setInventoryFullNotifier] =
     useState<boolean>(false);
-  const header = useHeaderHeight();
   const styles = useStyles();
   const [showingInteractionModal, setShowingInteractionModal] =
     useState<boolean>(false);
@@ -221,8 +219,11 @@ const ShopInteriorScreen = observer(() => {
     <>
       <View
         style={{
-          marginTop: Platform.OS == "ios" ? header / 2 : 0,
-          height: Platform.OS == "ios" ? header / 2 : header,
+          marginTop: Platform.OS == "ios" ? uiStore.headerHeight / 2 : 0,
+          height:
+            Platform.OS == "ios"
+              ? uiStore.headerHeight / 2
+              : uiStore.headerHeight,
           backgroundColor: colors?.background,
           opacity: 0.5,
         }}
@@ -411,7 +412,7 @@ const ShopInteriorScreen = observer(() => {
             sellItem={sellItem}
             sellStack={sellStack}
             clearItem={() => setDisplayItem(null)}
-            topGuard={header}
+            topGuard={uiStore.headerHeight}
           />
         </View>
       )}

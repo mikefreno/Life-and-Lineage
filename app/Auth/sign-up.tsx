@@ -18,7 +18,6 @@ import { observer } from "mobx-react-lite";
 import { API_BASE_URL } from "@/config/config";
 import D20DieAnimation from "@/components/DieRollAnim";
 import { Text } from "@/components/Themed";
-import { useHeaderHeight } from "@react-navigation/elements";
 import { isValidPassword } from "@/utility/functions/password";
 import { useVibration } from "@/hooks/generic";
 import { useRootStore } from "@/hooks/stores";
@@ -45,7 +44,6 @@ const SignUpScreen = observer(() => {
   const [isAutofilled, setIsAutofilled] = useState<boolean>(false);
   const [emailSent, setEmailSent] = useState<boolean>(false);
   const [usingEmail, setUsingEmail] = useState<boolean>(false);
-  const header = useHeaderHeight();
   const { getNormalizedSize, getNormalizedLineSize } = useScaling();
 
   const theme = Colors[uiStore.colorScheme];
@@ -238,7 +236,9 @@ const SignUpScreen = observer(() => {
         ) : !emailSent ? (
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={header + (Platform.OS == "ios" ? 20 : 0)}
+            keyboardVerticalOffset={
+              uiStore.headerHeight + (Platform.OS == "ios" ? 20 : 0)
+            }
             style={{
               flex: 1,
             }}

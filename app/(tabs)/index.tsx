@@ -10,7 +10,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "@/components/TutorialModal";
-import { useHeaderHeight } from "@react-navigation/elements";
 import InventoryRender from "@/components/InventoryRender";
 import "expo-router/entry";
 import { StatsDisplay } from "@/components/StatsDisplay";
@@ -40,7 +39,6 @@ const HomeScreen = observer(() => {
     position: { left: number; top: number };
   } | null>(null);
 
-  const header = useHeaderHeight();
   const isFocused = useIsFocused();
   const vibration = useVibration();
   const clearDisplayItem = useCallback(() => setDisplayItem(null), []);
@@ -82,11 +80,11 @@ const HomeScreen = observer(() => {
   const topViewStyle = useMemo(() => {
     return {
       flex: 1,
-      paddingTop: 44 + (uiStore.insets?.top ?? 0),
+      paddingTop: uiStore.headerHeight,
       paddingBottom: uiStore.compactRoutePadding,
     };
   }, [
-    header,
+    uiStore.headerHeight,
     root.pathname,
     uiStore.playerStatusExpandedOnAllRoutes,
     uiStore.playerStatusCompactHeight,

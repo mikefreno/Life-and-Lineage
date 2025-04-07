@@ -5,14 +5,12 @@ import InvestmentCard from "@/components/InvestmentCard";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "@/components/TutorialModal";
 import { ScrollView } from "react-native";
-import { useHeaderHeight } from "@react-navigation/elements";
 import { observer } from "mobx-react-lite";
 import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 import { useRootStore } from "@/hooks/stores";
 import { useStyles } from "@/hooks/styles";
 
 const InvestingScreen = observer(() => {
-  const header = useHeaderHeight();
   const { uiStore } = useRootStore();
   const styles = useStyles();
 
@@ -31,7 +29,7 @@ const InvestingScreen = observer(() => {
       />
       <ScrollView
         contentContainerStyle={{
-          paddingTop: header,
+          paddingTop: uiStore.headerHeight,
           paddingBottom: uiStore.playerStatusHeightSecondary,
           ...styles.notchAvoidingLanscapeMargin,
         }}

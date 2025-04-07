@@ -20,7 +20,6 @@ import { StatsDisplay } from "@/components/StatsDisplay";
 import { useDraggableStore, useRootStore } from "@/hooks/stores";
 import { usePouch } from "@/hooks/generic";
 import D20DieAnimation from "@/components/DieRollAnim";
-import { useHeaderHeight } from "@react-navigation/elements";
 import { LinearGradientBlur } from "@/components/LinearGradientBlur";
 import { Parallax } from "@/components/DungeonComponents/Parallax";
 import { Image } from "expo-image";
@@ -53,7 +52,6 @@ const DungeonLevelScreen = observer(() => {
   const [showLeftBehindItemsScreen, setShowLeftBehindItemsScreen] =
     useState<boolean>(false);
   const isFocused = useIsFocused();
-  const header = useHeaderHeight();
   const styles = useStyles();
 
   const pouchRef = useRef<View>(null);
@@ -206,7 +204,7 @@ const DungeonLevelScreen = observer(() => {
         </GenericModal>
         <View
           style={{
-            marginTop: header + 16,
+            marginTop: uiStore.headerHeight + 16,
             position: "absolute",
             marginLeft: 16,
             zIndex: 9999,
@@ -260,7 +258,7 @@ const DungeonLevelScreen = observer(() => {
                   ...styles.notchMirroredLanscapePad,
                 }}
               >
-                <VFXWrapper headerHeight={header}>
+                <VFXWrapper headerHeight={uiStore.headerHeight}>
                   <DungeonEnemyDisplay />
                 </VFXWrapper>
               </Pressable>

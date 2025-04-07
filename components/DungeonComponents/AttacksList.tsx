@@ -31,7 +31,6 @@ const AttacksList = observer(
     const playerState = usePlayerStore();
     const { pass } = useCombatActions();
 
-    // Combine the weapon attacks and spells into one array.
     const attacks = useMemo(
       () => [...playerState.weaponAttacks, ...playerState.spells],
       [playerState.weaponAttacks, playerState.spells],
@@ -120,7 +119,7 @@ const AttackItem = observer(
       setAttackDetails(attack);
     }, [setAttackDetails, attack]);
 
-    const isSpell = !!attack.element;
+    const isSpell = attack.element !== null;
 
     const buttonText = useMemo(() => {
       if (playerState.isStunned) return "Stunned!";

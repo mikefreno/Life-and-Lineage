@@ -16,7 +16,6 @@ import * as AppleAuthentication from "expo-apple-authentication";
 import { GoogleIcon } from "@/assets/icons/SVGIcons";
 import D20DieAnimation from "@/components/DieRollAnim";
 import { Text } from "@/components/Themed";
-import { useHeaderHeight } from "@react-navigation/elements";
 import { wait } from "@/utility/functions/misc";
 import { useRootStore } from "@/hooks/stores";
 import { tw, useStyles } from "@/hooks/styles";
@@ -40,7 +39,6 @@ const SignInScreen = observer(() => {
   const [password, setPassword] = useState("");
   const [awaitingResponse, setAwaitingResponse] = useState<boolean>(false);
   const [error, setError] = useState<string | undefined>();
-  const header = useHeaderHeight();
   const [usingEmail, setUsingEmail] = useState(false);
 
   useEffect(() => {
@@ -129,7 +127,7 @@ const SignInScreen = observer(() => {
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={{ flex: 1 }}
-            keyboardVerticalOffset={header}
+            keyboardVerticalOffset={uiStore.headerHeight}
           >
             <TouchableWithoutFeedback
               onPress={Keyboard.dismiss}

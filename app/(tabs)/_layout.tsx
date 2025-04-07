@@ -76,7 +76,7 @@ const TabLayout = observer(() => {
   const commonOptions = useMemo(
     () =>
       ({
-        lazy: false,
+        lazy: true,
         headerTransparent: true,
         headerTitleAlign: "center",
         headerTitleStyle: {
@@ -202,7 +202,7 @@ const TabLayout = observer(() => {
             },
             animation:
               uiStore.reduceMotion || Platform.OS == "android"
-                ? "fade"
+                ? "none"
                 : "shift",
             tabBarButton: (props) => {
               const onPressWithVibration = (event: GestureResponderEvent) => {

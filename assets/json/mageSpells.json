@@ -233,7 +233,9 @@
     "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 50,
-    "baseHealing": 35,
+    "selfDamageTable": {
+      "raw": -35
+    },
     "animation": {
       "sprite": "splash",
       "style": "static",

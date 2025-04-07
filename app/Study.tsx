@@ -22,7 +22,6 @@ import React from "react";
 import { radius, useStyles } from "@/hooks/styles";
 import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 import { observer } from "mobx-react-lite";
-import { useHeaderHeight } from "@react-navigation/elements";
 import { Attack } from "@/entities/attack";
 
 interface SpellStudyingState {
@@ -79,7 +78,6 @@ const LearningSpellScreen = observer(() => {
   );
   const [showMasteryLevelTooLow, setShowMasteryLevelTooLow] =
     useState<Element | null>(null);
-  const headerHeight = useHeaderHeight();
 
   useEffect(() => {
     if (selectedBook && playerState) {
@@ -196,7 +194,7 @@ const LearningSpellScreen = observer(() => {
               if (
                 playerState &&
                 selectedBookSpell.proficiencyNeeded !== null &&
-                selectedBookSpell.element &&
+                selectedBookSpell.element !== null &&
                 selectedBookSpell.proficiencyNeeded <=
                   playerState.currentMasteryLevel(selectedBookSpell.element)
               ) {
@@ -296,7 +294,7 @@ const LearningSpellScreen = observer(() => {
         isVisibleCondition={showMasteryLevelTooLow != null}
         backFunction={() => setShowMasteryLevelTooLow(null)}
       >
-        {showMasteryLevelTooLow && (
+        {showMasteryLevelTooLow ? (
           <>
             <Text
               style={[
@@ -315,12 +313,12 @@ const LearningSpellScreen = observer(() => {
               Acknowledge Knowledge
             </GenericRaisedButton>
           </>
-        )}
+        ) : null}
       </GenericModal>
       <View style={{ flex: 1 }}>
         <ScrollView
           contentContainerStyle={{
-            paddingTop: headerHeight,
+            paddingTop: uiStore.headerHeight,
             paddingBottom: uiStore.playerStatusHeightSecondary,
             paddingHorizontal: 12,
           }}

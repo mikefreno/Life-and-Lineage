@@ -30,7 +30,6 @@ import { tw, useStyles } from "@/hooks/styles";
 import { Enemy, Minion } from "@/entities/creatures";
 import GenericRaisedButton from "@/components/GenericRaisedButton";
 import { runInAction } from "mobx";
-import { Being } from "@/entities/being";
 import AttacksList from "./AttacksList";
 import { useScaling } from "@/hooks/scaling";
 import { toTitleCase } from "@/utility/functions/misc";

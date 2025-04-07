@@ -11,7 +11,6 @@ import { jsonServiceStore } from "@/stores/SingletonSource";
 import { toTitleCase, wait } from "@/utility/functions/misc";
 import { PvPRewardIcons } from "@/utility/pvp";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { useHeaderHeight } from "@react-navigation/elements";
 import { observer } from "mobx-react-lite";
 import React, { useRef } from "react";
 import { useEffect, useState } from "react";
@@ -23,7 +22,6 @@ import * as Notifications from "expo-notifications";
 const PVPArena = observer(() => {
   const { pvpStore, uiStore } = useRootStore();
   const styles = useStyles();
-  const header = useHeaderHeight();
   const [showPvPInfoModal, setShowPvPInfoModal] = useState<boolean>(false);
   const vibration = useVibration();
   const [expoPushToken, setExpoPushToken] = useState("");
@@ -96,7 +94,7 @@ const PVPArena = observer(() => {
         style={{
           flex: 1,
           paddingBottom: uiStore.playerStatusHeightSecondary,
-          paddingTop: header,
+          paddingTop: uiStore.headerHeight,
         }}
       >
         <View style={{ flex: 1 }}>

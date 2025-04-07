@@ -740,7 +740,7 @@ export class ItemRarityService {
       )} ${name}`;
     }
     if (suffix) {
-      name = `${name} of ${toTitleCase(
+      name = `${name} of the ${toTitleCase(
         suffix.affix.name[suffix.tier.toString()],
       )}`;
     }

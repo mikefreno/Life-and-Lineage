@@ -4,7 +4,6 @@ import { CharacterImage } from "@/components/CharacterImage";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import TutorialModal from "@/components/TutorialModal";
-import { useHeaderHeight } from "@react-navigation/elements";
 import { toTitleCase } from "@/utility/functions/misc";
 import { TutorialOption } from "@/utility/types";
 import { observer } from "mobx-react-lite";
@@ -35,8 +34,6 @@ const ShopsScreen = observer(() => {
   }, []);
 
   const isFocused = useIsFocused();
-
-  const headerHeight = useHeaderHeight();
 
   const renderItem = (shop: Shop) => {
     const colors = shopColors[shop.archetype];
@@ -133,14 +130,14 @@ const ShopsScreen = observer(() => {
 
   const topViewStyle = useMemo(() => {
     return {
-      paddingTop: headerHeight,
+      paddingTop: uiStore.headerHeight,
       paddingBottom: uiStore.compactRoutePadding,
       ...styles.notchAvoidingLanscapeMargin,
     };
   }, [
     uiStore.playerStatusExpandedOnAllRoutes,
     uiStore.playerStatusCompactHeight,
-    headerHeight,
+    uiStore.headerHeight,
     uiStore.orientation,
   ]);
 

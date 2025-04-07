@@ -2,7 +2,6 @@ import React from "react";
 import TrainingCard from "@/components/TrainingCard";
 import TutorialModal from "@/components/TutorialModal";
 import { useIsFocused } from "@react-navigation/native";
-import { useHeaderHeight } from "@react-navigation/elements";
 import { TutorialOption } from "@/utility/types";
 import { ScrollView, View } from "react-native";
 import { useRootStore } from "@/hooks/stores";
@@ -12,7 +11,6 @@ import { jsonServiceStore } from "@/stores/SingletonSource";
 
 const JobTraining = () => {
   const isFocused = useIsFocused();
-  const header = useHeaderHeight();
   const { playerState, uiStore } = useRootStore();
   const styles = useStyles();
 
@@ -32,7 +30,7 @@ const JobTraining = () => {
       />
       <ScrollView
         contentContainerStyle={{
-          paddingTop: header,
+          paddingTop: uiStore.headerHeight,
           paddingBottom: uiStore.playerStatusHeightSecondary,
           ...styles.notchAvoidingLanscapeMargin,
         }}

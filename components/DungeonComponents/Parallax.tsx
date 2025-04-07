@@ -19,7 +19,6 @@ import Animated, {
 } from "react-native-reanimated";
 import { Image, ImageStyle } from "expo-image";
 import { TILE_SIZE } from "@/stores/DungeonStore";
-import { useHeaderHeight } from "@react-navigation/elements";
 import { useRootStore } from "@/hooks/stores";
 import { observer } from "mobx-react-lite";
 
@@ -520,7 +519,6 @@ export const Parallax = observer(
     const backgroundData = backgroundImages[backgroundName];
     const { imageSet, size, verticalOffset } = backgroundData;
     const layerCount = Object.keys(imageSet).length - 1;
-    const header = useHeaderHeight();
 
     const { scale, scaledWidth, scaledHeight, imagesNeeded } = useMemo(() => {
       const targetHeight = uiStore.dimensions.height;
@@ -737,7 +735,7 @@ export const Parallax = observer(
         </View>
         <View
           style={{
-            paddingTop: header,
+            paddingTop: uiStore.headerHeight,
             flex: 1,
           }}
         >

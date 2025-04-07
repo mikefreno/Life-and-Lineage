@@ -25,11 +25,7 @@ import {
   getOrientationAsync,
 } from "expo-screen-orientation";
 import { hasNotch, isTablet, getDeviceType } from "react-native-device-info";
-import {
-  baseNormalize,
-  baseNormalizeForText,
-  baseNormalizeLineHeight,
-} from "@/hooks/scaling";
+import { baseNormalize, baseNormalizeLineHeight } from "@/hooks/scaling";
 import { getRandomInt } from "@/utility/functions/misc";
 
 export const LOADING_TIPS: string[] = [
@@ -261,6 +257,7 @@ export default class UIStore {
       markStoreAsLoaded: action,
       setPlayerStatusHeight: action,
 
+      headerHeight: computed,
       tabHeight: computed,
       itemBlockSize: computed,
       playerStatusHeightSecondary: computed,
@@ -447,9 +444,13 @@ export default class UIStore {
   get tabHeight() {
     return (
       this.tabHeightBase +
-      (!this.isLandscape ? baseNormalizeLineHeight(15) : 4) +
-      (this.insets?.bottom ?? 0) / 2
+      (!this.isLandscape ? baseNormalizeLineHeight(15) : 12) +
+      (this.insets?.bottom ?? 0) / 1.5
     );
+  }
+
+  get headerHeight() {
+    return 44 + (this.insets?.top ?? 0);
   }
 
   setPlayerStatusHeight(value: number, forceExpansionMod = false) {
@@ -458,7 +459,6 @@ export default class UIStore {
         ? 0
         : this.expansionPadding;
     if (this.playerStatusCompactHeight === undefined) {
-      console.log("no mod: ", value, "with mod: ", mod);
       this.setPlayerStatusCompactHeight(value - mod);
     }
   }

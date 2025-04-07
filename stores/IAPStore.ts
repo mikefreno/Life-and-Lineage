@@ -10,7 +10,7 @@ import Purchases, {
 } from "react-native-purchases";
 import { storage } from "@/utility/functions/storage";
 import { API_BASE_URL } from "@/config/config";
-import { isEmulatorSync } from "react-native-device-info";
+import DeviceInfo, { isEmulatorSync } from "react-native-device-info";
 import { stringify } from "flatted";
 import { Platform } from "react-native";
 
@@ -73,6 +73,14 @@ export class IAPStore {
       .then((val) => this.root.iapStore.setOffering(val.current))
       .then(() => {
         this.root.uiStore.markStoreAsLoaded("iaps");
+      })
+      .catch((e) => {
+        if (DeviceInfo.isEmulatorSync()) {
+          this.root.uiStore.markStoreAsLoaded("iaps");
+        } else {
+          this.root.uiStore.markStoreAsLoaded("iaps");
+          console.warn(e);
+        }
       });
 
     makeObservable(this, {
