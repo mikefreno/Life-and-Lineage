@@ -14,7 +14,8 @@ import { useRootStore } from "@/hooks/stores";
 import { useVibration } from "@/hooks/generic";
 import type { Investment } from "@/entities/investment";
 import { useStyles } from "@/hooks/styles";
-import { Colors } from "react-native/Libraries/NewAppScreen";
+import Colors from "@/constants/Colors";
+import GenericFlatButton from "./GenericFlatButton";
 
 const InvestmentCard = observer(
   ({ investment }: { investment: InvestmentType }) => {
@@ -86,15 +87,12 @@ const InvestmentCard = observer(
               {investment.requires.message}
             </Text>
             <Text style={[styles.mx8, styles.py4, styles.textCenter]}>
-              Complete the {toTitleCase(investment.requires.requirement)}{" "}
-              dungeon to unlock this investment!
+              {toTitleCase(investment.requires.requirement)} dungeon to unlock
+              this investment!
             </Text>
-            <Pressable
-              onPress={() => setShowRequirements(false)}
-              style={styles.investmentButton}
-            >
-              <Text>Cancel</Text>
-            </Pressable>
+            <GenericFlatButton onPress={() => setShowRequirements(false)}>
+              <Text>Close</Text>
+            </GenericFlatButton>
           </GenericModal>
         )}
         <GenericModal
@@ -245,7 +243,7 @@ const InvestmentCard = observer(
                         >
                           <Entypo
                             name="chevron-small-down"
-                            size={24}
+                            size={uiStore.iconSizeLarge}
                             color={theme.text}
                           />
                         </Animated.View>

@@ -20,7 +20,7 @@ const lightBorder = "#27272a";
 // Dark theme colors
 const darkBackground = "#09090b";
 const darkCard = "#18181b";
-const darkText = "#fff";
+const darkText = "#f3f4f6";
 const darkBorder = "#a1a1aa";
 
 export default {

@@ -284,6 +284,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
     setEnemyObjects(null);
     root.enemyStore.clearEnemyList();
     root.dungeonStore.clearDungeonState();
+    root.dungeonStore.clearPersistedActivity();
     wait(350).then(() => setBadOutcome(null));
   }
 

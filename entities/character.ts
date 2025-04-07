@@ -441,6 +441,7 @@ export class PlayerCharacter extends Character {
   unAllocatedSkillPoints: number;
 
   knownSpells: string[];
+  availableRespecs: number;
 
   learningSpells: {
     bookName: string;
@@ -483,6 +484,7 @@ export class PlayerCharacter extends Character {
     keyItems,
     jobs,
     debilitations,
+    availableRespecs,
     ...props
   }: PlayerCharacterOptions) {
     super({
@@ -518,6 +520,7 @@ export class PlayerCharacter extends Character {
     this.debilitations = debilitations ?? [];
 
     this.investments = investments ?? [];
+    this.availableRespecs = availableRespecs ?? 0;
 
     __DEV__ && this.setupDevActions();
 
@@ -530,6 +533,7 @@ export class PlayerCharacter extends Character {
       unAllocatedSkillPoints: observable,
       setUnAllocatedSkillPoints: action,
       totalAllocatedPoints: computed,
+      availableRespecs: observable,
 
       gold: observable,
       spendGold: action,
@@ -561,6 +565,7 @@ export class PlayerCharacter extends Character {
       pass: action,
 
       jobs: observable.deep,
+      checkForJobsDataChange: action,
       getCurrentJobAndExperience: action,
       incrementQualificationProgress: action,
       qualificationProgress: observable,
@@ -1579,7 +1584,9 @@ export class PlayerCharacter extends Character {
    * Returns the species(name) of the created minion, adds the minion to the minion list
    */
   public summonPet(minionName: string) {
-    const minionObj = summons.find((summon) => summon.name == minionName);
+    const minionObj = jsonServiceStore
+      .readJsonFileSync("summons")
+      .find((summon) => summon.name == minionName);
     if (!minionObj) {
       throw new Error(`Minion (${minionName}) not found!`);
     }
@@ -1598,6 +1605,8 @@ export class PlayerCharacter extends Character {
       baseDamageTable: minionObj.baseDamageTable,
       baseResistanceTable: minionObj.baseResistanceTable,
       beingType: minionObj.beingType as BeingType,
+      animationStrings: {},
+      activeAuraConditionIds: [],
       root: this.root,
       parent: this,
     });
@@ -1872,6 +1881,19 @@ export class PlayerCharacter extends Character {
     }
   }
 
+  checkForJobsDataChange() {
+    const json = jsonServiceStore.readJsonFileSync("jobs");
+    json.forEach((job) => {
+      const savedVal = this.jobs.get(job.title);
+      if (savedVal) {
+        savedVal.reward.gold =
+          job.reward.gold * 1 + savedVal?.currentRank * job.rankMultiplier;
+        savedVal.rankMultiplier = job.rankMultiplier;
+        savedVal.cost = job.cost;
+      }
+    });
+  }
+
   /**
    * Creates a PlayerCharacter instance from a JSON object
    * @param json - JSON representation of a PlayerCharacter
@@ -1954,6 +1976,7 @@ export class PlayerCharacter extends Character {
       knownCharacterIds: json.knownCharacterIds ?? [],
       activeAuraConditionIds: json.activeAuraConditionIds,
       animationStrings: {},
+      availableRespecs: json.availableRespecs,
       root: json.root,
     });
     return player;
@@ -2223,4 +2246,5 @@ const _playerSave = async (
     callback();
   }
 };
+
 export const savePlayer = throttle(_playerSave, 500);

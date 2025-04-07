@@ -9,7 +9,7 @@
     ],
     "slot": "one-hand",
     "stats": {
-      "damage": 8.0
+      "physicalDamage": 8.0
     }
   }
 ]

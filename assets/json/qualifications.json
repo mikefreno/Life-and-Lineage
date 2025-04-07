@@ -1,4 +1,19 @@
 [
-   {"name": "high school education", "ticks": 40, "goldCostPerTick": 0, "sanityCostPerTick": 3, "prerequisites": null},
-   {"name": "defense course", "ticks": 30, "goldCostPerTick": 30, "sanityCostPerTick": 5, "prerequisites": ["high school education"]}
+  {
+    "name": "high school education",
+    "ticks": 40,
+    "goldCostPerTick": 0,
+    "sanityCostPerTick": 3,
+    "prerequisites": null
+  },
+  {
+    "name": "defense course",
+    "ticks": 30,
+    "goldCostPerTick": 100,
+    "sanityCostPerTick": 5,
+    "prerequisites": [
+      "high school education"
+    ]
+  }
 ]
+

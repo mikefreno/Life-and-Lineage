@@ -39,7 +39,6 @@ import type { Item } from "@/entities/item";
 import { useVibration } from "@/hooks/generic";
 import { useRootStore } from "@/hooks/stores";
 import { Condition } from "@/entities/conditions";
-import { useEnemyManagement } from "@/hooks/combat";
 import type { Shop } from "@/entities/shop";
 import Colors, { rarityColors } from "@/constants/Colors";
 import { tw, useStyles } from "@/hooks/styles";
@@ -527,12 +526,7 @@ export const StatsDisplay = observer(
               ) && (
                 <GenericFlatButton
                   onPress={() => {
-                    if (enemyStore.enemies.length > 0) {
-                      const { enemyTurn } = useEnemyManagement();
-                      firstItem.use(enemyTurn);
-                    } else {
-                      firstItem.use();
-                    }
+                    firstItem.use();
                     clearItem();
                   }}
                   style={tw.pt1}
@@ -585,6 +579,12 @@ export const StatsDisplay = observer(
                 invItem.equals(firstItem),
               ) && (
                 <GenericFlatButton
+                  disabled={
+                    playerState.equipment?.mainHand.itemClass !==
+                      ItemClassType.Melee &&
+                    playerState.equipment?.mainHand.itemClass !==
+                      ItemClassType.Bow
+                  }
                   onPress={() => {
                     firstItem.use();
                     clearItem();

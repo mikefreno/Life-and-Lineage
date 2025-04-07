@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import LaborTask from "@/components/LaborTask";
 import { View, ScrollView } from "react-native";
 import { useMemo, useState } from "react";
@@ -22,6 +22,10 @@ const LaborScreen = observer(() => {
   const [missingPreReqs, setMissingPreReqs] = useState<string[]>([]);
   const styles = useStyles();
   const router = useRouter();
+
+  useEffect(() => {
+    playerState?.checkForJobsDataChange();
+  }, []);
 
   const vibration = useVibration();
 

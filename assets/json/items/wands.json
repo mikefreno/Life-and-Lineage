@@ -8,7 +8,7 @@
       "cast"
     ],
     "stats": {
-      "damage": 5.0
+      "magicDamage": 5.0
     }
   },
   {
@@ -20,7 +20,7 @@
       "cast"
     ],
     "stats": {
-      "damage": 8.0
+      "fireDamage": 8.0
     }
   },
   {
@@ -32,7 +32,7 @@
       "cast"
     ],
     "stats": {
-      "damage": 12.0
+      "coldDamage": 12.0
     }
   },
   {
@@ -44,7 +44,7 @@
       "cast"
     ],
     "stats": {
-      "damage": 18.0
+      "magicDamage": 18.0
     }
   },
   {
@@ -56,7 +56,7 @@
       "cast"
     ],
     "stats": {
-      "damage": 20.0
+      "magicDamage": 20.0
     }
   },
   {
@@ -68,7 +68,7 @@
       "cast"
     ],
     "stats": {
-      "damage": 23.0
+      "fireDamage": 23.0
     }
   },
   {
@@ -80,7 +80,7 @@
       "cast"
     ],
     "stats": {
-      "damage": 27.0
+      "magicDamage": 27.0
     }
   },
   {
@@ -92,7 +92,7 @@
       "cast"
     ],
     "stats": {
-      "damage": 31.0
+      "coldDamage": 31.0
     }
   },
   {
@@ -104,7 +104,7 @@
       "cast"
     ],
     "stats": {
-      "damage": 34.0
+      "magicDamage": 34.0
     }
   },
   {
@@ -116,7 +116,7 @@
       "cast"
     ],
     "stats": {
-      "damage": 38.0
+      "poisonDamage": 38.0
     }
   },
   {
@@ -128,7 +128,7 @@
       "cast"
     ],
     "stats": {
-      "damage": 42.0
+      "magicDamage": 42.0
     }
   },
   {
@@ -140,7 +140,7 @@
       "cast"
     ],
     "stats": {
-      "damage": 45.0
+      "magicDamage": 45.0
     }
   },
   {
@@ -152,7 +152,7 @@
       "cast"
     ],
     "stats": {
-      "damage": 48.0
+      "magicDamage": 48.0
     }
   },
   {
@@ -164,7 +164,7 @@
       "cast"
     ],
     "stats": {
-      "damage": 52.0
+      "holyDamage": 52.0
     }
   },
   {
@@ -176,7 +176,7 @@
       "cast"
     ],
     "stats": {
-      "damage": 55.0
+      "poisonDamage": 55.0
     }
   },
   {
@@ -188,7 +188,7 @@
       "cast"
     ],
     "stats": {
-      "damage": 58.0
+      "lightningDamage": 58.0
     }
   },
   {
@@ -200,7 +200,7 @@
       "cast"
     ],
     "stats": {
-      "damage": 60.0
+      "physicalDamage": 60.0
     }
   },
   {
@@ -212,7 +212,7 @@
       "cast"
     ],
     "stats": {
-      "damage": 62.0
+      "holyDamage": 62.0
     }
   },
   {
@@ -224,7 +224,7 @@
       "cast"
     ],
     "stats": {
-      "damage": 65.0
+      "poisonDamage": 65.0
     }
   },
   {
@@ -236,7 +236,8 @@
       "cast"
     ],
     "stats": {
-      "damage": 70.0
+      "holyDamage": 50.0,
+      "magicDamage": 20.0
     }
   }
 ]

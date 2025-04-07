@@ -7,7 +7,7 @@
     "qualifications": null,
     "experienceToPromote": 50,
     "reward": {
-      "gold": 15
+      "gold": 20
     },
     "rankMultiplier": 0.15
   },
@@ -20,7 +20,7 @@
     "qualifications": null,
     "experienceToPromote": 50,
     "reward": {
-      "gold": 20
+      "gold": 30
     },
     "rankMultiplier": 0.20
   },
@@ -34,7 +34,7 @@
     ],
     "experienceToPromote": 50,
     "reward": {
-      "gold": 30
+      "gold": 45
     },
     "rankMultiplier": 0.20
   },
@@ -49,7 +49,7 @@
     ],
     "experienceToPromote": 50,
     "reward": {
-      "gold": 35
+      "gold": 55
     },
     "rankMultiplier": 0.25
   },
@@ -65,7 +65,7 @@
     ],
     "experienceToPromote": 50,
     "reward": {
-      "gold": 60
+      "gold": 90
     },
     "rankMultiplier": 0.25
   },
@@ -81,7 +81,7 @@
     ],
     "experienceToPromote": 50,
     "reward": {
-      "gold": 70
+      "gold": 120
     },
     "rankMultiplier": 0.30
   }

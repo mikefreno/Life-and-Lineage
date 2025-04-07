@@ -1,13 +1,8 @@
 [
   {
-    "name": "test artifact 1",
+    "name": "golden goblet",
     "icon": "Goblet",
-    "baseValue": 500
-  },
-  {
-    "name": "test artifact 2",
-    "icon": "Goblet",
-    "baseValue": 2500
+    "baseValue": 5000
   }
 ]
 

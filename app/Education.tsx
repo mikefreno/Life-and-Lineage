@@ -1,5 +1,4 @@
 import React from "react";
-import qualifications from "@/assets/json/qualifications.json";
 import TrainingCard from "@/components/TrainingCard";
 import TutorialModal from "@/components/TutorialModal";
 import { useIsFocused } from "@react-navigation/native";
@@ -9,6 +8,7 @@ import { ScrollView, View } from "react-native";
 import { useRootStore } from "@/hooks/stores";
 import { tw, useStyles } from "@/hooks/styles";
 import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
+import { jsonServiceStore } from "@/stores/SingletonSource";
 
 const JobTraining = () => {
   const isFocused = useIsFocused();
@@ -38,16 +38,18 @@ const JobTraining = () => {
         }}
       >
         <View style={[tw.px2, tw.pt4]}>
-          {qualifications.map((qual, index) => (
-            <TrainingCard
-              key={index}
-              name={qual.name}
-              ticks={qual.ticks}
-              sanityCostPerTick={qual.sanityCostPerTick}
-              goldCostPerTick={qual.goldCostPerTick}
-              preRequisites={qual.prerequisites}
-            />
-          ))}
+          {jsonServiceStore
+            .readJsonFileSync("qualifications")
+            .map((qual, index) => (
+              <TrainingCard
+                key={index}
+                name={qual.name}
+                ticks={qual.ticks}
+                sanityCostPerTick={qual.sanityCostPerTick}
+                goldCostPerTick={qual.goldCostPerTick}
+                preRequisites={qual.prerequisites}
+              />
+            ))}
         </View>
       </ScrollView>
       <PlayerStatusForSecondary />

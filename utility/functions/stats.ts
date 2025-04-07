@@ -6,6 +6,7 @@ import {
   Energy,
   Fire,
   HealthIcon,
+  Holy,
   Ice,
   IntelligenceIcon,
   Lightning,
@@ -186,6 +187,36 @@ export const statMapping: Record<Modifier, StatInfo> = {
     formatValue: (value) => `${cleanRoundToTenths(value * 100)}%`,
     description: "Increased Poison Damage To Attacks/Spells",
   },
+  [Modifier.MagicDamage]: {
+    icon: Regen,
+    shouldShowTotal: true,
+    description: "Base Item Magic Damage",
+  },
+  [Modifier.MagicDamageAdded]: {
+    icon: Regen,
+    shouldShowTotal: true,
+    description: "Magic Damage Added To Attacks/Spells",
+  },
+  [Modifier.MagicDamageMultiplier]: {
+    icon: Regen,
+    formatValue: (value) => `${cleanRoundToTenths(value * 100)}%`,
+    description: "Increased Magic Damage To Attacks/Spells",
+  },
+  [Modifier.HolyDamage]: {
+    icon: Holy,
+    shouldShowTotal: true,
+    description: "Base Item Holy Damage",
+  },
+  [Modifier.HolyDamageAdded]: {
+    icon: Holy,
+    shouldShowTotal: true,
+    description: "Holy Damage Added To Attacks/Spells",
+  },
+  [Modifier.HolyDamageMultiplier]: {
+    icon: Holy,
+    formatValue: (value) => `${cleanRoundToTenths(value * 100)}%`,
+    description: "Increased Holy Damage To Attacks/Spells",
+  },
 };
 
 export const DEFENSIVE_STATS = [
@@ -203,6 +234,8 @@ export const DEFENSIVE_STATS = [
   Modifier.ColdResistance,
   Modifier.LightningResistance,
   Modifier.PoisonResistance,
+  Modifier.MagicResistance,
+  Modifier.HolyResistance,
 ];
 
 export const OFFENSIVE_STATS = [
@@ -224,6 +257,12 @@ export const OFFENSIVE_STATS = [
   Modifier.PoisonDamage,
   Modifier.PoisonDamageAdded,
   Modifier.PoisonDamageMultiplier,
+  Modifier.MagicDamage,
+  Modifier.MagicDamageAdded,
+  Modifier.MagicDamageMultiplier,
+  Modifier.HolyDamage,
+  Modifier.HolyDamageAdded,
+  Modifier.HolyDamageMultiplier,
 ];
 
 export const getStatInfo = (mod: Modifier): StatInfo => {
@@ -248,6 +287,8 @@ export const shouldShowModifier = (mod: Modifier, item: Item): boolean => {
       Modifier.ColdResistance,
       Modifier.LightningResistance,
       Modifier.PoisonResistance,
+      Modifier.MagicResistance,
+      Modifier.HolyResistance,
     ].includes(mod)
   ) {
     return true;
@@ -260,6 +301,8 @@ export const shouldShowModifier = (mod: Modifier, item: Item): boolean => {
       Modifier.ColdDamageMultiplier,
       Modifier.LightningDamageMultiplier,
       Modifier.PoisonDamageMultiplier,
+      Modifier.MagicDamageMultiplier,
+      Modifier.HolyDamageMultiplier,
     ].includes(mod)
   ) {
     return false;
@@ -271,6 +314,8 @@ export const shouldShowModifier = (mod: Modifier, item: Item): boolean => {
       [Modifier.FireDamage, Modifier.FireDamageAdded],
       [Modifier.ColdDamage, Modifier.ColdDamageAdded],
       [Modifier.LightningDamage, Modifier.LightningDamageAdded],
+      [Modifier.MagicDamage, Modifier.MagicDamageAdded],
+      [Modifier.HolyDamage, Modifier.HolyDamageAdded],
       [Modifier.PoisonDamage, Modifier.PoisonDamageAdded],
       [Modifier.Armor, Modifier.ArmorAdded],
     ].some(

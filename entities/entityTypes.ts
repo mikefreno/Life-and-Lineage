@@ -111,7 +111,7 @@ export interface PlayerCharacterBase extends BaseCharacterOptions {
   investments?: Investment[];
   unAllocatedSkillPoints?: number;
   debilitations?: Condition[];
-  pvpName?: string;
+  availableRespecs?: number;
 }
 
 export type MageCharacter = PlayerCharacterBase & {

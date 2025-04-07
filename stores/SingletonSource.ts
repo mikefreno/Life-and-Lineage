@@ -64,8 +64,6 @@ import names from "@/assets/json/names.json";
 import qualifications from "@/assets/json/qualifications.json";
 import shopLines from "@/assets/json/shopLines.json";
 import shops from "@/assets/json/shops.json";
-import { RootStore } from "./RootStore";
-import { Platform } from "react-native";
 
 // Define JSON file options as a constant array
 export const JSONFileOptions = [
@@ -217,6 +215,9 @@ class JSONService {
   readJsonFileSync<T extends JSONFileOptionsType>(
     filename: T,
   ): JSONFileTypeMap[T] {
+    if (__DEV__) {
+      return this.getOriginalJson(filename);
+    }
     if (!this.initialized) {
       console.warn("JSONService not fully initialized yet");
     }
