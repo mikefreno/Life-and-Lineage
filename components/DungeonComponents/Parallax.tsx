@@ -739,7 +739,6 @@ export const Parallax = observer(
           style={{
             paddingTop: header,
             flex: 1,
-            paddingBottom: uiStore.playerStatusHeightSecondary,
           }}
         >
           {children}

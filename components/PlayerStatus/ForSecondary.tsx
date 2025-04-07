@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import ProgressBar from "@/components/ProgressBar";
 import { findNodeHandle, Pressable, UIManager, View } from "react-native";
 import { observer } from "mobx-react-lite";
@@ -31,8 +31,8 @@ const PlayerStatusForSecondary = observer(() => {
     if (nodeHandle) {
       UIManager.measure(nodeHandle, (x, y, width, height, pageX, pageY) => {
         if (height > 0) {
-          uiStore.setPlayerStatusHeight(height);
-          uiStore.setPlayerStatusTop(pageY);
+          uiStore.setPlayerStatusHeight(height, true);
+          uiStore.setPlayerStatusTop(pageY, true);
         }
       });
     }
@@ -63,6 +63,7 @@ const PlayerStatusForSecondary = observer(() => {
             vibration({ style: "light" });
             uiStore.setDetailedStatusViewShowing(true);
           }}
+          style={{ flex: 1 }}
         >
           <View
             style={{

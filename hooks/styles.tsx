@@ -136,6 +136,63 @@ export const useStyles = () => {
     ...text,
     ...font,
     ...shadows,
+    statusPressable: {
+      position: "absolute",
+      zIndex: 9999,
+      top: uiStore.dimensions.height - uiStore.bottomBarHeight,
+      height: uiStore.playerStatusHeight,
+      width: uiStore.isLandscape
+        ? uiStore.dimensions.width * 0.75 - 16
+        : uiStore.dimensions.width - 16,
+      alignSelf: "center",
+    } as const,
+    dungeonPlayerStatusBG: {
+      zIndex: 999,
+      backgroundColor:
+        Platform.OS !== "ios"
+          ? uiStore.colorScheme === "dark"
+            ? "#27272a"
+            : "#fafafa"
+          : "transparent",
+      shadowColor: uiStore.colorScheme === "dark" ? "#ffffff" : "#000000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+      position: "absolute",
+      paddingBottom: (uiStore.insets?.bottom ?? 0) / 2,
+      bottom: 0,
+      width: "100%",
+    } as const,
+    secondaryPlayerStatusBG: {
+      zIndex: 999,
+      backgroundColor:
+        Platform.OS !== "ios"
+          ? uiStore.colorScheme === "dark"
+            ? "#27272a"
+            : "#fafafa"
+          : "transparent",
+      shadowColor: uiStore.colorScheme === "dark" ? "#ffffff" : "#000000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+      position: "absolute",
+      paddingBottom: (uiStore.insets?.bottom ?? 0) / 2,
+      bottom: 0,
+      width: "100%",
+    } as const,
+    playerStatusBG: {
+      marginHorizontal: 16,
+      borderRadius: 12,
+      zIndex: 10,
+      backgroundColor: uiStore.colorScheme === "dark" ? "#27272a" : "#fafafa",
+      shadowColor: uiStore.colorScheme === "dark" ? "#ffffff" : "#000000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.35,
+      shadowRadius: 3.84,
+      elevation: 5,
+    } as const,
     border,
     themedCard,
     roundedBorder,
@@ -1094,7 +1151,7 @@ export const useStyles = () => {
     dungeonBlur: {
       position: "absolute",
       bottom: 0,
-      height: "80%",
+      height: "70%",
     } as const,
     // webview
     webViewHeader: {

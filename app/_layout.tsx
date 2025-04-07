@@ -155,10 +155,9 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   const styles = useStyles();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+
   useEffect(() => {
-    if (insets !== uiStore.insets) {
-      uiStore.setInsets(insets);
-    }
+    uiStore.setInsets(insets);
   }, [insets]);
 
   const [firstLoad, setFirstLoad] = useState(true);

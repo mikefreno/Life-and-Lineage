@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from "react";
+import React from "react";
 import { type LayoutChangeEvent, View, Animated } from "react-native";
 import { useRef, useEffect, useState, useCallback } from "react";
 import { Pressable } from "react-native";
@@ -57,10 +57,6 @@ const DungeonLevelScreen = observer(() => {
   const styles = useStyles();
 
   const pouchRef = useRef<View>(null);
-  const mainBodyRef = useRef<View>(null);
-  const [mainHeight, setMainHeight] = useState<number>(
-    uiStore.playerStatusHeight,
-  );
 
   const setPouchBoundsOnLayout = useCallback(
     (event: LayoutChangeEvent) => {
@@ -167,12 +163,6 @@ const DungeonLevelScreen = observer(() => {
     }
   }, [playerAnimationStore.textString]);
 
-  useLayoutEffect(() => {
-    mainBodyRef.current?.measure((x, y, width, height) => {
-      setMainHeight(height);
-    });
-  }, [mainBodyRef]);
-
   if (currentLevel) {
     return (
       <ScreenShaker>
@@ -245,80 +235,85 @@ const DungeonLevelScreen = observer(() => {
           boundingBox={dungeonStore.currentMapDimensions!}
           reduceMotion={uiStore.reduceMotion}
         >
-          {dungeonStore.currentSpecialEncounter ? (
-            <Pressable
-              style={styles.dungeonSpecialEncounter}
-              onPress={() => setDisplayItem(null)}
-            >
-              <Image
-                source={dungeonStore.currentSpecialEncounter.imageSource}
+          <View style={{ flex: 1 }}>
+            {dungeonStore.currentSpecialEncounter ? (
+              <Pressable
+                style={styles.dungeonSpecialEncounter}
+                onPress={() => setDisplayItem(null)}
+              >
+                <Image
+                  source={dungeonStore.currentSpecialEncounter.imageSource}
+                  style={{
+                    width: uiStore.dimensions.lesser * 0.5,
+                    height: uiStore.dimensions.lesser * 0.5,
+                    marginVertical: "auto",
+                  }}
+                  contentFit="contain"
+                />
+              </Pressable>
+            ) : inCombat ? (
+              <Pressable
+                onPress={() => setDisplayItem(null)}
                 style={{
-                  width: uiStore.dimensions.lesser * 0.5,
-                  height: uiStore.dimensions.lesser * 0.5,
-                  marginVertical: "auto",
-                }}
-                contentFit="contain"
-              />
-            </Pressable>
-          ) : inCombat ? (
-            <Pressable
-              onPress={() => setDisplayItem(null)}
-              style={{
-                flex: 1,
-                height: "40%",
-                ...styles.notchMirroredLanscapePad,
-              }}
-            >
-              <VFXWrapper headerHeight={header}>
-                <DungeonEnemyDisplay />
-              </VFXWrapper>
-            </Pressable>
-          ) : (
-            <Pressable style={{ flex: 1 }} onPress={() => setDisplayItem(null)}>
-              <DungeonMapRender />
-            </Pressable>
-          )}
-          <LinearGradientBlur style={styles.dungeonBlur} />
-          <View
-            ref={mainBodyRef}
-            style={{
-              flex: 1,
-            }}
-          >
-            <View
-              style={{
-                position: "absolute",
-                width: uiStore.dimensions.width,
-                marginTop: -getNormalizedFontSize(30),
-              }}
-            >
-              <Animated.Text
-                style={{
-                  textAlign: "center",
-                  ...styles["text-2xl"],
-                  color: Colors.dark.text,
-                  opacity: textOpacity,
-                  fontFamily: "PixelifySans",
+                  flex: 1,
+                  height: "40%",
+                  ...styles.notchMirroredLanscapePad,
                 }}
               >
-                {playerAnimationStore.textString}
-              </Animated.Text>
-            </View>
+                <VFXWrapper headerHeight={header}>
+                  <DungeonEnemyDisplay />
+                </VFXWrapper>
+              </Pressable>
+            ) : (
+              <Pressable
+                style={{ flex: 1 }}
+                onPress={() => setDisplayItem(null)}
+              >
+                <DungeonMapRender />
+              </Pressable>
+            )}
+            <LinearGradientBlur style={styles.dungeonBlur} />
             <View
               style={{
                 flex: 1,
-                flexDirection: uiStore.isLandscape ? "row" : "column",
-                ...styles.notchAvoidingLanscapePad,
+                paddingBottom: uiStore.playerStatusHeightSecondary,
               }}
             >
-              <BattleTab battleTab={battleTab} />
-              <BattleTabControls
-                battleTab={battleTab}
-                setBattleTab={setBattleTab}
-              />
+              <View
+                style={{
+                  position: "absolute",
+                  width: uiStore.dimensions.width,
+                  marginTop: -getNormalizedFontSize(30),
+                }}
+              >
+                <Animated.Text
+                  style={{
+                    textAlign: "center",
+                    ...styles["text-2xl"],
+                    color: Colors.dark.text,
+                    opacity: textOpacity,
+                    fontFamily: "PixelifySans",
+                  }}
+                >
+                  {playerAnimationStore.textString}
+                </Animated.Text>
+              </View>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: uiStore.isLandscape ? "row" : "column",
+                  ...styles.notchAvoidingLanscapePad,
+                }}
+              >
+                <BattleTab battleTab={battleTab} />
+                <BattleTabControls
+                  battleTab={battleTab}
+                  setBattleTab={setBattleTab}
+                />
+              </View>
             </View>
+            <PlayerStatusForSecondary />
           </View>
-          <PlayerStatusForSecondary />
         </Parallax>
         {displayItem && (
           <View

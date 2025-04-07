@@ -41,7 +41,6 @@ import { wait } from "@/utility/functions/misc";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import GenericModal from "@/components/GenericModal";
 import { useScaling } from "@/hooks/scaling";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const TabLayout = observer(() => {
   const isFocused = useIsFocused();
@@ -54,19 +53,17 @@ const TabLayout = observer(() => {
   const vibration = useVibration();
   const { getNormalizedSize } = useScaling();
 
-  const insets = useSafeAreaInsets();
-
   const tabBarLayout = useMemo(() => {
     const playerStatusHeight = uiStore.playerStatusCompactHeight ?? 0;
     const expandedPadding = uiStore.playerStatusExpandedOnAllRoutes
       ? uiStore.expansionPadding
       : 0;
     const totalTabHeight =
-      uiStore.tabHeight + playerStatusHeight + expandedPadding;
+      uiStore.tabHeight + 8 + playerStatusHeight + expandedPadding;
 
     return {
       height: totalTabHeight,
-      contentHeight: uiStore.tabHeight,
+      contentHeight: uiStore.tabHeight + 8,
       paddingTop: playerStatusHeight + expandedPadding,
     };
   }, [
@@ -87,7 +84,7 @@ const TabLayout = observer(() => {
           fontSize: getNormalizedSize(24),
         },
         headerStyle: {
-          height: 44 + insets.top,
+          height: 44 + (uiStore.insets?.top ?? 0),
         },
         headerBackground:
           Platform.OS === "ios"
@@ -106,7 +103,7 @@ const TabLayout = observer(() => {
                 <ThemedView style={[StyleSheet.absoluteFill, styles.diffuse]} />
               ),
       }) as const,
-    [uiStore.colorScheme, uiStore.dimensions, insets.top],
+    [uiStore.colorScheme, uiStore.dimensions, uiStore.insets?.top],
   );
 
   return (
@@ -145,19 +142,7 @@ const TabLayout = observer(() => {
           vibration({ style: "light" });
           uiStore.setDetailedStatusViewShowing(true);
         }}
-        style={[
-          uiStore.showDevDebugUI && styles.debugBorder,
-          {
-            position: "absolute",
-            zIndex: 9999,
-            top: uiStore.dimensions.height - uiStore.bottomBarHeight,
-            height: uiStore.playerStatusHeight,
-            width: uiStore.isLandscape
-              ? uiStore.dimensions.width * 0.75 - 16
-              : uiStore.dimensions.width - 16,
-            alignSelf: "center",
-          },
-        ]}
+        style={styles.statusPressable}
       />
       {playerState && (
         <Tabs
@@ -165,7 +150,11 @@ const TabLayout = observer(() => {
             tabBarBackground: () => {
               return (
                 <View
-                  style={{ position: "absolute", bottom: 0, width: "100%" }}
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    width: "100%",
+                  }}
                 >
                   <PlayerStatusForHome />
                   <LinearGradientBlur
@@ -199,7 +188,7 @@ const TabLayout = observer(() => {
               borderTopWidth: 0,
               position: "absolute",
               shadowColor: "transparent",
-              height: tabBarLayout.height + insets.bottom / 4,
+              height: tabBarLayout.height,
               paddingHorizontal: "2%",
               paddingTop: tabBarLayout.paddingTop,
             },
@@ -210,7 +199,6 @@ const TabLayout = observer(() => {
             tabBarItemStyle: {
               height: tabBarLayout.contentHeight,
               justifyContent: "center",
-              paddingTop: 0,
             },
             animation:
               uiStore.reduceMotion || Platform.OS == "android"

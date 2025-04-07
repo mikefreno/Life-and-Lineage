@@ -37,6 +37,7 @@ export default function OptionsLayout() {
         },
         tabBarStyle: {
           borderTopWidth: 0,
+          height: uiStore.tabHeight + 8,
           ...styles.diffuseTop,
         },
         tabBarIconStyle: {

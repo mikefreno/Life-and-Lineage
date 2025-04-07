@@ -25,7 +25,11 @@ import {
   getOrientationAsync,
 } from "expo-screen-orientation";
 import { hasNotch, isTablet, getDeviceType } from "react-native-device-info";
-import { baseNormalize, baseNormalizeForText } from "@/hooks/scaling";
+import {
+  baseNormalize,
+  baseNormalizeForText,
+  baseNormalizeLineHeight,
+} from "@/hooks/scaling";
 import { getRandomInt } from "@/utility/functions/misc";
 
 export const LOADING_TIPS: string[] = [
@@ -104,7 +108,7 @@ export default class UIStore {
   progressIncrementing: boolean = false;
 
   iconSizeXL = baseNormalize(28);
-  tabHeightBase = baseNormalize(28) + 4;
+  tabHeightBase = baseNormalize(28);
 
   expansionPadding = baseNormalize(24);
   iconSizeLarge = baseNormalize(22);
@@ -322,6 +326,7 @@ export default class UIStore {
 
   get playerStatusIsCompact() {
     if (
+      this.root.pathname === "dungoenlevel" &&
       !(
         tabRouteIndexing.includes(this.root.pathname) ||
         this.root.pathname.includes("options") ||
@@ -366,7 +371,11 @@ export default class UIStore {
   }
 
   get playerStatusHeightSecondary() {
-    return this.playerStatusHeight + (this.insets?.bottom ?? 0) / 2;
+    return (
+      (this.playerStatusCompactHeight ?? 0) +
+      this.expansionPadding +
+      (this.insets?.bottom ?? 0) / 2
+    );
   }
 
   get bottomBarHeight() {
@@ -438,20 +447,27 @@ export default class UIStore {
   get tabHeight() {
     return (
       this.tabHeightBase +
-      (this.insets?.bottom ?? 0) +
-      (!this.isLandscape ? baseNormalizeForText(15) : 4)
+      (!this.isLandscape ? baseNormalizeLineHeight(15) : 4) +
+      (this.insets?.bottom ?? 0) / 2
     );
   }
 
-  setPlayerStatusHeight(value: number) {
-    const mod = this.playerStatusIsCompact ? 0 : this.expansionPadding;
+  setPlayerStatusHeight(value: number, forceExpansionMod = false) {
+    const mod =
+      this.playerStatusIsCompact && !forceExpansionMod
+        ? 0
+        : this.expansionPadding;
     if (this.playerStatusCompactHeight === undefined) {
+      console.log("no mod: ", value, "with mod: ", mod);
       this.setPlayerStatusCompactHeight(value - mod);
     }
   }
 
-  setPlayerStatusTop(pY: number) {
-    const mod = this.playerStatusIsCompact ? 0 : this.expansionPadding;
+  setPlayerStatusTop(pY: number, forceExpansionMod = false) {
+    const mod =
+      this.playerStatusIsCompact && !forceExpansionMod
+        ? 0
+        : this.expansionPadding;
     if (this.playerStatusTop === undefined) {
       this.playerStatusTop = pY - mod;
     }

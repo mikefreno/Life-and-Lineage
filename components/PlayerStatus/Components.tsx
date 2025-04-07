@@ -869,6 +869,7 @@ export const ColorAndPlatformDependantBlur = observer(
     const pathname = usePathname();
     const { healthDamageFlash, sanityDamageFlash, statChanges } =
       useStatChanges(playerState!);
+    const styles = useStyles();
 
     const healthWarningAnimatedValue = useState(new Animated.Value(0))[0];
     const sanityWarningAnimatedValue = useState(new Animated.Value(0))[0];
@@ -1045,7 +1046,7 @@ export const ColorAndPlatformDependantBlur = observer(
             }}
           >
             <BlurView
-              intensity={100}
+              intensity={50}
               tint={uiStore.colorScheme}
               style={[
                 {
@@ -1071,21 +1072,7 @@ export const ColorAndPlatformDependantBlur = observer(
         );
       } else {
         return (
-          <View
-            style={{
-              marginHorizontal: 16,
-              borderRadius: 12,
-              zIndex: 10,
-              backgroundColor:
-                uiStore.colorScheme === "dark" ? "#27272a" : "#fafafa",
-              shadowColor:
-                uiStore.colorScheme === "dark" ? "#ffffff" : "#000000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.35,
-              shadowRadius: 3.84,
-              elevation: 5,
-            }}
-          >
+          <View style={styles.playerStatusBG}>
             <Animated.View
               style={{
                 display: "flex",
@@ -1104,26 +1091,7 @@ export const ColorAndPlatformDependantBlur = observer(
 
     if (dungeonStore.isInDungeon) {
       return (
-        <View
-          style={{
-            zIndex: 999,
-            backgroundColor:
-              Platform.OS !== "ios"
-                ? uiStore.colorScheme === "dark"
-                  ? "#27272a"
-                  : "#fafafa"
-                : "transparent",
-            shadowColor: uiStore.colorScheme === "dark" ? "#ffffff" : "#000000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.25,
-            shadowRadius: 3.84,
-            elevation: 5,
-            position: "absolute",
-            paddingBottom: (uiStore.insets?.bottom ?? 0) / 2,
-            bottom: 0,
-            width: "100%",
-          }}
-        >
+        <View style={styles.dungeonPlayerStatusBG}>
           <Animated.View
             style={{
               display: "flex",
@@ -1139,26 +1107,9 @@ export const ColorAndPlatformDependantBlur = observer(
     } else {
       return (
         <BlurView
-          intensity={Platform.OS === "ios" ? 100 : 0}
+          intensity={Platform.OS === "ios" ? 50 : 0}
           tint={uiStore.colorScheme}
-          style={{
-            zIndex: 999,
-            backgroundColor:
-              Platform.OS !== "ios"
-                ? uiStore.colorScheme === "dark"
-                  ? "#27272a"
-                  : "#fafafa"
-                : "transparent",
-            shadowColor: uiStore.colorScheme === "dark" ? "#ffffff" : "#000000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.25,
-            shadowRadius: 3.84,
-            elevation: 5,
-            position: "absolute",
-            paddingBottom: (uiStore.insets?.bottom ?? 0) / 2,
-            bottom: 0,
-            width: "100%",
-          }}
+          style={styles.secondaryPlayerStatusBG}
         >
           <Animated.View
             style={{

@@ -21,7 +21,7 @@ const JobTraining = () => {
   }
 
   return (
-    <>
+    <View style={{ flex: 1 }}>
       <TutorialModal
         isFocused={isFocused}
         tutorial={TutorialOption.training}
@@ -53,7 +53,7 @@ const JobTraining = () => {
         </View>
       </ScrollView>
       <PlayerStatusForSecondary />
-    </>
+    </View>
   );
 };
 export default JobTraining;
