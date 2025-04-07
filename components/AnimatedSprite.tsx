@@ -64,7 +64,7 @@ export const AnimatedSprite = observer(
 
     useEffect(() => {
       handleLayout();
-    }, [uiStore.orientation]);
+    }, [uiStore.orientation, enemyStore.enemies.length]);
 
     const animationStore = enemyStore.getAnimationStore(enemy?.id ?? "");
     const styles = useStyles();

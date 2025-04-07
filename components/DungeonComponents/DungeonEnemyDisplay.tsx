@@ -44,7 +44,7 @@ const EnemyHealthChangePopUp = ({
   );
 };
 
-const EnemyConditions = ({ enemy }: { enemy: Being }) => {
+const EnemyConditions = observer(({ enemy }: { enemy: Being }) => {
   const { uiStore } = useRootStore();
   const { getNormalizedSize } = useScaling();
   const simplifiedConditions = useMemo(() => {
@@ -121,7 +121,7 @@ const EnemyConditions = ({ enemy }: { enemy: Being }) => {
       </ScrollView>
     </View>
   );
-};
+});
 
 const EnemyDialogue = observer(
   ({

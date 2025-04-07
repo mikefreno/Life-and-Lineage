@@ -504,6 +504,15 @@ export class Attack {
       throw new Error("used attack that was not valid... check before use!");
     }
 
+    if (this.user instanceof PlayerCharacter) {
+      const bloodOrbsNeeded =
+        this.buffNames?.filter((buff) => buff === "consume blood orb").length ??
+        0;
+      if (bloodOrbsNeeded > 0) {
+        this.user.removeBloodOrbs(this);
+      }
+    }
+
     if (this.isAura) {
       if (this.auraIsActive) {
         this.deactivateAura();

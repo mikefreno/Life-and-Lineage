@@ -935,6 +935,7 @@ export const useStyles = () => {
     storyContainer: {
       ...tw.pr4,
       ...tw.py4,
+      ...tw.pl1,
       height: "100%",
     } as const,
     storyHeaderContainer: {

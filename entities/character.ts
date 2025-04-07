@@ -1952,6 +1952,11 @@ export class PlayerCharacter extends Character {
             Item.fromJSON({ ...item, root: json.root }),
           )
         : [],
+      keyItems: json.keyItems
+        ? json.keyItems.map((item: any) =>
+            Item.fromJSON({ ...item, root: json.root }),
+          )
+        : [],
       equipment: json.equipment && {
         ...Object.fromEntries(
           ["mainHand", "offHand", "body", "head"].map((slot) => [

@@ -134,18 +134,17 @@ export class Enemy extends Creature {
     if (!this.root) return;
 
     this.root.enemyStore.clearPersistedEnemy(this.id);
-    const newId = Crypto.randomUUID();
-    runInAction(() => {
-      this.id = newId;
-    });
-
     const oldStore = this.root.enemyStore.getAnimationStore(this.id);
     if (oldStore) {
       oldStore.concludeAnimation();
       oldStore.clearProjectileSet();
       oldStore.clearGlow();
-      this.root.enemyStore.animationStoreMap.delete(this.id);
+      runInAction(() => this.root.enemyStore.animationStoreMap.delete(this.id));
     }
+    const newId = Crypto.randomUUID();
+    runInAction(() => {
+      this.id = newId;
+    });
 
     // Update properties
     runInAction(() => {

@@ -178,6 +178,7 @@ export const StatsDisplay = observer(
       largeMeta: boolean;
       emphasized: boolean;
     }
+
     const StoryItemDescriptionRender = ({ item }: { item: Item }) => {
       if (!item.description) {
         throw Error(`Missing description on story item: ${item.name}`);
@@ -280,6 +281,15 @@ export const StatsDisplay = observer(
 
       return (
         <View style={styles.storyContainer}>
+          <Pressable
+            onPress={() => {
+              vibration({ style: "light" });
+              setRenderStory(null);
+            }}
+            style={[styles.closeButton, { right: 4 }]}
+          >
+            <Text style={styles["text-4xl"]}>x</Text>
+          </Pressable>
           <View style={styles.storyHeaderContainer}>
             <Text
               style={{ marginLeft: -16, marginRight: 16, ...styles["text-xl"] }}
@@ -287,23 +297,7 @@ export const StatsDisplay = observer(
               {toTitleCase(item.name)}
             </Text>
           </View>
-          <Pressable
-            onPress={() => {
-              vibration({ style: "light" });
-              setRenderStory(null);
-            }}
-            style={[
-              styles.closeButton,
-              {
-                [displayItem.position.left + itemBlockSize <
-                dimensions.width * 0.6
-                  ? "left"
-                  : "right"]: 0,
-              },
-            ]}
-          >
-            <Text style={{ fontSize: 36 }}>x</Text>
-          </Pressable>
+
           {sections.map((section, idx) => {
             if (section.meta) {
               return (
@@ -315,7 +309,7 @@ export const StatsDisplay = observer(
                     section.largeMeta && styles["text-xl"],
                   ]}
                 >
-                  [{section.text}]
+                  *{section.text}*
                 </Text>
               );
             } else {
@@ -337,7 +331,10 @@ export const StatsDisplay = observer(
                               return (
                                 <CursiveTextBold
                                   key={partIdx}
-                                  style={{ fontSize: 48, letterSpacing: 2 }}
+                                  style={[
+                                    styles["text-4xl"],
+                                    { letterSpacing: 2 },
+                                  ]}
                                 >
                                   {cleanPart}
                                 </CursiveTextBold>
@@ -346,7 +343,7 @@ export const StatsDisplay = observer(
                               return (
                                 <HandwrittenText
                                   key={partIdx}
-                                  style={{ fontSize: 30 }}
+                                  style={styles["text-3xl"]}
                                 >
                                   {cleanPart}
                                 </HandwrittenText>
@@ -357,7 +354,10 @@ export const StatsDisplay = observer(
                               return (
                                 <CursiveText
                                   key={partIdx}
-                                  style={{ fontSize: 36, letterSpacing: 2 }}
+                                  style={[
+                                    styles["text-3xl"],
+                                    { letterSpacing: 2 },
+                                  ]}
                                 >
                                   {cleanPart}
                                 </CursiveText>
@@ -366,7 +366,7 @@ export const StatsDisplay = observer(
                               return (
                                 <HandwrittenText
                                   key={partIdx}
-                                  style={{ fontSize: 30 }}
+                                  style={[styles["text-2xl"], { fontSize: 30 }]}
                                 >
                                   {cleanPart}
                                 </HandwrittenText>
@@ -808,10 +808,9 @@ export const StatsDisplay = observer(
           size={95}
           noPad
           style={styles.storyModalContainer}
+          scrollEnabled={true}
         >
-          <ScrollView style={tw.px4}>
-            <StoryItemDescriptionRender item={firstItem} />
-          </ScrollView>
+          <StoryItemDescriptionRender item={firstItem} />
         </GenericModal>
         <Animated.View
           style={[
