@@ -1,10 +1,10 @@
-import { View, Image, ScrollView } from "react-native";
+import { View, Image, ScrollView, Pressable } from "react-native";
 import { statRounding, toTitleCase } from "@/utility/functions/misc";
 import ProgressBar from "@/components/ProgressBar";
 import GenericStrikeAround from "@/components/GenericStrikeAround";
 import { Text } from "@/components/Themed";
 import FadeOutNode from "@/components/FadeOutNode";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { Creature, Enemy } from "@/entities/creatures";
 import { useRootStore } from "@/hooks/stores";
@@ -19,6 +19,7 @@ import {
 import { type Being } from "@/entities/being";
 import { Character } from "@/entities/character";
 import { useScaling } from "@/hooks/scaling";
+import { runInAction } from "mobx";
 
 const EnemyHealthChangePopUp = ({
   healthDiff,
@@ -122,6 +123,88 @@ const EnemyConditions = ({ enemy }: { enemy: Being }) => {
   );
 };
 
+const EnemyDialogue = observer(
+  ({
+    dialogue,
+    clear,
+  }: {
+    dialogue: { [key: number]: string } | null;
+    clear: () => void;
+  }) => {
+    const [currentPage, setCurrentPage] = useState(1);
+    const styles = useStyles();
+    const { uiStore } = useRootStore();
+    const { getNormalizedSize } = useScaling();
+    const clearTimeoutRef = useRef<NodeJS.Timeout>();
+
+    if (!dialogue) return null;
+
+    const maxPages = Object.keys(dialogue).length;
+    const currentText = dialogue[currentPage];
+
+    useEffect(() => {
+      if (currentPage === maxPages) {
+        clearTimeoutRef.current = setTimeout(() => {
+          clear();
+        }, 5000);
+      }
+
+      return () => {
+        if (clearTimeoutRef.current) {
+          clearTimeout(clearTimeoutRef.current);
+        }
+      };
+    }, [currentPage, maxPages, clear]);
+
+    const dialogueWidth = uiStore.dimensions.lesser * 0.5;
+
+    return (
+      <Pressable
+        onPress={() => {
+          if (clearTimeoutRef.current) {
+            clearTimeout(clearTimeoutRef.current);
+          }
+
+          if (currentPage < maxPages) {
+            setCurrentPage((prev) => prev + 1);
+          } else {
+            setCurrentPage(1);
+          }
+        }}
+        style={[
+          {
+            backgroundColor: "rgba(0, 0, 0, 0.75)",
+            borderRadius: 8,
+            padding: getNormalizedSize(12),
+            marginBottom: getNormalizedSize(8),
+            top: uiStore.dimensions.height / 8,
+            position: "absolute",
+            zIndex: 9999,
+            width: dialogueWidth,
+            left: (uiStore.dimensions.lesser - dialogueWidth) / 2,
+          },
+        ]}
+      >
+        <Text
+          style={[styles["text-lg"], { color: "#ffffff", textAlign: "center" }]}
+        >
+          {currentText}
+        </Text>
+        {maxPages > 1 && (
+          <Text
+            style={[
+              styles["text-sm"],
+              { color: "#ffffff80", textAlign: "right", marginTop: 4 },
+            ]}
+          >
+            {currentPage}/{maxPages}
+          </Text>
+        )}
+      </Pressable>
+    );
+  },
+);
+
 const DungeonEnemyDisplay = observer(() => {
   const { enemyStore } = useRootStore();
 
@@ -154,6 +237,7 @@ const EnemyDisplay = observer(({ enemy }: { enemy: Being }) => {
     diff: 0,
     showing: false,
   });
+  const { enemyStore } = useRootStore();
   const glowValue = useSharedValue(0);
 
   const enemyName = useMemo(() => {
@@ -191,8 +275,19 @@ const EnemyDisplay = observer(({ enemy }: { enemy: Being }) => {
     }
   }, [enemy.currentHealth, enemy.id]);
 
+  const enemyAnimStore = useMemo(
+    () => enemyStore.getAnimationStore(enemy.id),
+    [enemy.id],
+  );
+
   return (
     <View style={{ flex: 1, paddingHorizontal: "2%" }}>
+      {enemyAnimStore?.dialogue && (
+        <EnemyDialogue
+          dialogue={enemyAnimStore.dialogue}
+          clear={() => runInAction(() => (enemyAnimStore.dialogue = null))}
+        />
+      )}
       <View style={[flex.rowBetween, { flex: 1 }]}>
         <View
           style={{
@@ -231,7 +326,7 @@ const EnemyDisplay = observer(({ enemy }: { enemy: Being }) => {
           />
           <EnemyConditions enemy={enemy} />
         </View>
-        <AnimatedSprite enemy={enemy} glow={glowValue} />
+        <AnimatedSprite enemy={enemy} glow={glowValue} key={enemy.id} />
       </View>
       {enemy instanceof Enemy && enemy.minions.length > 0 ? (
         <View style={styles.mx4}>

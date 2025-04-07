@@ -49,48 +49,16 @@ export const VFXWrapper = observer(
       enemyStore.enemies,
       enemyStore.animationStoreMap.entries,
       enemyStore.animationStoreMap.keys,
-      enemyStore.midpointUpdater,
       uiStore.orientation,
     ]);
 
     return (
       <View style={{ flex: 1 }}>
-        {/* Debug dots */}
-        {__DEV__ && uiStore.showDevDebugUI && (
-          <>
-            {enemyAnimationStores.map((elem) => (
-              <View
-                key={`enemy-dot-${elem.spriteMidPoint?.x}-${elem.spriteMidPoint?.y}`}
-                style={{
-                  position: "absolute",
-                  width: 10,
-                  height: 10,
-                  borderRadius: 5,
-                  backgroundColor: "red",
-                  top: elem.spriteMidPoint?.y,
-                  left: elem.spriteMidPoint?.x,
-                  zIndex: 9999,
-                }}
-              />
-            ))}
-            <View
-              style={{
-                position: "absolute",
-                width: 10,
-                height: 10,
-                borderRadius: 5,
-                backgroundColor: "green",
-                top: playerAnimationStore.playerOrigin.y,
-                left: playerAnimationStore.playerOrigin.x,
-                zIndex: 9999,
-              }}
-            />
-          </>
-        )}
         {children}
         <PlayerVFX
           enemyPositions={enemyAndPosList}
           playerOrigin={playerAnimationStore.playerOrigin}
+          targetPoint={playerAnimationStore.targetPoint}
           headerHeight={headerHeight}
         />
         {enemyAnimationStores.map((store) => (
@@ -111,6 +79,7 @@ const PlayerVFX = observer(
     enemyPositions,
     playerOrigin,
     headerHeight,
+    targetPoint,
   }: {
     enemyPositions: {
       enemyID: string;
@@ -118,6 +87,7 @@ const PlayerVFX = observer(
     }[];
     playerOrigin: Vector2;
     headerHeight: number;
+    targetPoint: Vector2 | null;
   }) => {
     const { playerState, playerAnimationStore } = useRootStore();
 
@@ -150,7 +120,8 @@ const PlayerVFX = observer(
       }
     }, [playerAnimationStore.animationSet, enemyPositions]);
 
-    if (!playerAnimationStore.animationSet || !playerState) return null;
+    if (!playerAnimationStore.animationSet || !playerState || !targetPoint)
+      return null;
 
     return (
       <>
@@ -162,8 +133,8 @@ const PlayerVFX = observer(
                 playerAnimationStore.animationSet,
               ) as PlayerSpriteAnimationSet
             }
-            enemyPositions={enemyPositions}
             playerOrigin={playerOrigin}
+            targetPoint={targetPoint}
             onComplete={() => playerAnimationStore.clearAnimation()}
           />
         ) : (
@@ -199,22 +170,22 @@ const missilePlacementHandler = ({
 const staticPlacementHandler = ({
   playerOrigin,
   normalized,
-  targetPosition,
+  targetPoint,
   position,
 }: {
   playerOrigin: Vector2;
   normalized: { width: number; height: number };
-  targetPosition: Vector2;
+  targetPoint: Vector2;
   position: "enemy" | "field" | "self";
 }): Vector2 => {
   const centerOffset = new Vector2(normalized.width / 2, normalized.height / 2);
 
   switch (position) {
     case "enemy":
-      return targetPosition.subtract(centerOffset);
+      return targetPoint.subtract(centerOffset);
 
     case "field":
-      return playerOrigin.midpoint(targetPosition).subtract(centerOffset);
+      return playerOrigin.midpoint(targetPoint).subtract(centerOffset);
 
     case "self":
     default:
@@ -238,288 +209,281 @@ const spanPlacementHandler = ({
   );
 };
 
-const PlayerSpriteVFX = ({
-  animation,
-  enemyPositions,
-  playerOrigin,
-  onComplete,
-  set,
-}: {
-  animation: {
-    source: any;
-    height: number;
-    width: number;
-  };
-  enemyPositions: {
-    enemyID: string;
-    positionMidPoint: Vector2;
-  }[];
-  playerOrigin: Vector2;
-  set: PlayerSpriteAnimationSet;
-  onComplete: (() => void) | null;
-}) => {
-  const { uiStore } = useRootStore();
-  const animatedImage = useAnimatedImage(animation.source);
-  const [currentFrame, setCurrentFrame] = useState(0);
-  const frameRef = useRef(0);
-  const animationTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const isMounted = useRef(true);
-  const { memoizedCalculateRenderScaling } = useScaling();
-
-  const animXY = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
-  const animationRef = useRef<Animated.CompositeAnimation | null>(null);
-
-  const renderScaleCalc = memoizedCalculateRenderScaling(set.scale);
-
-  const containerSize = uiStore.dimensions.lesser * 0.5;
-
-  const scaleX = (containerSize / animation.width) * renderScaleCalc;
-  const scaleY = (containerSize / animation.height) * renderScaleCalc;
-
-  const scale = Math.min(scaleX, scaleY);
-
-  const normalized = useMemo(() => {
-    return {
-      height: animation.height * scale,
-      width: animation.width * scale,
+const PlayerSpriteVFX = observer(
+  ({
+    animation,
+    playerOrigin,
+    onComplete,
+    set,
+    targetPoint,
+  }: {
+    animation: {
+      source: any;
+      height: number;
+      width: number;
     };
-  }, [animation.height, animation.width, scale]);
+    playerOrigin: Vector2;
+    targetPoint: Vector2;
+    set: PlayerSpriteAnimationSet;
+    onComplete: (() => void) | null;
+  }) => {
+    const { uiStore } = useRootStore();
+    const animatedImage = useAnimatedImage(animation.source);
+    const [currentFrame, setCurrentFrame] = useState(0);
+    const frameRef = useRef(0);
+    const animationTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const isMounted = useRef(true);
+    const { memoizedCalculateRenderScaling } = useScaling();
 
-  const targetPosition = useMemo(() => {
-    return enemyPositions.length > 0
-      ? enemyPositions[0].positionMidPoint
-      : playerOrigin.add(Vector2.fromAngle(-Math.PI / 2, 0));
-  }, [enemyPositions, playerOrigin]);
+    const animXY = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
+    const animationRef = useRef<Animated.CompositeAnimation | null>(null);
 
-  const initialPosition = useMemo(() => {
-    switch (set.style) {
-      case "static":
-        return staticPlacementHandler({
-          playerOrigin,
-          normalized,
-          targetPosition,
-          position: set.position,
-        });
-      case "missile":
-        return missilePlacementHandler({ playerOrigin, normalized });
-      case "span":
-        return spanPlacementHandler({ playerOrigin, normalized });
-    }
-  }, [set.style, set.position, playerOrigin, normalized, targetPosition]);
+    const renderScaleCalc = memoizedCalculateRenderScaling(set.scale);
 
-  const spanCalculations = useMemo(() => {
-    if (set.style !== "span") return null;
+    const containerSize = uiStore.dimensions.lesser * 0.5;
 
-    const direction = targetPosition.subtract(playerOrigin);
-    const distance = direction.magnitude();
-    const angle = direction.angleDegrees();
+    const scaleX = (containerSize / animation.width) * renderScaleCalc;
+    const scaleY = (containerSize / animation.height) * renderScaleCalc;
 
-    return { distance, angle };
-  }, [set.style, playerOrigin, targetPosition]);
+    const scale = Math.min(scaleX, scaleY);
 
-  const safeSetCurrentFrame = useCallback((frame: number) => {
-    if (isMounted.current) {
-      setCurrentFrame(frame);
-    }
-  }, []);
+    const normalized = useMemo(() => {
+      return {
+        height: animation.height * scale,
+        width: animation.width * scale,
+      };
+    }, [animation.height, animation.width, scale]);
 
-  useEffect(() => {
-    isMounted.current = true;
-
-    return () => {
-      isMounted.current = false;
-      if (animationTimerRef.current) {
-        clearTimeout(animationTimerRef.current);
-        animationTimerRef.current = null;
+    const initialPosition = useMemo(() => {
+      switch (set.style) {
+        case "static":
+          return staticPlacementHandler({
+            playerOrigin,
+            normalized,
+            targetPoint,
+            position: set.position,
+          });
+        case "missile":
+          return missilePlacementHandler({ playerOrigin, normalized });
+        case "span":
+          return spanPlacementHandler({ playerOrigin, normalized });
       }
-      if (animationRef.current) {
-        animationRef.current.stop();
+    }, [set.style, set.position, playerOrigin, normalized, targetPoint]);
+
+    const spanCalculations = useMemo(() => {
+      if (set.style !== "span") return null;
+
+      const direction = targetPoint.subtract(playerOrigin);
+      const distance = direction.magnitude();
+      const angle = direction.angleDegrees();
+
+      return { distance, angle };
+    }, [set.style, playerOrigin, targetPoint]);
+
+    const safeSetCurrentFrame = useCallback((frame: number) => {
+      if (isMounted.current) {
+        setCurrentFrame(frame);
       }
-      if (animatedImage) {
-        animatedImage.dispose();
-      }
-    };
-  }, []);
+    }, []);
 
-  useEffect(() => {
-    if (!animatedImage) return;
+    useEffect(() => {
+      isMounted.current = true;
 
-    frameRef.current = 0;
-    safeSetCurrentFrame(0);
-
-    const frameCount = animatedImage.getFrameCount() * (set.repeat ?? 1);
-    const frameDuration = animatedImage.currentFrameDuration();
-
-    const advanceFrame = () => {
-      if (!animatedImage || !isMounted.current) return;
-
-      try {
-        animatedImage.decodeNextFrame();
-        frameRef.current = (frameRef.current + 1) % frameCount;
-        safeSetCurrentFrame(frameRef.current);
-
-        if (frameRef.current === frameCount - 1) {
-          animatedImage.dispose();
-          if (onComplete && isMounted.current) {
-            onComplete();
-            return;
-          }
+      return () => {
+        isMounted.current = false;
+        if (animationTimerRef.current) {
+          clearTimeout(animationTimerRef.current);
+          animationTimerRef.current = null;
         }
+        if (animationRef.current) {
+          animationRef.current.stop();
+        }
+        if (animatedImage) {
+          animatedImage.dispose();
+        }
+      };
+    }, []);
 
-        animationTimerRef.current = setTimeout(advanceFrame, frameDuration);
-      } catch (error) {
-        console.error("Error in animation frame:", error);
-      }
-    };
+    useEffect(() => {
+      if (!animatedImage) return;
 
-    advanceFrame();
-  }, [animatedImage, onComplete, safeSetCurrentFrame]);
+      frameRef.current = 0;
+      safeSetCurrentFrame(0);
 
-  useEffect(() => {
-    if (!animatedImage || set.style !== "missile") return;
+      const frameCount = animatedImage.getFrameCount() * (set.repeat ?? 1);
+      const frameDuration = animatedImage.currentFrameDuration();
 
-    const frameCount = animatedImage.getFrameCount();
-    const frameDuration = animatedImage.currentFrameDuration();
-    const totalDuration =
-      (set.reachTargetAtFrame ? set.reachTargetAtFrame : frameCount) *
-      frameDuration;
+      const advanceFrame = () => {
+        if (!animatedImage || !isMounted.current) return;
 
-    const dist = targetPosition.subtract(playerOrigin);
+        try {
+          animatedImage.decodeNextFrame();
+          frameRef.current = (frameRef.current + 1) % frameCount;
+          safeSetCurrentFrame(frameRef.current);
 
-    animXY.setValue({ x: 0, y: 0 });
+          if (frameRef.current === frameCount - 1) {
+            animatedImage.dispose();
+            if (onComplete && isMounted.current) {
+              onComplete();
+              return;
+            }
+          }
 
-    animationRef.current = Animated.timing(animXY, {
-      toValue: dist,
-      duration: totalDuration,
-      useNativeDriver: true,
-    });
+          animationTimerRef.current = setTimeout(advanceFrame, frameDuration);
+        } catch (error) {
+          console.error("Error in animation frame:", error);
+        }
+      };
 
-    animationRef.current.start();
+      advanceFrame();
+    }, [animatedImage, onComplete, safeSetCurrentFrame]);
 
-    return () => {
-      if (animationRef.current) {
-        animationRef.current.stop();
-      }
-    };
-  }, [animatedImage, set.style, playerOrigin, targetPosition, animXY]);
+    useEffect(() => {
+      if (!animatedImage || set.style !== "missile") return;
 
-  if (!animatedImage) {
-    return null;
-  }
+      const frameCount = animatedImage.getFrameCount();
+      const frameDuration = animatedImage.currentFrameDuration();
+      const totalDuration =
+        (set.reachTargetAtFrame ? set.reachTargetAtFrame : frameCount) *
+        frameDuration;
 
-  if (set.style === "span" && spanCalculations) {
-    const { distance, angle } = spanCalculations;
-    const scaleX = distance / normalized.width;
+      const dist = targetPoint.subtract(playerOrigin);
 
-    return (
-      <View
-        style={{
-          position: "absolute",
-          left: playerOrigin.x,
-          top: playerOrigin.y,
-          width: normalized.width,
-          height: normalized.height,
-          transform: [
-            { translateX: -normalized.width / 2 },
-            { translateY: -normalized.height / 2 },
-            { rotate: `${angle}deg` },
-            { scaleX: scaleX },
-            { translateX: normalized.width / 2 },
-          ],
-        }}
-      >
-        <Canvas
+      animXY.setValue({ x: 0, y: 0 });
+
+      animationRef.current = Animated.timing(animXY, {
+        toValue: dist,
+        duration: totalDuration,
+        useNativeDriver: true,
+      });
+
+      animationRef.current.start();
+
+      return () => {
+        if (animationRef.current) {
+          animationRef.current.stop();
+        }
+      };
+    }, [animatedImage, set.style, playerOrigin, targetPoint, animXY]);
+
+    if (!animatedImage) {
+      return null;
+    }
+
+    if (set.style === "span" && spanCalculations) {
+      const { distance, angle } = spanCalculations;
+      const scaleX = distance / normalized.width;
+
+      return (
+        <View
           style={{
+            position: "absolute",
+            left: playerOrigin.x,
+            top: playerOrigin.y,
             width: normalized.width,
             height: normalized.height,
-            top: set.topOffset ? `${set.topOffset}%` : 0,
-            left: set.leftOffset ? `${set.leftOffset}%` : 0,
+            transform: [
+              { translateX: -normalized.width / 2 },
+              { translateY: -normalized.height / 2 },
+              { rotate: `${angle}deg` },
+              { scaleX: scaleX },
+              { translateX: normalized.width / 2 },
+            ],
           }}
         >
-          <Image
-            image={animatedImage.getCurrentFrame()}
-            x={0}
-            y={0}
-            width={normalized.width}
-            height={normalized.height}
-            fit="contain"
-          />
-        </Canvas>
-      </View>
-    );
-  } else if (set.style === "missile") {
-    const angle = playerOrigin.angleBetweenDegrees(targetPosition);
+          <Canvas
+            style={{
+              width: normalized.width,
+              height: normalized.height,
+              top: set.topOffset ? `${set.topOffset}%` : 0,
+              left: set.leftOffset ? `${set.leftOffset}%` : 0,
+            }}
+          >
+            <Image
+              image={animatedImage.getCurrentFrame()}
+              x={0}
+              y={0}
+              width={normalized.width}
+              height={normalized.height}
+              fit="contain"
+            />
+          </Canvas>
+        </View>
+      );
+    } else if (set.style === "missile") {
+      const angle = playerOrigin.angleBetweenDegrees(targetPoint);
 
-    return (
-      <Animated.View
-        style={{
-          position: "absolute",
-          left: initialPosition.x,
-          top: initialPosition.y,
-          width: normalized.width,
-          height: normalized.height,
-          zIndex: 9999,
-          transform: [
-            { translateX: animXY.x },
-            { translateY: animXY.y },
-            { rotate: `${angle}deg` },
-          ],
-        }}
-      >
-        <Canvas
+      return (
+        <Animated.View
           style={{
+            position: "absolute",
+            left: initialPosition.x,
+            top: initialPosition.y,
             width: normalized.width,
             height: normalized.height,
             zIndex: 9999,
-            top: set.topOffset ? `${set.topOffset}%` : 0,
-            left: set.leftOffset ? `${set.leftOffset}%` : 0,
+            transform: [
+              { translateX: animXY.x },
+              { translateY: animXY.y },
+              { rotate: `${angle}deg` },
+            ],
           }}
         >
-          <Image
-            image={animatedImage.getCurrentFrame()}
-            x={0}
-            y={0}
-            width={normalized.width}
-            height={normalized.height}
-            fit="contain"
-          />
-        </Canvas>
-      </Animated.View>
-    );
-  } else {
-    return (
-      <View
-        style={{
-          position: "absolute",
-          left: initialPosition.x,
-          top: initialPosition.y,
-          width: normalized.width,
-          height: normalized.height,
-          zIndex: 9999,
-        }}
-      >
-        <Canvas
+          <Canvas
+            style={{
+              width: normalized.width,
+              height: normalized.height,
+              zIndex: 9999,
+              top: set.topOffset ? `${set.topOffset}%` : 0,
+              left: set.leftOffset ? `${set.leftOffset}%` : 0,
+            }}
+          >
+            <Image
+              image={animatedImage.getCurrentFrame()}
+              x={0}
+              y={0}
+              width={normalized.width}
+              height={normalized.height}
+              fit="contain"
+            />
+          </Canvas>
+        </Animated.View>
+      );
+    } else {
+      return (
+        <View
           style={{
+            position: "absolute",
+            left: initialPosition.x,
+            top: initialPosition.y,
             width: normalized.width,
             height: normalized.height,
-            top: set.topOffset ? `${set.topOffset}%` : 0,
-            left: set.leftOffset ? `${set.leftOffset}%` : 0,
             zIndex: 9999,
           }}
         >
-          <Image
-            image={animatedImage.getCurrentFrame()}
-            x={0}
-            y={0}
-            width={normalized.width}
-            height={normalized.height}
-            fit="contain"
-          />
-        </Canvas>
-      </View>
-    );
-  }
-};
+          <Canvas
+            style={{
+              width: normalized.width,
+              height: normalized.height,
+              top: set.topOffset ? `${set.topOffset}%` : 0,
+              left: set.leftOffset ? `${set.leftOffset}%` : 0,
+              zIndex: 9999,
+            }}
+          >
+            <Image
+              image={animatedImage.getCurrentFrame()}
+              x={0}
+              y={0}
+              width={normalized.width}
+              height={normalized.height}
+              fit="contain"
+            />
+          </Canvas>
+        </View>
+      );
+    }
+  },
+);
 
 const GlowVFX = ({
   glow,
@@ -594,7 +558,7 @@ const GlowVFX = ({
     }
 
     return null;
-  }, [targetIDs, position, playerState?.id, enemyStore.midpointUpdater]);
+  }, [targetIDs, position, playerState?.id]);
 
   useEffect(() => {
     Animated.timing(opacity, {

@@ -10,6 +10,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { AnimationOptions } from "@/utility/animation/enemy";
 import { type Condition } from "@/entities/conditions";
 import { Being } from "@/entities/being";
+import { Vector2 } from "@/utility/Vec2";
 
 const attackHandler = ({
   attackResults,
@@ -396,7 +397,6 @@ export const useCombatActions = () => {
           });
         }
 
-        // skip in case of killed enemy
         targets.forEach((target) => {
           if (target.currentHealth <= 0) {
             if (target instanceof Enemy) {
@@ -423,15 +423,21 @@ export const useCombatActions = () => {
       };
 
       if (attack.animation && typeof attack.animation !== "string") {
-        const targetIDs: string[] = [];
+        const targetMidpoints: Vector2[] = [];
         targets.forEach((target) => {
           if (target instanceof Enemy || target instanceof Character) {
-            targetIDs.push(target.id);
+            const mid = enemyStore.getAnimationStore(target.id)?.spriteMidPoint;
+            if (mid) {
+              targetMidpoints.push(mid);
+            }
           }
         });
 
         playerAnimationStore
-          .setAnimation({ set: attack.animation, enemyIDs: targetIDs })
+          .setAnimation({
+            set: attack.animation,
+            targetMidpoints: targetMidpoints,
+          })
           .then(() => {
             continueAttackFlow();
           });

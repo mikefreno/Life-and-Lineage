@@ -26,14 +26,25 @@ import { Being } from "@/entities/being";
 import { useScaling } from "@/hooks/scaling";
 
 export const AnimatedSprite = observer(
-  ({ enemy, glow }: { enemy: Being; glow?: SharedValue<number> }) => {
+  ({
+    enemy,
+    glow,
+    isInTargetSelection = false,
+  }: {
+    enemy: Being;
+    glow?: SharedValue<number>;
+    isInTargetSelection?: boolean;
+  }) => {
     const spriteContainerRef = useRef<View>(null);
-    const measurementAttempts = useRef(0);
     const [frameCount, setFrameCount] = useState(0);
     const { uiStore, playerAnimationStore, enemyStore } = useRootStore();
 
     const measureAndUpdatePosition = () => {
-      if (spriteContainerRef.current && animationStore) {
+      if (
+        spriteContainerRef.current &&
+        animationStore &&
+        !isInTargetSelection
+      ) {
         spriteContainerRef.current.measure(
           (x, y, width, height, pageX, pageY) => {
             if (width > 0 && height > 0) {
@@ -41,10 +52,6 @@ export const AnimatedSprite = observer(
                 x: pageX + width / 2,
                 y: pageY - uiStore.headerHeight + height / 2,
               });
-              measurementAttempts.current = 0;
-            } else if (measurementAttempts.current < 5) {
-              measurementAttempts.current++;
-              setTimeout(measureAndUpdatePosition, 100);
             }
           },
         );
@@ -52,7 +59,7 @@ export const AnimatedSprite = observer(
     };
 
     const handleLayout = () => {
-      setTimeout(measureAndUpdatePosition, 50);
+      setTimeout(measureAndUpdatePosition, 0);
     };
 
     useEffect(() => {
@@ -323,6 +330,19 @@ export const AnimatedSprite = observer(
           justifyContent: "center",
         }}
       >
+        {__DEV__ && uiStore.showDevDebugUI && (
+          <View
+            style={{
+              backgroundColor: "red",
+              position: "absolute",
+              width: 4,
+              height: 4,
+              top: animationStore?.spriteMidPoint?.y,
+              left: animationStore?.spriteMidPoint?.x,
+              zIndex: 99999,
+            }}
+          />
+        )}
         <View
           style={{
             padding: 20,
@@ -332,7 +352,6 @@ export const AnimatedSprite = observer(
         >
           <Animated.View
             ref={spriteContainerRef}
-            onLayout={handleLayout}
             style={[
               {
                 width: currentDimensions.width,

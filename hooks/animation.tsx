@@ -145,7 +145,7 @@ export const useReanimatedAnimations = () => {
     if (isForwardMovement) {
       const direction = targetPosition.subtract(currentPosition);
       const distance = direction.magnitude();
-      const moveDistance = Math.min(distance, 100);
+      const moveDistance = Math.max(distance * 0.75, 75);
 
       const moveVector =
         distance > 0

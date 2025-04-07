@@ -21,7 +21,7 @@ export class PlayerAnimationStore {
     remainingRefires: number;
   }[] = [];
 
-  targetIDs: string[] | null = null;
+  targetPoint: Vector2 | null = null;
   animationPromiseResolver: (() => void) | null = null;
 
   textString: string | undefined = undefined;
@@ -34,7 +34,7 @@ export class PlayerAnimationStore {
     this.root = root;
 
     this.playerOrigin = Vector2.from({
-      x: this.root.uiStore.dimensions.width / 4,
+      x: this.root.uiStore.dimensions.width / 2.5,
       y: this.root.uiStore.dimensions.height / 2.5,
     });
 
@@ -45,6 +45,7 @@ export class PlayerAnimationStore {
       usedPass: observable,
       animationPromiseResolver: observable,
       refiringAnimationSets: observable,
+      targetPoint: observable,
 
       setAnimation: action,
       clearAnimation: action,
@@ -105,13 +106,13 @@ export class PlayerAnimationStore {
 
   setAnimation({
     set,
-    enemyIDs,
+    targetMidpoints,
   }: {
     set: PlayerAnimationSet;
-    enemyIDs: string[];
+    targetMidpoints: Vector2[];
   }): Promise<void> {
     this.animationSet = set;
-    this.targetIDs = enemyIDs;
+    this.targetPoint = Vector2.multiMidpoint(targetMidpoints);
 
     if (
       this.animationSet?.triggersScreenShake &&
@@ -145,6 +146,6 @@ export class PlayerAnimationStore {
     }
 
     this.animationSet = null;
-    this.targetIDs = null;
+    this.targetPoint = null;
   }
 }

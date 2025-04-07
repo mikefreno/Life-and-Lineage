@@ -26,6 +26,8 @@ import {
 } from "./entityTypes";
 import { Being } from "./being";
 import { jsonServiceStore } from "@/stores/SingletonSource";
+import { EnemyAnimationStore } from "@/stores/EnemyAnimationStore";
+import * as Crypto from "expo-crypto";
 
 /**
  * This class is used as a base class for `Enemy` and `Minion` and is not meant to be instantiated directly.
@@ -40,7 +42,6 @@ export class Creature extends Being {
     this.creatureSpecies = creatureSpecies;
 
     makeObservable(this, {
-      id: observable,
       creatureSpecies: observable,
       nameReference: computed,
     });
@@ -130,23 +131,23 @@ export class Enemy extends Creature {
   }
 
   private updatePhaseProperties(phase: Phase) {
-    // First, get the animation store to properly handle animation cleanup
-    const animationStore = this.root?.enemyStore.getAnimationStore(this.id);
+    if (!this.root) return;
 
-    if (animationStore) {
-      // Reset animation state before changing properties
-      animationStore.concludeAnimation();
-      animationStore.clearProjectileSet();
-      animationStore.clearGlow();
+    this.root.enemyStore.clearPersistedEnemy(this.id);
+    const newId = Crypto.randomUUID();
+    runInAction(() => {
+      this.id = newId;
+    });
 
-      // Queue idle animation to ensure proper state
-      runInAction(() => {
-        animationStore.animationQueue = ["idle"];
-        animationStore.isIdle = true;
-      });
+    const oldStore = this.root.enemyStore.getAnimationStore(this.id);
+    if (oldStore) {
+      oldStore.concludeAnimation();
+      oldStore.clearProjectileSet();
+      oldStore.clearGlow();
+      this.root.enemyStore.animationStoreMap.delete(this.id);
     }
 
-    // Now update the properties
+    // Update properties
     runInAction(() => {
       if (phase.health) {
         this.currentHealth = phase.health;
@@ -177,11 +178,25 @@ export class Enemy extends Creature {
       }
     });
 
-    if (phase.dialogue && animationStore) {
-      runInAction(() => {
-        animationStore.dialogue = phase.dialogue;
+    // Create new animation store with updated sprite
+    if (this.sprite) {
+      const newStore = new EnemyAnimationStore({
+        root: this.root,
+        sprite: this.sprite,
+        id: newId,
       });
+
+      if (phase.dialogue) {
+        runInAction(() => {
+          newStore.dialogue = phase.dialogue;
+        });
+      }
+
+      this.root.enemyStore.animationStoreMap.set(newId, newStore);
     }
+
+    // Update the enemy in storage with new ID
+    this.root.enemyStore.saveEnemy(this);
   }
 
   checkPhaseTransitions(): boolean {

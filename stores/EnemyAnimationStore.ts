@@ -112,6 +112,7 @@ export class EnemyAnimationStore {
       projectileSet: observable,
       activeGlow: observable,
       currentAnimationDetails: observable,
+      dialogue: observable,
 
       setRenderedDimensions: action,
       setCurrentAnimation: action,

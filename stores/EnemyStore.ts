@@ -22,7 +22,6 @@ export default class EnemyStore {
   enemies: Being[];
   animationStoreMap: Map<string, EnemyAnimationStore>;
   root: RootStore;
-  midpointUpdater: number = 0;
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
@@ -37,7 +36,6 @@ export default class EnemyStore {
     makeObservable(this, {
       enemies: observable,
       animationStoreMap: observable,
-      midpointUpdater: observable,
 
       addToEnemyList: action,
       removeEnemy: action,
@@ -45,6 +43,7 @@ export default class EnemyStore {
       _enemyTester: action,
       enemyTurnOngoing: computed,
       allBeings: computed,
+      enemiesIDString: computed,
     });
 
     reaction(
@@ -133,6 +132,10 @@ export default class EnemyStore {
       }),
     );
     this.saveEnemy(enemy);
+  }
+
+  get enemiesIDString() {
+    return this.enemies.map((enemy) => enemy.id);
   }
 
   _bossTester(val: string) {
@@ -309,7 +312,7 @@ export default class EnemyStore {
     }
   }
 
-  private clearPersistedEnemy(enemyId: string) {
+  clearPersistedEnemy(enemyId: string) {
     storage.delete(`enemy_${enemyId}`);
 
     const storedIds = storage.getString("enemyIDs");

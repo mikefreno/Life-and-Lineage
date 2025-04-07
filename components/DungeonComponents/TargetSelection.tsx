@@ -51,7 +51,7 @@ const TargetSelectionRender = observer(() => {
   const handleSelection = (target: Being) => {
     if (showTargetSelection.chosenAttack?.targets == "dual") {
       if (!firstTarget) {
-        setFirstTarget(firstTarget);
+        setFirstTarget(target);
       } else if (firstTarget.equals(target.id)) {
         setFirstTarget(null);
       } else {
@@ -63,6 +63,7 @@ const TargetSelectionRender = observer(() => {
           showing: false,
           chosenAttack: null,
         });
+        setFirstTarget(null);
       }
     } else {
       useAttack({
@@ -107,7 +108,7 @@ const TargetSelectionRender = observer(() => {
               >
                 <View style={flex.rowEvenly}>
                   <View style={{ marginVertical: "auto" }}>
-                    <AnimatedSprite enemy={target} />
+                    <AnimatedSprite enemy={target} isInTargetSelection={true} />
                   </View>
                   <View style={[styles.myAuto, { width: "33%" }]}>
                     <Text style={{ textAlign: "center" }}>

@@ -43,7 +43,7 @@ import {
 import { jsonServiceStore } from "@/stores/SingletonSource";
 
 export class Being {
-  readonly id: string;
+  id: string;
   readonly beingType: BeingType;
   sprite: EnemyImageKeyOption;
 
@@ -160,6 +160,7 @@ export class Being {
     this.root = props.root;
 
     makeObservable(this, {
+      id: observable,
       currentHealth: observable,
       currentSanity: observable,
       currentMana: observable,

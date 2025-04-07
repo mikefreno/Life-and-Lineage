@@ -312,7 +312,7 @@ export const PlayerStatusModal = observer(() => {
             >
               {dungeonStore.inCombat
                 ? "Can't respec during combat"
-                : "No respecs available (potions coming in future release)"}
+                : "No respecs available (potions coming in pvp release)"}
             </Text>
           </Animated.View>
         )}
