@@ -414,8 +414,15 @@ const InvestmentCard = observer(
             </Text>
           </View>
 
-          <View style={[styles.rowEvenly, styles.itemsCenter, styles.py4]}>
-            <View style={[styles.mx12, styles.columnCenter]}>
+          <View
+            style={[
+              styles.rowBetween,
+              styles.itemsCenter,
+              styles.py4,
+              { width: "100%" },
+            ]}
+          >
+            <View style={styles.columnCenter}>
               <View style={styles.rowCenter}>
                 {madeInvestment ? (
                   <Text>
@@ -457,22 +464,16 @@ const InvestmentCard = observer(
                 />
               </View>
             </View>
-            <Pressable
+            <GenericFlatButton
               onPress={() => {
                 vibration({ style: "light" });
                 setShowUpgrades(true);
               }}
-              style={[
-                styles.mx12,
-                styles.roundedBorder,
-                styles.px4,
-                styles.py1,
-              ]}
             >
               <Text style={styles.textCenter}>
                 {`View\nUpgrades `}({investment.upgrades.length})
               </Text>
-            </Pressable>
+            </GenericFlatButton>
           </View>
 
           {!madeInvestment ? (
@@ -508,7 +509,7 @@ const InvestmentCard = observer(
             <Pressable
               onPress={collectOnInvestment}
               disabled={madeInvestment.currentGoldStockPile == 0}
-              style={[styles.mxAuto, styles.mb2]}
+              style={styles.mxAuto}
             >
               {({ pressed }) => (
                 <View
