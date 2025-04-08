@@ -17,70 +17,70 @@ import { useEffect, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { API_BASE_URL } from "@/config/config";
 import { registerForPushNotificationsAsync } from "@/utility/functions/notifications";
-import * as Notifications from "expo-notifications";
+//import * as Notifications from "expo-notifications";
 
 const PVPArena = observer(() => {
-  const { pvpStore, uiStore } = useRootStore();
+  const { uiStore } = useRootStore();
   const styles = useStyles();
   const [showPvPInfoModal, setShowPvPInfoModal] = useState<boolean>(false);
   const vibration = useVibration();
   const [expoPushToken, setExpoPushToken] = useState("");
   const [sentToken, setSentToken] = useState(false);
-  const [_, setNotification] = useState<Notifications.Notification | undefined>(
-    undefined,
-  );
-  const notificationListener = useRef<Notifications.EventSubscription>();
-  const responseListener = useRef<Notifications.EventSubscription>();
+  //const [_, setNotification] = useState<Notifications.Notification | undefined>(
+  //undefined,
+  //);
+  //const notificationListener = useRef<Notifications.EventSubscription>();
+  //const responseListener = useRef<Notifications.EventSubscription>();
 
-  useEffect(() => {
-    const notificationFlow = () => {
-      wait(500).then(() => {
-        registerForPushNotificationsAsync()
-          .then((token) => setExpoPushToken(token ?? ""))
-          .catch((error: any) => setExpoPushToken(`${error}`));
+  //useEffect(() => {
+  //const notificationFlow = () => {
+  //wait(500).then(() => {
+  //registerForPushNotificationsAsync()
+  //.then((token) => setExpoPushToken(token ?? ""))
+  //.catch((error: any) => setExpoPushToken(`${error}`));
 
-        notificationListener.current =
-          Notifications.addNotificationReceivedListener((notification) => {
-            setNotification(notification);
-          });
+  //notificationListener.current =
+  //Notifications.addNotificationReceivedListener((notification) => {
+  //setNotification(notification);
+  //});
 
-        responseListener.current =
-          Notifications.addNotificationResponseReceivedListener(
-            (response) => {},
-          );
+  //responseListener.current =
+  //Notifications.addNotificationResponseReceivedListener(
+  //(response) => {},
+  //);
 
-        return () => {
-          notificationListener.current &&
-            Notifications.removeNotificationSubscription(
-              notificationListener.current,
-            );
-          responseListener.current &&
-            Notifications.removeNotificationSubscription(
-              responseListener.current,
-            );
-        };
-      });
-    };
-    notificationFlow();
-  }, []);
+  //return () => {
+  //notificationListener.current &&
+  //Notifications.removeNotificationSubscription(
+  //notificationListener.current,
+  //);
+  //responseListener.current &&
+  //Notifications.removeNotificationSubscription(
+  //responseListener.current,
+  //);
+  //};
+  //});
+  //};
+  //notificationFlow();
+  //}, []);
 
-  useEffect(() => {
-    if (expoPushToken && !sentToken) {
-      fetch(`${API_BASE_URL}/tokens`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token: expoPushToken }),
-      });
-      setSentToken(true);
-      pvpStore.setExpoPushToken(expoPushToken);
-    }
-  }, [expoPushToken]);
+  //useEffect(() => {
+  //if (expoPushToken && !sentToken) {
+  //fetch(`${API_BASE_URL}/tokens`, {
+  //method: "POST",
+  //headers: {
+  //"Content-Type": "application/json",
+  //},
+  //body: JSON.stringify({ token: expoPushToken }),
+  //});
+  //setSentToken(true);
+  //pvpStore.setExpoPushToken(expoPushToken);
+  //}
+  //}, [expoPushToken]);
 
-  useEffect(() => {
-    pvpStore.sendPlayerToAPI();
-  }, []);
+  //useEffect(() => {
+  //pvpStore.sendPlayerToAPI();
+  //}, []);
 
   return (
     <>
@@ -122,9 +122,9 @@ const PVPArena = observer(() => {
               ...styles.notchMirroredLanscapePad,
             }}
           >
-            {pvpStore.availableOpponents.map((opp) => (
+            {/*{pvpStore.availableOpponents.map((opp) => (
               <ThemedCard key={opp.id}></ThemedCard>
-            ))}
+            ))} */}
           </ScrollView>
         </View>
         <View style={{ flex: 1 }}>

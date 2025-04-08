@@ -25,7 +25,7 @@ import { IAPStore } from "@/stores/IAPStore";
 import { reloadAppAsync } from "expo";
 import { JSONServiceStore } from "./JSONServiceStore";
 import { jsonServiceStore } from "./SingletonSource";
-import { PVPStore } from "./PVPStore";
+//import { PVPStore } from "./PVPStore";
 
 export class RootStore {
   playerState: PlayerCharacter | null;
@@ -43,7 +43,7 @@ export class RootStore {
   audioStore: AudioStore;
   iapStore: IAPStore;
   JSONServiceStore: JSONServiceStore;
-  pvpStore: PVPStore;
+  //pvpStore: PVPStore;
 
   constructed: boolean = false;
   atDeathScreen: boolean = false;
@@ -67,7 +67,6 @@ export class RootStore {
     this.uiStore = new UIStore({ root: this });
 
     this.authStore = new AuthStore({ root: this });
-    this.JSONServiceStore = new JSONServiceStore({ root: this });
 
     this.enemyStore = new EnemyStore({ root: this });
     this.uiStore.markStoreAsLoaded("enemy");
@@ -97,7 +96,6 @@ export class RootStore {
 
     this.shopsStore = new ShopStore({ root: this });
     this.uiStore.markStoreAsLoaded("shops");
-    this.audioStore = new AudioStore({ root: this });
 
     this.tutorialStore = new TutorialStore({ root: this });
     this.uiStore.markStoreAsLoaded("tutorial");
@@ -108,11 +106,15 @@ export class RootStore {
     this.saveStore = new SaveStore({ root: this });
     this.uiStore.markStoreAsLoaded("save");
 
-    this.pvpStore = new PVPStore({ root: this });
+    //this.pvpStore = new PVPStore({ root: this });
     this.iapStore = new IAPStore({
       root: this,
     });
+
+    this.audioStore = new AudioStore({ root: this });
     this.constructed = true;
+
+    this.JSONServiceStore = new JSONServiceStore({ root: this });
 
     makeObservable(this, {
       constructed: observable,

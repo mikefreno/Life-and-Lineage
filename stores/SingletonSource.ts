@@ -189,18 +189,15 @@ export type JSONFileTypeMap = {
   shops: typeof shops;
 };
 
-// Standalone JSON service that doesn't depend on MobX or RootStore
 class JSONService {
   private storage = new MMKV({ id: "json-service" });
   private jsonCache: Partial<JSONFileTypeMap> = {};
   private initialized = false;
 
   constructor() {
-    // Initialize the cache with bundled data
     this.initializeCache();
   }
 
-  // Initialize cache with bundled data
   private initializeCache(): void {
     for (const key of JSONFileOptions) {
       const originalData = this.getOriginalJson(key);
@@ -222,12 +219,10 @@ class JSONService {
       console.warn("JSONService not fully initialized yet");
     }
 
-    // First check in-memory cache for fastest access
     if (this.jsonCache[filename]) {
       return this.jsonCache[filename] as JSONFileTypeMap[T];
     }
 
-    // Then check MMKV storage
     const storedData = this.storage.getString(`json_${filename}`);
     if (storedData) {
       try {
@@ -239,7 +234,6 @@ class JSONService {
       }
     }
 
-    // Fall back to original bundled JSON
     const originalData = this.getOriginalJson(filename);
     this.jsonCache[filename] = originalData; // Cache it
     this.storage.set(`json_${filename}`, JSON.stringify(originalData));
@@ -258,14 +252,12 @@ class JSONService {
         const content = await FileSystem.readAsStringAsync(path);
         const data = JSON.parse(content) as JSONFileTypeMap[T];
 
-        // Update caches
         this.jsonCache[filename] = data;
         this.storage.set(`json_${filename}`, JSON.stringify(data));
 
         return data;
       }
 
-      // If file doesn't exist, return from cache or original
       return this.readJsonFileSync(filename);
     } catch (error) {
       console.error(`Error reading ${filename}.json:`, error);
@@ -273,16 +265,13 @@ class JSONService {
     }
   }
 
-  // Helper method to get the path for a specific JSON file
   getJsonPath(filename: string): string {
     return `${FileSystem.documentDirectory}${filename}.json`;
   }
 
-  // Helper method to get original bundled JSON
   getOriginalJson<T extends JSONFileOptionsType>(
     filename: T,
   ): JSONFileTypeMap[T] {
-    // Map filename to the imported JSON
     const jsonMap: JSONFileTypeMap = {
       // Attack route files
       mageBooks,

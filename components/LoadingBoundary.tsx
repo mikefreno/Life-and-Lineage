@@ -64,6 +64,7 @@ export const LoadingBoundary = observer(
           setTimeout(() => {
             if (isLoading) {
               uiStore.markStoreAsLoaded("inventory");
+              uiStore.markStoreAsLoaded("ambient");
               uiStore.completeLoading();
             }
           }, 2000);

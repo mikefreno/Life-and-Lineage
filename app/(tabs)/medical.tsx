@@ -12,7 +12,7 @@ import { jsonServiceStore } from "@/stores/SingletonSource";
 
 const MedicalScreen = observer(() => {
   const isFocused = useIsFocused();
-  const { uiStore, JSONServiceStore } = useRootStore();
+  const { uiStore } = useRootStore();
   const styles = useStyles();
 
   return (

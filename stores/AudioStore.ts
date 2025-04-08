@@ -15,7 +15,7 @@ import {
   GainNode,
 } from "react-native-audio-api";
 import { Asset } from "expo-asset";
-import { Assets } from "@react-navigation/elements";
+import { parse, stringify } from "flatted";
 
 const AMBIENT_TRACKS = {
   shops: require("@/assets/music/shops.mp3"),
@@ -33,12 +33,12 @@ const COMBAT_TRACKS = {
 
 type COMBAT_TRACK_OPTIONS = keyof typeof COMBAT_TRACKS;
 
-const SOUND_EFFECTS = {
-  bossHit: require("@/assets/sfx/boss_hit.mp3"),
-  //normalHit: require("@/assets/sfx/hit.mp3"), // this track is causing errors
-};
+//const SOUND_EFFECTS = {
+//bossHit: require("@/assets/sfx/boss_hit.mp3"),
+//normalHit: require("@/assets/sfx/hit.mp3"), // this track is causing errors
+//};
 
-type SFX_OPTIONS = keyof typeof SOUND_EFFECTS;
+//type SFX_OPTIONS = keyof typeof SOUND_EFFECTS;
 
 type CrossFadeOptions =
   | {
@@ -78,7 +78,7 @@ export class AudioStore {
 
   ambientTrackBuffers: Map<AMBIENT_TRACK_OPTIONS, AudioBuffer> = new Map();
   combatTrackBuffers: Map<COMBAT_TRACK_OPTIONS, AudioBuffer> = new Map();
-  sfxTrackBuffers: Map<SFX_OPTIONS, AudioBuffer> = new Map();
+  //sfxTrackBuffers: Map<SFX_OPTIONS, AudioBuffer> = new Map();
 
   ranMutedStart: boolean;
 
@@ -185,11 +185,13 @@ export class AudioStore {
         if (!this.currentAudioContext) {
           this.currentAudioContext = new AudioContext();
         }
-        const buffer = await this.currentAudioContext.decodeAudioDataSource(
-          asset.localUri!,
-        );
+        if (asset.localUri) {
+          const buffer = await this.currentAudioContext.decodeAudioDataSource(
+            asset.localUri,
+          );
 
-        loadedCombatBuffers.push([asset.name, buffer]);
+          loadedCombatBuffers.push([asset.name, buffer]);
+        }
       }
       this.combatTrackBuffers = new Map(loadedCombatBuffers);
 
@@ -198,6 +200,7 @@ export class AudioStore {
       runInAction(() => (this.ranMutedStart = false));
     } catch (error) {
       console.warn("Failed to initialize audio buffers", error);
+      this.root.uiStore.markStoreAsLoaded("ambient");
     }
   }
 
@@ -413,7 +416,7 @@ export class AudioStore {
     try {
       const stored = storage.getString("audio_settings");
       if (stored) {
-        const settings = JSON.parse(stored);
+        const settings = parse(stored);
         master = settings.master ?? 1;
         ambient = settings.ambient ?? 1;
         sfx = settings.sfx ?? 1;
@@ -435,7 +438,7 @@ export class AudioStore {
         combat: this.combatMusicVolume,
         muted: this.muted,
       };
-      storage.set("audio_settings", JSON.stringify(settings));
+      storage.set("audio_settings", stringify(settings));
     } catch (error) {
       console.warn("Error persisting settings", error);
     }
@@ -462,7 +465,7 @@ export class AudioStore {
 
       this.ambientTrackBuffers.clear();
       this.combatTrackBuffers.clear();
-      this.sfxTrackBuffers.clear();
+      //this.sfxTrackBuffers.clear();
     } catch (error) {
       console.warn("Error cleaning up audio store:", error);
     }
