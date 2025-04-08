@@ -16,7 +16,7 @@
       "usesAppleSignIn": true,
       "supportsTablet": true,
       "bundleIdentifier": "com.mikefrenodev.lineage",
-      "buildNumber": "0",
+      "buildNumber": "4",
       "entitlements": {
         "com.apple.developer.networking.wifi-info": true,
         "aps-environment": "development"
@@ -83,11 +83,10 @@
         }
       ],
       [
-        "expo-asset",
+        "expo-notifications",
         {
-          "assets": [
-            "./assets/json/necroSpells.json"
-          ]
+          "defaultChannel": "default",
+          "enableBackgroundRemoteNotifications": true
         }
       ]
     ],
@@ -109,4 +108,3 @@
     "owner": "mikefrenodev"
   }
 }
-

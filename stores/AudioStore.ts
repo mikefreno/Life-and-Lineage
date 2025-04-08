@@ -15,13 +15,14 @@ import {
   GainNode,
 } from "react-native-audio-api";
 import { Asset } from "expo-asset";
+import { Assets } from "@react-navigation/elements";
 
 const AMBIENT_TRACKS = {
   shops: require("@/assets/music/shops.mp3"),
-  old: require("@/assets/music/ambient_old.mp3"),
-  middle: require("@/assets/music/ambient_middle.mp3"),
-  young: require("@/assets/music/ambient_young.mp3"),
-  dungeon: require("@/assets/music/ambient_dungeon.mp3"),
+  ambient_old: require("@/assets/music/ambient_old.mp3"),
+  ambient_middle: require("@/assets/music/ambient_middle.mp3"),
+  ambient_young: require("@/assets/music/ambient_young.mp3"),
+  ambient_dungeon: require("@/assets/music/ambient_dungeon.mp3"),
 };
 
 type AMBIENT_TRACK_OPTIONS = keyof typeof AMBIENT_TRACKS;
@@ -54,16 +55,6 @@ const GLOBAL_MULT = 0.8;
 
 type TrackType = "ambient" | "combat" | "sfx";
 
-const scheduleTask =
-  typeof requestIdleCallback !== "undefined"
-    ? requestIdleCallback
-    : (callback: (deadline: any) => void) =>
-        setTimeout(() => {
-          callback({
-            timeRemaining: () => Number.MAX_VALUE,
-          });
-        }, 1);
-
 export class AudioStore {
   root: RootStore;
   masterVolume: number = 1;
@@ -71,8 +62,7 @@ export class AudioStore {
   soundEffectsVolume: number = 1;
   combatMusicVolume: number = 1;
   muted: boolean = false;
-  private initializationPromise: Promise<void> | null = null;
-  isInitializing: boolean = false;
+  isInitializing: boolean = true;
 
   currentAudioContext: AudioContext | undefined = undefined;
   currentPlayer: AudioBufferSourceNode | undefined = undefined;
@@ -104,8 +94,9 @@ export class AudioStore {
 
     if (!this.muted) {
       this.ranMutedStart = false;
-      this.initializeAudio();
-      this.root.uiStore.markStoreAsLoaded("audio");
+      this.initializeAudio().then(() => {
+        this.root.uiStore.markStoreAsLoaded("audio");
+      });
     } else {
       this.mutedStartOverride();
       this.ranMutedStart = true;
@@ -126,6 +117,8 @@ export class AudioStore {
       setMuteValue: action,
       getEffectiveVolume: action,
       initializationInProgress: computed,
+      initializeAudio: action,
+      mutedStartOverride: action,
     });
 
     reaction(
@@ -161,86 +154,51 @@ export class AudioStore {
   }
 
   mutedStartOverride() {
+    this.isInitializing = false;
     this.root.uiStore.markStoreAsLoaded("audio");
     this.root.uiStore.markStoreAsLoaded("ambient");
   }
 
-  initializeAudio() {
-    if (this.muted || this.initializationPromise) {
-      return;
+  async initializeAudio() {
+    try {
+      const loadedAmbientBuffers: [AMBIENT_TRACK_OPTIONS, AudioBuffer][] = [];
+      const ambientAssets = await Asset.loadAsync(
+        Object.values(AMBIENT_TRACKS),
+      );
+      for (const asset of ambientAssets) {
+        if (!this.currentAudioContext) {
+          this.currentAudioContext = new AudioContext();
+        }
+        const buffer = await this.currentAudioContext.decodeAudioDataSource(
+          asset.localUri!,
+        );
+
+        loadedAmbientBuffers.push([asset.name, buffer]);
+      }
+
+      this.ambientTrackBuffers = new Map(loadedAmbientBuffers);
+      this.root.uiStore.markStoreAsLoaded("ambient");
+
+      const loadedCombatBuffers: [COMBAT_TRACK_OPTIONS, AudioBuffer][] = [];
+      const combatAssets = await Asset.loadAsync(Object.values(COMBAT_TRACKS));
+      for (const asset of combatAssets) {
+        if (!this.currentAudioContext) {
+          this.currentAudioContext = new AudioContext();
+        }
+        const buffer = await this.currentAudioContext.decodeAudioDataSource(
+          asset.localUri!,
+        );
+
+        loadedCombatBuffers.push([asset.name, buffer]);
+      }
+      this.combatTrackBuffers = new Map(loadedCombatBuffers);
+
+      this.parseLocationForRelevantTrack();
+      runInAction(() => (this.isInitializing = false));
+      runInAction(() => (this.ranMutedStart = false));
+    } catch (error) {
+      console.warn("Failed to initialize audio buffers", error);
     }
-
-    runInAction(() => {
-      this.isInitializing = true;
-    });
-
-    this.initializationPromise = new Promise((resolve) => {
-      scheduleTask(() => {
-        const loadTracks = async () => {
-          try {
-            const loadedAmbientPromises = Object.entries(AMBIENT_TRACKS).map(
-              async ([key, source]) => {
-                const asset = Asset.fromModule(source);
-                if (!asset.downloaded) {
-                  await asset.downloadAsync();
-                }
-                if (!this.currentAudioContext) {
-                  this.currentAudioContext = new AudioContext();
-                }
-                const buffer =
-                  await this.currentAudioContext.decodeAudioDataSource(
-                    asset.localUri!,
-                  );
-                return [key as AMBIENT_TRACK_OPTIONS, buffer] as const;
-              },
-            );
-
-            const loadedCombatPromises = Object.entries(COMBAT_TRACKS).map(
-              async ([key, source]) => {
-                const asset = Asset.fromModule(source);
-                if (!asset.downloaded) {
-                  await asset.downloadAsync();
-                }
-                if (!this.currentAudioContext) {
-                  this.currentAudioContext = new AudioContext();
-                }
-                const buffer =
-                  await this.currentAudioContext.decodeAudioDataSource(
-                    asset.localUri!,
-                  );
-                return [key as COMBAT_TRACK_OPTIONS, buffer] as const;
-              },
-            );
-
-            const [loadedAmbientBuffers, loadedCombatBuffers] =
-              await Promise.all([
-                Promise.all(loadedAmbientPromises),
-                Promise.all(loadedCombatPromises),
-              ]);
-
-            runInAction(() => {
-              this.ambientTrackBuffers = new Map(loadedAmbientBuffers);
-              this.combatTrackBuffers = new Map(loadedCombatBuffers);
-            });
-
-            this.root.uiStore.markStoreAsLoaded("ambient");
-            this.parseLocationForRelevantTrack();
-          } catch (error) {
-            console.warn("Failed to initialize audio buffers", error);
-          } finally {
-            this.initializationPromise = null;
-            runInAction(() => {
-              this.isInitializing = false;
-            });
-            resolve();
-          }
-        };
-
-        loadTracks();
-      });
-    });
-
-    return this.initializationPromise;
   }
 
   private parseLocationForRelevantTrack(current?: any, previous?: any) {
@@ -277,12 +235,16 @@ export class AudioStore {
     let selectedTrack: keyof typeof AMBIENT_TRACKS;
     const playerAge = this.root.playerState?.age ?? 0;
     if (this.root.dungeonStore.isInDungeon) {
-      selectedTrack = "dungeon";
+      selectedTrack = "ambient_dungeon";
     } else if (this.root.shopsStore.inMarket) {
       selectedTrack = "shops";
     } else {
       selectedTrack =
-        playerAge < 30 ? "young" : playerAge < 60 ? "middle" : "old";
+        playerAge < 30
+          ? "ambient_young"
+          : playerAge < 60
+          ? "ambient_middle"
+          : "ambient_old";
     }
     this.crossFade({ type: "ambient", newTrack: selectedTrack });
   }
@@ -393,10 +355,6 @@ export class AudioStore {
   }
 
   async setMuteValue(val: boolean) {
-    if (this.initializationPromise) {
-      await this.initializationPromise;
-    }
-
     runInAction(() => {
       this.muted = val;
     });
@@ -409,9 +367,15 @@ export class AudioStore {
         this.currentPlayer.disconnect();
         runInAction(() => (this.currentPlayer = undefined));
       }
+      if (this.outBoundPlayer) {
+        this.outBoundPlayer.stop();
+        this.outBoundPlayer.disconnect();
+        runInAction(() => (this.outBoundPlayer = undefined));
+      }
     } else {
       this.currentAudioContext = new AudioContext();
       if (this.ranMutedStart) {
+        runInAction(() => (this.isInitializing = true));
         await this.initializeAudio();
       } else {
         this.parseLocationForRelevantTrack();
