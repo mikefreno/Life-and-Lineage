@@ -2,16 +2,8 @@ import { AIPlayerCharacter } from "@/entities/playerCharacterAI";
 import { RootStore } from "./RootStore";
 import { API_BASE_URL } from "@/config/config";
 import { storage } from "@/utility/functions/storage";
-import {
-  action,
-  computed,
-  makeObservable,
-  observable,
-  reaction,
-  runInAction,
-} from "mobx";
+import { action, computed, makeObservable, observable, reaction } from "mobx";
 import DeviceInfo from "react-native-device-info";
-import * as Notifications from "expo-notifications";
 
 export class PVPStore {
   root: RootStore;
@@ -26,16 +18,13 @@ export class PVPStore {
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
-    this.hydrate().then(
-      ({ linkID, expoPushToken, notificationsEnabled, pvpName }) => {
-        runInAction(() => {
-          this.linkID = linkID;
-          this.expoPushToken = expoPushToken;
-          this.notificationsEnabled = notificationsEnabled;
-          this.pvpName = pvpName ?? this.root.playerState?.fullName;
-        });
-      },
-    );
+    const { linkID, expoPushToken, notificationsEnabled, pvpName } =
+      this.hydrate();
+
+    this.linkID = linkID;
+    this.expoPushToken = expoPushToken;
+    this.notificationsEnabled = notificationsEnabled;
+    this.pvpName = pvpName ?? this.root.playerState?.fullName;
 
     makeObservable(this, {
       availableOpponents: observable,
@@ -151,10 +140,10 @@ export class PVPStore {
     }
   }
 
-  async hydrate() {
+  hydrate() {
     const notificationsEnabled: boolean =
-      storage.getBoolean("pvpNotifications") ??
-      (await Notifications.getPermissionsAsync().then((res) => res.granted));
+      storage.getBoolean("pvpNotifications") ?? false;
+
     const expoPushToken = storage.getString("expoPushToken");
     const linkID = storage.getString("linkID") ?? DeviceInfo.getUniqueIdSync();
     const pvpName = storage.getString("pvpName");
