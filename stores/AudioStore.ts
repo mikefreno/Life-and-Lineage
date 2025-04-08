@@ -28,7 +28,7 @@ const AMBIENT_TRACKS = {
 type AMBIENT_TRACK_OPTIONS = keyof typeof AMBIENT_TRACKS;
 
 const COMBAT_TRACKS = {
-  basic: require("@/assets/music/combat.mp3"),
+  combat: require("@/assets/music/combat.mp3"),
 };
 
 type COMBAT_TRACK_OPTIONS = keyof typeof COMBAT_TRACKS;
@@ -143,7 +143,7 @@ export class AudioStore {
         try {
           this.parseLocationForRelevantTrack(current, previous);
         } catch (error) {
-          console.warn("Error in location reaction", error);
+          console.error("Error in location reaction", error);
         }
       },
     );
@@ -160,6 +160,7 @@ export class AudioStore {
   }
 
   async initializeAudio() {
+    console.log("called init");
     try {
       const loadedAmbientBuffers: [AMBIENT_TRACK_OPTIONS, AudioBuffer][] = [];
       const ambientAssets = await Asset.loadAsync(
@@ -173,11 +174,11 @@ export class AudioStore {
           asset.localUri!,
         );
 
-        loadedAmbientBuffers.push([asset.name, buffer]);
+        loadedAmbientBuffers.push([
+          asset.name as AMBIENT_TRACK_OPTIONS,
+          buffer,
+        ]);
       }
-
-      this.ambientTrackBuffers = new Map(loadedAmbientBuffers);
-      this.root.uiStore.markStoreAsLoaded("ambient");
 
       const loadedCombatBuffers: [COMBAT_TRACK_OPTIONS, AudioBuffer][] = [];
       const combatAssets = await Asset.loadAsync(Object.values(COMBAT_TRACKS));
@@ -190,16 +191,22 @@ export class AudioStore {
             asset.localUri,
           );
 
-          loadedCombatBuffers.push([asset.name, buffer]);
+          loadedCombatBuffers.push([
+            asset.name as COMBAT_TRACK_OPTIONS,
+            buffer,
+          ]);
         }
       }
+
+      this.ambientTrackBuffers = new Map(loadedAmbientBuffers);
+      this.root.uiStore.markStoreAsLoaded("ambient");
       this.combatTrackBuffers = new Map(loadedCombatBuffers);
 
       this.parseLocationForRelevantTrack();
       runInAction(() => (this.isInitializing = false));
       runInAction(() => (this.ranMutedStart = false));
     } catch (error) {
-      console.warn("Failed to initialize audio buffers", error);
+      console.error("Failed to initialize audio buffers", error);
       this.root.uiStore.markStoreAsLoaded("ambient");
     }
   }
@@ -207,6 +214,7 @@ export class AudioStore {
   private parseLocationForRelevantTrack(current?: any, previous?: any) {
     if (this.muted) return;
 
+    console.log("called parse");
     try {
       if (!previous || !current) {
         if (this.root.dungeonStore.inCombat) {
@@ -256,7 +264,7 @@ export class AudioStore {
    * Currently only one combat track exists (basic), eventually, will select based on the current enemy or interface
    */
   playCombat() {
-    this.crossFade({ type: "combat", newTrack: "basic" });
+    this.crossFade({ type: "combat", newTrack: "combat" });
   }
 
   crossFade({ type, newTrack }: CrossFadeOptions) {

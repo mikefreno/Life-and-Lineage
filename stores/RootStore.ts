@@ -25,7 +25,7 @@ import { IAPStore } from "@/stores/IAPStore";
 import { reloadAppAsync } from "expo";
 import { JSONServiceStore } from "./JSONServiceStore";
 import { jsonServiceStore } from "./SingletonSource";
-//import { PVPStore } from "./PVPStore";
+import { PVPStore } from "./PVPStore";
 
 export class RootStore {
   playerState: PlayerCharacter | null;
@@ -43,7 +43,7 @@ export class RootStore {
   audioStore: AudioStore;
   iapStore: IAPStore;
   JSONServiceStore: JSONServiceStore;
-  //pvpStore: PVPStore;
+  pvpStore: PVPStore;
 
   constructed: boolean = false;
   atDeathScreen: boolean = false;
@@ -68,8 +68,9 @@ export class RootStore {
 
     this.authStore = new AuthStore({ root: this });
 
-    this.enemyStore = new EnemyStore({ root: this });
-    this.uiStore.markStoreAsLoaded("enemy");
+    this.iapStore = new IAPStore({
+      root: this,
+    });
 
     this.uiStore.markStoreAsLoaded("auth");
     __DEV__ ?? this.uiStore.markStoreAsLoaded("inventory");
@@ -82,11 +83,13 @@ export class RootStore {
       ? PlayerCharacter.fromJSON({ ...parse(retrieved_player), root: this })
       : null;
     if (!this.playerState) {
-      runInAction(() => (this.uiStore.storeLoadingStatus.inventory = true));
+      runInAction(() => this.uiStore.markStoreAsLoaded("inventory"));
     }
     this.playerAnimationStore = new PlayerAnimationStore({ root: this });
-
     this.uiStore.markStoreAsLoaded("player");
+
+    this.enemyStore = new EnemyStore({ root: this });
+    this.uiStore.markStoreAsLoaded("enemy");
 
     this.dungeonStore = new DungeonStore({ root: this });
     this.uiStore.markStoreAsLoaded("dungeon");
@@ -106,11 +109,7 @@ export class RootStore {
     this.saveStore = new SaveStore({ root: this });
     this.uiStore.markStoreAsLoaded("save");
 
-    //this.pvpStore = new PVPStore({ root: this });
-    this.iapStore = new IAPStore({
-      root: this,
-    });
-
+    this.pvpStore = new PVPStore({ root: this });
     this.audioStore = new AudioStore({ root: this });
     this.constructed = true;
 
