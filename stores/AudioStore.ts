@@ -1,6 +1,5 @@
 import {
   action,
-  computed,
   makeObservable,
   observable,
   reaction,
@@ -116,7 +115,6 @@ export class AudioStore {
       setAudioLevel: action,
       setMuteValue: action,
       getEffectiveVolume: action,
-      initializationInProgress: computed,
       initializeAudio: action,
       mutedStartOverride: action,
     });
@@ -149,10 +147,6 @@ export class AudioStore {
     );
   }
 
-  get initializationInProgress(): boolean {
-    return this.isInitializing;
-  }
-
   mutedStartOverride() {
     this.isInitializing = false;
     this.root.uiStore.markStoreAsLoaded("audio");
@@ -160,7 +154,6 @@ export class AudioStore {
   }
 
   async initializeAudio() {
-    console.log("called init");
     try {
       const loadedAmbientBuffers: [AMBIENT_TRACK_OPTIONS, AudioBuffer][] = [];
       const ambientAssets = await Asset.loadAsync(
@@ -214,7 +207,6 @@ export class AudioStore {
   private parseLocationForRelevantTrack(current?: any, previous?: any) {
     if (this.muted) return;
 
-    console.log("called parse");
     try {
       if (!previous || !current) {
         if (this.root.dungeonStore.inCombat) {

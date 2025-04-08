@@ -109,11 +109,17 @@ export class RootStore {
     this.saveStore = new SaveStore({ root: this });
     this.uiStore.markStoreAsLoaded("save");
 
-    this.pvpStore = new PVPStore({ root: this });
     this.audioStore = new AudioStore({ root: this });
     this.constructed = true;
 
-    this.JSONServiceStore = new JSONServiceStore({ root: this });
+    setTimeout(
+      () =>
+        runInAction(() => {
+          this.pvpStore = new PVPStore({ root: this });
+          this.JSONServiceStore = new JSONServiceStore({ root: this });
+        }),
+      1500,
+    );
 
     makeObservable(this, {
       constructed: observable,

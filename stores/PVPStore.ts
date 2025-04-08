@@ -75,7 +75,7 @@ export class PVPStore {
   async sendPlayerToAPI() {
     if (this.root.playerState) {
       const asAI = AIPlayerCharacter.create(this.root.playerState);
-      const res = await fetch(`http://192.168.0.163:3000/api/lineage/pvp`, {
+      const res = await fetch(`${API_BASE_URL}/pvp`, {
         method: "POST",
         body: JSON.stringify({
           character: {
