@@ -3,8 +3,7 @@ import { RootStore } from "@/stores/RootStore";
 import { type SharedValue, useSharedValue } from "react-native-reanimated";
 import { DraggableDataStore } from "@/stores/DraggableDataStore";
 
-const rootStore = new RootStore();
-export const StoreContext = createContext<RootStore>(rootStore);
+export const StoreContext = createContext<RootStore | undefined>(undefined);
 
 export const DragContext = createContext<
   | {
@@ -20,7 +19,13 @@ export const DragContext = createContext<
   | undefined
 >(undefined);
 
-const StoreProvider = ({ children }: { children: ReactNode }) => {
+const StoreProvider = ({
+  children,
+  rootStore,
+}: {
+  children: ReactNode;
+  rootStore: RootStore;
+}) => {
   return (
     <StoreContext.Provider value={rootStore}>{children}</StoreContext.Provider>
   );
@@ -50,9 +55,15 @@ const DraggableDataProvider = ({ children }: { children: ReactNode }) => {
   return <DragContext.Provider value={store}>{children}</DragContext.Provider>;
 };
 
-export const AppProvider = ({ children }: { children: ReactNode }) => {
+export const AppProvider = ({
+  children,
+  rootStore,
+}: {
+  children: ReactNode;
+  rootStore: RootStore;
+}) => {
   return (
-    <StoreProvider>
+    <StoreProvider rootStore={rootStore}>
       <DraggableDataProvider>{children}</DraggableDataProvider>
     </StoreProvider>
   );

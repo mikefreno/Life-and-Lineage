@@ -1,6 +1,6 @@
 import { useFonts } from "expo-font";
 import { Stack, usePathname, useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { Platform, Pressable, View, StyleSheet, UIManager } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
@@ -35,7 +35,7 @@ import {
   configureReanimatedLogger,
   ReanimatedLogLevel,
 } from "react-native-reanimated";
-import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import PlatformDependantGestureWrapper from "@/components/PlatformDependantGestureWrapper";
 import { SCREEN_TRANSITION_TIMING } from "@/stores/UIStore";
@@ -45,7 +45,9 @@ import TutorialModal from "@/components/TutorialModal";
 import { TutorialOption } from "@/utility/types";
 import { HeaderBackButton } from "@react-navigation/elements";
 import { useVibration } from "@/hooks/generic";
-import D20DieAnimation from "@/components/DieRollAnim";
+import { AudioToggle } from "@/components/AudioToggle";
+import { useAssets } from "expo-asset";
+import { AMBIENT_TRACKS, COMBAT_TRACKS } from "@/stores/AudioStore";
 
 global.atob = decode;
 
@@ -110,6 +112,9 @@ const Root = () => {
     CursiveBold: require("@/assets/fonts/Tangerine-Bold.ttf"),
   });
 
+  const [ambientMusicAssets, aerror] = useAssets(AMBIENT_TRACKS);
+  const [combatMusicAssets, cerrer] = useAssets(COMBAT_TRACKS);
+
   useEffect(() => {
     if (error) {
       console.error(error);
@@ -118,13 +123,22 @@ const Root = () => {
       SplashScreen.hideAsync();
     }
   }, [mainFontLoaded, error]);
+  if (aerror || cerrer) {
+    throw aerror || cerrer;
+  }
 
-  while (!mainFontLoaded) {
+  const rootStore = useMemo(() => {
+    if (ambientMusicAssets && combatMusicAssets) {
+      return new RootStore({ ambientMusicAssets, combatMusicAssets });
+    }
+  }, [ambientMusicAssets, combatMusicAssets]);
+
+  while (!mainFontLoaded || !rootStore) {
     return null;
   }
 
   return (
-    <AppProvider>
+    <AppProvider rootStore={rootStore}>
       <DungeonProvider>
         <SafeAreaProvider>
           <ErrorBoundary>
@@ -577,7 +591,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                     style={{ marginLeft: -16 }}
                   />
                 ),
-                headerRight: () => <AudioToggleButton />,
+                headerRight: () => <AudioToggle />,
                 title: "PvP Home",
               }}
             />
@@ -620,7 +634,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                     )}
                   </Pressable>
                 ),
-                headerRight: () => <AudioToggleButton />,
+                headerRight: () => <AudioToggle />,
                 title: dungeonStore.currentLevel?.nameOverride
                   ? dungeonStore.currentLevel?.nameOverride
                   : dungeonStore.currentInstance?.name.toLowerCase() ===
@@ -670,41 +684,3 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
 });
 
 export default Sentry.wrap(Root);
-
-const AudioToggleButton = observer(() => {
-  const { audioStore, uiStore } = useRootStore();
-  const vibration = useVibration();
-
-  return (
-    <Pressable
-      onPress={() => {
-        if (!audioStore.isInitializing) {
-          vibration({ style: "light" });
-          audioStore.setMuteValue(!audioStore.muted);
-        }
-      }}
-      accessibilityRole="button"
-      accessibilityLabel={`Toggle audio ${audioStore.muted ? "on" : "off"}`}
-    >
-      {audioStore.isInitializing ? (
-        <D20DieAnimation
-          keepRolling
-          showNumber={false}
-          size={uiStore.iconSizeXL}
-        />
-      ) : audioStore.muted ? (
-        <MaterialIcons
-          name="music-off"
-          size={uiStore.iconSizeXL}
-          color={uiStore.isDark ? "#fafafa" : "#27272a"}
-        />
-      ) : (
-        <MaterialIcons
-          name="music-note"
-          size={uiStore.iconSizeXL}
-          color={uiStore.isDark ? "#fafafa" : "#27272a"}
-        />
-      )}
-    </Pressable>
-  );
-});

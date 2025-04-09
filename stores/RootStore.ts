@@ -20,12 +20,13 @@ import { StashStore } from "@/stores/StashStore";
 import { SaveStore } from "@/stores/SaveStore";
 import { AudioStore } from "@/stores/AudioStore";
 import { PlayerAnimationStore } from "@/stores/PlayerAnimationStore";
-import { flipCoin } from "@/utility/functions/misc";
+import { flipCoin, wait } from "@/utility/functions/misc";
 import { IAPStore } from "@/stores/IAPStore";
 import { reloadAppAsync } from "expo";
 import { JSONServiceStore } from "./JSONServiceStore";
 import { jsonServiceStore } from "./SingletonSource";
 import { PVPStore } from "./PVPStore";
+import { Asset } from "expo-asset";
 
 export class RootStore {
   playerState: PlayerCharacter | null;
@@ -63,7 +64,13 @@ export class RootStore {
     initVal?: number | undefined;
   }[] = [];
 
-  constructor() {
+  constructor({
+    ambientMusicAssets,
+    combatMusicAssets,
+  }: {
+    ambientMusicAssets: Asset[];
+    combatMusicAssets: Asset[];
+  }) {
     this.uiStore = new UIStore({ root: this });
 
     this.authStore = new AuthStore({ root: this });
@@ -109,17 +116,17 @@ export class RootStore {
     this.saveStore = new SaveStore({ root: this });
     this.uiStore.markStoreAsLoaded("save");
 
-    this.audioStore = new AudioStore({ root: this });
+    this.audioStore = new AudioStore({
+      root: this,
+      ambientMusicAssets,
+      combatMusicAssets,
+    });
+    this.uiStore.markStoreAsLoaded("audio");
+
     this.constructed = true;
 
-    setTimeout(
-      () =>
-        runInAction(() => {
-          this.pvpStore = new PVPStore({ root: this });
-          this.JSONServiceStore = new JSONServiceStore({ root: this });
-        }),
-      1500,
-    );
+    this.pvpStore = new PVPStore({ root: this });
+    this.JSONServiceStore = new JSONServiceStore({ root: this });
 
     makeObservable(this, {
       constructed: observable,

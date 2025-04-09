@@ -16,7 +16,7 @@
       "usesAppleSignIn": true,
       "supportsTablet": true,
       "bundleIdentifier": "com.mikefrenodev.lineage",
-      "buildNumber": "14",
+      "buildNumber": "24",
       "entitlements": {
         "com.apple.developer.networking.wifi-info": true,
         "aps-environment": "development"
