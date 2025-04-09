@@ -128,8 +128,7 @@ const DungeonLevelScreen = observer(() => {
                   resolve();
                   uiStore.incrementLoadingStep();
                 } else {
-                  audioStore.cleanup();
-                  audioStore.initializeAudio();
+                  resolve();
                   uiStore.incrementLoadingStep();
                 }
               }, 1000);

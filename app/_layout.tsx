@@ -1,6 +1,6 @@
 import { useFonts } from "expo-font";
 import { Stack, usePathname, useRouter } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { Platform, Pressable, View, StyleSheet, UIManager } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
@@ -35,7 +35,7 @@ import {
   configureReanimatedLogger,
   ReanimatedLogLevel,
 } from "react-native-reanimated";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import PlatformDependantGestureWrapper from "@/components/PlatformDependantGestureWrapper";
 import { SCREEN_TRANSITION_TIMING } from "@/stores/UIStore";
@@ -46,8 +46,12 @@ import { TutorialOption } from "@/utility/types";
 import { HeaderBackButton } from "@react-navigation/elements";
 import { useVibration } from "@/hooks/generic";
 import { AudioToggle } from "@/components/AudioToggle";
-import { useAssets } from "expo-asset";
-import { AMBIENT_TRACKS, COMBAT_TRACKS } from "@/stores/AudioStore";
+import {
+  AMBIENT_TRACK_OPTIONS,
+  COMBAT_TRACK_OPTIONS,
+  getAmbientLocalURIs,
+  getCombatLocalURIs,
+} from "@/utility/audio";
 
 global.atob = decode;
 
@@ -111,9 +115,28 @@ const Root = () => {
     Cursive: require("@/assets/fonts/Tangerine-Regular.ttf"),
     CursiveBold: require("@/assets/fonts/Tangerine-Bold.ttf"),
   });
+  const [hasSetURIs, setHasSetURIs] = useState(false);
+  const ambientURIsRef = useRef<Partial<Record<AMBIENT_TRACK_OPTIONS, string>>>(
+    {},
+  );
+  const combatURIsRef = useRef<Partial<Record<COMBAT_TRACK_OPTIONS, string>>>(
+    {},
+  );
+  useEffect(() => {
+    const loadAudioAssets = async () => {
+      try {
+        const ambientURIs = await getAmbientLocalURIs();
+        const combatURIs = await getCombatLocalURIs();
+        ambientURIsRef.current = ambientURIs;
+        combatURIsRef.current = combatURIs;
+        setHasSetURIs(true);
+      } catch (assetLoadingError) {
+        console.error("Audio asset loading error:", assetLoadingError);
+      }
+    };
 
-  const [ambientMusicAssets, aerror] = useAssets(AMBIENT_TRACKS);
-  const [combatMusicAssets, cerrer] = useAssets(COMBAT_TRACKS);
+    loadAudioAssets();
+  }, []);
 
   useEffect(() => {
     if (error) {
@@ -123,22 +146,16 @@ const Root = () => {
       SplashScreen.hideAsync();
     }
   }, [mainFontLoaded, error]);
-  if (aerror || cerrer) {
-    throw aerror || cerrer;
-  }
 
-  const rootStore = useMemo(() => {
-    if (ambientMusicAssets && combatMusicAssets) {
-      return new RootStore({ ambientMusicAssets, combatMusicAssets });
-    }
-  }, [ambientMusicAssets, combatMusicAssets]);
-
-  while (!mainFontLoaded || !rootStore) {
+  while (!mainFontLoaded || !hasSetURIs) {
     return null;
   }
 
   return (
-    <AppProvider rootStore={rootStore}>
+    <AppProvider
+      ambientURIs={ambientURIsRef.current}
+      combatURIs={combatURIsRef.current}
+    >
       <DungeonProvider>
         <SafeAreaProvider>
           <ErrorBoundary>

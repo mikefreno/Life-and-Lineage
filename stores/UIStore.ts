@@ -72,7 +72,7 @@ export type LoadingStores =
   | "stash"
   | "save"
   | "audio"
-  | "ambient"
+  //| "ambient"
   | "fonts"
   | "routing"
   | "iaps";
@@ -133,7 +133,7 @@ export default class UIStore {
     stash: false,
     save: false,
     audio: false,
-    ambient: false,
+    //ambient: false,
     fonts: false,
     routing: false,
     iaps: false,

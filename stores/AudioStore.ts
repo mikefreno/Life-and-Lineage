@@ -11,37 +11,16 @@ import {
   AudioBuffer,
   AudioBufferSourceNode,
   AudioContext,
-  //AudioManager,
   GainNode,
 } from "react-native-audio-api";
-import { Asset } from "expo-asset";
+import {
+  AMBIENT_TRACK_OPTIONS,
+  AMBIENT_TRACKS,
+  COMBAT_TRACK_OPTIONS,
+  COMBAT_TRACKS,
+  SFX_OPTIONS,
+} from "@/utility/audio";
 import { parse, stringify } from "flatted";
-
-export const AMBIENT_TRACKS = [
-  require("@/assets/music/shops.mp3"),
-  require("@/assets/music/ambient_old.mp3"),
-  require("@/assets/music/ambient_middle.mp3"),
-  require("@/assets/music/ambient_young.mp3"),
-  require("@/assets/music/ambient_dungeon.mp3"),
-];
-
-type AMBIENT_TRACK_OPTIONS =
-  | "shops"
-  | "ambient_old"
-  | "ambient_middle"
-  | "ambient_young"
-  | "ambient_dungeon";
-
-export const COMBAT_TRACKS = [require("@/assets/music/combat.mp3")];
-
-type COMBAT_TRACK_OPTIONS = "combat";
-
-const SOUND_EFFECTS = {
-  bossHit: require("@/assets/sfx/boss_hit.mp3"),
-  //normalHit: require("@/assets/sfx/hit.mp3"), // this track is causing errors
-};
-
-type SFX_OPTIONS = keyof typeof SOUND_EFFECTS;
 
 type CrossFadeOptions =
   | {
@@ -54,7 +33,7 @@ type CrossFadeOptions =
     };
 
 const DEFAULT_FADE = 2000;
-const GLOBAL_MULT = 0.9;
+const GLOBAL_MULT = 0.8;
 
 type TrackType = "ambient" | "combat" | "sfx";
 
@@ -66,59 +45,47 @@ export class AudioStore {
   soundEffectsVolume: number = 1;
   combatMusicVolume: number = 1;
   muted: boolean = false;
-  audioContextState: "suspended" | "running" | "closed" = "suspended";
+
+  ambientURIs: Partial<Record<AMBIENT_TRACK_OPTIONS, string>>;
+  combatURIs: Partial<Record<COMBAT_TRACK_OPTIONS, string>>;
 
   currentAudioContext: AudioContext | undefined = undefined;
   currentPlayer: AudioBufferSourceNode | undefined = undefined;
   currentEnvelope: GainNode | undefined = undefined;
-  storedTimeOnMute: number | undefined;
+  storedTimeOnMute: number | undefined = undefined;
   currentlyPlayingTrack:
     | AMBIENT_TRACK_OPTIONS
     | COMBAT_TRACK_OPTIONS
     | undefined = undefined;
 
-  outBoundAudioContext: AudioContext | undefined = undefined;
+  outBoundAudioContext = new AudioContext();
   outBoundPlayer: AudioBufferSourceNode | undefined = undefined;
+  //isInitializing: boolean = true;
 
   ambientTrackBuffers: Map<AMBIENT_TRACK_OPTIONS, AudioBuffer> = new Map();
   combatTrackBuffers: Map<COMBAT_TRACK_OPTIONS, AudioBuffer> = new Map();
   sfxTrackBuffers: Map<SFX_OPTIONS, AudioBuffer> = new Map();
-  isInitializing: boolean = true;
-  ambientMusicAssets: Asset[];
-  combatMusicAssets: Asset[];
 
   constructor({
     root,
-    ambientMusicAssets,
-    combatMusicAssets,
+    ambientURIs,
+    combatURIs,
   }: {
     root: RootStore;
-    ambientMusicAssets: Asset[];
-    combatMusicAssets: Asset[];
+    ambientURIs: Partial<Record<AMBIENT_TRACK_OPTIONS, string>>;
+    combatURIs: Partial<Record<COMBAT_TRACK_OPTIONS, string>>;
   }) {
     this.root = root;
-    this.ambientMusicAssets = ambientMusicAssets;
-    this.combatMusicAssets = combatMusicAssets;
-
-    const { muted, master, ambient, combat, sfx } =
+    this.ambientURIs = ambientURIs;
+    this.combatURIs = combatURIs;
+    const { ambient, muted, master, sfx, combat } =
       this.loadPersistedSettings();
     this.muted = muted;
-    this.masterVolume = master;
     this.ambientMusicVolume = ambient;
-    this.combatMusicVolume = combat;
+    this.masterVolume = master;
     this.soundEffectsVolume = sfx;
-
-    if (!this.muted) {
-      //AudioManager.setAudioSessionOptions({
-      //iosMode: "default",
-      //iosCategory: "ambient",
-      //iosOptions: ["duckOthers", "allowBluetooth"],
-      //});
-      this.currentAudioContext = new AudioContext();
-      this.initializeAudio().then(() => this.parseLocationForRelevantTrack());
-    } else {
-      this.mutedStartOverride();
-    }
+    this.combatMusicVolume = combat;
+    //this.parseLocationForRelevantTrack();
 
     makeObservable(this, {
       masterVolume: observable,
@@ -126,16 +93,26 @@ export class AudioStore {
       soundEffectsVolume: observable,
       combatMusicVolume: observable,
       muted: observable,
+      ambientTrackBuffers: observable,
+      combatTrackBuffers: observable,
+      currentAudioContext: observable,
+      currentEnvelope: observable,
+      storedTimeOnMute: observable,
+      currentlyPlayingTrack: observable,
+      outBoundAudioContext: observable,
 
       currentPlayer: observable,
       outBoundPlayer: observable,
-      isInitializing: observable,
 
+      //isInitializing: observable,
+
+      createBuffer: action,
       cleanup: action,
       crossFade: action,
       setAudioLevel: action,
       setMuteValue: action,
       getEffectiveVolume: action,
+      updatePlayingAudioLevel: action,
     });
 
     reaction(
@@ -153,7 +130,7 @@ export class AudioStore {
       () => ({
         inDungeon: this.root.dungeonStore.isInDungeon,
         inMarket: this.root.shopsStore.inMarket,
-        playerAge: this.root.playerState?.age ?? 0,
+        playerAge: this.root.playerState?.age,
         inCombat: this.root.dungeonStore.inCombat,
       }),
       (current, previous) => {
@@ -166,62 +143,27 @@ export class AudioStore {
     );
   }
 
-  mutedStartOverride() {
-    this.isInitializing = false;
-    //this.root.uiStore.markStoreAsLoaded("audio");
-    this.root.uiStore.markStoreAsLoaded("ambient");
-  }
-
-  async initializeAudio() {
-    try {
-      if (!this.currentAudioContext) {
-        this.currentAudioContext = new AudioContext();
-      }
-      if (this.ambientTrackBuffers.size === 0) {
-        const loadedAmbientBuffers: [AMBIENT_TRACK_OPTIONS, AudioBuffer][] = [];
-
-        for (const ambientAsset of this.ambientMusicAssets) {
-          const buffer = await this.currentAudioContext.decodeAudioDataSource(
-            ambientAsset.localUri!,
-          );
-          loadedAmbientBuffers.push([
-            ambientAsset.name as AMBIENT_TRACK_OPTIONS,
-            buffer,
-          ]);
-        }
-
-        this.ambientTrackBuffers = new Map(loadedAmbientBuffers);
-        this.root.uiStore.markStoreAsLoaded("ambient");
-      }
-
-      if (this.combatTrackBuffers.size === 0) {
-        const loadedCombatBuffers: [COMBAT_TRACK_OPTIONS, AudioBuffer][] = [];
-        for (const combatAsset of this.combatMusicAssets) {
-          const buffer = await this.currentAudioContext.decodeAudioDataSource(
-            combatAsset.localUri!,
-          );
-
-          loadedCombatBuffers.push([
-            combatAsset.name as COMBAT_TRACK_OPTIONS,
-            buffer,
-          ]);
-        }
-      }
-      runInAction(() => (this.isInitializing = false));
-    } catch (error) {
-      console.error("Failed to initialize audio buffers", error);
-      throw error;
+  async createBuffer({ type, newTrack }: CrossFadeOptions) {
+    if (!this.currentAudioContext) {
+      this.currentAudioContext = new AudioContext();
+    }
+    if (type === "ambient") {
+      const buffer = await this.currentAudioContext.decodeAudioDataSource(
+        this.ambientURIs[newTrack]!,
+      );
+      this.ambientTrackBuffers.set(newTrack, buffer);
+      return buffer;
+    } else if (type === "combat") {
+      const buffer = await this.currentAudioContext.decodeAudioDataSource(
+        this.combatURIs[newTrack]!,
+      );
+      this.combatTrackBuffers.set(newTrack, buffer);
+      return buffer;
     }
   }
 
   private parseLocationForRelevantTrack(current?: any, previous?: any) {
     if (this.muted) return;
-    //if (
-    //this.ambientTrackBuffers.size === 0 ||
-    //this.combatTrackBuffers.size === 0
-    //) {
-    //return this.initializeAudio();
-    //}
     try {
       if (!previous || !current) {
         if (this.root.dungeonStore.inCombat) {
@@ -246,7 +188,6 @@ export class AudioStore {
       }
     } catch (error) {
       console.warn("Error parsing location for track", error);
-      throw error;
     }
   }
 
@@ -276,70 +217,76 @@ export class AudioStore {
   }
 
   async crossFade({ type, newTrack }: CrossFadeOptions) {
-    try {
-      let buffer: AudioBuffer | undefined;
+    if (!this.currentAudioContext) {
+      runInAction(() => (this.currentAudioContext = new AudioContext()));
+    }
+    let buffer: AudioBuffer | undefined;
 
-      switch (
-        type //sfx will not be crossfaded
-      ) {
-        case "ambient":
+    switch (
+      type //sfx will not be crossfaded
+    ) {
+      case "ambient":
+        buffer = this.ambientTrackBuffers.get(newTrack);
+        if (!buffer) {
+          await this.createBuffer({ type, newTrack });
           buffer = this.ambientTrackBuffers.get(newTrack);
-          break;
-        case "combat":
+        }
+        break;
+      case "combat":
+        buffer = this.combatTrackBuffers.get(newTrack);
+        if (!buffer) {
+          await this.createBuffer({ type, newTrack });
           buffer = this.combatTrackBuffers.get(newTrack);
-          break;
-      }
+        }
+        break;
+    }
 
-      if (!buffer) {
-        throw new Error(`No buffer found for ${type} track: ${newTrack}`);
-      }
+    if (!buffer) {
+      throw new Error(`No buffer found for ${type} track: ${newTrack}`);
+    }
 
-      if (this.currentPlayer && this.currentEnvelope) {
-        this.outBoundPlayer = this.currentPlayer;
-        const outboundEnvelope = this.currentEnvelope;
+    if (this.currentPlayer && this.currentEnvelope) {
+      this.outBoundPlayer = this.currentPlayer;
+      const outboundEnvelope = this.currentEnvelope;
 
-        const tNow = this.currentAudioContext!.currentTime;
-        outboundEnvelope.gain.linearRampToValueAtTime(
-          0,
-          tNow + DEFAULT_FADE / 1000,
-        );
-
-        setTimeout(() => {
-          runInAction(() => {
-            outboundEnvelope.disconnect();
-            this.outBoundPlayer?.stop();
-            this.outBoundPlayer?.disconnect();
-            this.outBoundPlayer = undefined;
-          });
-        }, DEFAULT_FADE);
-      }
-      this.currentPlayer = this.currentAudioContext!.createBufferSource();
-      this.currentPlayer.buffer = buffer;
-
-      this.currentEnvelope = this.currentAudioContext!.createGain();
-      this.currentPlayer.connect(this.currentEnvelope);
-      this.currentEnvelope.connect(this.currentAudioContext!.destination);
-
-      const tNow = this.currentAudioContext!.currentTime;
-      this.currentEnvelope.gain.setValueAtTime(0, tNow);
-      this.currentEnvelope.gain.linearRampToValueAtTime(
-        this.getEffectiveVolume(type),
+      const tNow = this.currentAudioContext.currentTime;
+      outboundEnvelope.gain.linearRampToValueAtTime(
+        0,
         tNow + DEFAULT_FADE / 1000,
       );
-      this.currentPlayer.loop = true;
 
-      if (this.storedTimeOnMute && newTrack == this.currentlyPlayingTrack) {
-        this.currentPlayer.start(0, this.storedTimeOnMute);
-        //clear stored info
-        this.storedTimeOnMute = undefined;
-      } else {
-        this.currentPlayer.start();
-      }
-
-      this.currentlyPlayingTrack = newTrack;
-    } catch (error) {
-      console.warn("Error during crossfade:", error);
+      setTimeout(() => {
+        runInAction(() => {
+          outboundEnvelope.disconnect();
+          this.outBoundPlayer?.stop();
+          this.outBoundPlayer?.disconnect();
+          this.outBoundPlayer = undefined;
+        });
+      }, DEFAULT_FADE);
     }
+    this.currentPlayer = this.currentAudioContext.createBufferSource();
+    this.currentPlayer.buffer = buffer;
+
+    this.currentEnvelope = this.currentAudioContext.createGain();
+    this.currentPlayer.connect(this.currentEnvelope);
+    this.currentEnvelope.connect(this.currentAudioContext.destination);
+
+    const tNow = this.currentAudioContext.currentTime;
+    this.currentEnvelope.gain.setValueAtTime(0, tNow);
+    this.currentEnvelope.gain.linearRampToValueAtTime(
+      this.getEffectiveVolume(type),
+      tNow + DEFAULT_FADE / 1000,
+    );
+    this.currentPlayer.loop = true;
+
+    if (this.storedTimeOnMute && newTrack == this.currentlyPlayingTrack) {
+      this.currentPlayer.start(0, this.storedTimeOnMute);
+      this.storedTimeOnMute = undefined;
+    } else {
+      this.currentPlayer.start();
+    }
+
+    runInAction(() => (this.currentlyPlayingTrack = newTrack));
   }
 
   setAudioLevel(type: "master" | TrackType, value: number): void {
@@ -360,10 +307,10 @@ export class AudioStore {
     this.updatePlayingAudioLevel();
   }
 
-  private updatePlayingAudioLevel() {
-    if (!this.currentlyPlayingTrack) return;
+  updatePlayingAudioLevel() {
+    if (!this.currentlyPlayingTrack || !this.currentAudioContext) return;
 
-    const tNow = this.currentAudioContext!.currentTime;
+    const tNow = this.currentAudioContext.currentTime;
     this.currentEnvelope?.gain.setValueAtTime(
       this.getEffectiveVolume(
         this.currentlyPlayingTrack in AMBIENT_TRACKS
@@ -376,31 +323,17 @@ export class AudioStore {
     );
   }
 
-  async setMuteValue(val: boolean) {
-    runInAction(() => (this.muted = val));
+  setMuteValue(val: boolean) {
+    this.muted = val;
     if (val) {
-      this.storedTimeOnMute = this.currentAudioContext!.currentTime;
-      this.currentAudioContext!.close();
+      this.storedTimeOnMute = this.currentAudioContext?.currentTime;
       this.currentPlayer?.stop();
       this.currentPlayer?.disconnect();
       this.currentPlayer = undefined;
+      this.currentAudioContext?.close();
+      this.currentAudioContext = undefined;
     } else {
-      runInAction(() => (this.currentAudioContext = new AudioContext()));
-      if (
-        this.ambientTrackBuffers.size === 0 ||
-        this.combatTrackBuffers.size === 0
-      ) {
-        //AudioManager.setAudioSessionOptions({
-        //iosMode: "default",
-        //iosCategory: "ambient",
-        //iosOptions: ["duckOthers", "allowBluetooth"],
-        //});
-        runInAction(() => (this.isInitializing = true));
-        await this.initializeAudio();
-        this.parseLocationForRelevantTrack();
-      } else {
-        this.parseLocationForRelevantTrack();
-      }
+      this.parseLocationForRelevantTrack();
     }
   }
 
@@ -461,7 +394,6 @@ export class AudioStore {
       console.warn("Error persisting settings", error);
     }
   }
-
   cleanup() {
     try {
       if (this.currentPlayer) {
@@ -479,13 +411,6 @@ export class AudioStore {
         this.outBoundPlayer.stop();
         this.outBoundPlayer.disconnect();
         this.outBoundPlayer = undefined;
-      }
-
-      if (this.currentAudioContext) {
-        this.currentAudioContext.close();
-        runInAction(() => {
-          this.audioContextState = "closed";
-        });
       }
 
       this.ambientTrackBuffers.clear();

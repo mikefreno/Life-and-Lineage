@@ -20,13 +20,13 @@ import { StashStore } from "@/stores/StashStore";
 import { SaveStore } from "@/stores/SaveStore";
 import { AudioStore } from "@/stores/AudioStore";
 import { PlayerAnimationStore } from "@/stores/PlayerAnimationStore";
-import { flipCoin, wait } from "@/utility/functions/misc";
+import { flipCoin } from "@/utility/functions/misc";
 import { IAPStore } from "@/stores/IAPStore";
 import { reloadAppAsync } from "expo";
 import { JSONServiceStore } from "./JSONServiceStore";
 import { jsonServiceStore } from "./SingletonSource";
 import { PVPStore } from "./PVPStore";
-import { Asset } from "expo-asset";
+import { AMBIENT_TRACK_OPTIONS, COMBAT_TRACK_OPTIONS } from "@/utility/audio";
 
 export class RootStore {
   playerState: PlayerCharacter | null;
@@ -65,22 +65,13 @@ export class RootStore {
   }[] = [];
 
   constructor({
-    ambientMusicAssets,
-    combatMusicAssets,
+    ambientURIs,
+    combatURIs,
   }: {
-    ambientMusicAssets: Asset[];
-    combatMusicAssets: Asset[];
+    ambientURIs: Partial<Record<AMBIENT_TRACK_OPTIONS, string>>;
+    combatURIs: Partial<Record<COMBAT_TRACK_OPTIONS, string>>;
   }) {
     this.uiStore = new UIStore({ root: this });
-
-    this.authStore = new AuthStore({ root: this });
-
-    this.iapStore = new IAPStore({
-      root: this,
-    });
-
-    this.uiStore.markStoreAsLoaded("auth");
-    __DEV__ ?? this.uiStore.markStoreAsLoaded("inventory");
 
     this.time = new TimeStore({ root: this });
     this.uiStore.markStoreAsLoaded("time");
@@ -90,13 +81,17 @@ export class RootStore {
       ? PlayerCharacter.fromJSON({ ...parse(retrieved_player), root: this })
       : null;
     if (!this.playerState) {
-      runInAction(() => this.uiStore.markStoreAsLoaded("inventory"));
+      runInAction(() => (this.uiStore.storeLoadingStatus.inventory = true));
     }
     this.playerAnimationStore = new PlayerAnimationStore({ root: this });
+
     this.uiStore.markStoreAsLoaded("player");
 
-    this.enemyStore = new EnemyStore({ root: this });
-    this.uiStore.markStoreAsLoaded("enemy");
+    this.authStore = new AuthStore({ root: this });
+    this.uiStore.markStoreAsLoaded("auth");
+
+    this.iapStore = new IAPStore({ root: this });
+    this.uiStore.markStoreAsLoaded("iaps");
 
     this.dungeonStore = new DungeonStore({ root: this });
     this.uiStore.markStoreAsLoaded("dungeon");
@@ -107,6 +102,12 @@ export class RootStore {
     this.shopsStore = new ShopStore({ root: this });
     this.uiStore.markStoreAsLoaded("shops");
 
+    this.audioStore = new AudioStore({ root: this, ambientURIs, combatURIs });
+    this.uiStore.markStoreAsLoaded("audio");
+
+    this.enemyStore = new EnemyStore({ root: this });
+    this.uiStore.markStoreAsLoaded("enemy");
+
     this.tutorialStore = new TutorialStore({ root: this });
     this.uiStore.markStoreAsLoaded("tutorial");
 
@@ -116,17 +117,11 @@ export class RootStore {
     this.saveStore = new SaveStore({ root: this });
     this.uiStore.markStoreAsLoaded("save");
 
-    this.audioStore = new AudioStore({
-      root: this,
-      ambientMusicAssets,
-      combatMusicAssets,
-    });
-    this.uiStore.markStoreAsLoaded("audio");
-
     this.constructed = true;
 
-    this.pvpStore = new PVPStore({ root: this });
     this.JSONServiceStore = new JSONServiceStore({ root: this });
+
+    this.pvpStore = new PVPStore({ root: this });
 
     makeObservable(this, {
       constructed: observable,

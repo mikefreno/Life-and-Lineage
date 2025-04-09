@@ -2,6 +2,7 @@ import React, { createContext, type ReactNode, useMemo } from "react";
 import { RootStore } from "@/stores/RootStore";
 import { type SharedValue, useSharedValue } from "react-native-reanimated";
 import { DraggableDataStore } from "@/stores/DraggableDataStore";
+import { AMBIENT_TRACK_OPTIONS, COMBAT_TRACK_OPTIONS } from "@/utility/audio";
 
 export const StoreContext = createContext<RootStore | undefined>(undefined);
 
@@ -21,11 +22,17 @@ export const DragContext = createContext<
 
 const StoreProvider = ({
   children,
-  rootStore,
+  ambientURIs,
+  combatURIs,
 }: {
   children: ReactNode;
-  rootStore: RootStore;
+  ambientURIs: Partial<Record<AMBIENT_TRACK_OPTIONS, string>>;
+  combatURIs: Partial<Record<COMBAT_TRACK_OPTIONS, string>>;
 }) => {
+  const rootStore = useMemo(
+    () => new RootStore({ ambientURIs, combatURIs }),
+    [],
+  );
   return (
     <StoreContext.Provider value={rootStore}>{children}</StoreContext.Provider>
   );
@@ -57,13 +64,15 @@ const DraggableDataProvider = ({ children }: { children: ReactNode }) => {
 
 export const AppProvider = ({
   children,
-  rootStore,
+  ambientURIs,
+  combatURIs,
 }: {
   children: ReactNode;
-  rootStore: RootStore;
+  ambientURIs: Partial<Record<AMBIENT_TRACK_OPTIONS, string>>;
+  combatURIs: Partial<Record<COMBAT_TRACK_OPTIONS, string>>;
 }) => {
   return (
-    <StoreProvider rootStore={rootStore}>
+    <StoreProvider ambientURIs={ambientURIs} combatURIs={combatURIs}>
       <DraggableDataProvider>{children}</DraggableDataProvider>
     </StoreProvider>
   );

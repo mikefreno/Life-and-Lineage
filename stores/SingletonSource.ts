@@ -64,6 +64,7 @@ import names from "@/assets/json/names.json";
 import qualifications from "@/assets/json/qualifications.json";
 import shopLines from "@/assets/json/shopLines.json";
 import shops from "@/assets/json/shops.json";
+import { AudioStore } from "./AudioStore";
 
 // Define JSON file options as a constant array
 export const JSONFileOptions = [

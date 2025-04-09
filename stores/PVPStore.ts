@@ -3,7 +3,7 @@ import { RootStore } from "./RootStore";
 import { API_BASE_URL } from "@/config/config";
 import { storage } from "@/utility/functions/storage";
 import { action, computed, makeObservable, observable, reaction } from "mobx";
-import DeviceInfo from "react-native-device-info";
+import * as Crypto from "expo-crypto";
 
 export class PVPStore {
   root: RootStore;
@@ -21,7 +21,7 @@ export class PVPStore {
     const { linkID, expoPushToken, notificationsEnabled, pvpName } =
       this.hydrate();
 
-    this.linkID = linkID;
+    this.linkID = linkID ?? Crypto.randomUUID(); // need a better solution
     this.expoPushToken = expoPushToken;
     this.notificationsEnabled = notificationsEnabled;
     this.pvpName = pvpName ?? this.root.playerState?.fullName;
@@ -145,7 +145,7 @@ export class PVPStore {
       storage.getBoolean("pvpNotifications") ?? false;
 
     const expoPushToken = storage.getString("expoPushToken");
-    const linkID = storage.getString("linkID") ?? DeviceInfo.getUniqueIdSync();
+    const linkID = storage.getString("linkID");
     const pvpName = storage.getString("pvpName");
 
     return { notificationsEnabled, expoPushToken, linkID, pvpName };
