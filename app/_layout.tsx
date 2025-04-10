@@ -1,3 +1,11 @@
+import { AudioManager } from "react-native-audio-api";
+
+AudioManager.setAudioSessionOptions({
+  iosMode: "default",
+  iosCategory: "ambient",
+  iosOptions: ["duckOthers", "allowBluetooth", "allowAirPlay"],
+});
+
 import { useFonts } from "expo-font";
 import { Stack, usePathname, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
