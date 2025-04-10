@@ -65,6 +65,8 @@ import qualifications from "@/assets/json/qualifications.json";
 import shopLines from "@/assets/json/shopLines.json";
 import shops from "@/assets/json/shops.json";
 
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export const JSONFileOptions = [
   "mageBooks",
   "mageSpells",
@@ -112,10 +114,10 @@ export const JSONFileOptions = [
   "sanityOptions",
   "pvpRewards",
   "deathMessages",
+  "shops",
   "names",
   "qualifications",
   "shopLines",
-  "shops",
 ] as const;
 
 export type JSONFileOptionsType = (typeof JSONFileOptions)[number];
@@ -147,7 +149,6 @@ export type JSONFileTypeMap = {
   hats: typeof hats;
   helmets: typeof helmets;
   ingredients: typeof ingredients;
-  junk: typeof junk;
   melee: typeof melee;
   poison: typeof poison;
   potions: typeof potions;
@@ -156,12 +157,13 @@ export type JSONFileTypeMap = {
   staves: typeof staves;
   storyItems: typeof storyItems;
   wands: typeof wands;
+  junk: typeof junk;
   prefix: typeof prefix;
   suffix: typeof suffix;
   activities: typeof activities;
   healthOptions: typeof healthOptions;
-  investments: typeof investments;
   jobs: typeof jobs;
+  investments: typeof investments;
   manaOptions: typeof manaOptions;
   otherOptions: typeof otherOptions;
   sanityOptions: typeof sanityOptions;
@@ -207,7 +209,7 @@ class JSONService {
           }),
         );
 
-        await new Promise((resolve) => setTimeout(resolve, 10));
+        await wait(20);
       }
 
       this.initialized = true;

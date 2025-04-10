@@ -67,7 +67,9 @@ export class ShopStore {
       });
       return map;
     } catch (e) {}
-    return this.getInitShopsState();
+    if (this.root.playerState) {
+      return this.getInitShopsState();
+    }
   }
 
   setCurrentShop(shop: Shop | null) {

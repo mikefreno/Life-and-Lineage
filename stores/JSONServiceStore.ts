@@ -54,14 +54,22 @@ export class JSONServiceStore {
 
   async runAll(): Promise<void> {
     try {
-      await Promise.all([
-        this.getAndUpdateAttacks(),
-        this.getAndUpdateConditions(),
-        this.getAndUpdateDungeons(),
-        this.getAndUpdateEnemies(),
-        this.getAndUpdateItems(),
-        this.getAndUpdateMisc(),
-      ]);
+      await this.getAndUpdateAttacks();
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      await this.getAndUpdateConditions();
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      await this.getAndUpdateDungeons();
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      await this.getAndUpdateEnemies();
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      await this.getAndUpdateItems();
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      await this.getAndUpdateMisc();
     } catch (error) {
       console.error("Error updating JSON files:", error);
     }
