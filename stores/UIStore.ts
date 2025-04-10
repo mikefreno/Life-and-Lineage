@@ -71,7 +71,7 @@ export type LoadingStores =
   | "tutorial"
   | "stash"
   | "save"
-  | "audio"
+  //| "audio"
   //| "ambient"
   | "fonts"
   | "routing"
@@ -132,7 +132,7 @@ export default class UIStore {
     tutorial: false,
     stash: false,
     save: false,
-    audio: false,
+    //audio: false,
     //ambient: false,
     fonts: false,
     routing: false,

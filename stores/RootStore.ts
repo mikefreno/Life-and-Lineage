@@ -26,7 +26,6 @@ import { reloadAppAsync } from "expo";
 import { JSONServiceStore } from "./JSONServiceStore";
 import { jsonServiceStore } from "./SingletonSource";
 import { PVPStore } from "./PVPStore";
-import { AMBIENT_TRACK_OPTIONS, COMBAT_TRACK_OPTIONS } from "@/utility/audio";
 
 export class RootStore {
   playerState: PlayerCharacter | null;
@@ -64,13 +63,7 @@ export class RootStore {
     initVal?: number | undefined;
   }[] = [];
 
-  constructor({
-    ambientURIs,
-    combatURIs,
-  }: {
-    ambientURIs: Partial<Record<AMBIENT_TRACK_OPTIONS, string>>;
-    combatURIs: Partial<Record<COMBAT_TRACK_OPTIONS, string>>;
-  }) {
+  constructor() {
     this.uiStore = new UIStore({ root: this });
 
     this.time = new TimeStore({ root: this });
@@ -102,8 +95,7 @@ export class RootStore {
     this.shopsStore = new ShopStore({ root: this });
     this.uiStore.markStoreAsLoaded("shops");
 
-    this.audioStore = new AudioStore({ root: this, ambientURIs, combatURIs });
-    this.uiStore.markStoreAsLoaded("audio");
+    this.audioStore = new AudioStore({ root: this });
 
     this.enemyStore = new EnemyStore({ root: this });
     this.uiStore.markStoreAsLoaded("enemy");

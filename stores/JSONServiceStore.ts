@@ -2,6 +2,7 @@ import { makeAutoObservable, reaction } from "mobx";
 import { RootStore } from "./RootStore";
 import { API_BASE_URL } from "@/config/config";
 import { jsonServiceStore, JSONFileOptionsType } from "./SingletonSource";
+import { fetch } from "expo/fetch";
 
 // API urls
 const api_base = `${API_BASE_URL}/json_service`;
@@ -74,7 +75,6 @@ export class JSONServiceStore {
       const data = (await res.json()) as ApiResponse;
       if (!data.ok) return;
 
-      // Update data through the service
       if (data.mageBooks)
         jsonServiceStore.updateJsonData("mageBooks", data.mageBooks);
       if (data.mageSpells)
@@ -235,7 +235,6 @@ export class JSONServiceStore {
     }
   }
 
-  // Method to manually update uncovered files
   async updateUncoveredFile(
     filename: JSONFileOptionsType,
     newData: any,
@@ -243,7 +242,6 @@ export class JSONServiceStore {
     jsonServiceStore.updateJsonData(filename, newData);
   }
 
-  // Check if all data has been retrieved
   get isAllDataRetrieved(): boolean {
     return (
       this.retrievedAttacks &&

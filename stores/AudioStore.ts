@@ -13,14 +13,33 @@ import {
   AudioContext,
   GainNode,
 } from "react-native-audio-api";
-import {
-  AMBIENT_TRACK_OPTIONS,
-  AMBIENT_TRACKS,
-  COMBAT_TRACK_OPTIONS,
-  COMBAT_TRACKS,
-  SFX_OPTIONS,
-} from "@/utility/audio";
+
+import { Asset } from "expo-asset";
 import { parse, stringify } from "flatted";
+import { wait } from "@/utility/functions/misc";
+
+const AMBIENT_TRACKS = {
+  shops: require("../assets/music/shops.mp3"),
+  ambient_old: require("../assets/music/ambient_old.mp3"),
+  ambient_middle: require("../assets/music/ambient_middle.mp3"),
+  ambient_young: require("../assets/music/ambient_young.mp3"),
+  ambient_dungeon: require("../assets/music/ambient_dungeon.mp3"),
+} as const;
+
+const COMBAT_TRACKS = {
+  combat: require("../assets/music/combat.mp3"),
+} as const;
+
+const SOUND_EFFECTS = {
+  bossHit: require("../assets/sfx/boss_hit.mp3"),
+  //normalHit: require("@/assets/sfx/hit.mp3"), // this track is causing errors
+} as const;
+
+type AMBIENT_TRACK_OPTIONS = keyof typeof AMBIENT_TRACKS;
+
+type COMBAT_TRACK_OPTIONS = keyof typeof COMBAT_TRACKS;
+
+type SFX_OPTIONS = keyof typeof SOUND_EFFECTS;
 
 type CrossFadeOptions =
   | {
@@ -46,13 +65,10 @@ export class AudioStore {
   combatMusicVolume: number = 1;
   muted: boolean = false;
 
-  ambientURIs: Partial<Record<AMBIENT_TRACK_OPTIONS, string>>;
-  combatURIs: Partial<Record<COMBAT_TRACK_OPTIONS, string>>;
-
   currentAudioContext: AudioContext | undefined = undefined;
   currentPlayer: AudioBufferSourceNode | undefined = undefined;
   currentEnvelope: GainNode | undefined = undefined;
-  storedTimeOnMute: number | undefined = undefined;
+  storedTimeOnMute: number | undefined;
   currentlyPlayingTrack:
     | AMBIENT_TRACK_OPTIONS
     | COMBAT_TRACK_OPTIONS
@@ -60,24 +76,14 @@ export class AudioStore {
 
   outBoundAudioContext = new AudioContext();
   outBoundPlayer: AudioBufferSourceNode | undefined = undefined;
-  //isInitializing: boolean = true;
+  isInitializing: boolean = true;
 
   ambientTrackBuffers: Map<AMBIENT_TRACK_OPTIONS, AudioBuffer> = new Map();
   combatTrackBuffers: Map<COMBAT_TRACK_OPTIONS, AudioBuffer> = new Map();
   sfxTrackBuffers: Map<SFX_OPTIONS, AudioBuffer> = new Map();
 
-  constructor({
-    root,
-    ambientURIs,
-    combatURIs,
-  }: {
-    root: RootStore;
-    ambientURIs: Partial<Record<AMBIENT_TRACK_OPTIONS, string>>;
-    combatURIs: Partial<Record<COMBAT_TRACK_OPTIONS, string>>;
-  }) {
+  constructor({ root }: { root: RootStore }) {
     this.root = root;
-    this.ambientURIs = ambientURIs;
-    this.combatURIs = combatURIs;
     const { ambient, muted, master, sfx, combat } =
       this.loadPersistedSettings();
     this.muted = muted;
@@ -85,7 +91,17 @@ export class AudioStore {
     this.masterVolume = master;
     this.soundEffectsVolume = sfx;
     this.combatMusicVolume = combat;
-    //this.parseLocationForRelevantTrack();
+
+    if (!muted) {
+      this.initializeAudio()
+        .then(() => this.parseLocationForRelevantTrack())
+        .catch((error) => {
+          console.error("Failed to initialize audio:", error);
+          this.parseLocationForRelevantTrack();
+        });
+    } else {
+      this.isInitializing = false;
+    }
 
     makeObservable(this, {
       masterVolume: observable,
@@ -95,24 +111,18 @@ export class AudioStore {
       muted: observable,
       ambientTrackBuffers: observable,
       combatTrackBuffers: observable,
-      currentAudioContext: observable,
-      currentEnvelope: observable,
-      storedTimeOnMute: observable,
-      currentlyPlayingTrack: observable,
-      outBoundAudioContext: observable,
+      createBuffer: action,
 
       currentPlayer: observable,
       outBoundPlayer: observable,
 
-      //isInitializing: observable,
+      isInitializing: observable,
 
-      createBuffer: action,
       cleanup: action,
       crossFade: action,
       setAudioLevel: action,
       setMuteValue: action,
       getEffectiveVolume: action,
-      updatePlayingAudioLevel: action,
     });
 
     reaction(
@@ -148,17 +158,78 @@ export class AudioStore {
       this.currentAudioContext = new AudioContext();
     }
     if (type === "ambient") {
-      const buffer = await this.currentAudioContext.decodeAudioDataSource(
-        this.ambientURIs[newTrack]!,
+      const [{ localUri }] = await Asset.loadAsync(
+        newTrack === "shops"
+          ? require("../assets/music/shops.mp3")
+          : newTrack === "ambient_dungeon"
+          ? require("../assets/music/ambient_dungeon.mp3")
+          : newTrack === "ambient_young"
+          ? require("../assets/music/ambient_young.mp3")
+          : newTrack === "ambient_middle"
+          ? require("../assets/music/ambient_middle.mp3")
+          : require("../assets/music/ambient_old.mp3"),
       );
-      this.ambientTrackBuffers.set(newTrack, buffer);
+
+      const buffer = await this.currentAudioContext.decodeAudioDataSource(
+        localUri!,
+      );
+
+      runInAction(() => this.ambientTrackBuffers.set(newTrack, buffer));
       return buffer;
     } else if (type === "combat") {
+      const [{ localUri }] = await Asset.loadAsync(COMBAT_TRACKS[newTrack]);
+
       const buffer = await this.currentAudioContext.decodeAudioDataSource(
-        this.combatURIs[newTrack]!,
+        localUri!,
       );
-      this.combatTrackBuffers.set(newTrack, buffer);
+
+      runInAction(() => this.combatTrackBuffers.set(newTrack, buffer));
       return buffer;
+    }
+  }
+
+  async initializeAudio() {
+    if (this.muted) {
+      runInAction(() => (this.isInitializing = false));
+      return;
+    }
+
+    try {
+      this.currentAudioContext = new AudioContext();
+      runInAction(() => (this.isInitializing = true));
+
+      for (const k of Object.keys(AMBIENT_TRACKS)) {
+        try {
+          await this.createBuffer({
+            type: "ambient",
+            newTrack: k as AMBIENT_TRACK_OPTIONS,
+          });
+          await wait(10);
+        } catch (error) {
+          console.error(`Failed to decode ambient track: ${k}`, error);
+        }
+      }
+
+      for (const k of Object.keys(COMBAT_TRACKS)) {
+        try {
+          await this.createBuffer({
+            type: "combat",
+            newTrack: k as COMBAT_TRACK_OPTIONS,
+          });
+          await wait(10);
+        } catch (error) {
+          console.error(`Failed to decode combat track: ${k}`, error);
+        }
+      }
+
+      runInAction(() => {
+        this.isInitializing = false;
+      });
+    } catch (error) {
+      console.error("Audio initialization failed:", error);
+      runInAction(() => {
+        this.isInitializing = false;
+      });
     }
   }
 
@@ -218,7 +289,7 @@ export class AudioStore {
 
   async crossFade({ type, newTrack }: CrossFadeOptions) {
     if (!this.currentAudioContext) {
-      runInAction(() => (this.currentAudioContext = new AudioContext()));
+      return this.initializeAudio();
     }
     let buffer: AudioBuffer | undefined;
 
@@ -228,15 +299,13 @@ export class AudioStore {
       case "ambient":
         buffer = this.ambientTrackBuffers.get(newTrack);
         if (!buffer) {
-          await this.createBuffer({ type, newTrack });
-          buffer = this.ambientTrackBuffers.get(newTrack);
+          buffer = await this.createBuffer({ type, newTrack });
         }
         break;
       case "combat":
         buffer = this.combatTrackBuffers.get(newTrack);
         if (!buffer) {
-          await this.createBuffer({ type, newTrack });
-          buffer = this.combatTrackBuffers.get(newTrack);
+          buffer = await this.createBuffer({ type, newTrack });
         }
         break;
     }
@@ -286,7 +355,7 @@ export class AudioStore {
       this.currentPlayer.start();
     }
 
-    runInAction(() => (this.currentlyPlayingTrack = newTrack));
+    this.currentlyPlayingTrack = newTrack;
   }
 
   setAudioLevel(type: "master" | TrackType, value: number): void {
@@ -307,7 +376,7 @@ export class AudioStore {
     this.updatePlayingAudioLevel();
   }
 
-  updatePlayingAudioLevel() {
+  private updatePlayingAudioLevel() {
     if (!this.currentlyPlayingTrack || !this.currentAudioContext) return;
 
     const tNow = this.currentAudioContext.currentTime;
@@ -333,7 +402,7 @@ export class AudioStore {
       this.currentAudioContext?.close();
       this.currentAudioContext = undefined;
     } else {
-      this.parseLocationForRelevantTrack();
+      this.initializeAudio();
     }
   }
 

@@ -15,7 +15,7 @@
       "usesAppleSignIn": true,
       "supportsTablet": true,
       "bundleIdentifier": "com.mikefrenodev.lineage",
-      "buildNumber": "40",
+      "buildNumber": "55",
       "entitlements": {
         "com.apple.developer.networking.wifi-info": true,
         "aps-environment": "development"
@@ -87,19 +87,6 @@
           "defaultChannel": "default",
           "enableBackgroundRemoteNotifications": true
         }
-      ],
-      [
-        "expo-asset",
-        {
-          "assets": [
-            "./assets/music/ambient_dungeon.mp3",
-            "./assets/music/ambient_middle.mp3",
-            "./assets/music/ambient_old.mp3",
-            "./assets/music/ambient_young.mp3",
-            "./assets/music/shops.mp3",
-            "./assets/music/combat.mp3"
-          ]
-        }
       ]
     ],
     "experiments": {
@@ -120,4 +107,3 @@
     }
   }
 }
-

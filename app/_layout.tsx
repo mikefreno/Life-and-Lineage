@@ -35,7 +35,7 @@ import {
   configureReanimatedLogger,
   ReanimatedLogLevel,
 } from "react-native-reanimated";
-import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import PlatformDependantGestureWrapper from "@/components/PlatformDependantGestureWrapper";
 import { SCREEN_TRANSITION_TIMING } from "@/stores/UIStore";
@@ -46,12 +46,6 @@ import { TutorialOption } from "@/utility/types";
 import { HeaderBackButton } from "@react-navigation/elements";
 import { useVibration } from "@/hooks/generic";
 import { AudioToggle } from "@/components/AudioToggle";
-import {
-  AMBIENT_TRACK_OPTIONS,
-  COMBAT_TRACK_OPTIONS,
-  getAmbientLocalURIs,
-  getCombatLocalURIs,
-} from "@/utility/audio";
 
 global.atob = decode;
 
@@ -115,28 +109,6 @@ const Root = () => {
     Cursive: require("@/assets/fonts/Tangerine-Regular.ttf"),
     CursiveBold: require("@/assets/fonts/Tangerine-Bold.ttf"),
   });
-  const [hasSetURIs, setHasSetURIs] = useState(false);
-  const ambientURIsRef = useRef<Partial<Record<AMBIENT_TRACK_OPTIONS, string>>>(
-    {},
-  );
-  const combatURIsRef = useRef<Partial<Record<COMBAT_TRACK_OPTIONS, string>>>(
-    {},
-  );
-  useEffect(() => {
-    const loadAudioAssets = async () => {
-      try {
-        const ambientURIs = await getAmbientLocalURIs();
-        const combatURIs = await getCombatLocalURIs();
-        ambientURIsRef.current = ambientURIs;
-        combatURIsRef.current = combatURIs;
-        setHasSetURIs(true);
-      } catch (assetLoadingError) {
-        console.error("Audio asset loading error:", assetLoadingError);
-      }
-    };
-
-    loadAudioAssets();
-  }, []);
 
   useEffect(() => {
     if (error) {
@@ -147,15 +119,12 @@ const Root = () => {
     }
   }, [mainFontLoaded, error]);
 
-  while (!mainFontLoaded || !hasSetURIs) {
+  while (!mainFontLoaded) {
     return null;
   }
 
   return (
-    <AppProvider
-      ambientURIs={ambientURIsRef.current}
-      combatURIs={combatURIsRef.current}
-    >
+    <AppProvider>
       <DungeonProvider>
         <SafeAreaProvider>
           <ErrorBoundary>

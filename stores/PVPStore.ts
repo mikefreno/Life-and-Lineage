@@ -4,6 +4,7 @@ import { API_BASE_URL } from "@/config/config";
 import { storage } from "@/utility/functions/storage";
 import { action, computed, makeObservable, observable, reaction } from "mobx";
 import * as Crypto from "expo-crypto";
+import { fetch } from "expo/fetch";
 
 export class PVPStore {
   root: RootStore;

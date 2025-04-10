@@ -64,11 +64,8 @@ import names from "@/assets/json/names.json";
 import qualifications from "@/assets/json/qualifications.json";
 import shopLines from "@/assets/json/shopLines.json";
 import shops from "@/assets/json/shops.json";
-import { AudioStore } from "./AudioStore";
 
-// Define JSON file options as a constant array
 export const JSONFileOptions = [
-  // Attack route files
   "mageBooks",
   "mageSpells",
   "necroBooks",
@@ -79,18 +76,14 @@ export const JSONFileOptions = [
   "rangerBooks",
   "rangerSpells",
   "summons",
-  // Conditions route files
   "conditions",
   "debilitations",
   "sanityDebuffs",
-  // Dungeon route files
   "dungeons",
   "specialEncounters",
-  // Enemy route files
   "bosses",
   "enemy",
   "enemyAttacks",
-  // Item route files
   "arrows",
   "artifacts",
   "bodyArmor",
@@ -110,7 +103,6 @@ export const JSONFileOptions = [
   "wands",
   "prefix",
   "suffix",
-  // Misc route files
   "activities",
   "healthOptions",
   "investments",
@@ -119,7 +111,6 @@ export const JSONFileOptions = [
   "otherOptions",
   "sanityOptions",
   "pvpRewards",
-  // Uncovered files
   "deathMessages",
   "names",
   "qualifications",
@@ -129,9 +120,7 @@ export const JSONFileOptions = [
 
 export type JSONFileOptionsType = (typeof JSONFileOptions)[number];
 
-// Create type mapping for JSON files
 export type JSONFileTypeMap = {
-  // Attack route files
   mageBooks: typeof mageBooks;
   mageSpells: typeof mageSpells;
   necroBooks: typeof necroBooks;
@@ -142,18 +131,14 @@ export type JSONFileTypeMap = {
   rangerBooks: typeof rangerBooks;
   rangerSpells: typeof rangerSpells;
   summons: typeof summons;
-  // Conditions route files
   conditions: typeof conditions;
   debilitations: typeof debilitations;
   sanityDebuffs: typeof sanityDebuffs;
-  // Dungeon route files
   dungeons: typeof dungeons;
   specialEncounters: typeof specialEncounters;
-  // Enemy route files
   bosses: typeof bosses;
   enemy: typeof enemy;
   enemyAttacks: typeof enemyAttacks;
-  // Item route files
   arrows: typeof arrows;
   artifacts: typeof artifacts;
   bodyArmor: typeof bodyArmor;
@@ -173,7 +158,6 @@ export type JSONFileTypeMap = {
   wands: typeof wands;
   prefix: typeof prefix;
   suffix: typeof suffix;
-  // Misc route files
   activities: typeof activities;
   healthOptions: typeof healthOptions;
   investments: typeof investments;
@@ -182,7 +166,6 @@ export type JSONFileTypeMap = {
   otherOptions: typeof otherOptions;
   sanityOptions: typeof sanityOptions;
   pvpRewards: typeof pvpRewards;
-  // Uncovered files
   deathMessages: typeof deathMessages;
   names: typeof names;
   qualifications: typeof qualifications;
@@ -194,30 +177,53 @@ class JSONService {
   private storage = new MMKV({ id: "json-service" });
   private jsonCache: Partial<JSONFileTypeMap> = {};
   private initialized = false;
+  private initializationPromise: Promise<void> | null = null;
 
   constructor() {
     this.initializeCache();
   }
 
   private initializeCache(): void {
-    for (const key of JSONFileOptions) {
-      const originalData = this.getOriginalJson(key);
-      this.jsonCache[key] = originalData;
-      this.storage.set(`json_${key}`, JSON.stringify(originalData));
-    }
-
-    this.initialized = true;
+    this.initializationPromise = this._doBatchInitialize();
   }
 
-  // Synchronous read method - available immediately
+  private async _doBatchInitialize(): Promise<void> {
+    try {
+      const batchSize = 3;
+      const allFiles = [...JSONFileOptions];
+
+      for (let i = 0; i < allFiles.length; i += batchSize) {
+        const batch = allFiles.slice(i, i + batchSize);
+
+        await Promise.all(
+          batch.map(async (key) => {
+            try {
+              const originalData = this.getOriginalJson(key);
+              this.jsonCache[key] = originalData;
+              this.storage.set(`json_${key}`, JSON.stringify(originalData));
+            } catch (error) {
+              console.error(`Error initializing ${key}:`, error);
+            }
+          }),
+        );
+
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      }
+
+      this.initialized = true;
+    } catch (error) {
+      console.error("Error during JSONService initialization:", error);
+      this.initialized = true;
+    } finally {
+      this.initializationPromise = null;
+    }
+  }
+
   readJsonFileSync<T extends JSONFileOptionsType>(
     filename: T,
   ): JSONFileTypeMap[T] {
     if (__DEV__) {
       return this.getOriginalJson(filename);
-    }
-    if (!this.initialized) {
-      console.warn("JSONService not fully initialized yet");
     }
 
     if (this.jsonCache[filename]) {
@@ -228,7 +234,7 @@ class JSONService {
     if (storedData) {
       try {
         const data = JSON.parse(storedData) as JSONFileTypeMap[T];
-        this.jsonCache[filename] = data; // Update in-memory cache
+        this.jsonCache[filename] = data;
         return data;
       } catch (error) {
         console.error(`Error parsing stored JSON for ${filename}:`, error);
@@ -236,12 +242,19 @@ class JSONService {
     }
 
     const originalData = this.getOriginalJson(filename);
-    this.jsonCache[filename] = originalData; // Cache it
-    this.storage.set(`json_${filename}`, JSON.stringify(originalData));
+    this.jsonCache[filename] = originalData;
+
+    setTimeout(() => {
+      try {
+        this.storage.set(`json_${filename}`, JSON.stringify(originalData));
+      } catch (storageError) {
+        console.error(`Error storing ${filename} in MMKV:`, storageError);
+      }
+    }, 0);
+
     return originalData as JSONFileTypeMap[T];
   }
 
-  // Asynchronous read method (for completeness)
   async readJsonFile<T extends JSONFileOptionsType>(
     filename: T,
   ): Promise<JSONFileTypeMap[T]> {
@@ -274,7 +287,6 @@ class JSONService {
     filename: T,
   ): JSONFileTypeMap[T] {
     const jsonMap: JSONFileTypeMap = {
-      // Attack route files
       mageBooks,
       mageSpells,
       necroBooks,
@@ -285,18 +297,14 @@ class JSONService {
       rangerBooks,
       rangerSpells,
       summons,
-      // Conditions route files
       conditions,
       debilitations,
       sanityDebuffs,
-      // Dungeon route files
       dungeons,
       specialEncounters,
-      // Enemy route files
       bosses,
       enemy,
       enemyAttacks,
-      // Item route files
       arrows,
       artifacts,
       bodyArmor,
@@ -316,7 +324,6 @@ class JSONService {
       wands,
       prefix,
       suffix,
-      // Misc route files
       activities,
       healthOptions,
       investments,
@@ -325,7 +332,6 @@ class JSONService {
       otherOptions,
       sanityOptions,
       pvpRewards,
-      // Uncovered files
       deathMessages,
       names,
       qualifications,
@@ -356,6 +362,16 @@ class JSONService {
     } catch (error) {
       console.error(`Error updating ${filename}:`, error);
     }
+  }
+
+  isInitialized(): boolean {
+    return this.initialized;
+  }
+
+  async waitForInitialization(): Promise<void> {
+    if (this.initialized) return;
+    if (this.initializationPromise) return this.initializationPromise;
+    return Promise.resolve();
   }
 }
 

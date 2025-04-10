@@ -52,7 +52,7 @@
     "react-native-easing-gradient": "^1.1.1",
     "react-native-edge-to-edge": "^1.0.1",
     "react-native-gesture-handler": "~2.20.2",
-    "react-native-mmkv": "^2.12.2",
+    "react-native-mmkv": "^3.2.0",
     "react-native-modal": "^13.0.1",
     "react-native-purchases": "^8.9.1",
     "react-native-reanimated": "~3.16.1",
@@ -61,8 +61,7 @@
     "react-native-screens": "~4.4.0",
     "react-native-svg": "15.8.0",
     "react-native-web": "~0.19.6",
-    "react-native-webview": "13.12.5",
-    "expo-asset": "~11.0.5"
+    "react-native-webview": "13.12.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
