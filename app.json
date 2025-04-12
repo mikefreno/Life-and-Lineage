@@ -8,13 +8,15 @@
     "scheme": "lineageapp",
     "userInterfaceStyle": "automatic",
     "assetBundlePatterns": [
-      "**/*"
+      "**/*",
+      "./assets/music/*",
+      "./assets/sfx/*"
     ],
     "ios": {
       "usesAppleSignIn": true,
       "supportsTablet": true,
       "bundleIdentifier": "com.mikefrenodev.lineage",
-      "buildNumber": "56",
+      "buildNumber": "76",
       "entitlements": {
         "com.apple.developer.networking.wifi-info": true,
         "aps-environment": "development"
@@ -61,7 +63,7 @@
           "image": "./assets/images/splash.png",
           "dark": {
             "image": "./assets/images/splash.png",
-            "backgroundColor": "#27272a"
+            "backgroundColor": "#18181b"
           },
           "imageWidth": 400
         }

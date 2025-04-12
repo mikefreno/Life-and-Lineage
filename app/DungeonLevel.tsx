@@ -108,37 +108,9 @@ const DungeonLevelScreen = observer(() => {
           },
         );
       }
-    })
-      .then(() => {
-        setTimeout(() => {
-          uiStore.incrementLoadingStep();
-          return new Promise<void>((resolve) => {
-            if (
-              audioStore.ambientTrackBuffers.size > 0 &&
-              audioStore.combatTrackBuffers.size > 0
-            ) {
-              resolve();
-              uiStore.incrementLoadingStep();
-            } else {
-              setTimeout(() => {
-                if (
-                  audioStore.ambientTrackBuffers.size > 0 &&
-                  audioStore.combatTrackBuffers.size > 0
-                ) {
-                  resolve();
-                  uiStore.incrementLoadingStep();
-                } else {
-                  resolve();
-                  uiStore.incrementLoadingStep();
-                }
-              }, 1000);
-            }
-          });
-        }, SCREEN_TRANSITION_TIMING + 50);
-      })
-      .catch((error) => {
-        uiStore.completeLoading();
-      });
+    }).catch((error) => {
+      uiStore.completeLoading();
+    });
     return () => draggableClassStore.removeAncillaryBounds("pouch");
   }, []);
 

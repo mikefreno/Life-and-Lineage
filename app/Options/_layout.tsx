@@ -11,8 +11,9 @@ import { useStyles } from "@/hooks/styles";
 import { useRootStore } from "@/hooks/stores";
 import Colors from "@/constants/Colors";
 import { Text } from "@/components/Themed";
+import { observer } from "mobx-react-lite";
 
-export default function OptionsLayout() {
+const OptionsLayout = observer(() => {
   const vibration = useVibration();
   const styles = useStyles();
   const { uiStore } = useRootStore();
@@ -195,4 +196,5 @@ export default function OptionsLayout() {
       />
     </Tabs>
   );
-}
+});
+export default OptionsLayout;

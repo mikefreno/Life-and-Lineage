@@ -2,7 +2,6 @@ import { makeAutoObservable, reaction } from "mobx";
 import { RootStore } from "./RootStore";
 import { API_BASE_URL } from "@/config/config";
 import { jsonServiceStore, JSONFileOptionsType } from "./SingletonSource";
-import { fetch } from "expo/fetch";
 
 // API urls
 const api_base = `${API_BASE_URL}/json_service`;

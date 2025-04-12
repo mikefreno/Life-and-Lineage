@@ -5,7 +5,6 @@ import { Text } from "@/components/Themed";
 import GenericStrikeAround from "@/components/GenericStrikeAround";
 import { View, Switch, ScrollView } from "react-native";
 import Slider from "@react-native-community/slider";
-import D20DieAnimation from "@/components/DieRollAnim";
 
 const AudioSettings = observer(() => {
   const { audioStore, uiStore } = useRootStore();
@@ -13,7 +12,7 @@ const AudioSettings = observer(() => {
 
   const renderSlider = (
     label: string,
-    type: "master" | "ambient" | "sfx" | "combat",
+    type: "master" | "ambient" | "sfx" | "dungeon",
     value: number,
   ) => (
     <View style={styles.px2}>
@@ -53,25 +52,21 @@ const AudioSettings = observer(() => {
           )}
           {__DEV__ &&
             renderSlider("Sound Effects", "sfx", audioStore.soundEffectsVolume)}
-          {renderSlider("Combat Music", "combat", audioStore.combatMusicVolume)}
+          {renderSlider(
+            "Dungeon Music",
+            "dungeon",
+            audioStore.dungeonMusicVolume,
+          )}
 
           <View style={styles.rowEvenly}>
             <Text style={[styles.myAuto, styles["text-xl"]]}>Mute</Text>
-            {audioStore.isInitializing ? (
-              <D20DieAnimation
-                keepRolling
-                showNumber={false}
-                size={uiStore.iconSizeXL}
-              />
-            ) : (
-              <Switch
-                trackColor={{ false: "#767577", true: "#3b82f6" }}
-                ios_backgroundColor="#3e3e3e"
-                thumbColor={"white"}
-                onValueChange={(bool) => audioStore.setMuteValue(bool)}
-                value={audioStore.muted}
-              />
-            )}
+            <Switch
+              trackColor={{ false: "#767577", true: "#3b82f6" }}
+              ios_backgroundColor="#3e3e3e"
+              thumbColor={"white"}
+              onValueChange={(bool) => audioStore.setMuteValue(bool)}
+              value={audioStore.muted}
+            />
           </View>
         </View>
       </View>

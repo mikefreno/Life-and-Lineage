@@ -60,7 +60,7 @@ export const tabRouteIndexing = [
 ];
 export type LoadingStores =
   | "statusBar"
-  | "inventory"
+  //| "inventory"
   | "player"
   | "time"
   | "auth"
@@ -71,7 +71,7 @@ export type LoadingStores =
   | "tutorial"
   | "stash"
   | "save"
-  //| "audio"
+  | "audio"
   //| "ambient"
   | "fonts"
   | "routing"
@@ -121,7 +121,7 @@ export default class UIStore {
 
   storeLoadingStatus: Record<LoadingStores, boolean> = {
     statusBar: false,
-    inventory: false,
+    //inventory: false,
     player: false,
     time: false,
     auth: false,
@@ -132,7 +132,7 @@ export default class UIStore {
     tutorial: false,
     stash: false,
     save: false,
-    //audio: false,
+    audio: false,
     //ambient: false,
     fonts: false,
     routing: false,

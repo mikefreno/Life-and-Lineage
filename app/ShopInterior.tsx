@@ -1,5 +1,4 @@
-import React from "react";
-import { useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { Text, ThemedScrollView } from "@/components/Themed";
 import { CharacterImage } from "@/components/CharacterImage";
 import {
@@ -9,8 +8,9 @@ import {
   Animated,
   LayoutChangeEvent,
   Platform,
+  StyleSheet,
 } from "react-native";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useIsFocused } from "@react-navigation/native";
 import { observer } from "mobx-react-lite";
 import TutorialModal from "@/components/TutorialModal";
@@ -28,6 +28,10 @@ import { flex, tw, useStyles } from "@/hooks/styles";
 import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 import GenericFlatButton from "@/components/GenericFlatButton";
 import { CharacterInteractionModal } from "@/components/CharacterInteractionModal";
+import { toTitleCase } from "@/utility/functions/misc";
+import { useScaling } from "@/hooks/scaling";
+import { BlurView } from "expo-blur";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 const GreetingComponent = ({ greeting }: { greeting: string }) => {
   const fadeAnim = useRef(new Animated.Value(1)).current;
@@ -69,7 +73,10 @@ const ShopInteriorScreen = observer(() => {
   const { playerState, shopsStore, uiStore, time } = useRootStore();
   const { draggableClassStore } = useDraggableStore();
   const isFocused = useIsFocused();
+
   const router = useRouter();
+  const { getNormalizedSize } = useScaling();
+  const headerHeight = useHeaderHeight();
 
   const shopInventoryTarget = useRef<View | null>(null);
   const vibration = useVibration();
@@ -217,13 +224,37 @@ const ShopInteriorScreen = observer(() => {
 
   return (
     <>
+      <Stack.Screen
+        name="ShopInterior"
+        options={{
+          title: toTitleCase(shopsStore.currentShop?.archetype),
+          headerBackButtonMenuEnabled: false,
+          headerBackButtonDisplayMode: "minimal",
+          headerTransparent: true,
+          headerBackTitleStyle: {
+            fontFamily: "PixelifySans",
+            fontSize: getNormalizedSize(16),
+          },
+          headerTitleStyle: {
+            fontFamily: "PixelifySans",
+            fontSize: getNormalizedSize(22),
+          },
+          headerBackground: () => (
+            <View style={[StyleSheet.absoluteFill, styles.diffuse]}>
+              <BlurView
+                intensity={50}
+                style={[StyleSheet.absoluteFill]}
+                tint={uiStore.colorScheme}
+              />
+            </View>
+          ),
+        }}
+      />
       <View
         style={{
           marginTop: Platform.OS == "ios" ? uiStore.headerHeight / 2 : 0,
           height:
-            Platform.OS == "ios"
-              ? uiStore.headerHeight / 2
-              : uiStore.headerHeight,
+            Platform.OS == "ios" ? headerHeight / 2 : uiStore.headerHeight,
           backgroundColor: colors?.background,
           opacity: 0.5,
         }}

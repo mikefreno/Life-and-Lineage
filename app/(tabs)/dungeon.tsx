@@ -423,7 +423,7 @@ const DungeonScreen = observer(() => {
                       <GenericRaisedButton
                         key={levelIdx}
                         onPress={() => {
-                          uiStore.setTotalLoadingSteps(5);
+                          uiStore.setTotalLoadingSteps(3);
                           vibration({ style: "warning" });
                           dungeonStore
                             .setUpDungeon(dungeonInstance, level, false)

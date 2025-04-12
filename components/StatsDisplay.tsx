@@ -286,7 +286,7 @@ export const StatsDisplay = observer(
               vibration({ style: "light" });
               setRenderStory(null);
             }}
-            style={[styles.closeButton, { right: 4 }]}
+            style={[styles.closeButton, { right: 4, zIndex: 9999 }]}
           >
             <Text style={styles["text-4xl"]}>x</Text>
           </Pressable>

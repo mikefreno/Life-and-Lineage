@@ -92,7 +92,7 @@ const SetClassScreen = observer(() => {
           setHeldForDual(PlayerClassOptions.necromancer);
           setTimeout(
             () => setShowDualPaywall(true),
-            IAP_MODAL_ANIM_TIMING + 50,
+            IAP_MODAL_ANIM_TIMING + 150,
           );
         }}
         isVisibleCondition={showNecroPaywall}
@@ -110,7 +110,7 @@ const SetClassScreen = observer(() => {
           setHeldForDual(PlayerClassOptions.ranger);
           setTimeout(
             () => setShowDualPaywall(true),
-            IAP_MODAL_ANIM_TIMING + 50,
+            IAP_MODAL_ANIM_TIMING + 150,
           );
         }}
         isVisibleCondition={showRangerPaywall}

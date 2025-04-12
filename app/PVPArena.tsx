@@ -80,6 +80,7 @@ const PVPArena = observer(() => {
   const notificationListener = useRef<Notifications.EventSubscription>();
   const responseListener = useRef<Notifications.EventSubscription>();
 
+  // TODO: Move logic. The init request needs to be here, but the listeners need to be at root.
   useEffect(() => {
     const notificationFlow = () => {
       wait(500).then(() => {

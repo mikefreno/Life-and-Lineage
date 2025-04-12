@@ -4,9 +4,9 @@ import {
   Fire,
   Holy,
   Lightning,
+  MagicDamage,
   Pestilence,
   Raw,
-  Regen,
   Sword,
   Winter,
 } from "@/assets/icons/SVGIcons";
@@ -50,9 +50,11 @@ export const DamageTypeRender = observer(({ type }: { type: DamageType }) => {
       );
 
     case DamageType.MAGIC:
-      //TODO: Replace this with new icon
       return (
-        <Regen height={uiStore.iconSizeSmall} width={uiStore.iconSizeSmall} />
+        <MagicDamage
+          height={uiStore.iconSizeSmall}
+          width={uiStore.iconSizeSmall}
+        />
       );
 
     case DamageType.RAW:

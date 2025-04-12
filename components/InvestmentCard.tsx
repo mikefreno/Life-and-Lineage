@@ -87,7 +87,7 @@ const InvestmentCard = observer(
               {investment.requires.message}
             </Text>
             <Text style={[styles.mx8, styles.py4, styles.textCenter]}>
-              {toTitleCase(investment.requires.requirement)} dungeon to unlock
+              {toTitleCase(investment.requires.requirement)} needed to unlock
               this investment!
             </Text>
             <GenericFlatButton onPress={() => setShowRequirements(false)}>

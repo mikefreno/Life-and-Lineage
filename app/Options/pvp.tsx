@@ -21,7 +21,7 @@ import {
 
 const PVPOptions = observer(() => {
   const styles = useStyles();
-  const { uiStore, playerState } = useRootStore();
+  const { uiStore, playerState, pvpStore } = useRootStore();
   const [pvpNameInput, setPvpNameInput] = useState("");
   const vibration = useVibration();
 

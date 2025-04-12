@@ -31,7 +31,7 @@ export const DescriptionMap: Record<Element, string> = {
 };
 
 export const ClassDescriptionMap: Record<PlayerClassOptions, string> = {
-  mage: "The Mage is the default class, it is well balanced, with a focus on casting elemental magic",
+  mage: `The Mage is the "default" class, it is well balanced, with a focus on casting elemental magic`,
   paladin:
     "The Paladin is skilled with arms and uses holy magic, which is especially powerful against the undead and protecting life.",
   necromancer:

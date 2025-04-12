@@ -10,23 +10,26 @@ import {
   Ice,
   IntelligenceIcon,
   Lightning,
+  MagicDamage,
   Pestilence,
   Regen,
   Sanity,
   ShieldSlashIcon,
   StrengthIcon,
   Sword,
-} from "../../assets/icons/SVGIcons";
+} from "@/assets/icons/SVGIcons";
 import {
   ColdResist,
   FireResist,
   LightningResist,
   PoisonResist,
-} from "../../components/ResistanceIcons";
-import { Modifier } from "../types";
-import { HealthRegen, SanityRegen } from "../../components/RegenIcons";
-import { cleanRoundToTenths } from "./misc";
-import { Item } from "../../entities/item";
+  MagicResist,
+  HolyResist,
+} from "@/components/ResistanceIcons";
+import { Modifier } from "@/utility/types";
+import { HealthRegen, SanityRegen } from "@/components/RegenIcons";
+import { cleanRoundToTenths } from "@/utility/functions/misc";
+import { Item } from "@/entities/item";
 
 type StatInfo = {
   icon: (props: { height?: number; width?: number }) => ReactNode;
@@ -112,6 +115,16 @@ export const statMapping: Record<Modifier, StatInfo> = {
     formatValue: (value) => `${cleanRoundToTenths(value * 100)}%`,
     description: "Increased Poison Resistance",
   },
+  [Modifier.MagicResistance]: {
+    icon: MagicResist,
+    formatValue: (value) => `${cleanRoundToTenths(value * 100)}%`,
+    description: "Increased Magic Resistance",
+  },
+  [Modifier.HolyResistance]: {
+    icon: HolyResist,
+    formatValue: (value) => `${cleanRoundToTenths(value * 100)}%`,
+    description: "Increased Holy Resistance",
+  },
   [Modifier.PhysicalDamage]: {
     icon: Sword,
     shouldShowTotal: true,
@@ -188,17 +201,17 @@ export const statMapping: Record<Modifier, StatInfo> = {
     description: "Increased Poison Damage To Attacks/Spells",
   },
   [Modifier.MagicDamage]: {
-    icon: Regen,
+    icon: MagicDamage,
     shouldShowTotal: true,
     description: "Base Item Magic Damage",
   },
   [Modifier.MagicDamageAdded]: {
-    icon: Regen,
+    icon: MagicDamage,
     shouldShowTotal: true,
     description: "Magic Damage Added To Attacks/Spells",
   },
   [Modifier.MagicDamageMultiplier]: {
-    icon: Regen,
+    icon: MagicDamage,
     formatValue: (value) => `${cleanRoundToTenths(value * 100)}%`,
     description: "Increased Magic Damage To Attacks/Spells",
   },

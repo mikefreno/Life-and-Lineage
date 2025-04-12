@@ -1,14 +1,6 @@
-import { AudioManager } from "react-native-audio-api";
-
-AudioManager.setAudioSessionOptions({
-  iosMode: "default",
-  iosCategory: "ambient",
-  iosOptions: ["duckOthers", "allowBluetooth", "allowAirPlay"],
-});
-
 import { useFonts } from "expo-font";
 import { Stack, usePathname, useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { Platform, Pressable, View, StyleSheet, UIManager } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
@@ -155,8 +147,8 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
     playerState,
     dungeonStore,
     uiStore,
-    audioStore,
     shopsStore,
+    audioStore,
     showReachedEndOfCompletedDungeonsMessage,
     closeReachedEndOfCompletedDungeonsMessage,
   } = rootStore;
@@ -196,7 +188,6 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
     if (isDead && pathname !== "/DeathScreen") {
       router.replace("/DeathScreen");
       wait(350).then(() => {
-        uiStore.markStoreAsLoaded("inventory");
         uiStore.markStoreAsLoaded("routing");
       });
       return;
@@ -205,7 +196,6 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
     if (dungeonStore.hasPersistedState) {
       router.replace("/DungeonLevel");
       wait(350).then(() => {
-        uiStore.markStoreAsLoaded("inventory");
         uiStore.markStoreAsLoaded("routing");
       });
       return;
@@ -237,10 +227,6 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   ]);
 
   useEffect(() => {
-    return () => audioStore.cleanup();
-  }, []);
-
-  useEffect(() => {
     if (!firstLoad && playerState) {
       const isDead =
         rootStore.atDeathScreen ||
@@ -263,6 +249,12 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
     playerState?.currentSanity,
     rootStore.atDeathScreen,
   ]);
+
+  useEffect(() => {
+    return () => {
+      audioStore.cleanup();
+    };
+  }, []);
 
   useEffect(() => {
     if (uiStore.newbornBaby) {
@@ -531,38 +523,16 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                 ),
               }}
             />
-            <Stack.Screen
-              name="ShopInterior"
-              options={{
-                title: toTitleCase(shopsStore.currentShop?.archetype),
-                headerBackButtonMenuEnabled: false,
-                headerBackButtonDisplayMode: "minimal",
-                headerTransparent: true,
-                headerBackTitleStyle: {
-                  fontFamily: "PixelifySans",
-                  fontSize: getNormalizedSize(16),
-                },
-                headerTitleStyle: {
-                  fontFamily: "PixelifySans",
-                  fontSize: getNormalizedSize(22),
-                },
-                headerBackground: () => (
-                  <View style={[StyleSheet.absoluteFill, styles.diffuse]}>
-                    <BlurView
-                      intensity={50}
-                      style={[StyleSheet.absoluteFill]}
-                      tint={uiStore.colorScheme}
-                    />
-                  </View>
-                ),
-              }}
-            />
+            <Stack.Screen name="ShopInterior" />
             <Stack.Screen
               name="PVPArena"
               options={{
                 headerTitleStyle: {
                   fontFamily: "PixelifySans",
                   fontSize: getNormalizedSize(22),
+                },
+                headerStyle: {
+                  height: 44 + (uiStore.insets?.top ?? 0),
                 },
                 headerTransparent: true,
                 headerBackground: () => (
@@ -595,6 +565,9 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                 headerTitleStyle: {
                   fontFamily: "PixelifySans",
                   fontSize: getNormalizedSize(22),
+                },
+                headerStyle: {
+                  height: 44 + (uiStore.insets?.top ?? 0),
                 },
                 headerTransparent: true,
                 headerBackground: () => (
@@ -652,6 +625,9 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                 headerTitleStyle: {
                   fontFamily: "PixelifySans",
                   fontSize: getNormalizedSize(22),
+                },
+                headerStyle: {
+                  height: 44 + (uiStore.insets?.top ?? 0),
                 },
               }}
             />

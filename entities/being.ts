@@ -527,7 +527,7 @@ export class Being {
   }
 
   public restoreSanity(amount: number) {
-    if (!this.currentSanity || !this.maxSanity) return;
+    if (this.currentSanity === null || !this.maxSanity) return;
     if (this.currentSanity + amount < this.maxSanity) {
       this.currentSanity += amount;
     } else {

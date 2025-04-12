@@ -9,6 +9,16 @@ export const AudioToggle = observer(() => {
   const { audioStore, uiStore } = useRootStore();
   const vibration = useVibration();
 
+  while (!audioStore) {
+    return (
+      <D20DieAnimation
+        keepRolling
+        showNumber={false}
+        size={uiStore.iconSizeXL}
+      />
+    );
+  }
+
   return (
     <Pressable
       onPress={() => {

@@ -51,3 +51,28 @@ export const PoisonResist = ({
     source={require("../assets/images/icons/PoisonShield.png")}
   />
 );
+export const MagicResist = ({
+  width = 18,
+  height = 18,
+}: {
+  width?: number;
+  height?: number;
+}) => (
+  <Image
+    style={{ height, width }}
+    source={require("../assets/images/icons/MagicShield.png")}
+  />
+);
+
+export const HolyResist = ({
+  width = 18,
+  height = 18,
+}: {
+  width?: number;
+  height?: number;
+}) => (
+  <Image
+    style={{ height, width }}
+    source={require("../assets/images/icons/HolyShield.png")}
+  />
+);

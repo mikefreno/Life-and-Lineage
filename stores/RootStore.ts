@@ -9,7 +9,7 @@ import UIStore from "@/stores/UIStore";
 import EnemyStore from "@/stores/EnemyStore";
 import { DungeonStore } from "@/stores/DungeonStore";
 import { ShopStore } from "@/stores/ShopsStore";
-import { action, makeObservable, observable, runInAction } from "mobx";
+import { action, makeObservable, observable } from "mobx";
 import { AuthStore } from "@/stores/AuthStore";
 import { TimeStore } from "@/stores/TimeStore";
 import { CharacterStore } from "@/stores/CharacterStore";
@@ -69,13 +69,13 @@ export class RootStore {
     this.time = new TimeStore({ root: this });
     this.uiStore.markStoreAsLoaded("time");
 
+    this.audioStore = new AudioStore({ root: this });
+    this.uiStore.markStoreAsLoaded("audio");
+
     const retrieved_player = storage.getString("player");
     this.playerState = retrieved_player
       ? PlayerCharacter.fromJSON({ ...parse(retrieved_player), root: this })
       : null;
-    if (!this.playerState) {
-      runInAction(() => (this.uiStore.storeLoadingStatus.inventory = true));
-    }
     this.playerAnimationStore = new PlayerAnimationStore({ root: this });
 
     this.uiStore.markStoreAsLoaded("player");
@@ -95,8 +95,6 @@ export class RootStore {
     this.shopsStore = new ShopStore({ root: this });
     this.uiStore.markStoreAsLoaded("shops");
 
-    this.audioStore = new AudioStore({ root: this });
-
     this.enemyStore = new EnemyStore({ root: this });
     this.uiStore.markStoreAsLoaded("enemy");
 
@@ -109,11 +107,12 @@ export class RootStore {
     this.saveStore = new SaveStore({ root: this });
     this.uiStore.markStoreAsLoaded("save");
 
-    this.constructed = true;
-
     this.JSONServiceStore = new JSONServiceStore({ root: this });
 
     this.pvpStore = new PVPStore({ root: this });
+
+    this.constructed = true;
+    this.audioStore.initializeReactions();
 
     makeObservable(this, {
       constructed: observable,
@@ -123,6 +122,7 @@ export class RootStore {
       includeDevAttacks: observable,
       pathname: observable,
       showReachedEndOfCompletedDungeonsMessage: observable,
+      audioStore: observable,
 
       showEndOfCompletedDungeonsMessage: action,
       closeReachedEndOfCompletedDungeonsMessage: action,

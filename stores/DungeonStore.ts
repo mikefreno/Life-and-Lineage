@@ -121,6 +121,7 @@ export class DungeonStore {
       resetVolatileState: action,
       resetForNewGame: action,
       leaveSpecialEncounterRoom: action,
+      isFightingFinalInstanceBoss: computed,
     });
 
     reaction(
@@ -253,6 +254,14 @@ export class DungeonStore {
 
   get isInDungeon() {
     return !!(this.currentInstance && this.currentLevel);
+  }
+
+  get isFightingFinalInstanceBoss() {
+    return (
+      this.fightingBoss &&
+      !!this.currentLevel &&
+      this.currentLevel?.level === this.currentInstance?.levels.length
+    );
   }
 
   public toggleMovement() {
