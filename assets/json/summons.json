@@ -23,7 +23,7 @@
   {
     "name": "skeleton",
     "beingType": "undead",
-    "health": 55,
+    "health": 50,
     "sprite": "skeleton",
     "baseStrength": 5,
     "baseResistanceTable": {
@@ -31,7 +31,7 @@
       "holy": -50
     },
     "baseDamageTable": {
-      "physical": 4
+      "physical": 3
     },
     "mana": {
       "maximum": 50,
@@ -46,7 +46,7 @@
   {
     "name": "zombie",
     "beingType": "undead",
-    "health": 105,
+    "health": 100,
     "sprite": "zombie",
     "baseStrength": 8,
     "baseResistanceTable": {
@@ -56,7 +56,7 @@
       "holy": -75
     },
     "baseDamageTable": {
-      "physical": 12
+      "physical": 10
     },
     "mana": {
       "maximum": 50,

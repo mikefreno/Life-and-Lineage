@@ -40,7 +40,7 @@
     "sprite": "rat",
     "healthRange": {
       "minimum": 20,
-      "maximum": 50
+      "maximum": 35
     },
     "baseResistanceTable": {
       "physical": 5,
@@ -48,7 +48,7 @@
       "fire": -5
     },
     "baseDamageTable": {
-      "physical": 2
+      "physical": 1
     },
     "mana": {
       "maximum": 30,
@@ -130,8 +130,8 @@
     "beingType": "undead",
     "sanity": null,
     "healthRange": {
-      "minimum": 40,
-      "maximum": 60
+      "minimum": 35,
+      "maximum": 45
     },
     "mana": {
       "maximum": 50,
@@ -144,7 +144,7 @@
       "holy": -50
     },
     "baseDamageTable": {
-      "physical": 5
+      "physical": 3
     },
     "attackStrings": [
       "stab",
@@ -184,7 +184,7 @@
     "sanity": null,
     "healthRange": {
       "minimum": 30,
-      "maximum": 50
+      "maximum": 40
     },
     "mana": {
       "maximum": 50,
@@ -197,7 +197,7 @@
       "holy": -50
     },
     "baseDamageTable": {
-      "magic": 5
+      "magic": 4
     },
     "attackStrings": [
       "dark bolt"
@@ -225,11 +225,7 @@
     "sanity": null,
     "healthRange": {
       "minimum": 40,
-      "maximum": 60
-    },
-    "attackPowerRange": {
-      "minimum": 5,
-      "maximum": 10
+      "maximum": 55
     },
     "mana": {
       "maximum": 50,
@@ -276,8 +272,8 @@
     "beingType": "undead",
     "sanity": null,
     "healthRange": {
-      "minimum": 30,
-      "maximum": 55
+      "minimum": 20,
+      "maximum": 45
     },
     "mana": {
       "maximum": 25,
@@ -317,8 +313,8 @@
     "beingType": "demi-human",
     "sanity": 20,
     "healthRange": {
-      "minimum": 50,
-      "maximum": 70
+      "minimum": 45,
+      "maximum": 65
     },
     "mana": {
       "maximum": 50,
@@ -330,8 +326,8 @@
       "lightning": -5
     },
     "baseDamageTable": {
-      "physical": 6,
-      "poison": 3
+      "physical": 4,
+      "poison": 2
     },
     "attackStrings": [
       "blunt cleave",
@@ -373,7 +369,7 @@
       "fire": -10
     },
     "baseDamageTable": {
-      "physical": 12
+      "physical": 10
     },
     "attackStrings": [
       "bite",
@@ -424,7 +420,7 @@
       "fire": -10
     },
     "baseDamageTable": {
-      "physical": 6,
+      "physical": 5,
       "lightning": 4
     },
     "attackStrings": [
@@ -1011,10 +1007,6 @@
     "healthRange": {
       "minimum": 120,
       "maximum": 160
-    },
-    "attackPowerRange": {
-      "minimum": 10,
-      "maximum": 15
     },
     "mana": {
       "maximum": 40,

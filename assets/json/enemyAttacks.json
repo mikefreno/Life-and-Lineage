@@ -5,7 +5,7 @@
     "targets": "single",
     "baseHitChance": 1.0,
     "damageTable": {
-      "physical": 5
+      "physical": 4
     },
     "debuffNames": [
       {
@@ -20,7 +20,7 @@
     "targets": "single",
     "baseHitChance": 0.90,
     "damageTable": {
-      "physical": 5
+      "physical": 4
     },
     "debuffNames": [
       {
@@ -35,7 +35,7 @@
     "targets": "single",
     "baseHitChance": 1.0,
     "damageTable": {
-      "physical": 5
+      "physical": 4
     },
     "debuffNames": [
       {
@@ -51,7 +51,7 @@
     "baseHitChance": 0.95,
     "damageTable": {
       "physical": 3,
-      "poison": 5
+      "poison": 4
     },
     "debuffNames": [
       {
