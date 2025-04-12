@@ -112,7 +112,7 @@ export class Item {
       itemClass !== ItemClassType.Arrow &&
       name.toLowerCase() !== "unarmored"
     ) {
-      if (prefix || suffix || rarity) {
+      if (prefix || suffix || rarity !== null || rarity !== undefined) {
         this.rarity = rarity ?? Rarity.NORMAL;
         this.prefix = prefix ?? null;
         this.suffix = suffix ?? null;
