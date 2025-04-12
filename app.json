@@ -8,15 +8,16 @@
     "scheme": "lineageapp",
     "userInterfaceStyle": "automatic",
     "assetBundlePatterns": [
-      "**/*",
-      "./assets/music/*",
-      "./assets/sfx/*"
+      "./assets/**/*",
+      "./meta-assets/cloud_save_game.png",
+      "./meta-assets/RoundedIcon.png",
+      "./meta-assets/stashPurchase.png"
     ],
     "ios": {
       "usesAppleSignIn": true,
       "supportsTablet": true,
       "bundleIdentifier": "com.mikefrenodev.lineage",
-      "buildNumber": "77",
+      "buildNumber": "79",
       "entitlements": {
         "com.apple.developer.networking.wifi-info": true,
         "aps-environment": "development"
