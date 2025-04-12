@@ -25,8 +25,8 @@ import {
   StatCategory,
 } from "@/components/PlayerStatus/Components";
 import GenericStrikeAround from "@/components/GenericStrikeAround";
-import { Attribute, Modifier } from "@/utility/types";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Attribute } from "@/utility/types";
+import { useEffect, useMemo, useState } from "react";
 import { DEFENSIVE_STATS, OFFENSIVE_STATS } from "@/utility/functions/stats";
 import { observer } from "mobx-react-lite";
 import BlessingDisplay from "@/components/BlessingsDisplay";
@@ -35,7 +35,6 @@ import ClassDisplay from "@/components/ClassDisplay";
 import { toTitleCase } from "@/utility/functions/misc";
 import Colors, { playerClassColors } from "@/constants/Colors";
 import { useScaling } from "@/hooks/scaling";
-import { withDelay } from "react-native-reanimated";
 
 export const PlayerStatusModal = observer(() => {
   const { uiStore, playerState, dungeonStore } = useRootStore();
@@ -44,16 +43,8 @@ export const PlayerStatusModal = observer(() => {
   const vibration = useVibration();
   const [showNoRespecToast, setShowNoRespecToast] = useState(false);
 
-  const [ownedOffensive, setOwnedOffensive] = useState<Map<Modifier, number>>(
-    new Map(),
-  );
-  const [ownedDefensive, setOwnedDefensive] = useState<Map<Modifier, number>>(
-    new Map(),
-  );
-
   const [respeccing, setRespeccing] = useState<boolean>(false);
 
-  const prevEquipmentRef = useRef<string>("");
   const respeccingShared = useSharedValue(false);
   const pressed = useSharedValue(false);
 
@@ -167,30 +158,24 @@ export const PlayerStatusModal = observer(() => {
     uiStore.colorScheme,
   ]);
 
-  useEffect(() => {
-    if (!playerState?.equipmentStats) return;
+  const ownedOffensive = useMemo(() => {
+    if (!playerState?.equipmentStats) return new Map();
 
-    const currentEquipment = JSON.stringify(
-      Array.from(playerState.equipmentStats.entries()),
-    );
-    if (currentEquipment === prevEquipmentRef.current) return;
-
-    prevEquipmentRef.current = currentEquipment;
-
-    const offensive = new Map(
+    return new Map(
       Array.from(playerState.equipmentStats.entries()).filter(
         ([key, value]) => OFFENSIVE_STATS.includes(key) && value > 0,
       ),
     );
+  }, [playerState?.equipmentStats]);
 
-    const defensive = new Map(
+  const ownedDefensive = useMemo(() => {
+    if (!playerState?.equipmentStats) return new Map();
+
+    return new Map(
       Array.from(playerState.equipmentStats.entries()).filter(
         ([key, value]) => DEFENSIVE_STATS.includes(key) && value > 0,
       ),
     );
-
-    setOwnedOffensive(offensive);
-    setOwnedDefensive(defensive);
   }, [playerState?.equipmentStats]);
 
   if (!playerState) return;

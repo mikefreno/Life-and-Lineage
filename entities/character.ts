@@ -587,7 +587,6 @@ export class PlayerCharacter extends Character {
       buyItem: action,
       removeFromInventory: action,
       sellItem: action,
-      equipment: observable,
       equipItem: action,
       unEquipItem: action,
       inventory: computed,

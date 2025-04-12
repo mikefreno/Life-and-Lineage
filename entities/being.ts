@@ -192,6 +192,7 @@ export class Being {
 
       damageTypeCalculation: action,
       calculateAttackDamage: action,
+      equipment: observable,
 
       baseDamageTable: observable,
       baseResistanceTable: observable,

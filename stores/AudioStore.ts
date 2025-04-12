@@ -184,8 +184,8 @@ export class AudioStore {
   }
 
   startNextTrackTimeout() {
-    //start a countdown of 10-45 seconds, then start a new track
-    const delay = getRandomInt(10000, 45000);
+    //start a countdown of 25-120 seconds, then start a new track
+    const delay = getRandomInt(25_000, 120_000);
 
     this.nextTrackStartTimeout = setTimeout(() => {
       runInAction(() => {
