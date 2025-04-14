@@ -746,7 +746,7 @@
     "targets": "single",
     "baseHitChance": 0.95,
     "damageTable": {
-      "physical": 6
+      "physical": 4
     },
     "debuffNames": [
       {
