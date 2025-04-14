@@ -608,6 +608,11 @@ export class PlayerCharacter extends Character {
         this.unAllocatedSkillPoints,
         this.equipmentStats,
         this.baseInventory.length,
+        this.equipment?.mainHand,
+        this.equipment?.offHand,
+        this.equipment?.body,
+        this.equipment?.body,
+        this.equipment?.quiver,
       ],
       () => {
         savePlayer(this);
@@ -1915,6 +1920,35 @@ export class PlayerCharacter extends Character {
    * @returns A new PlayerCharacter instance
    */
   static fromJSON(json: any): PlayerCharacter {
+    const equipment = {
+      mainHand: json.equipment?.mainHand
+        ? Item.fromJSON({ ...json.equipment.mainHand, root: json.root })
+        : new Item({
+            // Default unarmored item
+            name: "unarmored",
+            slot: "one-hand",
+            stats: { [Modifier.PhysicalDamage]: 1 },
+            baseValue: 0,
+            rarity: Rarity.NORMAL,
+            itemClass: ItemClassType.NULL,
+            root: json.root,
+            attacks: ["punch"],
+          }),
+      offHand: json.equipment?.offHand
+        ? Item.fromJSON({ ...json.equipment.offHand, root: json.root })
+        : null,
+      body: json.equipment?.body
+        ? Item.fromJSON({ ...json.equipment.body, root: json.root })
+        : null,
+      head: json.equipment?.head
+        ? Item.fromJSON({ ...json.equipment.head, root: json.root })
+        : null,
+      quiver: json.equipment?.quiver
+        ? json.equipment.quiver.map((arrow: any) =>
+            Item.fromJSON({ ...arrow, root: json.root }),
+          )
+        : null,
+    };
     const player = new PlayerCharacter({
       id: json.id,
       beingType: "human",
@@ -1956,20 +1990,7 @@ export class PlayerCharacter extends Character {
             Item.fromJSON({ ...item, root: json.root }),
           )
         : [],
-      equipment: json.equipment && {
-        ...Object.fromEntries(
-          ["mainHand", "offHand", "body", "head"].map((slot) => [
-            slot,
-            json.equipment[slot]
-              ? Item.fromJSON({ ...json.equipment[slot], root: json.root })
-              : null,
-          ]),
-        ),
-        quiver:
-          json.equipment.quiver?.map((arrow: any) =>
-            Item.fromJSON({ ...arrow, root: json.root }),
-          ) ?? null,
-      },
+      equipment: equipment,
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],
@@ -2252,6 +2273,8 @@ const _playerSave = async (
           body: player.equipment?.body?.toJSON(),
           mainHand: player.equipment?.mainHand.toJSON(),
           offHand: player.equipment?.offHand?.toJSON(),
+          quiver:
+            player.equipment?.quiver?.map((arrow) => arrow.toJSON()) || null,
         },
         root: undefined,
       };
@@ -2267,4 +2290,4 @@ const _playerSave = async (
   }
 };
 
-export const savePlayer = throttle(_playerSave, 500);
+export const savePlayer = throttle(_playerSave, 50);

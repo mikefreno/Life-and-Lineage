@@ -22,6 +22,7 @@ export default class EnemyStore {
   enemies: Being[];
   animationStoreMap: Map<string, EnemyAnimationStore>;
   root: RootStore;
+  safetyTimeout: NodeJS.Timeout | null = null;
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
@@ -44,6 +45,7 @@ export default class EnemyStore {
       enemyTurnOngoing: computed,
       allBeings: computed,
       enemiesIDString: computed,
+      safetyClear: action,
     });
 
     reaction(
@@ -62,6 +64,28 @@ export default class EnemyStore {
         }
       },
     );
+    reaction(
+      () => this.enemyTurnOngoing,
+      () => {
+        if (this.enemyTurnOngoing) {
+          this.safetyTimeout = setTimeout(() => {
+            if (this.enemyTurnOngoing) {
+              this.safetyClear();
+            }
+          }, 5000);
+        } else {
+          if (this.safetyTimeout) {
+            clearTimeout(this.safetyTimeout);
+            this.safetyTimeout = null;
+          }
+        }
+      },
+    );
+  }
+
+  safetyClear() {
+    this.root.playerAnimationStore.safetyClear();
+    this.animationStoreMap.forEach((v) => v.safetyClear());
   }
 
   setupDevActions() {

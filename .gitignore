@@ -15,8 +15,6 @@ web-build/
 *.key
 *.mobileprovision
 
-
-
 # Metro
 .metro-health-check*
 
@@ -44,6 +42,7 @@ ios
 android
 magic-delve-messager-firebase-adminsdk-kfxxy-88e8768e79.json
 #google-services.json
+*.mp4
 
 # build
 *.app

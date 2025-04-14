@@ -47,6 +47,7 @@ export class PlayerAnimationStore {
       refiringAnimationSets: observable,
       targetPoint: observable,
 
+      safetyClear: action,
       setAnimation: action,
       clearAnimation: action,
       setTextString: action,
@@ -102,6 +103,11 @@ export class PlayerAnimationStore {
 
   get playerTurnOngoing() {
     return !!this.animationSet || this.usedPass;
+  }
+
+  safetyClear() {
+    this.animationSet = null;
+    this.usedPass = false;
   }
 
   setAnimation({

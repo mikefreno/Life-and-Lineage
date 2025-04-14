@@ -124,6 +124,7 @@ export class EnemyAnimationStore {
       clearProjectileSet: action,
       clearGlow: action,
       handleScreenShake: action,
+      safetyClear: action,
 
       notIdle: computed,
     });
@@ -154,6 +155,14 @@ export class EnemyAnimationStore {
         }
       },
     );
+  }
+  safetyClear() {
+    this.projectileSet = null;
+    this.activeGlow = null;
+    this.currentAnimationDetails = null;
+    this.textString = undefined;
+    this.dialogue = null;
+    this.animationQueue = ["idle"];
   }
 
   setRenderedDimensions(arg0: { width: number; height: number }) {
