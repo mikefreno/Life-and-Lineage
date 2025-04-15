@@ -397,25 +397,23 @@ const TabLayout = observer(() => {
                   color={color}
                 />
               ),
-              headerRight: __DEV__
-                ? () => (
-                    <Link href="/Activities" asChild>
-                      <Pressable onPress={() => vibration({ style: "light" })}>
-                        {({ pressed }) => (
-                          <BowlingBallAndPin
-                            width={uiStore.iconSizeXL}
-                            height={uiStore.iconSizeXL}
-                            color={"#27272a"}
-                            style={{
-                              marginRight: 15,
-                              opacity: pressed ? 0.5 : 1,
-                            }}
-                          />
-                        )}
-                      </Pressable>
-                    </Link>
-                  )
-                : undefined,
+              headerRight: () => (
+                <Link href="/Activities" asChild>
+                  <Pressable onPress={() => vibration({ style: "light" })}>
+                    {({ pressed }) => (
+                      <BowlingBallAndPin
+                        width={uiStore.iconSizeXL}
+                        height={uiStore.iconSizeXL}
+                        color={"#27272a"}
+                        style={{
+                          marginRight: 15,
+                          opacity: pressed ? 0.5 : 1,
+                        }}
+                      />
+                    )}
+                  </Pressable>
+                </Link>
+              ),
             }}
           />
           <Tabs.Screen
