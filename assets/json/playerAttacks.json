@@ -65,7 +65,7 @@
     "hitChance": 1.0,
     "damageTable": {},
     "animation": {
-      "sprite": "slash-horizontal",
+      "sprite": "slashHorizontal",
       "style": "static",
       "position": "enemy"
     }
@@ -76,7 +76,7 @@
     "hitChance": 0.85,
     "damageTable": {},
     "animation": {
-      "sprite": "slash-horizontal",
+      "sprite": "slashHorizontal",
       "style": "static",
       "position": "enemy"
     }
