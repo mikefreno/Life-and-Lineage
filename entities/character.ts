@@ -154,6 +154,7 @@ export class Character extends Being {
       setParents: action,
       initiatePregnancy: action,
       giveBirth: action,
+      addKnownCharacter: action,
 
       dateAvailable: computed,
       age: computed,
@@ -229,7 +230,7 @@ export class Character extends Being {
 
   public addKnownCharacter(character: Character) {
     if (!this.knownCharacterIds.includes(character.id)) {
-      this.knownCharacterIds.push(character.id);
+      this.knownCharacterIds = [...this.knownCharacterIds, character.id];
     }
   }
 
@@ -313,15 +314,39 @@ export class Character extends Being {
     this.job = job;
   }
 
-  public setDateCooldownStart(): void {
-    this.dateCooldownStart = this.root.time.currentDate;
+  public setDateCooldownStart(extraLong = false): void {
+    const currentDate = this.root.time.currentDate;
+
+    let newYear = currentDate.year;
+    let newWeek = currentDate.week + 1;
+
+    if (newWeek > 51) {
+      newWeek = 1;
+      newYear++;
+    }
+    if (extraLong) {
+      newWeek++;
+      if (newWeek > 51) {
+        newWeek = 1;
+        newYear++;
+      }
+    }
+
+    this.dateCooldownStart = { year: newYear, week: newWeek };
   }
 
   get dateAvailable() {
-    return this.dateCooldownStart
-      ? this.dateCooldownStart.year !== this.root.time.year ||
-          this.dateCooldownStart.week !== this.root.time.week
-      : true;
+    if (!this.dateCooldownStart) {
+      return true;
+    }
+
+    const currentDate = this.root.time.currentDate;
+
+    return (
+      this.dateCooldownStart.year < currentDate.year ||
+      (this.dateCooldownStart.year === currentDate.year &&
+        this.dateCooldownStart.week <= currentDate.week)
+    );
   }
 
   public kill() {
@@ -665,6 +690,8 @@ export class PlayerCharacter extends Character {
 
       getMedicalService: action,
       bossDefeated: action,
+      totalAllocatedSkillPoints: computed,
+      checkAndFixForDungeonAndSkillPointDiscontinuity: action,
 
       gameTurnHandler: action,
     });
@@ -693,6 +720,34 @@ export class PlayerCharacter extends Character {
         savePlayer(this);
       },
     );
+  }
+
+  //TODO: Make better solution(may even already be fixed, just needs testing), at very least needs to account for skill books when those are added
+  checkAndFixForDungeonAndSkillPointDiscontinuity() {
+    let bossesDefeated = 0;
+    this.root.dungeonStore.dungeonInstances.forEach((inst) => {
+      inst.levels.forEach((level) => {
+        if (level.bossDefeated) {
+          bossesDefeated++;
+        }
+      });
+    });
+    const deserved = bossesDefeated * 3;
+    const diff =
+      deserved - (this.totalAllocatedSkillPoints + this.unAllocatedSkillPoints);
+    if (diff > 0) {
+      this.addSkillPoint({ amount: diff, to: "unallocated" });
+    }
+  }
+
+  get totalAllocatedSkillPoints() {
+    if (!this.allocatedSkillPoints) {
+      return 0;
+    }
+
+    return Object.values(this.allocatedSkillPoints).reduce((total, points) => {
+      return total + (points || 0); // Add points, treating undefined or null as 0
+    }, 0);
   }
 
   private setupDevActions() {

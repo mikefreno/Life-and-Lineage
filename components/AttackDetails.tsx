@@ -19,7 +19,8 @@ export default function AttackDetails({
     <View style={styles.attackDetailsContainer}>
       <Text style={styles["text-xl"]}>{toTitleCase(attack.name)}</Text>
       <Text>
-        {toTitleCase(attack.targets)} {attack.targets == "single" && "Target"}
+        {toTitleCase(attack.targets)}{" "}
+        {(attack.targets == "single" || attack.targets == "dual") && "Target"}
       </Text>
       {attack.targets && <Text>{attack.baseHitChance * 100}% hit chance</Text>}
       {attack.buffNames && attack.buffNames.length > 0 && (

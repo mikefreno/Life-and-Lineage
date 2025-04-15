@@ -31,11 +31,10 @@ import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 import { PLAYER_TEXT_STRING_DURATION } from "@/stores/PlayerAnimationStore";
 import Colors from "@/constants/Colors";
 import { useScaling } from "@/hooks/scaling";
-import { SCREEN_TRANSITION_TIMING } from "@/stores/UIStore";
+import { jsonServiceStore } from "@/stores/SingletonSource";
 
 const DungeonLevelScreen = observer(() => {
-  const { dungeonStore, uiStore, audioStore, playerAnimationStore } =
-    useRootStore();
+  const { dungeonStore, uiStore, playerAnimationStore } = useRootStore();
   const { currentLevel, inCombat } = dungeonStore;
   const { draggableClassStore } = useDraggableStore();
 
@@ -194,7 +193,11 @@ const DungeonLevelScreen = observer(() => {
         </View>
         <Parallax
           backgroundName={
-            currentLevel.parallaxOverride ?? currentLevel.parent.bgName
+            jsonServiceStore
+              .readJsonFileSync("dungeons")
+              .find((d) => d.name === currentLevel.parent.name)?.bgName ??
+            currentLevel.parallaxOverride ??
+            currentLevel.parent.bgName
           }
           inCombat={inCombat}
           playerPosition={{

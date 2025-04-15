@@ -1,6 +1,6 @@
 import React from "react";
 import { Pressable, ScrollView, View } from "react-native";
-import { ThemedView, Text } from "@/components/Themed";
+import { Text } from "@/components/Themed";
 import { Activity, BadOutcome, GoodOutcome } from "@/utility/types";
 import { flipCoin, toTitleCase, wait } from "@/utility/functions/misc";
 import { generateNewCharacter } from "@/utility/functions/characterAid";
@@ -26,6 +26,8 @@ import { useStyles } from "@/hooks/styles";
 import { DungeonLevel } from "@/entities/dungeon";
 import { AnimatedSprite } from "@/components/AnimatedSprite";
 import { Enemy } from "@/entities/creatures";
+import ThemedCard from "./ThemedCard";
+import DateResultModal from "./DateResultModal";
 
 interface ActivityCardProps {
   activity: Activity;
@@ -44,6 +46,10 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
   const styles = useStyles();
   const router = useRouter();
   const [enemyObjects, setEnemyObjects] = useState<Enemy[] | null>();
+  const [showDateResultModal, setShowDateResultModal] =
+    useState<boolean>(false);
+  const [datePartner, setDatePartner] = useState<Character | null>(null);
+  const [dateAffectionChange, setDateAffectionChange] = useState<number>(0);
 
   function activityRoller(outcomes: { [key: string]: number }) {
     const keys = Object.keys(outcomes);
@@ -128,15 +134,31 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
         decreaseAffection: activity.date.decreaseAffection,
         increaseAffection: activity.date.increaseAffection,
       });
+
+      let affectionChange = 0;
+
       if (chosenOutcome == "increaseAffection") {
         const range = activity.date.increaseAffectionRange;
-        const res =
+        affectionChange =
           Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
       } else {
         const range = activity.date.decreaseAffectionRange;
-        const res =
-          Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
+        affectionChange =
+          -1 *
+          (Math.floor(Math.random() * (range.max - range.min + 1)) + range.min);
       }
+
+      root.gameTick();
+      character.setDateCooldownStart(true);
+      character.updateAffection(affectionChange);
+
+      // Set state for date result modal
+      setDatePartner(character);
+      setDateAffectionChange(affectionChange);
+      setShowDatePartnerSelection(false);
+      wait(750).then(() => {
+        setShowDateResultModal(true);
+      });
     }
   }
 
@@ -220,17 +242,25 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
   function renderCharacter(character: Character) {
     return (
       <Pressable
+        disabled={!character.dateAvailable}
         key={character.id}
         onPress={() => date(character)}
         style={({ pressed }) => [
           styles.characterCard,
+          !character.dateAvailable && { opacity: 0.5 },
           pressed && { transform: [{ scale: 0.95 }] },
         ]}
       >
         <Text style={[styles["text-2xl"], styles.textCenter]}>
           {character.fullName}
         </Text>
-        <View style={styles.itemsCenter}>
+        <View
+          style={{
+            width: uiStore.dimensions.lesser * 0.3,
+            height: uiStore.dimensions.lesser * 0.3,
+            alignSelf: "center",
+          }}
+        >
           <CharacterImage character={character} />
         </View>
         <Text style={styles["text-xl"]}>
@@ -290,6 +320,13 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
 
   return (
     <>
+      <DateResultModal
+        isVisible={showDateResultModal}
+        character={datePartner}
+        affectionChange={dateAffectionChange}
+        dateLocation={dateDestination}
+        closeFunction={() => setShowDateResultModal(false)}
+      />
       <GenericModal
         isVisibleCondition={showDatePartnerSelection}
         backFunction={() => setShowDatePartnerSelection(false)}
@@ -327,6 +364,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
       <CharacterInteractionModal
         showAdoptionModal={() => null}
         character={metCharacter}
+        triggeredByActivityMeeting={true}
         closeFunction={() => setMetCharacter(null)}
         showGiftModal={() => null}
       />
@@ -475,44 +513,42 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
         </View>
       </GenericModal>
       <View style={{ padding: 8 }}>
-        <ThemedView style={styles.activityCard}>
-          <View style={styles.activityCardInner}>
-            <View style={styles.rowBetween}>
-              <Text style={[styles["text-xl"], styles.bold, { width: "75%" }]}>
-                {toTitleCase(activity.name)}
+        <ThemedCard>
+          <View style={styles.rowBetween}>
+            <Text style={[styles["text-xl"], styles.bold, { width: "75%" }]}>
+              {toTitleCase(activity.name)}
+            </Text>
+            <View style={styles.rowCenter}>
+              <Text style={[styles["text-xl"], styles.bold]}>
+                {activity.cost == 0 ? "free" : activity.cost}{" "}
               </Text>
-              <View style={styles.rowCenter}>
-                <Text style={[styles["text-xl"], styles.bold]}>
-                  {activity.cost == 0 ? "free" : activity.cost}{" "}
-                </Text>
-                {activity.cost !== 0 && (
-                  <Coins
-                    height={uiStore.iconSizeSmall}
-                    width={uiStore.iconSizeSmall}
-                  />
-                )}
-              </View>
-            </View>
-            <View style={{ flexDirection: "row" }}>
-              {activity.alone && (
-                <GenericRaisedButton
-                  disabled={!!playerState && playerState.gold < activity.cost}
-                  onPress={visit}
-                >
-                  Visit Alone
-                </GenericRaisedButton>
-              )}
-              {activity.date && (
-                <GenericRaisedButton
-                  disabled={playerState?.getAllAdultCharacters().length == 0}
-                  onPress={() => dateSelect(activity.name)}
-                >
-                  Go on Date
-                </GenericRaisedButton>
+              {activity.cost !== 0 && (
+                <Coins
+                  height={uiStore.iconSizeSmall}
+                  width={uiStore.iconSizeSmall}
+                />
               )}
             </View>
           </View>
-        </ThemedView>
+          <View style={{ flexDirection: "row" }}>
+            {activity.alone && (
+              <GenericRaisedButton
+                disabled={!!playerState && playerState.gold < activity.cost}
+                onPress={visit}
+              >
+                Visit Alone
+              </GenericRaisedButton>
+            )}
+            {activity.date && (
+              <GenericRaisedButton
+                disabled={playerState?.getAllAdultCharacters().length == 0}
+                onPress={() => dateSelect(activity.name)}
+              >
+                Go on Date
+              </GenericRaisedButton>
+            )}
+          </View>
+        </ThemedCard>
       </View>
     </>
   );

@@ -1,4 +1,4 @@
-import { Component } from "react";
+import { Component, useEffect } from "react";
 import { Text } from "@/components/Themed";
 import { ScrollView, View } from "react-native";
 import D20DieAnimation from "@/components/DieRollAnim";
@@ -7,6 +7,13 @@ import { useRootStore } from "@/hooks/stores";
 import { reloadAppAsync } from "expo";
 import React, { ReactNode, useState } from "react";
 import * as Sentry from "@sentry/react-native";
+import {
+  checkForUpdateAsync,
+  fetchUpdateAsync,
+  reloadAsync,
+} from "expo-updates";
+import GenericModal from "./GenericModal";
+import { AnimatedLoadingText } from "./AnimatedLoadingText";
 
 type Extra = unknown;
 export type Extras = Record<string, Extra>;
@@ -64,59 +71,109 @@ function ErrorRender({ error }: { error: unknown }): React.ReactElement {
   const root = useRootStore();
   const [expanded, setExpanded] = useState(false);
   root.uiStore.clearDungeonColor();
+  const [downloadingUpdate, setDownloadingUpdate] = useState(false);
+  const [downloadingError, setDownloadingError] = useState<string>();
 
   return (
-    <ScrollView
-      contentContainerStyle={{
-        flex: 1,
-        justifyContent: "space-evenly",
-        paddingBottom: root.uiStore.insets?.bottom,
-      }}
-    >
-      <Text style={{ textAlign: "center" }}>Something went wrong.</Text>
-      <View
-        style={{
-          width: "100%",
-          marginHorizontal: "auto",
+    <>
+      <GenericModal
+        isVisibleCondition={!!downloadingError}
+        backFunction={() => setDownloadingError(undefined)}
+      >
+        <View>
+          <Text style={{ textAlign: "center" }}>
+            An error occurred while downloading the update ironically. Yikes.
+          </Text>
+          <Text style={{ textAlign: "center" }}>{downloadingError}</Text>
+        </View>
+      </GenericModal>
+      <ScrollView
+        contentContainerStyle={{
+          flex: 1,
+          justifyContent: "space-evenly",
+          paddingBottom: root.uiStore.insets?.bottom,
         }}
       >
-        <D20DieAnimation keepRolling={true} slowRoll={true} replaceNum={"??"} />
-      </View>
-      <View>
-        <GenericFlatButton
-          style={{ marginTop: 8 }}
-          onPress={() => setExpanded((prev) => !prev)}
+        <Text style={{ textAlign: "center" }}>Something went wrong.</Text>
+        <View
+          style={{
+            width: "100%",
+            marginHorizontal: "auto",
+          }}
         >
-          {expanded ? "Hide Error Details" : "Show Error Details"}
-        </GenericFlatButton>
-        {expanded && (
-          <Text style={{ textAlign: "center", marginVertical: 8 }}>
-            {getErrorMessage(error)}
-          </Text>
-        )}
-        <GenericFlatButton
-          style={{ marginTop: 8 }}
-          onPress={(): Promise<void> => reloadAppAsync("Restart")}
-        >
-          Restart
-        </GenericFlatButton>
-        {__DEV__ && (
-          <>
+          <D20DieAnimation
+            keepRolling={true}
+            slowRoll={true}
+            replaceNum={"??"}
+          />
+        </View>
+        {downloadingUpdate ? (
+          <View style={{ marginTop: 8 }}>
+            <Text style={{ textAlign: "center" }}>Downloading update</Text>
+            <AnimatedLoadingText />
+          </View>
+        ) : (
+          <View>
             <GenericFlatButton
               style={{ marginTop: 8 }}
-              onPress={() => root.leaveDungeon()}
+              onPress={() => setExpanded((prev) => !prev)}
             >
-              Clear Dungeon
+              {expanded ? "Hide Error Details" : "Show Error Details"}
             </GenericFlatButton>
+            {expanded && (
+              <Text style={{ textAlign: "center", marginVertical: 8 }}>
+                {getErrorMessage(error)}
+              </Text>
+            )}
+            {root.authStore.updateAvailable && (
+              <>
+                <Text style={{ textAlign: "center", marginVertical: 8 }}>
+                  An update is available that may address this, download and
+                  update?
+                </Text>
+                <GenericFlatButton
+                  style={{ marginTop: 8 }}
+                  onPress={() => {
+                    setDownloadingUpdate(true);
+                    fetchUpdateAsync()
+                      .then(() => reloadAsync())
+                      .catch((e) => {
+                        setDownloadingError(e);
+                        setDownloadingUpdate(false);
+                      });
+                  }}
+                >
+                  Start
+                </GenericFlatButton>
+              </>
+            )}
             <GenericFlatButton
               style={{ marginTop: 8 }}
-              onPress={() => root.clearAllData()}
+              onPress={(): Promise<void> => reloadAppAsync("Restart")}
             >
-              Clear All Data
+              {root.authStore.updateAvailable
+                ? "Restart without update"
+                : "Restart"}
             </GenericFlatButton>
-          </>
+            {__DEV__ && (
+              <>
+                <GenericFlatButton
+                  style={{ marginTop: 8 }}
+                  onPress={() => root.leaveDungeon()}
+                >
+                  Clear Dungeon
+                </GenericFlatButton>
+                <GenericFlatButton
+                  style={{ marginTop: 8 }}
+                  onPress={() => root.clearAllData()}
+                >
+                  Clear All Data
+                </GenericFlatButton>
+              </>
+            )}
+          </View>
         )}
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </>
   );
 }

@@ -1,5 +1,4 @@
 import React from "react";
-import investments from "@/assets/json/investments.json";
 import { InvestmentType, TutorialOption } from "@/utility/types";
 import InvestmentCard from "@/components/InvestmentCard";
 import { useIsFocused } from "@react-navigation/native";
@@ -9,6 +8,7 @@ import { observer } from "mobx-react-lite";
 import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 import { useRootStore } from "@/hooks/stores";
 import { useStyles } from "@/hooks/styles";
+import { jsonServiceStore } from "@/stores/SingletonSource";
 
 const InvestingScreen = observer(() => {
   const { uiStore } = useRootStore();
@@ -34,9 +34,11 @@ const InvestingScreen = observer(() => {
           ...styles.notchAvoidingLanscapeMargin,
         }}
       >
-        {investments.map((investment: InvestmentType, idx) => (
-          <InvestmentCard key={idx} investment={investment} />
-        ))}
+        {jsonServiceStore
+          .readJsonFileSync("investments")
+          .map((investment: InvestmentType, idx) => (
+            <InvestmentCard key={idx} investment={investment} />
+          ))}
       </ScrollView>
       <PlayerStatusForSecondary />
     </>

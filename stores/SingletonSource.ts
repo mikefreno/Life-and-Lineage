@@ -261,6 +261,10 @@ class JSONService {
     filename: T,
   ): Promise<JSONFileTypeMap[T]> {
     try {
+      if (__DEV__) {
+        return this.getOriginalJson(filename);
+      }
+
       const path = this.getJsonPath(filename);
       const fileInfo = await FileSystem.getInfoAsync(path);
 

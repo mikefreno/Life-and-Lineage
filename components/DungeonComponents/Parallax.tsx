@@ -113,7 +113,7 @@ const backgroundImages = {
       4: require("@/assets/backgrounds/Cave_2/4.png"),
     },
     size: { width: 320, height: 64 },
-    verticalOffset: 0.45,
+    verticalOffset: -0.25,
   },
   Cemetary: {
     imageSet: {
@@ -287,7 +287,7 @@ const backgroundImages = {
       8: require("@/assets/backgrounds/Plains/8.png"),
     },
     size: { width: 384, height: 216 },
-    verticalOffset: -0.25,
+    verticalOffset: -0.4,
   },
   SnowyMountain: {
     imageSet: {

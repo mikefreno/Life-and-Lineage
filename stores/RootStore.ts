@@ -88,6 +88,9 @@ export class RootStore {
 
     this.dungeonStore = new DungeonStore({ root: this });
     this.uiStore.markStoreAsLoaded("dungeon");
+    if (this.playerState) {
+      this.playerState.checkAndFixForDungeonAndSkillPointDiscontinuity();
+    }
 
     this.characterStore = new CharacterStore({
       root: this,

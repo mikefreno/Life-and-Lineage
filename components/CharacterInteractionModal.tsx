@@ -25,6 +25,7 @@ interface CharacterInteractionModal {
   backdropCloses?: boolean;
   showGiftModal: () => void;
   showAdoptionModal: (partnerName?: string) => void;
+  triggeredByActivityMeeting?: boolean;
 }
 
 export const CharacterInteractionModal = observer(
@@ -35,6 +36,7 @@ export const CharacterInteractionModal = observer(
     backdropCloses = false,
     showGiftModal,
     showAdoptionModal,
+    triggeredByActivityMeeting = false,
   }: CharacterInteractionModal) => {
     const root = useRootStore();
     const styles = useStyles();
@@ -109,6 +111,11 @@ export const CharacterInteractionModal = observer(
         size={100}
         scrollEnabled={true}
       >
+        {triggeredByActivityMeeting ? (
+          <Text style={{ textAlign: "center", ...styles["text-lg"] }}>
+            You meet:
+          </Text>
+        ) : null}
         {character && (
           <>
             <Text style={{ textAlign: "center", ...styles["text-xl"] }}>

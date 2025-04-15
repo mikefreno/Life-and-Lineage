@@ -1,10 +1,10 @@
 import React from "react";
-import activities from "@/assets/json/activities.json";
 import ActivityCard from "@/components/ActivityCard";
 import { ScrollView } from "react-native";
 import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 import { tw_base, useStyles } from "@/hooks/styles";
 import { useRootStore } from "@/hooks/stores";
+import { jsonServiceStore } from "@/stores/SingletonSource";
 
 export default function Activities() {
   const { uiStore } = useRootStore();
@@ -20,7 +20,7 @@ export default function Activities() {
           ...styles.notchAvoidingLanscapeMargin,
         }}
       >
-        {activities.map((activity) => (
+        {jsonServiceStore.readJsonFileSync("activities").map((activity) => (
           <ActivityCard activity={activity} key={activity.name} />
         ))}
       </ScrollView>

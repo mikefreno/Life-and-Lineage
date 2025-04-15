@@ -270,7 +270,7 @@
   },
   {
     "name": "goblin cave",
-    "bgName": "Cave_2",
+    "bgName": "Cave",
     "isComplete": true,
     "id": 2,
     "difficulty": 3,
@@ -417,7 +417,7 @@
   },
   {
     "name": "bandit hideout",
-    "bgName": "Medieval",
+    "bgName": "Plains",
     "isComplete": true,
     "id": 3,
     "difficulty": 3,

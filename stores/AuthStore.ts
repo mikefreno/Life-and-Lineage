@@ -9,6 +9,7 @@ import google_config from "@/config/google_config";
 import { API_BASE_URL } from "@/config/config";
 import type { RootStore } from "./RootStore";
 import { reloadAppAsync } from "expo";
+import { checkForUpdateAsync, fetchUpdateAsync } from "expo-updates";
 
 type EmailLogin = {
   token: string;
@@ -45,6 +46,7 @@ export class AuthStore {
   private db_token: string | null = null;
   deletionScheduled: string | undefined;
   isConnected: boolean = false;
+  updateAvailable: boolean = false;
   private isInitialized: boolean = false;
   root: RootStore;
 
@@ -58,6 +60,8 @@ export class AuthStore {
     this.initializeAuth();
     this.initializeGoogleSignIn();
 
+    setTimeout(() => this.checkAvailableUpdates(), 5000);
+
     makeAutoObservable(this);
 
     reaction(
@@ -65,9 +69,23 @@ export class AuthStore {
       () => {
         if (this.isConnected) {
           this.deletionCheck();
+          this.checkAvailableUpdates();
         }
       },
     );
+  }
+  checkAvailableUpdates() {
+    checkForUpdateAsync()
+      .then((val) => {
+        if (val.isAvailable) {
+          runInAction(() => {
+            this.updateAvailable = true;
+          });
+        }
+      })
+      .catch((e) => {
+        __DEV__ && console.log(e);
+      });
   }
 
   setAuthState = (

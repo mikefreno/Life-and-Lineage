@@ -122,6 +122,7 @@ export class DungeonStore {
       resetForNewGame: action,
       leaveSpecialEncounterRoom: action,
       isFightingFinalInstanceBoss: computed,
+      fromCheckpointData: action,
     });
 
     reaction(

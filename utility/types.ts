@@ -478,7 +478,14 @@ export type Activity = {
 export type BadOutcome = {
   name: string;
   buyOff?: { price: number };
-  fight?: string;
+  fight?: {
+    enemies: {
+      name: string;
+      image: string;
+      scaler: number;
+      count: number;
+    }[];
+  };
   dungeonTitle?: string;
   effect?: { healthDamage?: number; sanityDamage?: number };
 };

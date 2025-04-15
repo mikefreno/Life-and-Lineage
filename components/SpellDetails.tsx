@@ -69,6 +69,10 @@ const SpellDetails = observer(({ spell }: { spell: Attack }) => {
               style={{ marginLeft: 6 }}
             />
           </View>
+          <Text style={{ textAlign: "center", ...styles["text-sm"] }}>
+            {toTitleCase(spell.targets)}{" "}
+            {(spell.targets == "single" || spell.targets == "dual") && "Target"}
+          </Text>
         </View>
         <View
           style={{

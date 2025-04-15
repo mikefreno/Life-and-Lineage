@@ -182,7 +182,7 @@ const BattleTab = observer(
         >
           {attackDetails && (
             <View style={{ alignItems: "center" }}>
-              {attackDetails && attackDetails.element ? (
+              {attackDetails && attackDetails.element !== null ? (
                 <SpellDetails spell={attackDetails} />
               ) : (
                 attackDetails.AttackRender(styles)

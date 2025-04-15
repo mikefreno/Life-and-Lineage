@@ -127,7 +127,16 @@
       {
         "name": "Bar Fight",
         "dungeonTitle": "Local Pub",
-        "fight": "drunkard"
+        "fight": {
+          "enemies": [
+            {
+              "name": "bandit heavy",
+              "image": "bandit_heavy",
+              "scaler": 1,
+              "count": 1
+            }
+          ]
+        }
       }
     ],
     "randomGood": [
@@ -172,7 +181,16 @@
       {
         "name": "Raucous Local",
         "dungeonTitle": "Festival",
-        "fight": "drunkard"
+        "fight": {
+          "enemies": [
+            {
+              "name": "bandit heavy",
+              "image": "bandit_heavy",
+              "scaler": 1,
+              "count": 1
+            }
+          ]
+        }
       },
       {
         "name": "Ride broke down!",
