@@ -684,6 +684,10 @@ export class PlayerCharacter extends Character {
         this.equipment?.body,
         this.equipment?.quiver,
         this.partnerIds,
+        this.childrenIds,
+        this.isPregnant,
+        this.pregnancyDueDate,
+        this.babyDaddyId,
       ],
       () => {
         savePlayer(this);
