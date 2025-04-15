@@ -9,7 +9,7 @@ import {
   runInAction,
 } from "mobx";
 import { throttle } from "lodash";
-import { Character } from "@/entities/character";
+import { Character, PlayerCharacter } from "@/entities/character";
 import {
   flipCoin,
   getNPCBaseCombatStats,
@@ -22,11 +22,17 @@ export class CharacterStore {
   independentChildren: Character[] = []; // adoptable
   root: RootStore;
 
-  constructor({ root }: { root: RootStore }) {
+  constructor({
+    root,
+    playerCharacter,
+  }: {
+    root: RootStore;
+    playerCharacter: PlayerCharacter;
+  }) {
     this.root = root;
 
     const { characters, independentChildren } = this.hydrateCharacters(root);
-    this.characters = characters;
+    this.characters = [...characters, playerCharacter];
     this.independentChildren = independentChildren;
     this.independantChildrenAgeCheck();
 
@@ -74,7 +80,7 @@ export class CharacterStore {
 
   independantChildrenAgeCheck() {
     for (const child of this.independentChildren) {
-      if (child.age >= 16) {
+      if (child.age >= 15) {
         this.removeIndependentChild({ child });
       }
     }
@@ -127,7 +133,7 @@ export class CharacterStore {
   public createIndependantChild() {
     const sex = flipCoin() == "Heads" ? "male" : "female";
     const name = getRandomName(sex);
-    const birthdate = this.root.time.generateBirthDateInRange(1, 17);
+    const birthdate = this.root.time.generateBirthDateInRange(1, 15);
     const randomPersonality = getRandomPersonality();
 
     const child = new Character({
@@ -137,6 +143,8 @@ export class CharacterStore {
       lastName: name.lastName,
       birthdate: birthdate,
       personality: randomPersonality,
+      animationStrings: {},
+      activeAuraConditionIds: [],
       root: this.root,
       ...getNPCBaseCombatStats(),
     });

@@ -1143,7 +1143,6 @@ export const EnemyImageMap: EnemyImageMapType = {
     },
     height: 44,
     width: 62,
-    topOffset: -15,
     mirror: true,
     renderScale: 0.8,
   },

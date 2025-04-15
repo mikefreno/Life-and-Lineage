@@ -87,8 +87,9 @@ export const CharacterInteractionModal = observer(
     function attemptPregnancy(character: Character) {
       if (playerState && character) {
         const mother = playerState.sex === "female" ? playerState : character;
+        const father = playerState.sex === "male" ? playerState : character;
 
-        if (mother.initiatePregnancy()) {
+        if (mother.initiatePregnancy(father)) {
           setPregnancyMessage(`${mother.firstName} is now pregnant!`);
           setTimeout(() => setPregnancyMessage(null), 3000);
         } else {

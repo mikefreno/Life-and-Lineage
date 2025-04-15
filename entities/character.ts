@@ -75,8 +75,10 @@ export class Character extends Being {
   affection: number;
   qualifications: string[];
   dateCooldownStart?: { year: number; week: number };
+
   pregnancyDueDate?: { year: number; week: number };
   isPregnant: boolean;
+  babyDaddyId: string | null;
 
   childrenIds: string[];
   partnerIds: string[];
@@ -99,6 +101,7 @@ export class Character extends Being {
     parentIds,
     partnerIds,
     knownCharacterIds,
+    babyDaddyId,
     ...props
   }: CharacterOptions) {
     super(props);
@@ -120,6 +123,7 @@ export class Character extends Being {
     this.dateCooldownStart = dateCooldownStart;
     this.pregnancyDueDate = pregnancyDueDate;
     this.isPregnant = isPregnant;
+    this.babyDaddyId = babyDaddyId ?? null;
 
     makeObservable(this, {
       job: observable,
@@ -134,6 +138,7 @@ export class Character extends Being {
       childrenIds: observable,
       partnerIds: observable,
       parentIds: observable,
+      babyDaddyId: observable,
 
       makePartner: action,
       removePartner: action,
@@ -343,11 +348,12 @@ export class Character extends Being {
     this.lastName = newLastName;
   }
 
-  public initiatePregnancy() {
+  public initiatePregnancy(father: Character) {
     if (this.isPregnant || this.sex === "male") return false;
 
     const currentDate = this.root.time.currentDate;
     this.isPregnant = true;
+    this.babyDaddyId = father.id;
     this.pregnancyDueDate = {
       year:
         currentDate.week + 40 >= 52 ? currentDate.year + 1 : currentDate.year,
@@ -358,7 +364,12 @@ export class Character extends Being {
   }
 
   public giveBirth(): Character | null {
-    if (!this.isPregnant || !this.pregnancyDueDate) return null;
+    if (!this.isPregnant || !this.pregnancyDueDate || !this.babyDaddyId) {
+      this.isPregnant = false;
+      this.pregnancyDueDate = undefined;
+      this.babyDaddyId = null;
+      return null;
+    }
 
     const currentDate = this.root.time.currentDate;
     if (
@@ -368,19 +379,24 @@ export class Character extends Being {
     ) {
       return null;
     }
+    const father = this.root.characterStore.getCharacter(this.babyDaddyId);
 
     this.isPregnant = false;
     this.pregnancyDueDate = undefined;
+    this.babyDaddyId = null;
 
     const sex = Math.random() > 0.5 ? "male" : "female";
 
     const baby = new Character({
       beingType: "human",
+      parentIds: [this.id, father.id],
       firstName: getRandomName(sex).firstName,
-      lastName: this.lastName,
+      lastName: father.lastName,
       sex,
       personality: getRandomPersonality(),
       birthdate: currentDate,
+      animationStrings: {},
+      activeAuraConditionIds: [],
       root: this.root,
       ...getNPCBaseCombatStats(),
     });
@@ -2003,7 +2019,7 @@ export class PlayerCharacter extends Character {
         ? json.investments.map((investment: any) =>
             Investment.fromJSON(investment),
           )
-        : undefined,
+        : [],
       unAllocatedSkillPoints: json.unAllocatedSkillPoints,
       allocatedSkillPoints: json.allocatedSkillPoints,
       baseStrength: json.baseStrength,
@@ -2290,4 +2306,4 @@ const _playerSave = async (
   }
 };
 
-export const savePlayer = throttle(_playerSave, 50);
+export const savePlayer = throttle(_playerSave, 100);

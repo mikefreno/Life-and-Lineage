@@ -266,7 +266,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
 
   const BirthAnnouncementModal = observer(() => (
     <GenericModal
-      isVisibleCondition={showBirthModal}
+      isVisibleCondition={showBirthModal && !!newbornBaby}
       backFunction={() => setShowBirthModal(false)}
       accessibilityLabel="Birth Announcement"
     >
@@ -274,7 +274,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
         <Text style={{ ...styles["text-2xl"], ...styles.textCenter }}>
           A Child is Born!
         </Text>
-        {newbornBaby && (
+        {newbornBaby ? (
           <>
             <Text
               style={{
@@ -283,20 +283,29 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                 ...styles.mt4,
               }}
             >
-              {newbornBaby.fullName}
+              {newbornBaby.fullName || "Unnamed Child"}
             </Text>
             <Text style={{ ...styles.textCenter, ...styles.mt2 }}>
-              Sex: {toTitleCase(newbornBaby.sex)}
+              Sex: {newbornBaby.sex ? toTitleCase(newbornBaby.sex) : "Unknown"}
             </Text>
             <View style={styles.mt4}>
               <CharacterImage character={newbornBaby} />
             </View>
             <Text style={{ ...styles.textCenter, ...styles.mt4 }}>
-              Born to: {newbornBaby.parents?.[0].fullName}
-              {newbornBaby.parents?.[1] &&
+              Born to:{" "}
+              {newbornBaby.parents && newbornBaby.parents.length > 0
+                ? newbornBaby.parents[0]?.fullName || "Unknown Parent"
+                : "Unknown Parent"}
+              {newbornBaby.parents &&
+                newbornBaby.parents.length > 1 &&
+                newbornBaby.parents[1]?.fullName &&
                 ` and ${newbornBaby.parents[1].fullName}`}
             </Text>
           </>
+        ) : (
+          <Text style={{ ...styles.textCenter, ...styles.mt4 }}>
+            Child information unavailable
+          </Text>
         )}
         <GenericFlatButton
           onPress={() => setShowBirthModal(false)}

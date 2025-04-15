@@ -26,6 +26,8 @@ const InvestmentCard = observer(
 
     const [showUpgrades, setShowUpgrades] = useState<boolean>(false);
     const [showRequirements, setShowRequirements] = useState<boolean>(false);
+    const [showError, setShowError] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string>("");
 
     const [showInvestmentConfirmation, setShowInvestmentConfirmation] =
       useState<boolean>(false);
@@ -36,13 +38,24 @@ const InvestmentCard = observer(
     >(playerState?.getInvestment(investment.name));
 
     function purchaseInvestmentCheck() {
+      if (!playerState) return;
+
       const requirement = investment.requires.requirement;
-      if (playerState?.keyItems.find((item) => item.name == requirement)) {
-        if (playerState && playerState.gold >= investment.cost) {
+      if (playerState.keyItems.find((item) => item.name == requirement)) {
+        if (playerState.gold >= investment.cost) {
           if (investment.cost / playerState.gold >= 0.2) {
             setShowInvestmentConfirmation(true);
           } else {
-            playerState.purchaseInvestmentBase(investment);
+            try {
+              playerState.purchaseInvestmentBase(investment);
+              setMadeInvestment(playerState.getInvestment(investment.name));
+            } catch (error) {
+              console.error("Error purchasing investment:", error);
+              setErrorMessage(
+                "Failed to purchase investment. Please try again.",
+              );
+              setShowError(true);
+            }
           }
         }
       } else {
@@ -51,25 +64,70 @@ const InvestmentCard = observer(
     }
 
     function purchaseUpgradeCheck(specifiedUpgrade: InvestmentUpgrade) {
-      if (playerState && playerState.gold >= specifiedUpgrade.cost) {
+      if (!playerState) return;
+
+      if (playerState.gold < specifiedUpgrade.cost) return;
+
+      const existingInvestment = playerState.getInvestment(investment.name);
+      if (!existingInvestment) {
+        console.error(
+          `Investment ${investment.name} not found in player's investments!`,
+        );
+        setErrorMessage(
+          `Cannot purchase upgrade: You don't own the ${investment.name} investment yet.`,
+        );
+        setShowError(true);
+        return;
+      }
+
+      if (existingInvestment.upgrades.includes(specifiedUpgrade.name)) {
+        setErrorMessage(
+          `You've already purchased the ${specifiedUpgrade.name} upgrade.`,
+        );
+        setShowError(true);
+        return;
+      }
+
+      try {
         playerState.purchaseInvestmentUpgrade(
           investment,
           specifiedUpgrade,
           playerState,
         );
+
+        setMadeInvestment(playerState.getInvestment(investment.name));
+      } catch (error) {
+        console.error("Error purchasing upgrade:", error);
+        setErrorMessage(
+          `Failed to purchase upgrade: ${
+            error.message ?? "unkown validation error"
+          }`,
+        );
+        setShowError(true);
       }
     }
 
     function collectOnInvestment() {
-      if (playerState) {
+      if (!playerState) return;
+
+      try {
         playerState.collectFromInvestment(investment.name);
         root.gameTick();
+
+        setMadeInvestment(playerState.getInvestment(investment.name));
+      } catch (error) {
+        console.error("Error collecting from investment:", error);
+        setErrorMessage("Failed to collect from investment. Please try again.");
+        setShowError(true);
       }
     }
 
     useEffect(() => {
-      setMadeInvestment(playerState?.getInvestment(investment.name));
-    }, [playerState?.investments.length]);
+      if (playerState) {
+        const currentInvestment = playerState.getInvestment(investment.name);
+        setMadeInvestment(currentInvestment);
+      }
+    }, [playerState, investment.name, playerState?.investments.length]);
 
     return (
       <>
@@ -95,6 +153,31 @@ const InvestmentCard = observer(
             </GenericFlatButton>
           </GenericModal>
         )}
+
+        <GenericModal
+          isVisibleCondition={showError}
+          backFunction={() => setShowError(false)}
+        >
+          <GenericStrikeAround>
+            <Text style={{ textAlign: "center", ...styles["text-xl"] }}>
+              Error
+            </Text>
+          </GenericStrikeAround>
+          <Text
+            style={[
+              styles.mx4,
+              styles["text-lg"],
+              styles.py4,
+              styles.textCenter,
+            ]}
+          >
+            {errorMessage}
+          </Text>
+          <GenericFlatButton onPress={() => setShowError(false)}>
+            <Text>Close</Text>
+          </GenericFlatButton>
+        </GenericModal>
+
         <GenericModal
           isVisibleCondition={showInvestmentConfirmation}
           backFunction={() => setShowInvestmentConfirmation(false)}
@@ -112,7 +195,19 @@ const InvestmentCard = observer(
             <Pressable
               onPress={() => {
                 vibration({ style: "medium", essential: true });
-                playerState?.purchaseInvestmentBase(investment);
+                try {
+                  playerState?.purchaseInvestmentBase(investment);
+                  // Update the madeInvestment state after purchase
+                  setMadeInvestment(
+                    playerState?.getInvestment(investment.name),
+                  );
+                } catch (error) {
+                  console.error("Error purchasing investment:", error);
+                  setErrorMessage(
+                    "Failed to purchase investment. Please try again.",
+                  );
+                  setShowError(true);
+                }
                 setShowInvestmentConfirmation(false);
               }}
               style={styles.investmentButton}
@@ -130,55 +225,39 @@ const InvestmentCard = observer(
             </Pressable>
           </View>
         </GenericModal>
-        <GenericModal
-          isVisibleCondition={showInvestmentConfirmation}
-          backFunction={() => setShowInvestmentConfirmation(false)}
-        >
-          <Text style={[styles.textCenter, styles["text-lg"]]}>Purchase:</Text>
-          <GenericStrikeAround>
-            <Text style={[styles.textCenter, styles["text-2xl"]]}>
-              {investment.name}
-            </Text>
-          </GenericStrikeAround>
-          <Text style={[styles.pb6, styles.textCenter, styles["text-xl"]]}>
-            Are you sure?
-          </Text>
-          <View style={styles.rowCenter}>
-            <Pressable
-              onPress={() => {
-                vibration({ style: "medium", essential: true });
-                playerState?.purchaseInvestmentBase(investment);
-                setShowInvestmentConfirmation(false);
-              }}
-              style={styles.investmentButton}
-            >
-              <Text>Purchase</Text>
-            </Pressable>
-            <Pressable
-              onPress={() => {
-                vibration({ style: "light" });
-                setShowInvestmentConfirmation(false);
-              }}
-              style={styles.investmentButton}
-            >
-              <Text>Cancel</Text>
-            </Pressable>
-          </View>
-        </GenericModal>
+
+        {/* Upgrades Modal */}
         <GenericModal
           isVisibleCondition={showUpgrades}
           style={{ maxHeight: "75%", marginVertical: "auto" }}
           backFunction={() => setShowUpgrades(false)}
           size={95}
-          noPad
           scrollEnabled={true}
-          innerStyle={{ paddingHorizontal: "3%" }}
         >
           <GenericStrikeAround>
             <Text style={[styles.textCenter, styles["text-xl"]]}>
               {investment.name} Upgrades
             </Text>
           </GenericStrikeAround>
+
+          {!madeInvestment && (
+            <View
+              style={[
+                styles.my4,
+                styles.mx2,
+                styles.p2,
+                { backgroundColor: theme.warning, borderRadius: 8 },
+              ]}
+            >
+              <Text style={[styles.textCenter, styles.bold]}>
+                You don't own this investment yet!
+              </Text>
+              <Text style={styles.textCenter}>
+                Purchase the base investment first to unlock upgrades.
+              </Text>
+            </View>
+          )}
+
           <ScrollView>
             {investment.upgrades.map((upgrade) => {
               const [showingBody, setShowingBody] = useState<boolean>(false);
@@ -196,6 +275,10 @@ const InvestmentCard = observer(
                 inputRange: [0, 1],
                 outputRange: ["0deg", "180deg"],
               });
+
+              const isUpgradePurchased = madeInvestment?.upgrades.includes(
+                upgrade.name,
+              );
 
               return (
                 <Pressable
@@ -219,6 +302,7 @@ const InvestmentCard = observer(
                               ? theme.warning
                               : theme.success
                             : theme.background,
+                        opacity: !madeInvestment ? 0.7 : 1,
                       },
                     ]}
                   >
@@ -248,7 +332,7 @@ const InvestmentCard = observer(
                           />
                         </Animated.View>
                       </View>
-                      {madeInvestment?.upgrades.includes(upgrade.name) && (
+                      {isUpgradePurchased && (
                         <Text
                           style={[
                             styles["text-lg"],
@@ -296,15 +380,13 @@ const InvestmentCard = observer(
                             )}
                             {/* Additional effects follow same pattern */}
                           </View>
-                          {(!madeInvestment ||
-                            (madeInvestment &&
-                              !madeInvestment.upgrades.includes(
-                                upgrade.name,
-                              ))) && (
+                          {madeInvestment && !isUpgradePurchased && (
                             <Pressable
                               onPress={() => purchaseUpgradeCheck(upgrade)}
                               disabled={
-                                playerState && playerState.gold < upgrade.cost
+                                !playerState ||
+                                playerState.gold < upgrade.cost ||
+                                !madeInvestment
                               }
                               style={[styles.mxAuto, styles.my2]}
                             >
@@ -316,7 +398,8 @@ const InvestmentCard = observer(
                                     styles.py4,
                                     pressed && styles.pressedStyle,
                                     playerState &&
-                                    playerState.gold >= upgrade.cost
+                                    playerState.gold >= upgrade.cost &&
+                                    madeInvestment
                                       ? styles.activeButton
                                       : styles.disabledButton,
                                   ]}
@@ -339,6 +422,17 @@ const InvestmentCard = observer(
                                 </View>
                               )}
                             </Pressable>
+                          )}
+                          {!madeInvestment && (
+                            <Text
+                              style={[
+                                styles.textCenter,
+                                styles.my2,
+                                { color: theme.warning },
+                              ]}
+                            >
+                              Purchase base investment first
+                            </Text>
                           )}
                         </View>
                       )}
@@ -479,7 +573,7 @@ const InvestmentCard = observer(
           {!madeInvestment ? (
             <Pressable
               onPress={purchaseInvestmentCheck}
-              disabled={playerState && playerState.gold < investment.cost}
+              disabled={!playerState || playerState.gold < investment.cost}
               style={[styles.mxAuto, styles.mb2]}
             >
               {({ pressed }) => (
@@ -508,7 +602,9 @@ const InvestmentCard = observer(
           ) : (
             <Pressable
               onPress={collectOnInvestment}
-              disabled={madeInvestment.currentGoldStockPile == 0}
+              disabled={
+                !madeInvestment || madeInvestment.currentGoldStockPile === 0
+              }
               style={styles.mxAuto}
             >
               {({ pressed }) => (
@@ -518,7 +614,7 @@ const InvestmentCard = observer(
                     styles.px8,
                     styles.py4,
                     pressed && styles.pressedStyle,
-                    madeInvestment.currentGoldStockPile > 0
+                    madeInvestment && madeInvestment.currentGoldStockPile > 0
                       ? styles.activeButton
                       : styles.disabledButton,
                   ]}
@@ -526,7 +622,9 @@ const InvestmentCard = observer(
                   <Text style={styles.textCenter}>Collect</Text>
                   <View style={[styles.rowCenter, styles.itemsCenter]}>
                     <Text>
-                      {asReadableGold(madeInvestment.currentGoldStockPile)}{" "}
+                      {asReadableGold(
+                        madeInvestment?.currentGoldStockPile || 0,
+                      )}{" "}
                     </Text>
                     <Coins
                       width={uiStore.iconSizeSmall}

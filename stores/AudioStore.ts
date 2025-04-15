@@ -20,7 +20,7 @@ import {
   DungeonSoundTrack,
   TrackMap,
 } from "@/utility/audio";
-import { flipCoin, getRandomInt } from "@/utility/functions/misc";
+import { getRandomInt } from "@/utility/functions/misc";
 
 const DEFAULT_FADE_TIMEOUT = 50;
 const DEFAULT_FADE_STEPS = 20;

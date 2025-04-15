@@ -76,6 +76,7 @@ export interface BaseCharacterOptions extends BeingOptions {
   qualifications?: string[];
   dateCooldownStart?: { year: number; week: number };
   pregnancyDueDate?: { year: number; week: number };
+  babyDaddyId?: string | null;
   isPregnant?: boolean;
   parentIds?: string[];
   childrenIds?: string[];

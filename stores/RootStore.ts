@@ -253,13 +253,12 @@ export class RootStore {
       }
     }
 
-    // Check partners
-    this.playerState.partners.forEach((partner) => {
-      if (partner.sex === "female" && partner.isPregnant) {
-        const baby = partner.giveBirth();
+    this.characterStore.characters.forEach((char) => {
+      if (char.sex === "female" && char.isPregnant) {
+        const baby = char.giveBirth();
         if (baby) {
           this.playerState?.children.push(baby);
-          partner.children.push(baby);
+          char.children.push(baby);
           this.characterStore.addCharacter(baby);
           this.uiStore.setNewbornBaby(baby);
         }
