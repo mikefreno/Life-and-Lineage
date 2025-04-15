@@ -1,4 +1,4 @@
-import { makeAutoObservable, reaction } from "mobx";
+import { makeAutoObservable, reaction, runInAction } from "mobx";
 import { RootStore } from "./RootStore";
 import { API_BASE_URL } from "@/config/config";
 import { jsonServiceStore, JSONFileOptionsType } from "./SingletonSource";
@@ -103,7 +103,7 @@ export class JSONServiceStore {
       if (data.summons)
         jsonServiceStore.updateJsonData("summons", data.summons);
 
-      this.retrievedAttacks = true;
+      runInAction(() => (this.retrievedAttacks = true));
     } catch (error) {
       console.error("Error updating attack files:", error);
     }
@@ -124,7 +124,7 @@ export class JSONServiceStore {
       if (data.sanityDebuffs)
         jsonServiceStore.updateJsonData("sanityDebuffs", data.sanityDebuffs);
 
-      this.retrievedConditions = true;
+      runInAction(() => (this.retrievedConditions = true));
     } catch (error) {
       console.error("Error updating condition files:", error);
     }
@@ -146,7 +146,7 @@ export class JSONServiceStore {
           data.specialEncounters,
         );
 
-      this.retrievedDungeons = true;
+      runInAction(() => (this.retrievedDungeons = true));
     } catch (error) {
       console.error("Error updating dungeon files:", error);
     }
@@ -165,7 +165,7 @@ export class JSONServiceStore {
       if (data.enemyAttacks)
         jsonServiceStore.updateJsonData("enemyAttacks", data.enemyAttacks);
 
-      this.retrievedEnemies = true;
+      runInAction(() => (this.retrievedEnemies = true));
     } catch (error) {
       console.error("Error updating enemy files:", error);
     }
@@ -206,7 +206,7 @@ export class JSONServiceStore {
       if (data.prefix) jsonServiceStore.updateJsonData("prefix", data.prefix);
       if (data.suffix) jsonServiceStore.updateJsonData("suffix", data.suffix);
 
-      this.retrievedItems = true;
+      runInAction(() => (this.retrievedItems = true));
     } catch (error) {
       console.error("Error updating item files:", error);
     }
@@ -236,7 +236,7 @@ export class JSONServiceStore {
       if (data.pvpRewards)
         jsonServiceStore.updateJsonData("pvpRewards", data.pvpRewards);
 
-      this.retrievedMisc = true;
+      runInAction(() => (this.retrievedMisc = true));
     } catch (error) {
       console.error("Error updating misc files:", error);
     }

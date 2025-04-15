@@ -91,12 +91,10 @@ export const CharacterInteractionModal = observer(
 
         if (mother.initiatePregnancy(father)) {
           setPregnancyMessage(`${mother.firstName} is now pregnant!`);
-          setTimeout(() => setPregnancyMessage(null), 3000);
+          setTimeout(() => setPregnancyMessage(null), 6000);
         } else {
-          setPregnancyMessage(
-            `The attempt was unsuccessful. ${mother.firstName} might already be pregnant.`,
-          );
-          setTimeout(() => setPregnancyMessage(null), 3000);
+          setPregnancyMessage(`The attempt was unsuccessful.`);
+          setTimeout(() => setPregnancyMessage(null), 6000);
         }
       }
     }
@@ -125,6 +123,18 @@ export const CharacterInteractionModal = observer(
             >
               <CharacterImage character={character} />
             </View>
+            {pregnancyMessage && (
+              <View
+                style={{
+                  marginTop: 8,
+                  padding: 8,
+                  borderRadius: 8,
+                }}
+              >
+                <Text style={{ textAlign: "center" }}>{pregnancyMessage}</Text>
+              </View>
+            )}
+
             {showAssaultWarning ? (
               <AssaultWarningSection
                 character={character}

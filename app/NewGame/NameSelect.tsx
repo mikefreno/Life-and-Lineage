@@ -17,6 +17,7 @@ import { tw_base, useStyles } from "@/hooks/styles";
 import GenericFlatButton from "@/components/GenericFlatButton";
 import NewGameMetaControls from "@/components/NewGameMetaControls";
 import { useVibration } from "@/hooks/generic";
+import { trimWhitespace } from "@/utility/functions/characterAid";
 
 export default function SetName() {
   const styles = useStyles();
@@ -33,10 +34,6 @@ export default function SetName() {
     router.back();
     router.back();
     return;
-  }
-
-  function trimWhitespace(str: string) {
-    return str.trim().replace(/\s+/g, " ");
   }
 
   return (

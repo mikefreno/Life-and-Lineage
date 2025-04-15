@@ -27,12 +27,14 @@ export class CharacterStore {
     playerCharacter,
   }: {
     root: RootStore;
-    playerCharacter: PlayerCharacter;
+    playerCharacter: PlayerCharacter | null;
   }) {
     this.root = root;
 
     const { characters, independentChildren } = this.hydrateCharacters(root);
-    this.characters = [...characters, playerCharacter];
+    this.characters = playerCharacter
+      ? [...characters, playerCharacter]
+      : characters;
     this.independentChildren = independentChildren;
     this.independantChildrenAgeCheck();
 
@@ -93,8 +95,8 @@ export class CharacterStore {
   }
 
   addCharacter(character: Character) {
-    this.characters.push(character);
     this.characterSave(character);
+    this.characters.push(character);
   }
 
   getCharacter(characterId: string): Character {
@@ -181,11 +183,14 @@ export class CharacterStore {
       (parse(storedCharacterIds) as string[]).forEach((id) => {
         const retrieved = storage.getString(`character_${id}`);
         if (retrieved) {
-          try {
-            const character = Character.fromJSON({ ...parse(retrieved), root });
-            characters.push(character);
-          } catch (e) {
-            console.error("Error hydrating character:", id, e);
+          const parsed = parse(retrieved);
+          if (parsed.id !== this.root.playerState?.id) {
+            try {
+              const character = Character.fromJSON({ ...parsed, root });
+              characters.push(character);
+            } catch (e) {
+              console.error("Error hydrating character:", id, e);
+            }
           }
         }
       });
@@ -208,6 +213,9 @@ export class CharacterStore {
   }
 
   private characterSave = (character: Character) => {
+    if (character.id === this.root.playerState?.id) {
+      return;
+    }
     try {
       const key = `character_${character.id}`;
       const data = stringify({ ...character, root: null });
@@ -222,7 +230,7 @@ export class CharacterStore {
     }
   };
 
-  public saveCharacter = throttle(this.characterSave, 250);
+  public saveCharacter = throttle(this.characterSave, 500);
 
   private saveCharacterIds = () => {
     const characterIds = this.characters.map((c) => c.id);

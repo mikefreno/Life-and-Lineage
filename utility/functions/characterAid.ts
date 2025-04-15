@@ -229,3 +229,7 @@ export function createPlayerCharacter({
   root.characterStore.addCharacter(newCharacter);
   return newCharacter;
 }
+
+export function trimWhitespace(str: string) {
+  return str.trim().replace(/\s+/g, " ");
+}

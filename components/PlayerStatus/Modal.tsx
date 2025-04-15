@@ -1,12 +1,7 @@
 import GenericModal from "@/components/GenericModal";
 import { useRootStore } from "@/hooks/stores";
 import { useStyles } from "@/hooks/styles";
-import {
-  Pressable,
-  ScrollView,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { Text } from "@/components/Themed";
 import Animated, {
   useAnimatedStyle,

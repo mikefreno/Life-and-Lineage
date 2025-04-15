@@ -2,7 +2,14 @@ import { useFonts } from "expo-font";
 import { Stack, usePathname, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { Platform, Pressable, View, StyleSheet, UIManager } from "react-native";
+import {
+  Platform,
+  Pressable,
+  View,
+  StyleSheet,
+  UIManager,
+  TextInput,
+} from "react-native";
 import * as SplashScreen from "expo-splash-screen";
 import { Text } from "@/components/Themed";
 import * as Sentry from "@sentry/react-native";
@@ -26,7 +33,6 @@ import { Character, PlayerCharacter } from "@/entities/character";
 import { RootStore } from "@/stores/RootStore";
 import { DungeonStore } from "@/stores/DungeonStore";
 import GenericModal from "@/components/GenericModal";
-import { CharacterImage } from "@/components/CharacterImage";
 import GenericFlatButton from "@/components/GenericFlatButton";
 import { useStyles } from "@/hooks/styles";
 import { DevControls } from "@/components/DevControls";
@@ -46,6 +52,9 @@ import { TutorialOption } from "@/utility/types";
 import { HeaderBackButton } from "@react-navigation/elements";
 import { useVibration } from "@/hooks/generic";
 import { AudioToggle } from "@/components/AudioToggle";
+import GenericRaisedButton from "@/components/GenericRaisedButton";
+import { trimWhitespace } from "@/utility/functions/characterAid";
+import { BirthAnnouncementModal } from "@/components/BirthAnnouncementModal";
 
 global.atob = decode;
 
@@ -164,8 +173,6 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   const vibration = useVibration();
 
   const pathname = usePathname();
-  const [showBirthModal, setShowBirthModal] = useState(false);
-  const [newbornBaby, setNewbornBaby] = useState<Character | null>(null);
   const { getNormalizedSize } = useScaling();
 
   const handleRouting = (
@@ -255,67 +262,6 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
       audioStore.cleanup();
     };
   }, []);
-
-  useEffect(() => {
-    if (uiStore.newbornBaby) {
-      setNewbornBaby(uiStore.newbornBaby);
-      setShowBirthModal(true);
-      uiStore.setNewbornBaby(null);
-    }
-  }, [uiStore.newbornBaby]);
-
-  const BirthAnnouncementModal = observer(() => (
-    <GenericModal
-      isVisibleCondition={showBirthModal && !!newbornBaby}
-      backFunction={() => setShowBirthModal(false)}
-      accessibilityLabel="Birth Announcement"
-    >
-      <View style={styles.itemsCenter}>
-        <Text style={{ ...styles["text-2xl"], ...styles.textCenter }}>
-          A Child is Born!
-        </Text>
-        {newbornBaby ? (
-          <>
-            <Text
-              style={{
-                ...styles["text-xl"],
-                ...styles.textCenter,
-                ...styles.mt4,
-              }}
-            >
-              {newbornBaby.fullName || "Unnamed Child"}
-            </Text>
-            <Text style={{ ...styles.textCenter, ...styles.mt2 }}>
-              Sex: {newbornBaby.sex ? toTitleCase(newbornBaby.sex) : "Unknown"}
-            </Text>
-            <View style={styles.mt4}>
-              <CharacterImage character={newbornBaby} />
-            </View>
-            <Text style={{ ...styles.textCenter, ...styles.mt4 }}>
-              Born to:{" "}
-              {newbornBaby.parents && newbornBaby.parents.length > 0
-                ? newbornBaby.parents[0]?.fullName || "Unknown Parent"
-                : "Unknown Parent"}
-              {newbornBaby.parents &&
-                newbornBaby.parents.length > 1 &&
-                newbornBaby.parents[1]?.fullName &&
-                ` and ${newbornBaby.parents[1].fullName}`}
-            </Text>
-          </>
-        ) : (
-          <Text style={{ ...styles.textCenter, ...styles.mt4 }}>
-            Child information unavailable
-          </Text>
-        )}
-        <GenericFlatButton
-          onPress={() => setShowBirthModal(false)}
-          style={styles.mt4}
-        >
-          Close
-        </GenericFlatButton>
-      </View>
-    </GenericModal>
-  ));
 
   useEffect(() => {
     setTimeout(() => {

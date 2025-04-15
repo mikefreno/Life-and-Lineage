@@ -495,6 +495,8 @@ export function generateShopKeeper(
     birthdate: birthdate!,
     personality: personality,
     job: job,
+    animationStrings: {},
+    activeAuraConditionIds: [],
     root,
     ...getNPCBaseCombatStats(),
   });

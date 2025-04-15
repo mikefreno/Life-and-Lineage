@@ -89,7 +89,10 @@ export class RootStore {
     this.dungeonStore = new DungeonStore({ root: this });
     this.uiStore.markStoreAsLoaded("dungeon");
 
-    this.characterStore = new CharacterStore({ root: this });
+    this.characterStore = new CharacterStore({
+      root: this,
+      playerCharacter: this.playerState,
+    });
     this.uiStore.markStoreAsLoaded("character");
 
     this.shopsStore = new ShopStore({ root: this });
@@ -228,6 +231,7 @@ export class RootStore {
   async newGame(newPlayer: PlayerCharacter) {
     this.enemyStore.clearEnemyList();
     this.dungeonStore.resetForNewGame();
+    this.characterStore.addCharacter(newPlayer);
 
     const starterBook = getStartingBook(newPlayer);
     newPlayer.addToInventory(starterBook);
@@ -242,24 +246,10 @@ export class RootStore {
   }
 
   checkForBirths() {
-    if (!this.playerState) return;
-
-    if (this.playerState.sex === "female" && this.playerState.isPregnant) {
-      const baby = this.playerState.giveBirth();
-      if (baby) {
-        this.playerState.children.push(baby);
-        this.characterStore.addCharacter(baby);
-        this.uiStore.setNewbornBaby(baby);
-      }
-    }
-
     this.characterStore.characters.forEach((char) => {
       if (char.sex === "female" && char.isPregnant) {
         const baby = char.giveBirth();
         if (baby) {
-          this.playerState?.children.push(baby);
-          char.children.push(baby);
-          this.characterStore.addCharacter(baby);
           this.uiStore.setNewbornBaby(baby);
         }
       }

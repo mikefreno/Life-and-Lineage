@@ -66,7 +66,7 @@ export interface JobData {
  * This class serves as a base for the player's character - `PlayerCharacter`
  */
 export class Character extends Being {
-  readonly firstName: string;
+  firstName: string;
   lastName: string;
   readonly personality: Personality | null; // null only for the playerCharacter
   readonly sex: "male" | "female";
@@ -131,6 +131,7 @@ export class Character extends Being {
       qualifications: observable,
       dateCooldownStart: observable,
       birthdate: observable,
+      firstName: observable,
       lastName: observable,
       knownCharacterIds: observable,
       isPregnant: observable,
@@ -140,6 +141,7 @@ export class Character extends Being {
       parentIds: observable,
       babyDaddyId: observable,
 
+      setFirstName: observable,
       makePartner: action,
       removePartner: action,
       addChild: action,
@@ -173,6 +175,8 @@ export class Character extends Being {
         this.qualifications,
         this.dateCooldownStart,
         this.pregnancyDueDate,
+        this.isPregnant,
+        this.babyDaddyId,
         this.parentIds,
         this.childrenIds,
         this.partnerIds,
@@ -193,6 +197,10 @@ export class Character extends Being {
         }
       },
     );
+  }
+  //meant for babies
+  setFirstName(playerChosenName: string) {
+    this.firstName = playerChosenName;
   }
 
   get parents(): Character[] {
@@ -233,17 +241,27 @@ export class Character extends Being {
 
   public makePartner(character: Character) {
     if (!this.partnerIds.includes(character.id)) {
-      this.partnerIds.push(character.id);
+      this.partnerIds = [...this.partnerIds, character.id];
+
+      if (!character.partnerIds.includes(this.id)) {
+        character.makePartner(this);
+      }
     }
   }
 
   public removePartner(character: Character) {
     this.partnerIds = this.partnerIds.filter((id) => id !== character.id);
+
+    if (character.partnerIds.includes(this.id)) {
+      character.partnerIds = character.partnerIds.filter(
+        (id) => id !== this.id,
+      );
+    }
   }
 
   public addChild(child: Character) {
     if (!this.childrenIds.includes(child.id)) {
-      this.childrenIds.push(child.id);
+      this.childrenIds = [...this.childrenIds, child.id];
     }
   }
 
@@ -279,6 +297,7 @@ export class Character extends Being {
   }
 
   /**
+   * father.addChild(baby);
    * Adds a qualification to the character's qualifications list.
    * @param qual - The qualification to add.
    */
@@ -349,9 +368,37 @@ export class Character extends Being {
   }
 
   public initiatePregnancy(father: Character) {
-    if (this.isPregnant || this.sex === "male") return false;
+    if (this.isPregnant || this.sex === "male") {
+      this.setDateCooldownStart();
+      return false;
+    }
 
     const currentDate = this.root.time.currentDate;
+
+    let successChance = 0;
+
+    if (this.age < 16) {
+      successChance = 0;
+    } else if (this.age <= 25) {
+      successChance = 0.85;
+    } else if (this.age <= 35) {
+      successChance = 0.7;
+    } else if (this.age <= 45) {
+      successChance = 0.4;
+    } else if (this.age <= 55) {
+      successChance = 0.1;
+    } else {
+      successChance = 0;
+    }
+
+    if (!__DEV__) {
+      if (Math.random() > successChance) {
+        this.setDateCooldownStart();
+        return false;
+      }
+    }
+
+    // Pregnancy successful
     this.isPregnant = true;
     this.babyDaddyId = father.id;
     this.pregnancyDueDate = {
@@ -359,6 +406,7 @@ export class Character extends Being {
         currentDate.week + 40 >= 52 ? currentDate.year + 1 : currentDate.year,
       week: (currentDate.week + 40) % 52,
     };
+    this.setDateCooldownStart();
 
     return true;
   }
@@ -401,6 +449,11 @@ export class Character extends Being {
       ...getNPCBaseCombatStats(),
     });
 
+    this.root.characterStore.saveCharacter(this);
+    this.root.characterStore.addCharacter(baby);
+    this.addChild(baby);
+    father.addChild(baby);
+
     return baby;
   }
 
@@ -422,7 +475,7 @@ export class Character extends Being {
       beingType: "human",
       firstName: json.firstName,
       lastName: json.lastName,
-      sex: json.sex,
+      sex: json.sex ?? "female",
       birthdate: json.birthdate,
       alive: json.alive,
       deathdate: json.deathdate ?? null,
@@ -436,6 +489,7 @@ export class Character extends Being {
       partnerIds: json.partnerIds ?? [],
       pregnancyDueDate: json.pregnancyDueDate,
       isPregnant: json.isPregnant,
+      babyDaddyId: json.babyDaddyId,
       knownCharacterIds: json.knownCharacterIds ?? [],
       animationStrings: {},
       activeAuraConditionIds: [],
@@ -629,6 +683,7 @@ export class PlayerCharacter extends Character {
         this.equipment?.body,
         this.equipment?.body,
         this.equipment?.quiver,
+        this.partnerIds,
       ],
       () => {
         savePlayer(this);
@@ -1972,7 +2027,7 @@ export class PlayerCharacter extends Character {
       baseDamageTable: {},
       firstName: json.firstName,
       lastName: json.lastName,
-      sex: json.sex,
+      sex: json.sex ?? "male",
       alive: json.alive,
       birthdate: json.birthdate ?? undefined,
       deathdate: json.deathdate ?? null,
@@ -2027,6 +2082,7 @@ export class PlayerCharacter extends Character {
       baseDexterity: json.baseDexterity,
       pregnancyDueDate: json.pregnancyDueDate,
       isPregnant: json.isPregnant,
+      babyDaddyId: json.babyDaddyId,
       parentIds: json.parentIds ?? [],
       childrenIds: json.childrenIds ?? [],
       partnerIds: json.partnerIds ?? [],
@@ -2306,4 +2362,4 @@ const _playerSave = async (
   }
 };
 
-export const savePlayer = throttle(_playerSave, 100);
+export const savePlayer = throttle(_playerSave, 500);
