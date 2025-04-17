@@ -645,7 +645,7 @@ export class PlayerCharacter extends Character {
     this.knownSpells = knownSpells ?? [];
 
     this.baseInventory = baseInventory ?? [];
-    this.keyItems = keyItems ?? [];
+    this.keyItems = testKeyItems(this.root);
 
     this.investments = investments ?? [];
     this.availableRespecs = availableRespecs ?? 0;
@@ -1849,8 +1849,14 @@ export class PlayerCharacter extends Character {
 
   //----------------------------------Physical Combat----------------------------------//
   get weaponAttacks() {
-    const attacks = this.equipment?.mainHand.attachedAttacks ?? [];
-    const spells = this.equipment?.mainHand.providedSpells ?? [];
+    const attacks = [
+      ...(this.equipment?.mainHand.attachedAttacks ?? []),
+      ...(this.equipment?.offHand?.attachedAttacks ?? []),
+    ];
+    const spells = [
+      ...(this.equipment?.mainHand.providedSpells ?? []),
+      ...(this.equipment?.offHand?.providedSpells ?? []),
+    ];
     return [...attacks, ...spells];
   }
 

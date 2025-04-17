@@ -9,7 +9,7 @@ import UIStore from "@/stores/UIStore";
 import EnemyStore from "@/stores/EnemyStore";
 import { DungeonStore } from "@/stores/DungeonStore";
 import { ShopStore } from "@/stores/ShopsStore";
-import { action, makeObservable, observable } from "mobx";
+import { action, makeObservable, observable, reaction } from "mobx";
 import { AuthStore } from "@/stores/AuthStore";
 import { TimeStore } from "@/stores/TimeStore";
 import { CharacterStore } from "@/stores/CharacterStore";
@@ -25,6 +25,7 @@ import { reloadAppAsync } from "expo";
 import { JSONServiceStore } from "./JSONServiceStore";
 import { jsonServiceStore } from "./SingletonSource";
 import { PVPStore } from "./PVPStore";
+import * as StoreReview from "expo-store-review";
 
 export class RootStore {
   playerState: PlayerCharacter | null;
@@ -48,6 +49,8 @@ export class RootStore {
   atDeathScreen: boolean = false;
   startingNewGame: boolean = false;
   pathname: string = "/";
+
+  haveAskedForReview: boolean = false;
 
   includeDevAttacks: boolean = false;
 
@@ -118,6 +121,8 @@ export class RootStore {
 
     this.constructed = true;
     this.audioStore.initializeReactions();
+    const val = storage.getBoolean("reviewAsked");
+    this.haveAskedForReview = val ?? false;
 
     makeObservable(this, {
       constructed: observable,
@@ -139,6 +144,30 @@ export class RootStore {
       clearAllData: action,
       inheritance: action,
     });
+
+    reaction(
+      () => [this.playerState?.keyItems.length, this.pathname],
+      () => {
+        if (
+          !this.haveAskedForReview &&
+          this.playerState?.keyItems &&
+          this.playerState.keyItems.length >= 1
+        ) {
+          StoreReview.isAvailableAsync()
+            .then((available) => {
+              if (available) {
+                StoreReview.requestReview();
+                this.haveAskedForReview = true;
+              }
+            })
+            .catch((e) => __DEV__ && console.warn(e));
+        }
+      },
+    );
+    reaction(
+      () => this.haveAskedForReview,
+      () => storage.set("reviewAsked", this.haveAskedForReview),
+    );
   }
 
   setPathname(pathname: string) {
@@ -292,12 +321,12 @@ export class RootStore {
       const currentDebiliationNames = this.playerState?.debilitations.map(
         (deb) => deb.name,
       );
-      const availible = jsonServiceStore
+      const available = jsonServiceStore
         .readJsonFileSync("debilitations")
         .filter((cond) => !currentDebiliationNames.includes(cond.name));
-      if (availible.length > 0) {
-        const obj = availible[
-          Math.floor(Math.random() * availible.length)
+      if (available.length > 0) {
+        const obj = available[
+          Math.floor(Math.random() * available.length)
         ] as ConditionObjectType;
         const debuff = this.createDebuffFromObject(obj, "old age");
         this.playerState?.addDebilitation(debuff);

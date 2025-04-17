@@ -48,8 +48,7 @@ const BattleTab = observer(
     const [attackDetailsShowing, setAttackDetailsShowing] =
       useState<boolean>(false);
 
-    const { enemyStore, dungeonStore, uiStore, playerAnimationStore } =
-      useRootStore();
+    const { enemyStore, dungeonStore, playerAnimationStore } = useRootStore();
     const playerState = usePlayerStore();
 
     const { useAttack } = useCombatActions();
