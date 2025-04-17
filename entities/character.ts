@@ -1,8 +1,4 @@
-import {
-  createBuff,
-  createDebuff,
-  getConditionEffectsOnDefenses,
-} from "@/utility/functions/conditions";
+import { createBuff, createDebuff } from "@/utility/functions/conditions";
 import { Condition } from "@/entities/conditions";
 import { Item } from "@/entities/item";
 import { Minion } from "@/entities/creatures";
@@ -13,7 +9,6 @@ import {
   computed,
   reaction,
   runInAction,
-  override,
 } from "mobx";
 import { Investment } from "@/entities/investment";
 import {
@@ -33,7 +28,6 @@ import {
 import {
   rollToLiveByAge,
   rollD20,
-  damageReduction,
   getRandomName,
   getRandomPersonality,
   getAnimatedSpriteForNPC,

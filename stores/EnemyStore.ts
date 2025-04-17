@@ -293,6 +293,7 @@ export default class EnemyStore {
 
       if (parsed.personality) {
         enemy = Character.fromJSON({ ...parsed, root: this.root });
+        runInAction(() => (enemy.sprite = getAnimatedSpriteForNPC(enemy)));
       } else {
         enemy = Enemy.fromJSON({ ...parsed, root: this.root });
       }

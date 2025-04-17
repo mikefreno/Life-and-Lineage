@@ -117,7 +117,7 @@ export class Being {
     this.baseResistanceTable = parseDamageTypeObject(props.baseResistanceTable);
 
     this.activeAuraConditionIds = props.activeAuraConditionIds ?? [];
-    this.attackStrings = props.attackStrings ?? [];
+    this.attackStrings = props.attackStrings ?? ["punch"];
     this.animationStrings = props.animationStrings;
     this.baseDamageTable = parseDamageTypeObject(props.baseDamageTable);
 
