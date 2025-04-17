@@ -693,7 +693,7 @@ const ConditionCard = ({
             ...styles["text-xl"],
           }}
         >
-          {toTitleCase(condition.name)}
+          {toTitleCase(condition.name.replaceAll(" ", "\n"))}
         </Text>
         <View style={styles.columnCenter}>
           <View

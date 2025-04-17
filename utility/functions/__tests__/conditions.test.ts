@@ -8,8 +8,8 @@ import {
   getConditionEffectsOnMisc,
   getMagnitude,
 } from "../conditions";
-import { Condition } from "../../../entities/conditions";
-import { PlayerCharacter } from "../../../entities/character";
+import { Condition } from "@/entities/conditions";
+import { PlayerCharacter } from "@/entities/character";
 
 // Mock the JSON imports
 jest.mock("../../../assets/json/conditions.json", () => [

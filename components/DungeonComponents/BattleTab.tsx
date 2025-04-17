@@ -281,37 +281,35 @@ const BattleTab = observer(
                 />
               ) : (
                 <View style={styles.stunnedContainer}>
-                  <Text style={styles.stunnedText}>Stunned!</Text>
-                  <View style={styles.attackCardBase}>
+                  <Text style={[styles["text-3xl"], { textAlign: "center" }]}>
+                    Stunned!
+                  </Text>
+                  <View style={[styles.attackCardBase, { width: "100%" }]}>
                     <View style={styles.columnCenter}>
                       <Text style={styles["text-xl"]}>Pass</Text>
                     </View>
-                    <Pressable
+                    <GenericRaisedButton
                       disabled={enemyStore.enemyTurnOngoing}
+                      disableTopLevelStyling
+                      buttonStyle={styles.actionButton}
                       onPress={() => {
                         vibration({ style: "light" });
-                        runInAction(() => {
-                          playerAnimationStore.usedPass = true;
-                          setTimeout(
-                            () => (playerAnimationStore.usedPass = false),
-                            1000,
-                          );
-                        });
+                        runInAction(
+                          () => (playerAnimationStore.usedPass = true),
+                        );
+
+                        setTimeout(
+                          () =>
+                            runInAction(
+                              () => (playerAnimationStore.usedPass = false),
+                            ),
+                          1000,
+                        );
                         pass({ voluntary: true });
                       }}
-                      style={[
-                        styles.actionButton,
-                        {
-                          backgroundColor:
-                            uiStore.colorScheme == "light"
-                              ? "#d4d4d8"
-                              : "#27272a",
-                          opacity: enemyStore.enemyTurnOngoing ? 0.5 : 1,
-                        },
-                      ]}
                     >
-                      <Text style={styles["text-xl"]}>Use</Text>
-                    </Pressable>
+                      <Text style={styles["text-xl"]}> Use</Text>
+                    </GenericRaisedButton>
                   </View>
                 </View>
               )}

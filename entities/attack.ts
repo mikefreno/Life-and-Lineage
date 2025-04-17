@@ -377,8 +377,8 @@ export class Attack {
    */
   private _internalUse(target: Being): PerTargetUse {
     const { hitChanceMultiplier } = getConditionEffectsOnAttacks({
-      selfConditions: this.user.conditions,
-      enemyConditions: target.conditions,
+      selfConditions: [...this.user.conditions, ...this.user.debilitations],
+      enemyConditions: [...target.conditions, ...target.debilitations],
     });
 
     const hits: AttackUse[] = [];

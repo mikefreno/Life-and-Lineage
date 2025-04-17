@@ -82,7 +82,7 @@ export class CharacterStore {
 
   independantChildrenAgeCheck() {
     for (const child of this.independentChildren) {
-      if (child.age >= 15) {
+      if (child.age >= 14) {
         this.removeIndependentChild({ child });
       }
     }
@@ -135,7 +135,7 @@ export class CharacterStore {
   public createIndependantChild() {
     const sex = flipCoin() == "Heads" ? "male" : "female";
     const name = getRandomName(sex);
-    const birthdate = this.root.time.generateBirthDateInRange(1, 15);
+    const birthdate = this.root.time.generateBirthDateInRange(1, 13);
     const randomPersonality = getRandomPersonality();
 
     const child = new Character({

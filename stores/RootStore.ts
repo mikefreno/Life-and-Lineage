@@ -138,6 +138,7 @@ export class RootStore {
       addDevAction: action,
       removeDevAction: action,
       clearAllData: action,
+      inheritance: action,
     });
   }
 
@@ -161,7 +162,7 @@ export class RootStore {
     this.checkForBirths();
   }
 
-  inheritance() {
+  inheritance(newPlayerCharacter: PlayerCharacter) {
     let points = 0;
     for (const inst of this.dungeonStore.dungeonInstances) {
       for (const level of inst.levels) {
@@ -170,7 +171,9 @@ export class RootStore {
         }
       }
     }
-    return points;
+
+    newPlayerCharacter.addSkillPoint({ amount: points, to: "unallocated" });
+    this.playerState = newPlayerCharacter;
   }
   showEndOfCompletedDungeonsMessage() {
     this.showReachedEndOfCompletedDungeonsMessage = true;

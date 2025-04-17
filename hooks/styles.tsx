@@ -761,12 +761,6 @@ export const useStyles = () => {
     stunnedContainer: {
       marginVertical: "auto",
       paddingHorizontal: 16,
-      paddingVertical: 8,
-    } as const,
-    stunnedText: {
-      textAlign: "center",
-      fontSize: 24,
-      letterSpacing: 1,
     } as const,
     logContent: {
       flex: 1,

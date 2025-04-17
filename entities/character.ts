@@ -1,5 +1,6 @@
 import {
   createBuff,
+  createDebuff,
   getConditionEffectsOnDefenses,
 } from "@/utility/functions/conditions";
 import { Condition } from "@/entities/conditions";
@@ -12,6 +13,7 @@ import {
   computed,
   reaction,
   runInAction,
+  override,
 } from "mobx";
 import { Investment } from "@/entities/investment";
 import {
@@ -238,6 +240,13 @@ export class Character extends Being {
     this.knownCharacterIds = this.knownCharacterIds.filter(
       (id) => id !== character.id,
     );
+  }
+
+  public takeTurn({ player }: { player: PlayerCharacter }) {
+    return this._takeTurn({
+      targets: [player],
+      nameReference: this.nameReference,
+    }); //this is done as a way to easily add additional effects, note this function in Minion
   }
 
   public makePartner(character: Character) {
@@ -561,8 +570,6 @@ export class PlayerCharacter extends Character {
 
   investments: Investment[];
 
-  debilitations: Condition[]; // debuffs due to old age
-
   constructor({
     playerClass,
     blessing,
@@ -578,7 +585,6 @@ export class PlayerCharacter extends Character {
     unAllocatedSkillPoints,
     keyItems,
     jobs,
-    debilitations,
     availableRespecs,
     ...props
   }: PlayerCharacterOptions) {
@@ -612,7 +618,6 @@ export class PlayerCharacter extends Character {
 
     this.baseInventory = baseInventory ?? [];
     this.keyItems = keyItems ?? [];
-    this.debilitations = debilitations ?? [];
 
     this.investments = investments ?? [];
     this.availableRespecs = availableRespecs ?? 0;
@@ -671,7 +676,6 @@ export class PlayerCharacter extends Character {
       gainProficiency: action,
       addDebilitation: action,
 
-      debilitations: observable,
       investments: observable,
       adopt: action,
 
@@ -685,7 +689,6 @@ export class PlayerCharacter extends Character {
       equipItem: action,
       unEquipItem: action,
       inventory: computed,
-      getPhysicalDamageReduction: action,
       purchaseStack: action,
 
       getMedicalService: action,
@@ -822,6 +825,20 @@ export class PlayerCharacter extends Character {
             this.addCondition(cond2);
           },
           name: "Add condition",
+        },
+        {
+          action: () => {
+            const cond = createDebuff({
+              debuffName: "stun",
+              primaryAttackDamage: this.attackPower,
+              applierID: this.id,
+              enemyMaxHP: this.maxHealth,
+              enemyMaxSanity: this.maxSanity,
+              applierNameString: this.fullName,
+            });
+            this.addCondition(cond);
+          },
+          name: "Add Stun",
         },
         {
           action: () => this._unlockAllSpells(),
@@ -1236,16 +1253,6 @@ export class PlayerCharacter extends Character {
       }
     });
     return condensedInventory;
-  }
-
-  /**
-   * This includes `conditional` effects, it returns a float between 0 and 0.925 (hard cap)
-   */
-  public getPhysicalDamageReduction() {
-    const { armorMult, armorFlat } = getConditionEffectsOnDefenses(
-      this.conditions,
-    );
-    return damageReduction(this.totalArmor * armorMult + armorFlat);
   }
 
   private setUnarmored() {
@@ -1693,7 +1700,10 @@ export class PlayerCharacter extends Character {
   public adopt({ child, partner }: { child: Character; partner?: Character }) {
     child.updateLastName(this.lastName);
     child.setParents(this, partner);
-    this.children.push(child);
+    this.addChild(child);
+    if (partner) {
+      partner.addChild(child);
+    }
   }
   //----------------------------------Conditions----------------------------------//
   public addDebilitation(debuff: Condition) {

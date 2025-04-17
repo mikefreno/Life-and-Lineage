@@ -40,6 +40,7 @@ export interface BeingOptions {
   animationStrings: { [key: string]: string };
 
   conditions?: Condition[];
+  debilitations?: Condition[];
 
   baseArmor?: number;
 
@@ -111,17 +112,16 @@ export interface PlayerCharacterBase extends BaseCharacterOptions {
   rangerPet?: Minion;
   investments?: Investment[];
   unAllocatedSkillPoints?: number;
-  debilitations?: Condition[];
   availableRespecs?: number;
 }
 
 export type MageCharacter = PlayerCharacterBase & {
-  playerClass: "mage" | PlayerClassOptions.mage;
+  playerClass: PlayerClassOptions.mage;
   blessing: Element.fire | Element.water | Element.air | Element.earth;
 };
 
 export type NecromancerCharacter = PlayerCharacterBase & {
-  playerClass: "necromancer" | PlayerClassOptions.necromancer;
+  playerClass: PlayerClassOptions.necromancer;
   blessing:
     | Element.blood
     | Element.summoning
@@ -130,12 +130,12 @@ export type NecromancerCharacter = PlayerCharacterBase & {
 };
 
 export type PaladinCharacter = PlayerCharacterBase & {
-  playerClass: "paladin" | PlayerClassOptions.paladin;
+  playerClass: PlayerClassOptions.paladin;
   blessing: Element.holy | Element.vengeance | Element.protection;
 };
 
 export type RangerCharacter = PlayerCharacterBase & {
-  playerClass: "ranger" | PlayerClassOptions.ranger;
+  playerClass: PlayerClassOptions.ranger;
   blessing: Element.assassination | Element.beastMastery | Element.arcane;
 };
 

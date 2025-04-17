@@ -1008,6 +1008,7 @@ export const EnemyImageMap: EnemyImageMapType = {
     },
     height: 48,
     width: 48,
+    mirror: true,
   },
   npc_man_old: {
     sets: {
@@ -1029,6 +1030,7 @@ export const EnemyImageMap: EnemyImageMapType = {
     },
     height: 48,
     width: 48,
+    mirror: true,
   },
   npc_woman: {
     sets: {
@@ -1050,6 +1052,7 @@ export const EnemyImageMap: EnemyImageMapType = {
     },
     height: 48,
     width: 48,
+    mirror: true,
   },
   npc_woman_old: {
     sets: {
@@ -1071,6 +1074,7 @@ export const EnemyImageMap: EnemyImageMapType = {
     },
     height: 48,
     width: 48,
+    mirror: true,
   },
   orc_masked: {
     sets: {

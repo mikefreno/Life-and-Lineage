@@ -288,7 +288,15 @@ export default class EnemyStore {
     (parse(storedIds) as string[]).forEach((str) => {
       const retrieved = storage.getString(`enemy_${str}`);
       if (!retrieved) return;
-      const enemy = Enemy.fromJSON({ ...parse(retrieved), root: this.root });
+      const parsed = parse(retrieved);
+      let enemy: Being;
+
+      if (parsed.personality) {
+        enemy = Character.fromJSON({ ...parsed, root: this.root });
+      } else {
+        enemy = Enemy.fromJSON({ ...parsed, root: this.root });
+      }
+
       if (!enemy.sprite) {
         throw new Error(`No sprite on ${enemy.nameReference}`);
       }

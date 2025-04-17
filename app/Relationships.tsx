@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Text, ThemedView } from "@/components/Themed";
 import { wait } from "@/utility/functions/misc";
 import { CharacterImage } from "@/components/CharacterImage";
@@ -35,7 +35,7 @@ import { useVibration } from "@/hooks/generic";
 
 const RelationshipsScreen = observer(() => {
   const styles = useStyles();
-  const { playerState, uiStore } = useRootStore();
+  const { playerState, uiStore, characterStore } = useRootStore();
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
     null,
   );
@@ -49,6 +49,10 @@ const RelationshipsScreen = observer(() => {
   const isFocused = useIsFocused();
   const { getNormalizedSize } = useScaling();
   const vibration = useVibration();
+
+  useEffect(() => {
+    characterStore.independantChildrenAgeCheck();
+  }, []);
 
   const characterGroups = [
     { title: "Children", data: playerState?.children || [] },
@@ -403,7 +407,7 @@ const RenderCharacter = observer(
           <CharacterImage character={character} />
         </View>
         <View style={{ alignItems: "center" }}>
-          <Text style={styles["text-xl"]}>
+          <Text style={[styles["text-xl"], { textAlign: "center" }]}>
             {character.deathdate && "Died at "}
             {character.age} Years Old
           </Text>

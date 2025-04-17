@@ -1,12 +1,11 @@
 import React from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import { Platform, Pressable, ScrollView, View } from "react-native";
 import { Text, ThemedView } from "@/components/Themed";
 import deathMessages from "@/assets/json/deathMessages.json";
 import { useEffect, useState } from "react";
-import { useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import { CharacterImage } from "@/components/CharacterImage";
-import { wait } from "@/utility/functions/misc";
-import GenericModal from "@/components/GenericModal";
+import clearHistory, { wait } from "@/utility/functions/misc";
 import GenericFlatButton from "@/components/GenericFlatButton";
 import { Element, ElementToString, PlayerClassOptions } from "@/utility/types";
 import {
@@ -30,6 +29,13 @@ import { Item } from "@/entities/item";
 import CheckpointModal from "@/components/CheckpointModal";
 import { flex, tw, useStyles } from "@/hooks/styles";
 import { observer } from "mobx-react-lite";
+import {
+  DualPaywall,
+  IAP_MODAL_ANIM_TIMING,
+  NecromancerPaywall,
+  RangerPaywall,
+} from "@/components/IAPPaywalls";
+import Modal from "react-native-modal";
 
 const DeathScreen = observer(() => {
   const [nextLife, setNextLife] = useState<Character | null>(null);
@@ -40,12 +46,15 @@ const DeathScreen = observer(() => {
   const [selectedBlessing, setSelectedBlessing] = useState<Element | null>(
     null,
   );
+  const [showingNecroPaywall, setShowNecroPaywall] = useState(false);
+  const [showingRangerPaywall, setShowRangerPaywall] = useState(false);
   const [page, setPage] = useState<number>(0);
   const [isCheckpointModalVisible, setIsCheckpointModalVisible] =
     useState(false);
+  const navigation = useNavigation();
 
   const root = useRootStore();
-  const { playerState, uiStore } = root;
+  const { playerState, uiStore, iapStore } = root;
   const vibration = useVibration();
   const styles = useStyles();
   const router = useRouter();
@@ -68,99 +77,181 @@ const DeathScreen = observer(() => {
   function createPlayerCharacter() {
     if (nextLife && selectedClass && selectedBlessing && playerState) {
       const inventory = [
-        ...playerState.inventory,
         playerState.equipment?.mainHand.name.toLowerCase() !== "unarmored"
           ? playerState.equipment?.mainHand
           : null,
         playerState.equipment?.body,
         playerState.equipment?.head,
         playerState.equipment?.offHand,
-      ].filter((item): item is Item => item !== null);
+        ...playerState.baseInventory,
+      ].filter((item): item is Item => item !== null && item instanceof Item);
+
       const newCharacter = new PlayerCharacter({
         firstName: nextLife.firstName,
         lastName: nextLife.lastName,
         sex: nextLife.sex,
         playerClass: selectedClass,
         blessing: selectedBlessing,
-        parents: nextLife.parents ?? [],
+        parentIds: nextLife.parents.map((par) => par.id) ?? [],
         birthdate: nextLife.birthdate,
-        investments: playerState?.investments,
+        investments: playerState?.investments || [],
         gold: playerState.gold / playerState.children.length,
-        keyItems: playerState?.keyItems,
+        keyItems: playerState?.keyItems || [],
         baseInventory: inventory,
+        beingType: "human",
+        baseDamageTable: {},
+        baseResistanceTable: {},
+        animationStrings: {},
+        activeAuraConditionIds: [],
         ...getStartingBaseStats({ classSelection: selectedClass }),
         root,
       });
       return newCharacter;
     }
+    return null;
   }
 
   const startNextLife = () => {
     const newPlayerCharacter = createPlayerCharacter();
     if (newPlayerCharacter) {
       savePlayer(newPlayerCharacter);
-      const skillPoints = root.inheritance();
-      newPlayerCharacter.addSkillPoint({ amount: skillPoints });
-      wait(500).then(() => {
-        router.dismissAll();
-        router.replace("/");
+      console.log(newPlayerCharacter);
+
+      root.inheritance(newPlayerCharacter);
+      root.dungeonStore.clearDungeonState();
+      root.clearDeathScreen();
+      wait(1000).then(() => {
+        clearHistory(navigation);
       });
     }
+  };
+
+  const [showingDualPaywall, setShowingDualPaywall] = useState(false);
+  const [heldForDual, setHeldForDual] = useState<PlayerClassOptions>(
+    PlayerClassOptions.necromancer,
+  );
+
+  const dualToggle = (hold: PlayerClassOptions) => {
+    setShowNecroPaywall(false);
+    setShowRangerPaywall(false);
+    setHeldForDual(hold);
+    setTimeout(() => setShowingDualPaywall(true), IAP_MODAL_ANIM_TIMING + 150);
   };
 
   if (playerState) {
     return (
       <>
-        <GenericModal
-          isVisibleCondition={!!nextLife}
-          backFunction={() => setNextLife(null)}
-          size={100}
+        <NecromancerPaywall
+          isVisibleCondition={showingNecroPaywall}
+          onClose={() => setShowNecroPaywall(false)}
+          dualToggle={() => dualToggle(PlayerClassOptions.necromancer)}
+        />
+        <RangerPaywall
+          isVisibleCondition={showingRangerPaywall}
+          onClose={() => setShowRangerPaywall(false)}
+          dualToggle={() => dualToggle(PlayerClassOptions.ranger)}
+        />
+        <DualPaywall
+          isVisibleCondition={showingDualPaywall}
+          onClose={() => {
+            setShowingDualPaywall(false);
+            if (
+              (heldForDual == PlayerClassOptions.necromancer &&
+                iapStore.necromancerUnlocked) ||
+              (heldForDual === PlayerClassOptions.ranger &&
+                iapStore.rangerUnlocked)
+            ) {
+              setSelectedClass(heldForDual);
+              setSelectedBlessing(null);
+            }
+          }}
+        />
+
+        <Modal
+          animationIn={uiStore.reduceMotion ? "fadeIn" : "slideInUp"}
+          animationOut={uiStore.reduceMotion ? "fadeOut" : "slideOutDown"}
+          animationInTiming={300}
+          animationOutTiming={300}
+          backdropTransitionOutTiming={300}
+          backdropTransitionInTiming={300}
+          backdropColor={
+            Platform.OS == "ios"
+              ? "#000000"
+              : uiStore.colorScheme == "light"
+              ? "#ffffffff"
+              : "#000000"
+          }
+          isVisible={nextLife !== null}
+          backdropOpacity={0.5}
+          onBackdropPress={() => setNextLife(null)}
+          onBackButtonPress={() => setNextLife(null)}
+          statusBarTranslucent={true}
+          coverScreen={true}
+          deviceHeight={uiStore.dimensions.height}
+          deviceWidth={uiStore.dimensions.width}
         >
-          <View>
-            {page == 0 && (
-              <>
-                <MinimalClassSelect
-                  dimensions={uiStore.dimensions}
-                  vibration={vibration}
-                  selectedClass={selectedClass}
-                  setSelectedClass={setSelectedClass}
-                  colorScheme={uiStore.colorScheme}
-                />
-                <GenericFlatButton
-                  onPress={() => setPage(1)}
-                  disabled={!selectedClass}
-                >
-                  Select Blessing
-                </GenericFlatButton>
-              </>
-            )}
-            {page == 1 && selectedClass && (
-              <>
-                <Pressable onPress={() => setPage(0)}>
-                  <Entypo
-                    name="chevron-left"
-                    size={24}
-                    color={uiStore.colorScheme === "dark" ? "#f4f4f5" : "black"}
+          <ThemedView
+            style={{
+              maxHeight:
+                uiStore.dimensions.height -
+                (uiStore.insets?.top ?? 0) -
+                (uiStore.insets?.bottom ?? 0),
+              ...styles.modalContent,
+              width: "100%",
+            }}
+          >
+            <View>
+              {page == 0 && (
+                <>
+                  <MinimalClassSelect
+                    dimensions={uiStore.dimensions}
+                    vibration={vibration}
+                    selectedClass={selectedClass}
+                    setSelectedClass={setSelectedClass}
+                    colorScheme={uiStore.colorScheme}
+                    showRangerPaywall={() => setShowRangerPaywall(true)}
+                    showNecroPaywall={() => setShowNecroPaywall(true)}
                   />
-                </Pressable>
-                <MinimalBlessingSelect
-                  playerClass={selectedClass}
-                  blessing={selectedBlessing}
-                  setBlessing={setSelectedBlessing}
-                  vibration={vibration}
-                  colorScheme={uiStore.colorScheme}
-                  dimensions={uiStore.dimensions}
-                />
-                <GenericFlatButton
-                  onPress={startNextLife}
-                  disabled={!selectedClass}
-                >
-                  Continue Lineage
-                </GenericFlatButton>
-              </>
-            )}
-          </View>
-        </GenericModal>
+                  <GenericFlatButton
+                    onPress={() => setPage(1)}
+                    disabled={!selectedClass}
+                    style={styles.mb4}
+                  >
+                    Next
+                  </GenericFlatButton>
+                </>
+              )}
+              {page == 1 && selectedClass && (
+                <>
+                  <Pressable onPress={() => setPage(0)}>
+                    <Entypo
+                      name="chevron-left"
+                      size={24}
+                      color={
+                        uiStore.colorScheme === "dark" ? "#f4f4f5" : "black"
+                      }
+                    />
+                  </Pressable>
+                  <MinimalBlessingSelect
+                    playerClass={selectedClass}
+                    blessing={selectedBlessing}
+                    setBlessing={setSelectedBlessing}
+                    vibration={vibration}
+                    colorScheme={uiStore.colorScheme}
+                    dimensions={uiStore.dimensions}
+                  />
+                  <GenericFlatButton
+                    onPress={startNextLife}
+                    disabled={!selectedClass}
+                    style={styles.mb4}
+                  >
+                    Continue Lineage
+                  </GenericFlatButton>
+                </>
+              )}
+            </View>
+          </ThemedView>
+        </Modal>
         <CheckpointModal
           isVisible={isCheckpointModalVisible}
           onClose={() => setIsCheckpointModalVisible(false)}
@@ -192,7 +283,7 @@ const DeathScreen = observer(() => {
                     <Pressable
                       key={idx}
                       onPress={() => setNextLife(child)}
-                      style={[tw.myAuto, tw.mx2]}
+                      style={[tw.myAuto, tw.mx2, { zIndex: 9999 }]}
                     >
                       <View style={styles.childCard}>
                         <Text
@@ -200,7 +291,9 @@ const DeathScreen = observer(() => {
                         >
                           {child.firstName}
                         </Text>
-                        <CharacterImage character={child} />
+                        <View style={{ width: "100%", height: "60%" }}>
+                          <CharacterImage character={child} />
+                        </View>
                       </View>
                     </Pressable>
                   ))}
@@ -226,6 +319,8 @@ function MinimalClassSelect({
   selectedClass,
   setSelectedClass,
   colorScheme,
+  showNecroPaywall,
+  showRangerPaywall,
 }: {
   dimensions: {
     height: number;
@@ -245,8 +340,11 @@ function MinimalClassSelect({
     React.SetStateAction<PlayerClassOptions | null>
   >;
   colorScheme: "light" | "dark";
+  showNecroPaywall: () => void;
+  showRangerPaywall: () => void;
 }) {
   const styles = useStyles();
+  const { iapStore } = useRootStore();
 
   const ClassPressable = ({
     classOption,
@@ -265,7 +363,19 @@ function MinimalClassSelect({
       <Pressable
         onPress={() => {
           vibration({ style: "light" });
-          setSelectedClass(classOption);
+          if (
+            classOption === PlayerClassOptions.ranger &&
+            !iapStore.rangerUnlocked
+          ) {
+            showRangerPaywall();
+          } else if (
+            classOption === PlayerClassOptions.necromancer &&
+            !iapStore.necromancerUnlocked
+          ) {
+            showNecroPaywall();
+          } else {
+            setSelectedClass(classOption);
+          }
         }}
         style={{
           height: dimensions.height * 0.25,
@@ -325,6 +435,7 @@ function MinimalClassSelect({
           Icon={WizardHat}
           color="#2563eb"
         />
+
         <ClassPressable
           classOption={PlayerClassOptions.ranger}
           Icon={RangerIcon}

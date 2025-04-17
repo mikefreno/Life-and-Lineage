@@ -28,6 +28,7 @@ import {
   NecromancerPaywall,
   RangerPaywall,
 } from "@/components/IAPPaywalls";
+import { PlayerCodex } from "@/components/CodexPages";
 
 const SetClassScreen = observer(() => {
   const vibration = useVibration();
@@ -126,8 +127,15 @@ const SetClassScreen = observer(() => {
         isVisibleCondition={showDualPaywall}
         onClose={() => {
           setShowDualPaywall(false);
-          setClassSelection(heldForDual);
-          setBlessingSelection(undefined);
+          if (
+            (heldForDual == PlayerClassOptions.necromancer &&
+              iapStore.necromancerUnlocked) ||
+            (heldForDual === PlayerClassOptions.ranger &&
+              iapStore.rangerUnlocked)
+          ) {
+            setClassSelection(heldForDual);
+            setBlessingSelection(undefined);
+          }
         }}
       />
       <TutorialModal

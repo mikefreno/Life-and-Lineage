@@ -240,15 +240,6 @@ const EnemyDisplay = observer(({ enemy }: { enemy: Being }) => {
   const { enemyStore } = useRootStore();
   const glowValue = useSharedValue(0);
 
-  const enemyName = useMemo(() => {
-    if (enemy instanceof Creature) {
-      return enemy.creatureSpecies;
-    } else if (enemy instanceof Character) {
-      return enemy.fullName;
-    }
-    throw new Error(`invalid enemy instance: ${enemy.beingType}`);
-  }, [enemy]);
-
   useEffect(() => {
     if (healthState.id !== enemy.id) {
       setHealthState({
@@ -304,14 +295,14 @@ const EnemyDisplay = observer(({ enemy }: { enemy: Being }) => {
             }}
             numberOfLines={2}
           >
-            {toTitleCase(enemyName).replace(" ", "\n")}
+            {toTitleCase(enemy.nameReferenc).replace(" ", "\n")}
           </Text>
           <ProgressBar
             value={enemy.currentHealth >= 0 ? enemy.currentHealth : 0}
             maxValue={enemy.maxHealth}
             filledColor="#ef4444"
             unfilledColor="#fee2e2"
-            displayNumber={enemyName.toLowerCase() == "training dummy"}
+            displayNumber={enemy.nameReference == "training dummy"}
             removeAtZero={true}
             containerStyle={{ width: "90%" }}
           />

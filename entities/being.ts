@@ -67,6 +67,7 @@ export class Being {
   baseResistanceTable: { [key in DamageType]?: number };
 
   conditions: Condition[];
+  debilitations: Condition[];
 
   attackStrings: string[];
   animationStrings: { [key: string]: string };
@@ -102,6 +103,7 @@ export class Being {
     this.baseMana = props.baseMana ?? 0;
     this.currentMana = props.currentMana ?? this.baseMana;
     this.baseManaRegen = props.baseManaRegen ?? 0;
+    this.debilitations = props.debilitations ?? [];
 
     this.baseStrength = props.baseStrength ?? 0;
     this.baseIntelligence = props.baseIntelligence ?? 0;
@@ -185,6 +187,7 @@ export class Being {
       removeConditionById: action,
       conditionTicker: action,
       removeDebuffs: action,
+      debilitations: observable,
 
       changeBaseSanity: action,
       useMana: action,
@@ -315,9 +318,10 @@ export class Being {
 
   //----------------------------------Health----------------------------------//
   get maxHealth() {
-    const { healthFlat, healthMult } = getConditionEffectsOnDefenses(
-      this.conditions,
-    );
+    const { healthFlat, healthMult } = getConditionEffectsOnDefenses([
+      ...(this.conditions ?? []),
+      ...(this.debilitations ?? []),
+    ]);
     const allocated = this.allocatedSkillPoints
       ? this.allocatedSkillPoints[Attribute.health]
       : 0;
@@ -342,9 +346,10 @@ export class Being {
   }
 
   get totalHealthRegen() {
-    const { healthRegenFlat, healthRegenMult } = getConditionEffectsOnMisc(
-      this.conditions,
-    );
+    const { healthRegenFlat, healthRegenMult } = getConditionEffectsOnMisc([
+      ...this.conditions,
+      ...this.debilitations,
+    ]);
     const fromEquipment = this.equipment
       ? this.equipmentStats?.get(Modifier.HealthRegen) ?? 0
       : 0;
@@ -397,9 +402,10 @@ export class Being {
 
   //----------------------------------Mana----------------------------------//
   get maxMana() {
-    const { manaMaxFlat, manaMaxMult } = getConditionEffectsOnMisc(
-      this.conditions,
-    );
+    const { manaMaxFlat, manaMaxMult } = getConditionEffectsOnMisc([
+      ...this.conditions,
+      ...this.debilitations,
+    ]);
 
     const allocated = this.allocatedSkillPoints
       ? this.allocatedSkillPoints[Attribute.mana]
@@ -425,9 +431,10 @@ export class Being {
   }
 
   get totalManaRegen() {
-    const { manaRegenFlat, manaRegenMult } = getConditionEffectsOnMisc(
-      this.conditions,
-    );
+    const { manaRegenFlat, manaRegenMult } = getConditionEffectsOnMisc([
+      ...this.conditions,
+      ...this.debilitations,
+    ]);
     const allocated = this.allocatedSkillPoints
       ? this.allocatedSkillPoints[Attribute.manaRegen]
       : 0;
@@ -491,11 +498,12 @@ export class Being {
     }
   }
   //----------------------------------Sanity----------------------------------//
-  get maxSanity() {
+  get maxSanity(): number | null {
     if (!this.baseSanity) return null;
-    const { sanityFlat, sanityMult } = getConditionEffectsOnDefenses(
-      this.conditions,
-    );
+    const { sanityFlat, sanityMult } = getConditionEffectsOnDefenses([
+      ...this.conditions,
+      ...this.debilitations,
+    ]);
     const allocated = this.allocatedSkillPoints
       ? this.allocatedSkillPoints[Attribute.sanity]
       : 0;
@@ -677,9 +685,10 @@ export class Being {
   }
 
   get physicalDamageReduction() {
-    const { armorMult, armorFlat } = getConditionEffectsOnDefenses(
-      this.conditions,
-    );
+    const { armorMult, armorFlat } = getConditionEffectsOnDefenses([
+      ...this.conditions,
+      ...this.debilitations,
+    ]);
     return damageReduction(this.totalArmor * armorMult + armorFlat);
   }
 
@@ -1022,6 +1031,16 @@ export class Being {
     if (this.currentHealth <= undeadDeathCheck) {
       this.currentHealth = 0;
     }
+    for (let i = this.debilitations.length - 1; i >= 0; i--) {
+      const { effect } = this.debilitations[i].tick(this);
+
+      if (effect.includes("destroy undead")) {
+        undeadDeathCheck = getMagnitude(this.debilitations[i].effectMagnitude);
+      }
+    }
+    if (this.currentHealth <= undeadDeathCheck) {
+      this.currentHealth = 0;
+    }
   }
 
   public deactivateAuras() {
@@ -1039,7 +1058,10 @@ export class Being {
   }
 
   get isStunned() {
-    const isStunned = getConditionEffectsOnMisc(this.conditions).isStunned;
+    const isStunned = getConditionEffectsOnMisc([
+      ...this.conditions,
+      ...this.debilitations,
+    ]).isStunned;
     return isStunned;
   }
 
@@ -1380,8 +1402,11 @@ export class Being {
   }) {
     let cumulativeDamage = 0;
     const { damageFlat, damageMult } = getConditionEffectsOnAttacks({
-      selfConditions: this.conditions,
-      enemyConditions: target?.conditions ?? [],
+      selfConditions: [...this.conditions, ...this.debilitations],
+      enemyConditions: [
+        ...(target?.conditions ?? []),
+        ...(target?.debilitations ?? []),
+      ],
     });
 
     if (baseDamageMap == null)
