@@ -54,7 +54,7 @@ const DeathScreen = observer(() => {
   const navigation = useNavigation();
 
   const root = useRootStore();
-  const { playerState, uiStore, iapStore } = root;
+  const { playerState, uiStore, iapStorea, characterStore } = root;
   const vibration = useVibration();
   const styles = useStyles();
   const router = useRouter();
@@ -112,14 +112,15 @@ const DeathScreen = observer(() => {
   }
 
   const startNextLife = () => {
+    const currentPlayerCharacter = { ...playerState };
     const newPlayerCharacter = createPlayerCharacter();
     if (newPlayerCharacter) {
       savePlayer(newPlayerCharacter);
-      console.log(newPlayerCharacter);
 
       root.inheritance(newPlayerCharacter);
       root.dungeonStore.clearDungeonState();
       root.clearDeathScreen();
+      characterStore.saveCharacter(currentPlayerCharacter);
       wait(1000).then(() => {
         clearHistory(navigation);
       });

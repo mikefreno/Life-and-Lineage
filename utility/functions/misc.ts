@@ -206,7 +206,7 @@ export function getCharacterImage(
     ageGroup = "Youth";
   }
 
-  return PERSONALITY_SETS[sex][personality][ageGroup];
+  return PERSONALITY_SETS[sex][personality ?? Personality.AGGRESSIVE][ageGroup];
 }
 
 export function getItemJSONMap(
