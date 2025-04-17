@@ -13,7 +13,14 @@ import {
   toTitleCase,
 } from "@/utility/functions/misc";
 import { Attribute, AttributeToString, Modifier } from "@/utility/types";
-import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Animated,
   Image,
@@ -388,31 +395,42 @@ export const ConditionRenderer = observer(() => {
   const styles = useStyles();
   const { uiStore, playerState } = useRootStore();
   if (playerState) {
-    let simplifiedConditionsMap: Map<
-      string,
-      {
-        name: string;
-        icon: any;
-        id: string;
-        count: number;
-      }
-    > = new Map();
+    const simplifiedConditions = useMemo(() => {
+      const simplifiedConditionsMap: Map<
+        string,
+        {
+          name: string;
+          icon: any;
+          id: string;
+          count: number;
+        }
+      > = new Map();
 
-    playerState.conditions.forEach((condition) => {
-      if (simplifiedConditionsMap.has(condition.name)) {
-        let existingCondition = simplifiedConditionsMap.get(condition.name)!;
-        existingCondition.count += 1;
-        simplifiedConditionsMap.set(condition.name, existingCondition);
-      } else {
-        simplifiedConditionsMap.set(condition.name, {
-          name: condition.name,
-          id: condition.id,
-          icon: condition.getConditionIcon(),
-          count: 1,
-        });
+      if (!playerState || !playerState.conditions) {
+        return [];
       }
-    });
-    let simplifiedConditions = Array.from(simplifiedConditionsMap.values());
+      const conditions = [
+        ...playerState.conditions,
+        ...playerState.debilitations,
+      ];
+
+      conditions.forEach((condition) => {
+        if (simplifiedConditionsMap.has(condition.name)) {
+          let existingCondition = simplifiedConditionsMap.get(condition.name)!;
+          existingCondition.count += 1;
+          simplifiedConditionsMap.set(condition.name, existingCondition);
+        } else {
+          simplifiedConditionsMap.set(condition.name, {
+            name: condition.name,
+            id: condition.id,
+            icon: condition.getConditionIcon(),
+            count: 1,
+          });
+        }
+      });
+
+      return Array.from(simplifiedConditionsMap.values());
+    }, [playerState.conditions.length, playerState.debilitations.length]);
 
     return (
       <View style={[styles.rowAround, { marginLeft: tw_base[2] }]}>

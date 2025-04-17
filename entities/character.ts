@@ -201,27 +201,61 @@ export class Character extends Being {
   }
 
   get parents(): Character[] {
-    return this.parentIds.map((id) =>
-      this.root.characterStore.getCharacter(id),
-    );
+    return this.parentIds
+      .map((id) => {
+        try {
+          return this.root.characterStore.getCharacter(id);
+        } catch (e) {
+          this.parentIds = this.parentIds.filter((parentId) => parentId !== id);
+          return null;
+        }
+      })
+      .filter((parent): parent is Character => parent !== null);
   }
 
   get children(): Character[] {
-    return this.childrenIds.map((id) =>
-      this.root.characterStore.getCharacter(id),
-    );
+    return this.childrenIds
+      .map((id) => {
+        try {
+          return this.root.characterStore.getCharacter(id);
+        } catch (e) {
+          this.childrenIds = this.childrenIds.filter(
+            (childId) => childId !== id,
+          );
+          return null;
+        }
+      })
+      .filter((child): child is Character => child !== null);
   }
 
   get partners(): Character[] {
-    return this.partnerIds.map((id) =>
-      this.root.characterStore.getCharacter(id),
-    );
+    return this.partnerIds
+      .map((id) => {
+        try {
+          return this.root.characterStore.getCharacter(id);
+        } catch (e) {
+          this.partnerIds = this.partnerIds.filter(
+            (partnerId) => partnerId !== id,
+          );
+          return null;
+        }
+      })
+      .filter((partner): partner is Character => partner !== null);
   }
 
   get knownCharacters(): Character[] {
-    return this.knownCharacterIds.map((id) =>
-      this.root.characterStore.getCharacter(id),
-    );
+    return this.knownCharacterIds
+      .map((id) => {
+        try {
+          return this.root.characterStore.getCharacter(id);
+        } catch (e) {
+          this.knownCharacterIds = this.knownCharacterIds.filter(
+            (knownId) => knownId !== id,
+          );
+          return null;
+        }
+      })
+      .filter((character): character is Character => character !== null);
   }
 
   public addKnownCharacter(character: Character) {
