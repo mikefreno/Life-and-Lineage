@@ -312,6 +312,7 @@ export class Item {
     if (this.itemClass == ItemClassType.Book) {
       let spell;
       let bookObj: any;
+      //TODO: handle spell books of other classes
       switch (this.root.playerState?.playerClass) {
         case PlayerClassOptions.mage:
           bookObj = jsonServiceStore

@@ -84,7 +84,7 @@ export const StatsDisplay = observer(
   }: StatsDisplayProps) => {
     const styles = useStyles();
     const vibration = useVibration();
-    const { playerState, enemyStore, uiStore } = useRootStore();
+    const { playerState, uiStore } = useRootStore();
     const { dimensions, itemBlockSize, colorScheme } = uiStore;
     const theme = Colors[colorScheme];
 
@@ -608,7 +608,7 @@ export const StatsDisplay = observer(
         return "Key Item";
       }
       if (item.itemClass == ItemClassType.Book) {
-        return bookItemLabel();
+        return item.attachedSpell ? bookItemLabel() : "Book";
       }
       return toTitleCase(item.itemClass);
     };
@@ -922,7 +922,7 @@ export const StatsDisplay = observer(
               Show attacks
             </GenericFlatButton>
           )}
-          {firstItem.attachedSpell && (
+          {firstItem.attachedSpell ? (
             <>
               <View style={tw.px2}>
                 <SpellDetails spell={firstItem.attachedSpell} />
@@ -941,6 +941,14 @@ export const StatsDisplay = observer(
                 </GenericFlatButton>
               )}
             </>
+          ) : (
+            firstItem.itemClass === ItemClassType.Book && (
+              <View style={{ maxWidth: uiStore.dimensions.lesser * 0.3 }}>
+                <Text style={[styles["text-sm"], { textAlign: "center" }]}>
+                  You can't make heads or tails of this book.
+                </Text>
+              </View>
+            )
           )}
           {displayItem.side == "stash" && (
             <GenericFlatButton

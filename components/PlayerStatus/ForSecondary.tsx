@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useRef } from "react";
 import ProgressBar from "@/components/ProgressBar";
 import { findNodeHandle, Pressable, UIManager, View } from "react-native";
 import { observer } from "mobx-react-lite";

@@ -20,7 +20,7 @@ export const useStyles = () => {
 
   const raisedAbsolutePosition = {
     position: "absolute",
-    zIndex: 10,
+    zIndex: 9999,
   } as const;
 
   const roundedBorder = {

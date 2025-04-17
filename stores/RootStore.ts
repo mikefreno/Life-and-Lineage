@@ -20,7 +20,6 @@ import { StashStore } from "@/stores/StashStore";
 import { SaveStore } from "@/stores/SaveStore";
 import { AudioStore } from "@/stores/AudioStore";
 import { PlayerAnimationStore } from "@/stores/PlayerAnimationStore";
-import { flipCoin } from "@/utility/functions/misc";
 import { IAPStore } from "@/stores/IAPStore";
 import { reloadAppAsync } from "expo";
 import { JSONServiceStore } from "./JSONServiceStore";
@@ -276,18 +275,18 @@ export class RootStore {
       this.playerState.age < 30
         ? 0
         : this.playerState.age < 45
-        ? 0.01 // once every 100 turns
+        ? 0.005 // once every 200 turns
         : this.playerState.age < 55
-        ? 0.02 // once every 50 turns
+        ? 0.01 // once every 100 turns
         : this.playerState.age < 65
-        ? 0.04 // once every 25 turns
+        ? 0.02 // once every 50 turns
         : this.playerState.age < 75
-        ? 0.1 // once every 10 turns
+        ? 0.05 // once every 20 turns
         : this.playerState.age < 85
-        ? 0.2 // once every 5 turns
-        : 0.5; // every other turn
+        ? 0.1 // once every 10 turns
+        : 0.2; // once every 5 turns
     if (Math.random() < 1 - ageBasedModifier) return;
-    const debilitation = flipCoin() === "Heads";
+    const debilitation = Math.random() <= 0.25;
     if (debilitation) {
       //only 1 per type
       const currentDebiliationNames = this.playerState?.debilitations.map(
