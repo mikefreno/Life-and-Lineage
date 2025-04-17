@@ -502,7 +502,7 @@ export class DungeonStore {
     const currentNames = this.dungeonInstances.map((inst) => inst.name);
     const instancesToUnlock = dungeonsJSON.map((json) => {
       if (!currentNames.includes(json.name)) {
-        return DungeonInstance.fromJSON(json);
+        return DungeonInstance.fromJSON({ ...json, dungeonStore: this });
       }
     });
     for (const inst of instancesToUnlock) {

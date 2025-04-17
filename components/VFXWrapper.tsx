@@ -911,6 +911,7 @@ const SplashEffect = ({
   const [splashFrame, setSplashFrame] = useState(0);
   const frameTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isMounted = useRef(true);
+  const animationCompleted = useRef(false);
   const { memoizedCalculateRenderScaling } = useScaling();
 
   const renderScaleCalc = memoizedCalculateRenderScaling(splash.scale);
@@ -934,45 +935,93 @@ const SplashEffect = ({
     ? projectilePosition
     : playerOrigin.subtract(centerOffset);
 
-  useEffect(() => {
-    if (!splashImage) return;
+  // Safe frame setter that checks if component is still mounted
+  const safeSetSplashFrame = useCallback((frame: number) => {
+    if (isMounted.current) {
+      setSplashFrame(frame);
+    }
+  }, []);
 
-    isMounted.current = true;
+  // Cleanup function to ensure all resources are properly disposed
+  const cleanup = useCallback(() => {
+    if (frameTimerRef.current) {
+      clearTimeout(frameTimerRef.current);
+      frameTimerRef.current = null;
+    }
 
-    let frameCount = 0;
-    const frameTotal = splashImage.getFrameCount();
-    const frameDuration = splashImage.currentFrameDuration();
-
-    const animateFrames = () => {
-      if (!isMounted.current || !splashImage) return;
-
-      splashImage.decodeNextFrame();
-      frameCount = frameCount + 1;
-      setSplashFrame(frameCount);
-
-      if (frameCount < frameTotal) {
-        frameTimerRef.current = setTimeout(animateFrames, frameDuration);
-      } else {
-        if (onComplete) {
-          onComplete();
-        }
+    if (splashImage && !animationCompleted.current) {
+      try {
+        splashImage.dispose();
+      } catch (error) {
+        console.error("Error disposing splash image:", error);
       }
-    };
+    }
+  }, [splashImage]);
 
-    animateFrames();
+  // Handle animation completion
+  const handleAnimationComplete = useCallback(() => {
+    if (!animationCompleted.current && isMounted.current) {
+      animationCompleted.current = true;
+      cleanup();
+      if (onComplete) {
+        onComplete();
+      }
+    }
+  }, [cleanup, onComplete]);
+
+  useEffect(() => {
+    isMounted.current = true;
+    animationCompleted.current = false;
 
     return () => {
       isMounted.current = false;
-      if (frameTimerRef.current) {
-        clearTimeout(frameTimerRef.current);
-        frameTimerRef.current = null;
-      }
-
-      splashImage.dispose();
+      cleanup();
     };
-  }, [splashImage, onComplete]);
+  }, [cleanup]);
 
-  if (!splashImage) return null;
+  useEffect(() => {
+    if (!splashImage || !isMounted.current) return;
+
+    let frameCount = 0;
+    let frameTotal = 1;
+    let frameDuration = 16; // Default to 60fps if we can't get actual duration
+
+    try {
+      frameTotal = splashImage.getFrameCount();
+      frameDuration = splashImage.currentFrameDuration();
+    } catch (error) {
+      console.error("Error getting splash animation properties:", error);
+      handleAnimationComplete();
+      return;
+    }
+
+    const animateFrames = () => {
+      if (!isMounted.current || !splashImage || animationCompleted.current)
+        return;
+
+      try {
+        splashImage.decodeNextFrame();
+        frameCount = frameCount + 1;
+        safeSetSplashFrame(frameCount);
+
+        if (frameCount < frameTotal) {
+          frameTimerRef.current = setTimeout(animateFrames, frameDuration);
+        } else {
+          handleAnimationComplete();
+        }
+      } catch (error) {
+        console.error("Error in splash animation frame:", error);
+        handleAnimationComplete();
+      }
+    };
+
+    // Start animation with a small delay to ensure resources are ready
+    frameTimerRef.current = setTimeout(animateFrames, 10);
+
+    return cleanup;
+  }, [splashImage, safeSetSplashFrame, handleAnimationComplete, cleanup]);
+
+  if (!splashImage || !isMounted.current) return null;
 
   return (
     <View
@@ -985,14 +1034,16 @@ const SplashEffect = ({
       }}
     >
       <Canvas style={{ width: normalized.width, height: normalized.height }}>
-        <Image
-          image={splashImage.getCurrentFrame()}
-          x={0}
-          y={0}
-          width={normalized.width}
-          height={normalized.height}
-          fit="contain"
-        />
+        {splashImage && (
+          <Image
+            image={splashImage.getCurrentFrame()}
+            x={0}
+            y={0}
+            width={normalized.width}
+            height={normalized.height}
+            fit="contain"
+          />
+        )}
       </Canvas>
     </View>
   );

@@ -9,7 +9,8 @@ import google_config from "@/config/google_config";
 import { API_BASE_URL } from "@/config/config";
 import type { RootStore } from "./RootStore";
 import { reloadAppAsync } from "expo";
-import { checkForUpdateAsync, fetchUpdateAsync } from "expo-updates";
+import { checkForUpdateAsync } from "expo-updates";
+import DeviceInfo from "react-native-device-info";
 
 type EmailLogin = {
   token: string;
@@ -74,18 +75,21 @@ export class AuthStore {
       },
     );
   }
+
   checkAvailableUpdates() {
-    checkForUpdateAsync()
-      .then((val) => {
-        if (val.isAvailable) {
-          runInAction(() => {
-            this.updateAvailable = true;
-          });
-        }
-      })
-      .catch((e) => {
-        __DEV__ && console.log(e);
-      });
+    if (!DeviceInfo.isEmulatorSync()) {
+      checkForUpdateAsync()
+        .then((val) => {
+          if (val.isAvailable) {
+            runInAction(() => {
+              this.updateAvailable = true;
+            });
+          }
+        })
+        .catch((e) => {
+          __DEV__ && console.log(e);
+        });
+    }
   }
 
   setAuthState = (
