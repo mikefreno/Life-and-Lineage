@@ -8,7 +8,7 @@ import {
   stringToModifier,
 } from "@/utility/types";
 import { Attack } from "@/entities/attack";
-import { action, computed, makeObservable, observable } from "mobx";
+import { action, computed, makeObservable, observable, reaction } from "mobx";
 import { Condition } from "@/entities/conditions";
 import { toTitleCase, wait } from "@/utility/functions/misc";
 import type { RootStore } from "@/stores/RootStore";
@@ -193,7 +193,7 @@ export class Item {
       totalArmor: computed,
       attachedSpell: computed,
       attachedAttacks: computed,
-      playerHasRequirements: computed,
+      //playerHasRequirements: computed,
       use: action,
       activePoison: observable,
       consumePoison: action,
@@ -205,31 +205,37 @@ export class Item {
   }
 
   get playerHasRequirements() {
-    if (this.root.playerState) {
-      if (
-        this.requirements.strength &&
-        this.requirements.strength >
-          this.root.playerState.baseStrength +
-            this.root.playerState.allocatedSkillPoints![Attribute.strength]
-      ) {
-        return false;
-      }
-      if (
-        this.requirements.intelligence &&
-        this.requirements.intelligence >
-          this.root.playerState.baseIntelligence +
-            this.root.playerState.allocatedSkillPoints![Attribute.intelligence]
-      ) {
-        return false;
-      }
-      if (
-        this.requirements.dexterity &&
-        this.requirements.dexterity >
-          this.root.playerState.baseDexterity +
-            this.root.playerState.allocatedSkillPoints![Attribute.dexterity]
-      ) {
-        return false;
-      }
+    if (!this.root.playerState) return true;
+
+    const {
+      baseStrength,
+      baseIntelligence,
+      baseDexterity,
+      allocatedSkillPoints,
+    } = this.root.playerState;
+
+    if (
+      this.requirements.strength &&
+      this.requirements.strength >
+        baseStrength + (allocatedSkillPoints?.[Attribute.strength] || 0)
+    ) {
+      return false;
+    }
+
+    if (
+      this.requirements.intelligence &&
+      this.requirements.intelligence >
+        baseIntelligence + (allocatedSkillPoints?.[Attribute.intelligence] || 0)
+    ) {
+      return false;
+    }
+
+    if (
+      this.requirements.dexterity &&
+      this.requirements.dexterity >
+        baseDexterity + (allocatedSkillPoints?.[Attribute.dexterity] || 0)
+    ) {
+      return false;
     }
 
     return true;

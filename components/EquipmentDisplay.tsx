@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useRef } from "react";
+import React, { useEffect, useCallback, useRef, useMemo } from "react";
 import { View, Image } from "react-native";
 import { Text } from "@/components/Themed";
 import { InventoryItem } from "@/components/Draggable";
@@ -295,7 +295,10 @@ const EquipmentSlot = observer(
       return () => clearTimeout(timeoutId);
     }, [isFocused, measureAndSetBounds]);
 
-    const bgColor = itemStack[0]?.playerHasRequirements ? "#a1a1aa" : "#991b1b";
+    const bgColor = useMemo(
+      () => (itemStack[0]?.playerHasRequirements ? "#a1a1aa" : "#991b1b"),
+      [itemStack[0]?.playerHasRequirements, playerState],
+    );
 
     return (
       <View style={styles.columnCenter}>

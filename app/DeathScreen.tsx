@@ -54,7 +54,7 @@ const DeathScreen = observer(() => {
   const navigation = useNavigation();
 
   const root = useRootStore();
-  const { playerState, uiStore, iapStorea, characterStore } = root;
+  const { playerState, uiStore, iapStore, shopsStore, characterStore } = root;
   const vibration = useVibration();
   const styles = useStyles();
   const router = useRouter();
@@ -76,6 +76,7 @@ const DeathScreen = observer(() => {
 
   function createPlayerCharacter() {
     if (nextLife && selectedClass && selectedBlessing && playerState) {
+      //TODO: need overflow/too many items fix
       const inventory = [
         playerState.equipment?.mainHand.name.toLowerCase() !== "unarmored"
           ? playerState.equipment?.mainHand
@@ -115,6 +116,9 @@ const DeathScreen = observer(() => {
     const currentPlayerCharacter = { ...playerState };
     const newPlayerCharacter = createPlayerCharacter();
     if (newPlayerCharacter) {
+      shopsStore.shopsMap.forEach((shop) =>
+        newPlayerCharacter.addKnownCharacter(shop.shopKeeper),
+      );
       savePlayer(newPlayerCharacter);
 
       root.inheritance(newPlayerCharacter);
