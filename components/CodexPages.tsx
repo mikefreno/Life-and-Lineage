@@ -506,7 +506,8 @@ export function InvestmentsCodex() {
   const styles = useStyles();
   return (
     <View>
-      <Text>Investments are a way</Text>
+      <Text>Investments are a way to put your money to work.</Text>
+      <Text></Text>
     </View>
   );
 }

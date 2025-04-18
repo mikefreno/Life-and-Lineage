@@ -30,9 +30,7 @@ export class StashStore {
   saveStash() {
     try {
       const serializedData = stringify(
-        this.items.map(
-          ({ item }) => item.map((i) => ({ ...i, root: null })), // Remove root
-        ),
+        this.items.map(({ item }) => item.map((i) => i.toJSON())),
       );
       storage.set("stash", serializedData);
     } catch (error) {

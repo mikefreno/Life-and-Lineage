@@ -34,14 +34,13 @@ const StatRow = observer(
     const { uiStore } = useRootStore();
     const { getNormalizedSize } = useScaling();
 
-    if (!detailed && !shouldShowModifier(mod, item)) {
-      return null;
-    }
-
     const statInfo = getStatInfo(mod);
     const Icon = statInfo.icon;
     const value = getTotalValue(mod, magnitude);
 
+    if (!detailed && !shouldShowModifier(mod, item)) {
+      return null;
+    }
     return (
       <View style={styles.statRow}>
         <Icon
@@ -65,12 +64,13 @@ const StatRow = observer(
 export default function GearStatsDisplay({ item }: { item: Item }) {
   const { uiStore } = useRootStore();
   const styles = useStyles();
+  const [showingDetailedView, setShowingDetailedView] = useState(false);
+  const vibrate = useVibration();
 
   if (!item.stats || item.stats.size === 0) {
     return null;
   }
 
-  const [showingDetailedView, setShowingDetailedView] = useState(false);
   const shouldShowTotalDamage =
     (item.itemClass === ItemClassType.Bow ||
       item.itemClass === ItemClassType.Wand ||
@@ -85,8 +85,6 @@ export default function GearStatsDisplay({ item }: { item: Item }) {
       item.itemClass === ItemClassType.Helmet ||
       item.itemClass === ItemClassType.Shield) &&
     item.totalArmor > 0;
-
-  const vibrate = useVibration();
 
   return (
     <>
