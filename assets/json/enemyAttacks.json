@@ -820,7 +820,7 @@
   },
   {
     "name": "charged pierce",
-    "manaCost": 30,
+    "manaCost": 35,
     "targets": "single",
     "baseHitChance": 0.85,
     "damageTable": {
@@ -830,7 +830,7 @@
     "debuffNames": [
       {
         "name": "shocked",
-        "chance": 0.75
+        "chance": 0.5
       }
     ]
   }

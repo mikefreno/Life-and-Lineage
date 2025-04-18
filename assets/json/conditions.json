@@ -663,18 +663,18 @@
   {
     "name": "shocked",
     "style": "debuff",
-    "turns": 3,
+    "turns": 1,
     "effect": [
       "stun",
       "mana drain"
     ],
     "effectStyle": [
-      "multiplier",
+      null,
       "flat"
     ],
     "effectAmount": [
-      0.25,
-      5
+      null,
+      20
     ],
     "icon": "lightning"
   },

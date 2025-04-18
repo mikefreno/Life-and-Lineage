@@ -1168,9 +1168,11 @@ export class PlayerCharacter extends Character {
         }
         break;
       case "quiver":
-        this.removeEquipment("quiver");
-        this.equipment!.quiver = item;
-        this.removeFromInventory(item);
+        if (item[0].itemClass === ItemClassType.Arrow) {
+          this.removeEquipment("quiver");
+          this.equipment!.quiver = item;
+          this.removeFromInventory(item);
+        }
         break;
     }
     this.resolvePercentages(percentages);

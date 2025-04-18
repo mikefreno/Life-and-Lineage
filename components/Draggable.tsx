@@ -221,6 +221,7 @@ const InventoryItem = observer(
         runOnSuccess,
         position: { x, y },
       });
+
       draggableClassStore.setIconString(null);
       isDragging.value = false;
       position.x.value = 0;

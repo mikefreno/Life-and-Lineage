@@ -26,6 +26,7 @@ import { useStyles } from "@/hooks/styles";
 import { runInAction } from "mobx";
 import { useScaling } from "@/hooks/scaling";
 import { SCREEN_TRANSITION_TIMING } from "@/stores/UIStore";
+import { ItemClassType } from "@/utility/types";
 
 const InventoryRender = observer(
   ({
@@ -200,12 +201,37 @@ const InventoryRender = observer(
             setDisplayItem(null);
             break;
           case "head":
+            if (canEquipToHead.includes(item[0].itemClass)) {
+              playerState?.equipItem(item, droppedOnKey);
+              setDisplayItem(null);
+            } else {
+              return 0;
+            }
+            break;
           case "main-hand":
           case "off-hand":
+            if (canEquipToHands.includes(item[0].itemClass)) {
+              playerState?.equipItem(item, droppedOnKey);
+              setDisplayItem(null);
+            } else {
+              return 0;
+            }
+            break;
           case "body":
+            if (canEquipToBody.includes(item[0].itemClass)) {
+              playerState?.equipItem(item, droppedOnKey);
+              setDisplayItem(null);
+            } else {
+              return 0;
+            }
+            break;
           case "quiver":
-            playerState?.equipItem(item, droppedOnKey);
-            setDisplayItem(null);
+            if (canEquipToQuiver.includes(item[0].itemClass)) {
+              playerState?.equipItem(item, droppedOnKey);
+              setDisplayItem(null);
+            } else {
+              return 0;
+            }
             break;
           case "stash":
             runOnSuccess(item);
@@ -215,6 +241,23 @@ const InventoryRender = observer(
       },
       [playerState, runOnSuccess, setDisplayItem, vibration],
     );
+    const canEquipToHead: ItemClassType[] = [
+      ItemClassType.Hat,
+      ItemClassType.Helmet,
+    ];
+    const canEquipToHands: ItemClassType[] = [
+      ItemClassType.Shield,
+      ItemClassType.Bow,
+      ItemClassType.Wand,
+      ItemClassType.Staff,
+      ItemClassType.Melee,
+      ItemClassType.Focus,
+    ];
+    const canEquipToBody: ItemClassType[] = [
+      ItemClassType.BodyArmor,
+      ItemClassType.Robe,
+    ];
+    const canEquipToQuiver: ItemClassType[] = [ItemClassType.Arrow];
 
     const renderInventorySlot = useCallback(
       (index: number) => {
