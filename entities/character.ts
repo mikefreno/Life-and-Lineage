@@ -79,7 +79,9 @@ export class Character extends Being {
   childrenIds: string[];
   partnerIds: string[];
   parentIds: string[];
+
   knownCharacterIds: string[];
+  _birthPending;
 
   constructor({
     firstName,
@@ -468,6 +470,7 @@ export class Character extends Being {
         currentDate.week + 40 >= 52 ? currentDate.year + 1 : currentDate.year,
       week: (currentDate.week + 40) % 52,
     };
+    this._birthPending = true;
     this.setDateCooldownStart();
 
     return true;
@@ -483,7 +486,7 @@ export class Character extends Being {
 
     const currentDate = this.root.time.currentDate;
     if (
-      currentDate.year < this.pregnancyDueDate.year ||
+      currentDate.year-- - this.pregnancyDueDate.year ||
       (currentDate.year === this.pregnancyDueDate.year &&
         currentDate.week < this.pregnancyDueDate.week)
     ) {
@@ -1583,7 +1586,7 @@ export class PlayerCharacter extends Character {
         this.makePartner(character);
         return true;
       }
-    } else if (character.affection > 25) {
+    } else if (character.affection > 50) {
       if (rollD20() >= 10) {
         this.makePartner(character);
         return true;

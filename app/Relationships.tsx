@@ -54,6 +54,13 @@ const RelationshipsScreen = observer(() => {
     characterStore.independantChildrenAgeCheck();
   }, []);
 
+  const partners = playerState?.partners ?? [];
+  const knownCharacters = playerState?.knownCharacters ?? [];
+
+  const partnerIds = new Set(partners.map((p) => p.id));
+
+  const knownNotPartners = knownCharacters.filter((c) => !partnerIds.has(c.id));
+
   const characterGroups = [
     { title: "Children", data: playerState?.children || [] },
     {
@@ -63,33 +70,30 @@ const RelationshipsScreen = observer(() => {
     { title: "Parents", data: playerState?.parents || [] },
     {
       title: "Best Friends",
-      data: playerState?.knownCharacters.filter((c) => c.affection >= 75) || [],
+      data: knownNotPartners.filter((c) => c.affection >= 75) || [],
     },
     {
       title: "Bitter Enemies",
-      data:
-        playerState?.knownCharacters.filter((c) => c.affection <= -75) || [],
+      data: knownNotPartners.filter((c) => c.affection <= -75) || [],
     },
     {
       title: "Friends",
       data:
-        playerState?.knownCharacters.filter(
-          (c) => c.affection >= 25 && c.affection < 75,
-        ) || [],
+        knownNotPartners.filter((c) => c.affection >= 25 && c.affection < 75) ||
+        [],
     },
     {
       title: "Enemies",
       data:
-        playerState?.knownCharacters.filter(
+        knownNotPartners.filter(
           (c) => c.affection <= -25 && c.affection > -75,
         ) || [],
     },
     {
       title: "Acquaintances",
       data:
-        playerState?.knownCharacters.filter(
-          (c) => c.affection < 25 && c.affection > -25,
-        ) || [],
+        knownNotPartners.filter((c) => c.affection < 25 && c.affection > -25) ||
+        [],
     },
   ];
 

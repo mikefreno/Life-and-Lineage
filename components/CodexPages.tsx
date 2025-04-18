@@ -42,7 +42,7 @@ export function CombatCodex() {
         <Link href="/Options/Codex/Dungeon" style={{ color: "#3b82f6" }}>
           dungeons
         </Link>{" "}
-        with no armor and no weapon is probably not a good idea
+        with no armor and no weapon is probably not a good idea.
       </Text>
     </View>
   );
@@ -463,7 +463,7 @@ export function TimeCodex() {
           Nearly every action in Life and Lineage advances the game clock by 1
           week, aging every character. Specifically, this happens every time a
           labor is worked, a medical service is received, talking to character,
-          or leaving a dungeon.
+          collecting from an investment or leaving a dungeon.
         </Text>
         <Text style={styles["text-lg"]}>
           {"    "}
@@ -504,7 +504,11 @@ export function TimeCodex() {
 
 export function InvestmentsCodex() {
   const styles = useStyles();
-  return <View></View>;
+  return (
+    <View>
+      <Text>Investments are a way</Text>
+    </View>
+  );
 }
 
 export function ConditionsCodex() {

@@ -312,3 +312,7 @@ export const ArcaneCodex = () => (
 export const DebilitationCodex = () => {
   return <View></View>;
 };
+
+export const SpecialEncounters = () => {
+  return <View></View>;
+};

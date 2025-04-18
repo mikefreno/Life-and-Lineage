@@ -612,6 +612,7 @@ export const StatsDisplay = observer(
       }
       return toTitleCase(item.itemClass);
     };
+
     function bookItemLabel() {
       if (playerState && firstItem.attachedSpell) {
         return `${
@@ -619,6 +620,23 @@ export const StatsDisplay = observer(
         } level book`;
       }
     }
+
+    const attachedInvestment = (item: Item) => {
+      if (item.itemClass == ItemClassType.StoryItem) {
+        switch (item.name.toLowerCase()) {
+          case "the deed to the whispering raven inn":
+            return "Whispering Raven Inn";
+          case "head of goblin shaman":
+            return "Trading Route";
+          case "broken seal contract":
+            return "Village Inn";
+          default:
+            return null;
+        }
+      }
+      return null;
+    };
+
     const SaleSection = () => {
       if (playerState) {
         if ("shop" in props) {
@@ -969,6 +987,19 @@ export const StatsDisplay = observer(
               }}
             >
               Inspect
+            </GenericFlatButton>
+          )}
+          {attachedInvestment(firstItem) && (
+            <GenericFlatButton
+              onPress={() => {
+                vibration({ style: "light" });
+                router.push(
+                  `/Investing?targetName=${attachedInvestment(firstItem)}`,
+                );
+              }}
+              style={{ marginTop: 4 }}
+            >
+              Go To Unlock
             </GenericFlatButton>
           )}
           <ConsumableSection />

@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { View } from "react-native";
 import { Text } from "@/components/Themed";
 import GenericModal from "@/components/GenericModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CharacterImage } from "@/components/CharacterImage";
 import { toTitleCase, wait } from "@/utility/functions/misc";
 import ProgressBar from "@/components/ProgressBar";
@@ -53,6 +53,9 @@ export const CharacterInteractionModal = observer(
 
     const router = useRouter();
     const vibration = useVibration();
+    useEffect(() => {
+      setPregnancyMessage(null);
+    }, [character?.fullName]);
 
     function setFight() {
       if (character && playerState) {

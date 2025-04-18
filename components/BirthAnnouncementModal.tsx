@@ -97,9 +97,6 @@ export const BirthAnnouncementModal = observer(() => {
           </Text>
         </>
         <Text style={{ ...styles.textCenter, ...styles.mt4 }}>
-          Child information unavailable
-        </Text>
-        <Text style={{ ...styles.textCenter, ...styles.mt4 }}>
           The child will be known as{" "}
           {choosingName
             ? `${chosenFirstName} ${newbornBaby?.lastName}`

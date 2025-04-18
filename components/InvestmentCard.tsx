@@ -1,28 +1,35 @@
 import React from "react";
-import { Text } from "@/components/Themed";
+import { Text, ThemedView } from "@/components/Themed";
 import { InvestmentType, InvestmentUpgrade } from "@/utility/types";
-import { Pressable, View, Animated, ScrollView } from "react-native";
+import { Pressable, View, Animated, ScrollView, Platform } from "react-native";
 import { useEffect, useRef, useState } from "react";
 import { toTitleCase, asReadableGold } from "@/utility/functions/misc";
 import { Entypo } from "@expo/vector-icons";
 import GenericModal from "@/components/GenericModal";
 import { observer } from "mobx-react-lite";
-import ThemedCard from "@/components/ThemedCard";
 import GenericStrikeAround from "@/components/GenericStrikeAround";
-import { ClockIcon, Coins, Vault } from "@/assets/icons/SVGIcons";
+import { ClockIcon, Coins, Sanity, Vault } from "@/assets/icons/SVGIcons";
 import { useRootStore } from "@/hooks/stores";
 import { useVibration } from "@/hooks/generic";
 import type { Investment } from "@/entities/investment";
 import { useStyles } from "@/hooks/styles";
 import Colors from "@/constants/Colors";
 import GenericFlatButton from "./GenericFlatButton";
+import { useScaling } from "@/hooks/scaling";
 
 const InvestmentCard = observer(
-  ({ investment }: { investment: InvestmentType }) => {
+  ({
+    investment,
+    searchedFor,
+  }: {
+    investment: InvestmentType;
+    searchedFor: boolean;
+  }) => {
     const root = useRootStore();
     const { playerState, uiStore } = root;
     const styles = useStyles();
     const theme = Colors[uiStore.colorScheme];
+    const { getNormalizedSize } = useScaling();
 
     const [showUpgrades, setShowUpgrades] = useState<boolean>(false);
     const [showRequirements, setShowRequirements] = useState<boolean>(false);
@@ -121,6 +128,32 @@ const InvestmentCard = observer(
         setShowError(true);
       }
     }
+
+    const glowAnim = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+      if (searchedFor) {
+        const pulse = Animated.sequence([
+          Animated.timing(glowAnim, {
+            toValue: 1,
+            duration: 2000,
+            useNativeDriver: false,
+          }),
+          Animated.timing(glowAnim, {
+            toValue: 0,
+            duration: 2000,
+            useNativeDriver: false,
+          }),
+          //Animated.delay(1000),
+        ]);
+
+        Animated.loop(pulse, { iterations: 1 }).start(() => {
+          glowAnim.setValue(0);
+        });
+      } else {
+        glowAnim.setValue(0);
+      }
+    }, [searchedFor, glowAnim]);
 
     useEffect(() => {
       if (playerState) {
@@ -358,19 +391,23 @@ const InvestmentCard = observer(
                           >
                             {upgrade.description}
                           </Text>
+
                           <GenericStrikeAround>
                             <Text>Effects</Text>
                           </GenericStrikeAround>
                           <View style={[styles.columnCenter, styles.py2]}>
-                            {upgrade.effect.goldMinimumIncrease && (
+                            {/* min gold change */}
+                            {typeof upgrade.effect.goldMinimumIncrease ===
+                              "number" && (
                               <View
                                 style={[styles.rowCenter, styles.itemsCenter]}
                               >
                                 <Text>
-                                  Minimum return
+                                  Minimum return{" "}
                                   {upgrade.effect.goldMinimumIncrease! > 0
-                                    ? ` increase: ${upgrade.effect.goldMinimumIncrease} `
-                                    : ` decrease: ${upgrade.effect.goldMinimumIncrease} `}
+                                    ? `increase: ${upgrade.effect.goldMinimumIncrease}`
+                                    : `decrease: ${-upgrade.effect
+                                        .goldMinimumIncrease}`}{" "}
                                 </Text>
                                 <Coins
                                   height={uiStore.iconSizeSmall}
@@ -378,8 +415,87 @@ const InvestmentCard = observer(
                                 />
                               </View>
                             )}
-                            {/* Additional effects follow same pattern */}
+
+                            {/* max gold change */}
+                            {typeof upgrade.effect.goldMaximumIncrease ===
+                              "number" && (
+                              <View
+                                style={[styles.rowCenter, styles.itemsCenter]}
+                              >
+                                <Text>
+                                  Maximum return{" "}
+                                  {upgrade.effect.goldMaximumIncrease! > 0
+                                    ? `increase: ${upgrade.effect.goldMaximumIncrease}`
+                                    : `decrease: ${-upgrade.effect
+                                        .goldMaximumIncrease}`}{" "}
+                                </Text>
+                                <Coins
+                                  height={uiStore.iconSizeSmall}
+                                  width={uiStore.iconSizeSmall}
+                                />
+                              </View>
+                            )}
+
+                            {/* max stockpile change */}
+                            {typeof upgrade.effect.maxGoldStockPileIncrease ===
+                              "number" && (
+                              <View
+                                style={[styles.rowCenter, styles.itemsCenter]}
+                              >
+                                <Text>
+                                  Max stockpile{" "}
+                                  {upgrade.effect.maxGoldStockPileIncrease! > 0
+                                    ? `increase: ${upgrade.effect.maxGoldStockPileIncrease}`
+                                    : `decrease: ${-upgrade.effect
+                                        .maxGoldStockPileIncrease}`}{" "}
+                                </Text>
+                                <Vault
+                                  height={uiStore.iconSizeSmall}
+                                  width={uiStore.iconSizeSmall * 1.15}
+                                />
+                              </View>
+                            )}
+
+                            {/* turns‑per‑roll change */}
+                            {typeof upgrade.effect.turnsPerRollChange ===
+                              "number" && (
+                              <View
+                                style={[styles.rowCenter, styles.itemsCenter]}
+                              >
+                                <Text>
+                                  Turn interval{" "}
+                                  {upgrade.effect.turnsPerRollChange! < 0
+                                    ? `↓${-upgrade.effect.turnsPerRollChange}`
+                                    : `+${upgrade.effect.turnsPerRollChange}`}{" "}
+                                </Text>
+                                <ClockIcon
+                                  height={uiStore.iconSizeSmall}
+                                  width={uiStore.iconSizeSmall}
+                                  color={theme.text}
+                                />
+                              </View>
+                            )}
+
+                            {/* max sanity change */}
+                            {typeof upgrade.effect.changeMaxSanity ===
+                              "number" && (
+                              <View
+                                style={[styles.rowCenter, styles.itemsCenter]}
+                              >
+                                <Text>
+                                  Max sanity{" "}
+                                  {upgrade.effect.changeMaxSanity! > 0
+                                    ? `+${upgrade.effect.changeMaxSanity}`
+                                    : `${upgrade.effect.changeMaxSanity}`}{" "}
+                                </Text>
+                                <Sanity
+                                  height={uiStore.iconSizeSmall}
+                                  width={uiStore.iconSizeSmall}
+                                />
+                              </View>
+                            )}
                           </View>
+
                           {madeInvestment && !isUpgradePurchased && (
                             <Pressable
                               onPress={() => purchaseUpgradeCheck(upgrade)}
@@ -459,11 +575,62 @@ const InvestmentCard = observer(
             <Text>Close</Text>
           </Pressable>
         </GenericModal>
-
-        <ThemedCard>
-          <View>
-            {madeInvestment ? (
-              <View style={styles.rowBetween}>
+        <Animated.View
+          style={{
+            margin: getNormalizedSize(6),
+            borderRadius: 12,
+            // interpolate between base bg and accent glow
+            backgroundColor: glowAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: [theme.background, theme.border],
+            }),
+            shadowColor: uiStore.colorScheme === "dark" ? "#fff" : "#000",
+            shadowOffset: { width: 0, height: 2 } as const,
+            shadowOpacity: Platform.OS === "android" ? 0.9 : 0.2,
+            shadowRadius: 1.5,
+            elevation: 3,
+            // keep dark‐mode inner border
+            ...(uiStore.colorScheme === "dark" &&
+              ({
+                borderWidth: 1,
+                borderColor: "#71717a",
+              } as const)),
+          }}
+        >
+          <ThemedView
+            style={{
+              // inner container must be transparent so Animated.View color shows
+              backgroundColor: "transparent",
+              justifyContent: "space-between",
+              borderRadius: 12,
+              paddingHorizontal: 16,
+              paddingVertical: 8,
+            }}
+          >
+            <View>
+              {madeInvestment ? (
+                <View style={styles.rowBetween}>
+                  <Text
+                    style={[
+                      styles.bold,
+                      styles.myAuto,
+                      styles["text-xl"],
+                      { letterSpacing: 0.5 },
+                    ]}
+                  >
+                    {investment.name}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.myAuto,
+                      styles["text-xl"],
+                      { letterSpacing: 0.5, opacity: 0.7 },
+                    ]}
+                  >
+                    Purchased
+                  </Text>
+                </View>
+              ) : (
                 <Text
                   style={[
                     styles.bold,
@@ -474,168 +641,148 @@ const InvestmentCard = observer(
                 >
                   {investment.name}
                 </Text>
-                <Text
-                  style={[
-                    styles.myAuto,
-                    styles["text-xl"],
-                    { letterSpacing: 0.5, opacity: 0.7 },
-                  ]}
-                >
-                  Purchased
-                </Text>
-              </View>
-            ) : (
+              )}
               <Text
                 style={[
                   styles.bold,
                   styles.myAuto,
-                  styles["text-xl"],
-                  { letterSpacing: 0.5 },
+                  styles.py2,
+                  styles.textCenter,
                 ]}
               >
-                {investment.name}
+                {investment.description}
               </Text>
-            )}
-            <Text
+            </View>
+
+            <View
               style={[
-                styles.bold,
-                styles.myAuto,
-                styles.py2,
-                styles.textCenter,
+                styles.rowBetween,
+                styles.itemsCenter,
+                styles.py4,
+                { width: "100%" },
               ]}
             >
-              {investment.description}
-            </Text>
-          </View>
-
-          <View
-            style={[
-              styles.rowBetween,
-              styles.itemsCenter,
-              styles.py4,
-              { width: "100%" },
-            ]}
-          >
-            <View style={styles.columnCenter}>
-              <View style={styles.rowCenter}>
-                {madeInvestment ? (
-                  <Text>
-                    {`${madeInvestment.minimumReturn} - ${madeInvestment.maximumReturn} `}
-                  </Text>
-                ) : (
-                  <Text>
-                    {`${investment.goldReturnRange.min} - ${investment.goldReturnRange.max} `}
-                  </Text>
-                )}
-                <Coins
-                  height={uiStore.iconSizeSmall}
-                  width={uiStore.iconSizeSmall}
-                />
-              </View>
-              <View style={styles.rowCenter}>
-                <Text>
-                  {madeInvestment
-                    ? madeInvestment.turnsPerRoll
-                    : investment.turnsPerReturn}{" "}
-                </Text>
-                <View style={styles.myAuto}>
-                  <ClockIcon
+              <View style={styles.columnCenter}>
+                <View style={styles.rowCenter}>
+                  {madeInvestment ? (
+                    <Text>
+                      {`${madeInvestment.minimumReturn} - ${madeInvestment.maximumReturn} `}
+                    </Text>
+                  ) : (
+                    <Text>
+                      {`${investment.goldReturnRange.min} - ${investment.goldReturnRange.max} `}
+                    </Text>
+                  )}
+                  <Coins
                     height={uiStore.iconSizeSmall}
                     width={uiStore.iconSizeSmall}
-                    color={theme.text}
+                  />
+                </View>
+                <View style={styles.rowCenter}>
+                  <Text>
+                    {madeInvestment
+                      ? madeInvestment.turnsPerRoll
+                      : investment.turnsPerReturn}{" "}
+                  </Text>
+                  <View style={styles.myAuto}>
+                    <ClockIcon
+                      height={uiStore.iconSizeSmall}
+                      width={uiStore.iconSizeSmall}
+                      color={theme.text}
+                    />
+                  </View>
+                </View>
+                <View style={[styles.rowCenter, styles.itemsCenter]}>
+                  <Text>
+                    {madeInvestment
+                      ? madeInvestment.maxGoldStockPile
+                      : investment.maxGoldStockPile}{" "}
+                  </Text>
+                  <Vault
+                    height={uiStore.iconSizeSmall}
+                    width={uiStore.iconSizeSmall * 1.15}
                   />
                 </View>
               </View>
-              <View style={[styles.rowCenter, styles.itemsCenter]}>
-                <Text>
-                  {madeInvestment
-                    ? madeInvestment.maxGoldStockPile
-                    : investment.maxGoldStockPile}{" "}
+              <GenericFlatButton
+                onPress={() => {
+                  vibration({ style: "light" });
+                  setShowUpgrades(true);
+                }}
+              >
+                <Text style={styles.textCenter}>
+                  {`View\nUpgrades `}({investment.upgrades.length})
                 </Text>
-                <Vault
-                  height={uiStore.iconSizeSmall}
-                  width={uiStore.iconSizeSmall * 1.15}
-                />
-              </View>
+              </GenericFlatButton>
             </View>
-            <GenericFlatButton
-              onPress={() => {
-                vibration({ style: "light" });
-                setShowUpgrades(true);
-              }}
-            >
-              <Text style={styles.textCenter}>
-                {`View\nUpgrades `}({investment.upgrades.length})
-              </Text>
-            </GenericFlatButton>
-          </View>
 
-          {!madeInvestment ? (
-            <Pressable
-              onPress={purchaseInvestmentCheck}
-              disabled={!playerState || playerState.gold < investment.cost}
-              style={[styles.mxAuto, styles.mb2]}
-            >
-              {({ pressed }) => (
-                <View
-                  style={[
-                    styles.roundedBorder,
-                    styles.px8,
-                    styles.py4,
-                    pressed && styles.pressedStyle,
-                    playerState && playerState.gold >= investment.cost
-                      ? styles.activeButton
-                      : styles.disabledButton,
-                  ]}
-                >
-                  <Text style={styles.textCenter}>Purchase For</Text>
-                  <View style={[styles.rowCenter, styles.itemsCenter]}>
-                    <Text>{asReadableGold(investment.cost)} </Text>
-                    <Coins
-                      width={uiStore.iconSizeSmall}
-                      height={uiStore.iconSizeSmall}
-                    />
+            {!madeInvestment ? (
+              <Pressable
+                onPress={purchaseInvestmentCheck}
+                disabled={!playerState || playerState.gold < investment.cost}
+                style={[styles.mxAuto, styles.mb2]}
+              >
+                {({ pressed }) => (
+                  <View
+                    style={[
+                      styles.roundedBorder,
+                      styles.px8,
+                      styles.py4,
+                      pressed && styles.pressedStyle,
+                      playerState && playerState.gold >= investment.cost
+                        ? styles.activeButton
+                        : styles.disabledButton,
+                    ]}
+                  >
+                    <Text style={styles.textCenter}>Purchase For</Text>
+                    <View style={[styles.rowCenter, styles.itemsCenter]}>
+                      <Text>{asReadableGold(investment.cost)} </Text>
+                      <Coins
+                        width={uiStore.iconSizeSmall}
+                        height={uiStore.iconSizeSmall}
+                      />
+                    </View>
                   </View>
-                </View>
-              )}
-            </Pressable>
-          ) : (
-            <Pressable
-              onPress={collectOnInvestment}
-              disabled={
-                !madeInvestment || madeInvestment.currentGoldStockPile === 0
-              }
-              style={styles.mxAuto}
-            >
-              {({ pressed }) => (
-                <View
-                  style={[
-                    styles.roundedBorder,
-                    styles.px8,
-                    styles.py4,
-                    pressed && styles.pressedStyle,
-                    madeInvestment && madeInvestment.currentGoldStockPile > 0
-                      ? styles.activeButton
-                      : styles.disabledButton,
-                  ]}
-                >
-                  <Text style={styles.textCenter}>Collect</Text>
-                  <View style={[styles.rowCenter, styles.itemsCenter]}>
-                    <Text>
-                      {asReadableGold(
-                        madeInvestment?.currentGoldStockPile || 0,
-                      )}{" "}
-                    </Text>
-                    <Coins
-                      width={uiStore.iconSizeSmall}
-                      height={uiStore.iconSizeSmall}
-                    />
+                )}
+              </Pressable>
+            ) : (
+              <Pressable
+                onPress={collectOnInvestment}
+                disabled={
+                  !madeInvestment || madeInvestment.currentGoldStockPile === 0
+                }
+                style={styles.mxAuto}
+              >
+                {({ pressed }) => (
+                  <View
+                    style={[
+                      styles.roundedBorder,
+                      styles.px8,
+                      styles.py4,
+                      pressed && styles.pressedStyle,
+                      madeInvestment && madeInvestment.currentGoldStockPile > 0
+                        ? styles.activeButton
+                        : styles.disabledButton,
+                    ]}
+                  >
+                    <Text style={styles.textCenter}>Collect</Text>
+                    <View style={[styles.rowCenter, styles.itemsCenter]}>
+                      <Text>
+                        {asReadableGold(
+                          madeInvestment?.currentGoldStockPile || 0,
+                        )}{" "}
+                      </Text>
+                      <Coins
+                        width={uiStore.iconSizeSmall}
+                        height={uiStore.iconSizeSmall}
+                      />
+                    </View>
                   </View>
-                </View>
-              )}
-            </Pressable>
-          )}
-        </ThemedCard>
+                )}
+              </Pressable>
+            )}
+          </ThemedView>
+        </Animated.View>
       </>
     );
   },
