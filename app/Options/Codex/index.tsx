@@ -7,18 +7,22 @@ import ThemedCard from "@/components/ThemedCard";
 import { CodexEntry, searchCodex } from "@/utility/functions/codex";
 import { useRootStore } from "@/hooks/stores";
 import { useStyles } from "@/hooks/styles";
+import { observer } from "mobx-react-lite";
 
 const categories = [
   "Time",
   "Player",
-  "Relationships",
-  "Labor",
   "Combat",
   "Magic",
+  "Conditions",
+  "Dungeon",
+  "Investments",
   "Gear",
+  "Labor",
+  "Relationships",
 ];
 
-export default function Codex() {
+const Codex = observer(() => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [searchResults, setSearchResults] = useState<CodexEntry[]>([]);
   const [scrolling, setScrolling] = useState(false);
@@ -36,11 +40,11 @@ export default function Codex() {
   }, [searchTerm]);
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, ...styles.notchAvoidingLanscapePad }}>
       <Text
         style={{
           marginHorizontal: "auto",
-          paddingTop: 48,
+          paddingTop: uiStore.dimensions.height * 0.05,
           textAlign: "center",
           ...styles["text-2xl"],
         }}
@@ -108,4 +112,5 @@ export default function Codex() {
       </ScrollView>
     </View>
   );
-}
+});
+export default Codex;

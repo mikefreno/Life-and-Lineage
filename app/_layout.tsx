@@ -2,16 +2,8 @@ import { useFonts } from "expo-font";
 import { Stack, usePathname, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
-import {
-  Platform,
-  Pressable,
-  View,
-  StyleSheet,
-  UIManager,
-  TextInput,
-} from "react-native";
+import { Platform, Pressable, View, StyleSheet, UIManager } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
-import { Text } from "@/components/Themed";
 import * as Sentry from "@sentry/react-native";
 import {
   SafeAreaProvider,
@@ -29,11 +21,9 @@ import FleeModal from "@/components/DungeonComponents/FleeModal";
 import { DungeonProvider } from "@/providers/DungeonData";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { LoadingBoundary } from "@/components/LoadingBoundary";
-import { Character, PlayerCharacter } from "@/entities/character";
+import { PlayerCharacter } from "@/entities/character";
 import { RootStore } from "@/stores/RootStore";
 import { DungeonStore } from "@/stores/DungeonStore";
-import GenericModal from "@/components/GenericModal";
-import GenericFlatButton from "@/components/GenericFlatButton";
 import { useStyles } from "@/hooks/styles";
 import { DevControls } from "@/components/DevControls";
 import BoundsVisualizer from "@/components/BoundsVisualizer";
@@ -52,8 +42,6 @@ import { TutorialOption } from "@/utility/types";
 import { HeaderBackButton } from "@react-navigation/elements";
 import { useVibration } from "@/hooks/generic";
 import { AudioToggle } from "@/components/AudioToggle";
-import GenericRaisedButton from "@/components/GenericRaisedButton";
-import { trimWhitespace } from "@/utility/functions/characterAid";
 import { BirthAnnouncementModal } from "@/components/BirthAnnouncementModal";
 
 global.atob = decode;

@@ -378,20 +378,18 @@ export const useStyles = () => {
       minWidth: "50%",
     } as const,
     categoryContainer: {
+      width: "100%",
       marginHorizontal: 8,
       marginVertical: 24,
-      width: "100%",
       borderBottomWidth: 0.5,
       borderBottomColor: theme.border,
       paddingVertical: 8,
-      maxWidth: 512,
     } as const,
     categoryContent: {
       flexDirection: "row",
       justifyContent: "space-between",
       paddingHorizontal: 8,
     } as const,
-
     // ---- Main Tabs ---- //
     // ---- Main Tabs - Home ---- //
     inventoryContainer: {

@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import { Href, Stack, useRouter, useLocalSearchParams } from "expo-router";
-import { Pressable, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { View } from "react-native";
 import Colors from "@/constants/Colors";
 import {
   CombatCodex,
@@ -13,6 +12,7 @@ import {
   RelationshipsCodex,
   TimeCodex,
   ConditionsCodex,
+  InvestmentsCodex,
   PvPCodex,
 } from "@/components/CodexPages";
 import {
@@ -46,12 +46,14 @@ import { HeaderBackButton } from "@react-navigation/elements";
 const CategoryMap: { [key: string]: React.JSX.Element } = {
   Combat: <CombatCodex />,
   Dungeon: <DungeonCodex />,
+  Conditions: <ConditionsCodex />,
   Gear: <GearCodex />,
   Labor: <LaborCodex />,
   Magic: <MagicCodex />,
   Player: <PlayerCodex />,
   Relationships: <RelationshipsCodex />,
   Time: <TimeCodex />,
+  Investments: <InvestmentsCodex />,
 };
 
 const SecondaryMap: { [key: string]: React.JSX.Element } = {

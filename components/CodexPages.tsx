@@ -32,56 +32,71 @@ export function CombatCodex() {
     require("@/assets/images/codex/DungeonEquipment.png"),
     require("@/assets/images/codex/DungeonLog.png"),
   ];
+  const styles = useStyles();
 
   return (
     <View>
-      <GenericCarousel images={images} />
+      {/*<GenericCarousel images={images} />*/}
+      <Text style={styles["text-lg"]}>
+        The most important factor in combat is preparation. Going into the{" "}
+        <Link href="/Options/Codex/Dungeon" style={{ color: "#3b82f6" }}>
+          dungeons
+        </Link>{" "}
+        with no armor and no weapon is probably not a good idea
+      </Text>
     </View>
   );
 }
 
 export function DungeonCodex() {
+  const styles = useStyles();
   return (
     <View>
-      <View></View>
+      <Text style={styles["text-lg"]}>
+        {"    "}The dungeons are the core of Life and Lineage. Each dungeon has
+        a number of floors to it, that generally get more difficult with each
+        floor. Each floor will be cleared when its 'boss' is killed, unlocking
+        either the next floor, or a new Dungeon.
+      </Text>
+      <Text style={styles["text-lg"]}>
+        {/* TODO: clear up coming soon when pvp is added */}
+        {"    "}Clearing a dungeon also provides additional rewards, such as new{" "}
+        <Link href="/Options/Codex/Investment" style={{ color: "#3b82f6" }}>
+          Investments
+        </Link>
+      </Text>
     </View>
   );
 }
 
 export function GearCodex() {
+  const styles = useStyles();
   return (
-    <View>
-      <View>
-        <Text>
-          At it's core, gear(equipable items) is the culmination of 3 factors;
-          bases (which are the specific item variant), rarity ('Normal', 'Magic'
-          or 'Rare') and affixes(explained in detail later).
-        </Text>
-      </View>
-      <View>
-        <GenericStrikeAround>Bases</GenericStrikeAround>
-        <Text>
-          Bases are the essentially the state of the item if it is 'Normal',
-          these will have some basic stats like damage for weapons and armor for
-          armor. They will also determine the stat requirements for the item.
-        </Text>
-      </View>
-      <View>
-        <GenericStrikeAround>Rarity</GenericStrikeAround>
-        <Text>
-          'Rarity' can be 'Normal', 'Magic' or 'Rare'. 'Magic' items have one
-          affix, this can be either a 'Prefix' or 'Suffix'. 'Rare' items have
-          both a 'Prefix' and 'Suffix'.
-        </Text>
-      </View>
-      <View>
-        <GenericStrikeAround>Affixes</GenericStrikeAround>
-        <Text>
-          'Affixes' are of two variants, 'Prefix' or 'Suffix'. Prefixes add
-          attribute or defensive modifiers to items and Suffixes add offensive
-          modifiers.
-        </Text>
-      </View>
+    <View style={{ paddingHorizontal: 8 }}>
+      <Text style={styles["text-lg"]}>
+        {"    "}At it's core, gear(equipable items) is the culmination of 3
+        factors; bases (which are the specific item variant), rarity ('Normal',
+        'Magic' or 'Rare') and affixes(explained in detail later).
+      </Text>
+      <GenericStrikeAround>Bases</GenericStrikeAround>
+      <Text style={styles["text-lg"]}>
+        {"    "}Bases are the essentially the state of the item if it is
+        'Normal', these will have some basic stats like damage for weapons and
+        armor for armor. They will also determine the stat requirements for the
+        item.
+      </Text>
+      <GenericStrikeAround>Rarity</GenericStrikeAround>
+      <Text style={styles["text-lg"]}>
+        {"    "}'Rarity' can be 'Normal', 'Magic' or 'Rare'. 'Magic' items have
+        one affix, this can be either a 'Prefix' or 'Suffix'. 'Rare' items have
+        both a 'Prefix' and 'Suffix'.
+      </Text>
+      <GenericStrikeAround>Affixes</GenericStrikeAround>
+      <Text style={styles["text-lg"]}>
+        {"    "}'Affixes' are of two variants, 'Prefix' or 'Suffix'. Prefixes
+        add attribute or defensive modifiers to items and Suffixes add offensive
+        modifiers.
+      </Text>
     </View>
   );
 }
@@ -477,10 +492,19 @@ export function TimeCodex() {
           </Link>{" "}
           which is a type of condition that is permanent.
         </Text>
+        <Text style={styles["text-lg"]}>
+          {"    "}The answer, or way to deal with this is to build a Lineage -
+          have or adopt children and live on through them
+        </Text>
       </View>
       <View></View>
     </View>
   );
+}
+
+export function InvestmentsCodex() {
+  const styles = useStyles();
+  return <View></View>;
 }
 
 export function ConditionsCodex() {

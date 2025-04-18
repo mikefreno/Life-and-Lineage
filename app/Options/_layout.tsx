@@ -1,3 +1,4 @@
+import React from "react";
 import { Tabs } from "expo-router";
 import { Foundation, MaterialCommunityIcons } from "@expo/vector-icons";
 import {
@@ -17,45 +18,49 @@ const OptionsLayout = observer(() => {
   const vibration = useVibration();
   const styles = useStyles();
   const { uiStore } = useRootStore();
+  const isLandscape = uiStore.isLandscape;
 
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[uiStore.colorScheme].tint,
-        tabBarLabel: (props) => {
-          return (
-            <RNText
-              style={{
-                textAlign: "center",
-                fontFamily: "PixelifySans",
-                ...styles["text-sm"],
-                color: props.color,
-              }}
-            >
-              {props.children}
-            </RNText>
-          );
-        },
+
+        tabBarLabel: (props) => (
+          <RNText
+            style={{
+              fontFamily: "PixelifySans",
+              ...styles["text-sm"],
+              color: props.color,
+              marginLeft: isLandscape ? 8 : 0,
+              textAlign: isLandscape ? "left" : "center",
+            }}
+          >
+            {props.children}
+          </RNText>
+        ),
+
         tabBarStyle: {
           borderTopWidth: 0,
           height: uiStore.tabHeight + 8,
           ...styles.diffuseTop,
+          paddingHorizontal: isLandscape ? 16 : 0,
         },
+
         tabBarIconStyle: {
+          width: uiStore.iconSizeXL,
           height: uiStore.iconSizeXL,
-          marginHorizontal: "auto",
+          marginRight: isLandscape ? 8 : 0,
         },
-        tabBarItemStyle: {
-          justifyContent: "center",
-          paddingTop: 0,
-        },
+
         animation:
-          uiStore.reduceMotion || Platform.OS == "android" ? "none" : "shift",
+          uiStore.reduceMotion || Platform.OS === "android" ? "none" : "shift",
+
         tabBarButton: (props) => {
-          const onPressWithVibration = (event: GestureResponderEvent) => {
+          const onPressWithVibration = (e: GestureResponderEvent) => {
             vibration({ style: "light" });
-            if (props.onPress) props.onPress(event);
+            props.onPress?.(e);
           };
+
           return (
             <Pressable
               onPress={onPressWithVibration}
@@ -64,10 +69,18 @@ const OptionsLayout = observer(() => {
               accessibilityState={props.accessibilityState}
               style={[
                 props.style,
-                {
-                  justifyContent: "space-evenly",
-                  paddingHorizontal: "15%",
-                },
+                isLandscape
+                  ? {
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      height: uiStore.tabHeight + 8,
+                      paddingHorizontal: 16,
+                    }
+                  : {
+                      justifyContent: "space-evenly",
+                      paddingHorizontal: "15%",
+                    },
               ]}
             >
               {props.children}
@@ -81,11 +94,6 @@ const OptionsLayout = observer(() => {
         options={{
           headerShown: false,
           title: "App",
-          tabBarIconStyle: {
-            width: uiStore.iconSizeXL,
-            height: uiStore.iconSizeXL,
-            marginRight: uiStore.isLandscape ? 16 : 0,
-          },
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
               name="application-brackets"
@@ -100,11 +108,6 @@ const OptionsLayout = observer(() => {
         options={{
           headerShown: false,
           title: "Game",
-          tabBarIconStyle: {
-            width: uiStore.iconSizeXL,
-            height: uiStore.iconSizeXL,
-            marginRight: uiStore.isLandscape ? 16 : 0,
-          },
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
               name="gamepad-circle-right"
@@ -119,11 +122,6 @@ const OptionsLayout = observer(() => {
         options={{
           headerShown: false,
           title: "Audio",
-          tabBarIconStyle: {
-            width: uiStore.iconSizeXL,
-            height: uiStore.iconSizeXL,
-            marginRight: uiStore.isLandscape ? 16 : 0,
-          },
           tabBarIcon: ({ color }) => (
             <Foundation name="sound" color={color} size={uiStore.iconSizeXL} />
           ),
@@ -132,35 +130,14 @@ const OptionsLayout = observer(() => {
       <Tabs.Screen
         name="Codex/index"
         options={{
-          href: __DEV__ ? undefined : null, //TODO: when codex is done
+          href: __DEV__ ? undefined : null,
           headerShown: false,
           title: "Codex",
-          tabBarLabelStyle: { fontFamily: "PixelifySans" },
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
               name="book-open-variant"
               color={color}
               size={uiStore.iconSizeXL}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="pvp"
-        options={{
-          href: __DEV__ ? undefined : null, //TODO: when pvp is done
-          headerShown: false,
-          title: "PVP",
-          tabBarIconStyle: {
-            width: uiStore.iconSizeXL,
-            height: uiStore.iconSizeXL,
-            marginRight: uiStore.isLandscape ? 16 : 0,
-          },
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons
-              name="sword-cross"
-              size={uiStore.iconSizeXL}
-              color={color}
             />
           ),
         }}
@@ -172,15 +149,25 @@ const OptionsLayout = observer(() => {
         }}
       />
       <Tabs.Screen
+        name="pvp"
+        options={{
+          href: __DEV__ ? undefined : null,
+          headerShown: false,
+          title: "PVP",
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons
+              name="sword-cross"
+              size={uiStore.iconSizeXL}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="iaps"
         options={{
           headerShown: false,
           title: "IAPs",
-          tabBarIconStyle: {
-            width: uiStore.iconSizeXL,
-            height: uiStore.iconSizeXL,
-            marginRight: uiStore.isLandscape ? 16 : 0,
-          },
           tabBarIcon: ({ color }) => (
             <Text
               style={{
@@ -197,4 +184,5 @@ const OptionsLayout = observer(() => {
     </Tabs>
   );
 });
+
 export default OptionsLayout;

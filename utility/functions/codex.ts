@@ -63,13 +63,20 @@ export const codexData: CodexEntry[] = [
     route: "/Options/Codex/Time",
   },
   {
-    id: "time-overview",
-    title: "Time",
-    category: "Time",
-    content:
-      "Nearly every action in Life and Lineage advances the game clock by 1 week, aging every character.",
-    tags: ["time", "player", "overview"],
-    route: "/Options/Codex/Time",
+    id: "condition-overview",
+    title: "Conditions",
+    category: "Conditions",
+    content: "Conditions are special effects placed on the player or enemies",
+    tags: ["conditions", "combat", "effects", "debilitations"],
+    route: "/Options/Codex/Conditions",
+  },
+  {
+    id: "debilitation-overview",
+    title: "Debilitations",
+    category: "Debilitations",
+    content: "Debilitations are a subset of Conditions that never expire",
+    tags: ["conditions", "combat", "effects", "debilitations"],
+    route: "/Options/Codex/Debilitations",
   },
   {
     id: "player-overview",
