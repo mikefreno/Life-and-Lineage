@@ -54,6 +54,24 @@ export function searchCodex(searchTerm: string): CodexEntry[] {
 
 export const codexData: CodexEntry[] = [
   {
+    id: "time-overview",
+    title: "Time",
+    category: "Time",
+    content:
+      "Nearly every action in Life and Lineage advances the game clock by 1 week, aging every character.",
+    tags: ["time", "player", "overview"],
+    route: "/Options/Codex/Time",
+  },
+  {
+    id: "time-overview",
+    title: "Time",
+    category: "Time",
+    content:
+      "Nearly every action in Life and Lineage advances the game clock by 1 week, aging every character.",
+    tags: ["time", "player", "overview"],
+    route: "/Options/Codex/Time",
+  },
+  {
     id: "player-overview",
     title: "Player Classes Overview",
     category: "Player",

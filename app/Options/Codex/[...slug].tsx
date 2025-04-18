@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Href, Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { Pressable, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -11,6 +11,9 @@ import {
   MagicCodex,
   PlayerCodex,
   RelationshipsCodex,
+  TimeCodex,
+  ConditionsCodex,
+  PvPCodex,
 } from "@/components/CodexPages";
 import {
   AirCodex,
@@ -31,10 +34,14 @@ import {
   SummoningCodex,
   VengeanceCodex,
   WaterCodex,
+  DebilitationCodex,
 } from "@/components/CodexSecondaries";
 import { toTitleCase } from "@/utility/functions/misc";
 import { useEffect, useState } from "react";
 import { useRootStore } from "@/hooks/stores";
+import { useStyles } from "@/hooks/styles";
+import { observer } from "mobx-react-lite";
+import { HeaderBackButton } from "@react-navigation/elements";
 
 const CategoryMap: { [key: string]: React.JSX.Element } = {
   Combat: <CombatCodex />,
@@ -44,6 +51,7 @@ const CategoryMap: { [key: string]: React.JSX.Element } = {
   Magic: <MagicCodex />,
   Player: <PlayerCodex />,
   Relationships: <RelationshipsCodex />,
+  Time: <TimeCodex />,
 };
 
 const SecondaryMap: { [key: string]: React.JSX.Element } = {
@@ -65,11 +73,13 @@ const SecondaryMap: { [key: string]: React.JSX.Element } = {
   Assassination: <AssassinationCodex />,
   "Beast Mastery": <BeastMasteryCodex />,
   Arcane: <ArcaneCodex />,
+  Debilitation: <DebilitationCodex />,
 };
 
-export default function CodexInfo() {
+const CodexInfo = observer(() => {
   let { slug } = useLocalSearchParams();
   const { uiStore } = useRootStore();
+  const styles = useStyles();
 
   const [history, setHistory] = useState<Href[]>([]);
   let category: string;
@@ -109,30 +119,39 @@ export default function CodexInfo() {
     }
   };
 
+  const codexPageTopStyling = useMemo(() => {
+    return {
+      flex: 1,
+      padding: 8,
+      ...styles.notchMirroredLanscapePad,
+    };
+  }, [uiStore.orientation, uiStore.insets]);
+
   return (
     <>
       <Stack.Screen
         options={{
           headerLeft: () => (
-            <Pressable onPress={handleBack}>
-              {({ pressed }) => (
-                <Ionicons
-                  name={"chevron-back"}
-                  size={36}
-                  color={Colors[uiStore.colorScheme as "light" | "dark"].tint}
-                  style={{ marginLeft: 15, opacity: pressed ? 0.5 : 1 }}
-                />
-              )}
-            </Pressable>
+            <HeaderBackButton
+              onPress={handleBack}
+              tintColor={Colors[uiStore.colorScheme].tint}
+              displayMode="minimal"
+              style={{ marginLeft: 8 }}
+            />
           ),
           title: `${secondary ? secondary : category} Codex`,
         }}
       />
       {secondary ? (
-        <View style={{ flex: 1 }}>{SecondaryMap[toTitleCase(secondary)]}</View>
+        <View style={codexPageTopStyling}>
+          {SecondaryMap[toTitleCase(secondary)]}
+        </View>
       ) : (
-        <View style={{ flex: 1 }}>{CategoryMap[toTitleCase(category)]}</View>
+        <View style={codexPageTopStyling}>
+          {CategoryMap[toTitleCase(category)]}
+        </View>
       )}
     </>
   );
-}
+});
+export default CodexInfo;

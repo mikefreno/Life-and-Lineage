@@ -51,7 +51,8 @@ const FleeModal = observer(() => {
 
   const handleSuccessfulFlee = async () => {
     try {
-      uiStore.setTotalLoadingSteps(4);
+      uiStore.setTotalLoadingSteps(5);
+      rootStore.gameTick();
       await wait(150);
 
       vibration({ style: "light" });

@@ -133,7 +133,7 @@
       "multiplier"
     ],
     "effectAmount": [
-      0.25
+      0.35
     ],
     "icon": "flame"
   },
@@ -689,7 +689,7 @@
       "multiplier"
     ],
     "effectAmount": [
-      0.5
+      0.75
     ],
     "icon": "flame"
   },

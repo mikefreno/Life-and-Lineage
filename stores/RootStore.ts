@@ -133,7 +133,6 @@ export class RootStore {
       pathname: observable,
       showReachedEndOfCompletedDungeonsMessage: observable,
       audioStore: observable,
-
       showEndOfCompletedDungeonsMessage: action,
       closeReachedEndOfCompletedDungeonsMessage: action,
       setPathname: action,
@@ -158,15 +157,12 @@ export class RootStore {
               if (available) {
                 StoreReview.requestReview();
                 this.haveAskedForReview = true;
+                storage.set("reviewAsked", true);
               }
             })
             .catch((e) => __DEV__ && console.warn(e));
         }
       },
-    );
-    reaction(
-      () => this.haveAskedForReview,
-      () => storage.set("reviewAsked", this.haveAskedForReview),
     );
   }
 

@@ -11,6 +11,7 @@ import { AnimationOptions } from "@/utility/animation/enemy";
 import { type Condition } from "@/entities/conditions";
 import { Being } from "@/entities/being";
 import { Vector2 } from "@/utility/Vec2";
+import { Target } from "@expo/config-plugins/build/ios";
 
 const attackHandler = ({
   attackResults,
@@ -332,6 +333,12 @@ export const useCombatActions = () => {
               damage: res.use.damages?.total ?? 0,
               attackerId: attack.user.id,
             });
+            if (res.use.debuffs) {
+              res.use.debuffs.forEach((debuff: Condition) => {
+                console.log(debuff);
+                res.target.addCondition(debuff);
+              });
+            }
 
             res.target.damageSanity(res.use.damages?.sanity);
             break;
@@ -383,8 +390,6 @@ export const useCombatActions = () => {
       if (!playerState || !isFocused) return;
 
       const continueAttackFlow = () => {
-        const logString = handleAttackResult(attack, targets);
-        dungeonStore.addLog(logString);
         if (playerState.attacksHeldActive.length > 0) {
           playerState.attacksHeldActive.forEach((heldActive) => {
             if (heldActive.heldActiveTargets) {
@@ -396,6 +401,9 @@ export const useCombatActions = () => {
             }
           });
         }
+
+        const logString = handleAttackResult(attack, targets);
+        dungeonStore.addLog(logString);
 
         targets.forEach((target) => {
           if (target.currentHealth <= 0) {

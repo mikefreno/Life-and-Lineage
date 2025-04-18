@@ -6,10 +6,6 @@ import { Element, ElementToString, PlayerClassOptions } from "@/utility/types";
 import { ClassDescriptionMap, DescriptionMap } from "@/utility/descriptions";
 import { elementalColorMap, playerClassColors } from "@/constants/Colors";
 import { Text } from "@/components/Themed";
-import mageSpells from "@/assets/json/mageSpells.json";
-import necromancerSpells from "@/assets/json/necroSpells.json";
-import paladinSpells from "@/assets/json/paladinSpells.json";
-import rangerSpells from "@/assets/json/rangerSpells.json";
 import BlessingDisplay from "@/components/BlessingsDisplay";
 import {
   NecromancerSkull,
@@ -20,6 +16,7 @@ import {
 import { useRootStore } from "@/hooks/stores";
 import { useStyles } from "@/hooks/styles";
 import { Attack } from "@/entities/attack";
+import { jsonServiceStore } from "@/stores/SingletonSource";
 
 const ClassCodex = ({
   classOption,
@@ -32,7 +29,7 @@ const ClassCodex = ({
   schools: Element[];
   spells: any[];
 }) => {
-  const { uiStore } = useRootStore();
+  const { uiStore, playerState } = useRootStore();
   const styles = useStyles();
 
   const headerComponent = () => (
@@ -88,7 +85,7 @@ const ClassCodex = ({
 
   const renderItem = ({ item }) => (
     <View style={[styles.py2, styles.mxAuto]}>
-      <SpellDetails spell={new Attack({ ...item })} />
+      <SpellDetails spell={new Attack({ ...item, user: playerState })} />
     </View>
   );
 
@@ -110,7 +107,7 @@ const ElementCodex = ({
   element: Element;
   spells: any[];
 }) => {
-  const { uiStore } = useRootStore();
+  const { uiStore, playerState } = useRootStore();
   const styles = useStyles();
 
   const headerComponent = () => (
@@ -140,7 +137,7 @@ const ElementCodex = ({
 
   const renderItem = ({ item }) => (
     <View style={[styles.py2, styles.mxAuto]}>
-      <SpellDetails spell={new Attack({ ...item })} />
+      <SpellDetails spell={new Attack({ ...item, user: playerState })} />
     </View>
   );
 
@@ -160,32 +157,40 @@ export const MageCodex = () => (
     classOption={PlayerClassOptions.mage}
     icon={<WizardHat />}
     schools={[Element.fire, Element.water, Element.air, Element.earth]}
-    spells={mageSpells}
+    spells={jsonServiceStore.readJsonFileSync("mageSpells")}
   />
 );
 
 export const FireCodex = () => (
   <ElementCodex
     element={Element.fire}
-    spells={mageSpells.filter((spell) => spell.element === "fire")}
+    spells={jsonServiceStore
+      .readJsonFileSync("mageSpells")
+      .filter((spell) => spell.element === "fire")}
   />
 );
 export const WaterCodex = () => (
   <ElementCodex
     element={Element.water}
-    spells={mageSpells.filter((spell) => spell.element === "water")}
+    spells={jsonServiceStore
+      .readJsonFileSync("mageSpells")
+      .filter((spell) => spell.element === "water")}
   />
 );
 export const AirCodex = () => (
   <ElementCodex
     element={Element.air}
-    spells={mageSpells.filter((spell) => spell.element === "air")}
+    spells={jsonServiceStore
+      .readJsonFileSync("mageSpells")
+      .filter((spell) => spell.element === "air")}
   />
 );
 export const EarthCodex = () => (
   <ElementCodex
     element={Element.earth}
-    spells={mageSpells.filter((spell) => spell.element === "earth")}
+    spells={jsonServiceStore
+      .readJsonFileSync("mageSpells")
+      .filter((spell) => spell.element === "earth")}
   />
 );
 
@@ -199,32 +204,40 @@ export const NecromancerCodex = () => (
       Element.bone,
       Element.pestilence,
     ]}
-    spells={necromancerSpells}
+    spells={jsonServiceStore.readJsonFileSync("necroSpells")}
   />
 );
 
 export const BloodCodex = () => (
   <ElementCodex
     element={Element.blood}
-    spells={necromancerSpells.filter((spell) => spell.element === "blood")}
+    spells={jsonServiceStore
+      .readJsonFileSync("necroSpells")
+      .filter((spell) => spell.element === "blood")}
   />
 );
 export const BoneCodex = () => (
   <ElementCodex
     element={Element.bone}
-    spells={necromancerSpells.filter((spell) => spell.element === "bone")}
+    spells={jsonServiceStore
+      .readJsonFileSync("necroSpells")
+      .filter((spell) => spell.element === "bone")}
   />
 );
 export const PestilenceCodex = () => (
   <ElementCodex
     element={Element.pestilence}
-    spells={necromancerSpells.filter((spell) => spell.element === "pestilence")}
+    spells={jsonServiceStore
+      .readJsonFileSync("necroSpells")
+      .filter((spell) => spell.element === "pestilence")}
   />
 );
 export const SummoningCodex = () => (
   <ElementCodex
     element={Element.summoning}
-    spells={necromancerSpells.filter((spell) => spell.element === "summoning")}
+    spells={jsonServiceStore
+      .readJsonFileSync("necroSpells")
+      .filter((spell) => spell.element === "summoning")}
   />
 );
 
@@ -233,26 +246,32 @@ export const PaladinCodex = () => (
     classOption={PlayerClassOptions.paladin}
     icon={<PaladinHammer />}
     schools={[Element.protection, Element.holy, Element.vengeance]}
-    spells={paladinSpells}
+    spells={jsonServiceStore.readJsonFileSync("paladinSpells")}
   />
 );
 
 export const ProtectionCodex = () => (
   <ElementCodex
     element={Element.protection}
-    spells={paladinSpells.filter((spell) => spell.element === "protection")}
+    spells={jsonServiceStore
+      .readJsonFileSync("paladinSpells")
+      .filter((spell) => spell.element === "protection")}
   />
 );
 export const HolyCodex = () => (
   <ElementCodex
     element={Element.holy}
-    spells={paladinSpells.filter((spell) => spell.element === "holy")}
+    spells={jsonServiceStore
+      .readJsonFileSync("paladinSpells")
+      .filter((spell) => spell.element === "holy")}
   />
 );
 export const VengeanceCodex = () => (
   <ElementCodex
     element={Element.vengeance}
-    spells={paladinSpells.filter((spell) => spell.element === "vengeance")}
+    spells={jsonServiceStore
+      .readJsonFileSync("paladinSpells")
+      .filter((spell) => spell.element === "vengeance")}
   />
 );
 
@@ -261,25 +280,35 @@ export const RangerCodex = () => (
     classOption={PlayerClassOptions.ranger}
     icon={<RangerIcon />}
     schools={[Element.beastMastery, Element.assassination, Element.arcane]}
-    spells={rangerSpells}
+    spells={jsonServiceStore.readJsonFileSync("rangerSpells")}
   />
 );
 
 export const BeastMasteryCodex = () => (
   <ElementCodex
     element={Element.beastMastery}
-    spells={rangerSpells.filter((spell) => spell.element === "beastMastery")}
+    spells={jsonServiceStore
+      .readJsonFileSync("rangerSpells")
+      .filter((spell) => spell.element === "beastMastery")}
   />
 );
 export const AssassinationCodex = () => (
   <ElementCodex
     element={Element.assassination}
-    spells={rangerSpells.filter((spell) => spell.element === "assassination")}
+    spells={jsonServiceStore
+      .readJsonFileSync("rangerSpells")
+      .filter((spell) => spell.element === "assassination")}
   />
 );
 export const ArcaneCodex = () => (
   <ElementCodex
     element={Element.arcane}
-    spells={rangerSpells.filter((spell) => spell.element === "arcane")}
+    spells={jsonServiceStore
+      .readJsonFileSync("rangerSpells")
+      .filter((spell) => spell.element === "arcane")}
   />
 );
+
+export const DebilitationCodex = () => {
+  return <View></View>;
+};

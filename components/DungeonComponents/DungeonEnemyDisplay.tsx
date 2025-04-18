@@ -108,7 +108,7 @@ const EnemyConditions = observer(({ enemy }: { enemy: Being }) => {
                 flexDirection: "row",
                 position: "absolute",
                 right: getNormalizedSize(-4),
-                top: getNormalizedSize(16),
+                top: getNormalizedSize(12),
               }}
             >
               <Text style={[styles["text-3xl"], { top: 4 }]}>*</Text>

@@ -1,5 +1,5 @@
 import { ScrollView, View } from "react-native";
-import { Text } from "@/components/Themed";
+import { CursiveText, Text } from "@/components/Themed";
 import {
   Air,
   ArcaneIcon,
@@ -409,13 +409,13 @@ export function PlayerCodex() {
 
 export function RelationshipsCodex() {
   const images = [
-    require("../assets/images/codex/RelationshipsButton.jpeg"),
-    require("../assets/images/codex/Relationships.png"),
-    require("../assets/images/codex/RelationshipActions.png"),
+    require("@/assets/images/codex/RelationshipsButton.jpeg"),
+    require("@/assets/images/codex/Relationships.png"),
+    require("@/assets/images/codex/RelationshipActions.png"),
   ];
   const images2 = [
-    require("../assets/images/codex/ActivitiesButton.jpeg"),
-    require("../assets/images/codex/Activities.jpeg"),
+    require("@/assets/images/codex/ActivitiesButton.jpeg"),
+    require("@/assets/images/codex/Activities.jpeg"),
   ];
 
   return (
@@ -432,4 +432,63 @@ export function ShopsCodex() {
       <View></View>
     </View>
   );
+}
+
+export function TimeCodex() {
+  const styles = useStyles();
+  return (
+    <View>
+      <CursiveText style={[styles["text-5xl"], { textAlign: "center" }]}>
+        "Time is the most valuable thing a man can spend."
+      </CursiveText>
+      <Text style={{ textAlign: "right" }}>-Theophrastus</Text>
+      <View style={{ paddingTop: 16, paddingHorizontal: 8 }}>
+        <Text style={styles["text-lg"]}>
+          {"    "}
+          Nearly every action in Life and Lineage advances the game clock by 1
+          week, aging every character. Specifically, this happens every time a
+          labor is worked, a medical service is received, talking to character,
+          or leaving a dungeon.
+        </Text>
+        <Text style={styles["text-lg"]}>
+          {"    "}
+          Starting at the age 45, the
+          <Link href="/Options/Codex/Player" style={{ color: "#3b82f6" }}>
+            {" "}
+            Player
+          </Link>{" "}
+          starts to roll the possibility of gaining{" "}
+          <Link href="/Options/Codex/Conditions" style={{ color: "#3b82f6" }}>
+            Conditions.
+          </Link>{" "}
+        </Text>
+        <Text style={styles["text-lg"]}>
+          {"    "}The chance is quite low at start, less than once per year, but
+          rises as the player ages, up to a cap of once every 5 turns.
+        </Text>
+        <Text style={styles["text-lg"]}>
+          {"    "}Within this, there is a chance that the conditions is much
+          worse than a typical condition, a{" "}
+          <Link
+            href="/Options/Codex/Conditions/Debilitation"
+            style={{ color: "#3b82f6" }}
+          >
+            Debilitation
+          </Link>{" "}
+          which is a type of condition that is permanent.
+        </Text>
+      </View>
+      <View></View>
+    </View>
+  );
+}
+
+export function ConditionsCodex() {
+  const styles = useStyles();
+  return <View></View>;
+}
+
+export function PvPCodex() {
+  const styles = useStyles();
+  return <View></View>;
 }

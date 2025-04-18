@@ -59,7 +59,7 @@ export default function CodexCategory({
     <Pressable
       key={category}
       style={{ width: "100%" }}
-      onPressOut={() => {
+      onPress={() => {
         if (!scrolling) {
           handlePressOut();
         }
@@ -70,7 +70,7 @@ export default function CodexCategory({
           style={[styles.categoryContainer, { opacity: pressed ? 0.5 : 1 }]}
         >
           <View style={styles.categoryContent}>
-            <Text style={styles.xl}>{category}</Text>
+            <Text style={styles["text-xl"]}>{category}</Text>
             <Animated.View style={chevronAnimatedStyle}>
               <Entypo
                 name="chevron-thin-right"

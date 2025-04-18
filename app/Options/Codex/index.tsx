@@ -9,6 +9,7 @@ import { useRootStore } from "@/hooks/stores";
 import { useStyles } from "@/hooks/styles";
 
 const categories = [
+  "Time",
   "Player",
   "Relationships",
   "Labor",
@@ -66,6 +67,7 @@ export default function Codex() {
 
       <ScrollView
         style={{ marginHorizontal: 16 }}
+        contentContainerStyle={{ paddingRight: 12 }}
         scrollEventThrottle={16}
         onScrollBeginDrag={() => setScrolling(true)}
         onScrollEndDrag={() => setScrolling(false)}
@@ -76,7 +78,9 @@ export default function Codex() {
               <ThemedCard key={result.id}>
                 <TouchableOpacity
                   onPress={() => {
-                    router.push(result.route);
+                    if (!scrolling) {
+                      router.push(result.route);
+                    }
                   }}
                 >
                   <Text style={styles["text-xl"]}>{result.title}</Text>
