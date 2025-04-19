@@ -1,53 +1,57 @@
 import { storage } from "@/utility/functions/storage";
 import Constants from "expo-constants";
 import { RootStore } from "./RootStore";
-import React, { Component, ReactNode } from "react";
-import FeatureUpdateModal, {
-  NewFeaturePage,
-} from "@/components/NewFeaturesModal";
-import { action, computed, makeObservable, observable } from "mobx";
+import {
+  action,
+  computed,
+  makeObservable,
+  observable,
+  runInAction,
+} from "mobx";
+import { ExternalPathString, RelativePathString } from "expo-router";
+import { wait } from "@/utility/functions/misc";
 
-interface NewFeatureNotifierProps {
+export type NewFeaturePage = {
+  title: string;
+  body: string;
+  link: { path: RelativePathString | ExternalPathString; string: string };
+};
+
+export class NewFeatureNotifier {
   root: RootStore;
-  children?: ReactNode;
-}
-
-interface NewFeatureNotifierState {
-  isModalVisible: boolean;
-  messagesToGive: NewFeaturePage[];
-}
-
-export class NewFeatureNotifier extends Component<
-  NewFeatureNotifierProps,
-  NewFeatureNotifierState
-> {
   lastSeenAppVersion: string | null;
   currentAppVersion: string;
   shownCurrentMessage = false;
   getNotified: boolean;
 
-  constructor(props: NewFeatureNotifierProps) {
-    super(props);
-    props.root.setNewFeatureNotifier(this);
+  constructor({ root }: { root: RootStore }) {
+    this.root = root;
 
     const { lastSeenAppVersion, getNotified } = this.hydrate();
 
     this.getNotified = getNotified;
     this.currentAppVersion = Constants.expoConfig?.version!;
 
-    this.lastSeenAppVersion =
-      lastSeenAppVersion ??
-      (this.props.root.playerState ? "1.0.4" : this.currentAppVersion);
+    this.lastSeenAppVersion = __DEV__
+      ? "1.0.4"
+      : lastSeenAppVersion ??
+        (this.root.playerState ? "1.0.4" : this.currentAppVersion);
 
     this.handleModalClose = this.handleModalClose.bind(this);
     this.serialize = this.serialize.bind(this);
 
     makeObservable(this, {
       getNotified: observable,
-      setGetNotified: action,
+      shownCurrentMessage: observable,
+      lastSeenAppVersion: observable,
+
       isModalVisible: computed,
       messages: computed,
+
+      setGetNotified: action,
       handleModalClose: action,
+      serialize: action,
+      hydrate: action,
     });
   }
 
@@ -107,7 +111,9 @@ export class NewFeatureNotifier extends Component<
     try {
       storage.set("lastSeenAppVersion", this.currentAppVersion);
       storage.set("getNewFeatureNotified", this.getNotified);
-      this.lastSeenAppVersion = this.currentAppVersion;
+      wait(500).then(() => {
+        runInAction(() => (this.lastSeenAppVersion = this.currentAppVersion));
+      }); // Give time for modal to clear view
     } catch (error) {
       console.error("Failed to serialize NewFeatureNotifier state:", error);
     }
@@ -119,20 +125,6 @@ export class NewFeatureNotifier extends Component<
       this.getNotified &&
       this.messages.length > 0 &&
       this.lastSeenAppVersion !== this.currentAppVersion
-    );
-  }
-
-  render(): ReactNode {
-    if (!this.isModalVisible || this.messages.length === 0) {
-      return null;
-    }
-
-    return (
-      <FeatureUpdateModal
-        isVisible={this.isModalVisible}
-        pages={this.messages}
-        onClose={this.handleModalClose}
-      />
     );
   }
 }

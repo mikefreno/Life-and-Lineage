@@ -44,6 +44,7 @@ import { useVibration } from "@/hooks/generic";
 import { AudioToggle } from "@/components/AudioToggle";
 import { BirthAnnouncementModal } from "@/components/BirthAnnouncementModal";
 import { NewFeatureNotifier } from "@/stores/NewFeatureNotifier";
+import NewFeaturesModal from "@/components/NewFeaturesModal";
 
 global.atob = decode;
 
@@ -266,7 +267,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
           <SystemBars
             style={uiStore.colorScheme == "dark" ? "light" : "dark"}
           />
-          <NewFeatureNotifier root={rootStore} />
+          <NewFeaturesModal />
           <ProjectedImage />
           <FleeModal />
           <BirthAnnouncementModal />

@@ -121,6 +121,7 @@ export class RootStore {
     this.JSONServiceStore = new JSONServiceStore({ root: this });
 
     this.pvpStore = new PVPStore({ root: this });
+    this.newFeatureNotifier = new NewFeatureNotifier({ root: this });
 
     this.constructed = true;
     this.audioStore.initializeReactions();
@@ -167,10 +168,6 @@ export class RootStore {
         }
       },
     );
-  }
-
-  setNewFeatureNotifier(arg0: NewFeatureNotifier) {
-    this.newFeatureNotifier = arg0;
   }
 
   setPathname(pathname: string) {
