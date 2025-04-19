@@ -71,14 +71,6 @@ export const codexData: CodexEntry[] = [
     route: "/Options/Codex/Conditions",
   },
   {
-    id: "debilitation-overview",
-    title: "Debilitations",
-    category: "Debilitations",
-    content: "Debilitations are a subset of Conditions that never expire",
-    tags: ["conditions", "combat", "effects", "debilitations"],
-    route: "/Options/Codex/Debilitations",
-  },
-  {
     id: "player-overview",
     title: "Player Classes Overview",
     category: "Player",

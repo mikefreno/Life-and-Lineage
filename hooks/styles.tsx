@@ -45,11 +45,8 @@ export const useStyles = () => {
     shadowRadius: 1.5,
     elevation: 3,
     backgroundColor: theme.background,
-    ...(uiStore.colorScheme === "dark" &&
-      ({
-        borderWidth: 1,
-        borderColor: "#71717a",
-      } as const)),
+    borderWidth: 1,
+    borderColor: "#71717a",
   } as const;
 
   const text = {
@@ -213,6 +210,27 @@ export const useStyles = () => {
     debugBorder: {
       borderWidth: 1,
       borderColor: theme.border,
+    },
+    imageContainer: {
+      height: 160,
+      width: 160,
+      position: "absolute",
+      top: -getNormalizedSize(8),
+      right: -getNormalizedSize(8),
+      overflow: "hidden",
+    },
+    laborIcon: {
+      height: "100%",
+      width: "100%",
+    },
+    imageOverlay: {
+      ...StyleSheet.absoluteFillObject,
+      top: "10%",
+      left: "10%",
+      width: "80%",
+      height: "80%",
+      backgroundColor: "rgba(0, 0, 0, 0.35)",
+      borderRadius: 4,
     },
     // ---- New Game ---- //
     newGameContainer: {
@@ -494,12 +512,6 @@ export const useStyles = () => {
       marginVertical: 24,
       textAlign: "center",
       ...text["text-lg"],
-    } as const,
-    costContainer: {
-      marginVertical: "auto",
-      marginBottom: -32,
-      marginTop: 32,
-      width: "33%",
     } as const,
     costRow: {
       flexDirection: "row",

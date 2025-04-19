@@ -9,6 +9,9 @@ import { useRootStore } from "@/hooks/stores";
 import { AccelerationCurves } from "@/utility/functions/misc";
 import { useAcceleratedAction } from "@/hooks/generic";
 import { useStyles } from "@/hooks/styles";
+import { Image } from "expo-image";
+import { MedicalIcons } from "@/utility/functions/cardIconMappings";
+import { useScaling } from "@/hooks/scaling";
 
 interface MedicalOptionProps {
   title: string;
@@ -32,7 +35,6 @@ const MedicalOption = observer(
   }: MedicalOptionProps) => {
     const root = useRootStore();
     const { playerState, uiStore } = root;
-    const isDark = uiStore.colorScheme === "dark";
     const styles = useStyles();
 
     const isFill = useMemo(() => {
@@ -120,14 +122,14 @@ const MedicalOption = observer(
     ]);
 
     return (
-      <ThemedCard>
+      <ThemedCard iconSource={MedicalIcons[title]}>
         <View style={styles.rowBetween}>
           <Text style={styles.cardTitle}>{title}</Text>
-          <View style={{ width: "40%" }}>
+          <View style={{ width: "33%", marginTop: 8, marginBottom: -8 }}>
             <View style={styles.costRow}>
               {cost > 0 ? (
                 <>
-                  <Text>{cost}</Text>
+                  <Text style={{ color: "#fafafa" }}>{cost}</Text>
                   <Coins
                     width={uiStore.iconSizeSmall}
                     height={uiStore.iconSizeSmall}
@@ -135,14 +137,12 @@ const MedicalOption = observer(
                   />
                 </>
               ) : (
-                <Text style={{ color: isDark ? "#fafafa" : "#09090b" }}>
-                  Free
-                </Text>
+                <Text style={{ color: "#fafafa" }}>Free</Text>
               )}
             </View>
             {healthRestore ? (
               <View style={styles.costRow}>
-                <Text>
+                <Text style={{ color: "#fafafa" }}>
                   {healthRestore == "fill"
                     ? playerState?.maxHealth
                     : healthRestore}
@@ -156,7 +156,7 @@ const MedicalOption = observer(
             ) : null}
             {manaRestore ? (
               <View style={styles.costRow}>
-                <Text>
+                <Text style={{ color: "#fafafa" }}>
                   {manaRestore == "fill" ? playerState?.maxMana : manaRestore}
                 </Text>
                 <Energy
@@ -168,7 +168,7 @@ const MedicalOption = observer(
             ) : null}
             {sanityRestore ? (
               <View style={styles.costRow}>
-                <Text>
+                <Text style={{ color: "#fafafa" }}>
                   {sanityRestore == "fill"
                     ? (playerState?.maxSanity ?? 50) * 2
                     : sanityRestore}
@@ -182,7 +182,7 @@ const MedicalOption = observer(
             ) : null}
             {removeDebuffs ? (
               <View style={styles.costRow}>
-                <Text style={{ textAlign: "center" }}>
+                <Text style={{ textAlign: "center", color: "#fafafa" }}>
                   {`Remove ${removeDebuffs} ${
                     removeDebuffs !== 1 ? "debuffs" : "debuff"
                   }`}

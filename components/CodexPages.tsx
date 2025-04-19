@@ -1047,8 +1047,30 @@ export function ConditionsCodex() {
   return (
     <View>
       <Text style={styles["text-lg"]}>
-        {"    "}Conditions are effects applied by attack/spells, low sanity, and
-        old age.{" "}
+        {"    "}Conditions are temporary effects applied by attack/spells, low
+        sanity, and old age. Old age specifically, can apply a nasty variant of
+        Conditions, called Debilitations, these are permanent, unique (cannot
+        have more that one of each `type` - whereas normal Conditions can stack
+        indefinitely), and their effect is often extremely dangerous.
+      </Text>
+      <Text style={styles["text-lg"]}>
+        {"    "}Conditions tick every{" "}
+        <Link href="/Options/Codex/Combat" style={{ color: "#3b82f6" }}>
+          combat{" "}
+        </Link>
+        turn, or game{" "}
+        <Link href="/Options/Codex/Time" style={{ color: "#3b82f6" }}>
+          time{" "}
+        </Link>
+        tick reducing the number of turns remaining(if applicable). In combat,
+        the tick happens at the end of your turn if the condition is on you, and
+        at the end of the enemy's turn, if on the enemy.
+      </Text>
+
+      <Text style={styles["text-lg"]}>
+        {"    "}Some conditions are constant, in that their effect is ongoing
+        for the lifetime of the Condition, while others only apply their effect
+        when they tick.
       </Text>
     </View>
   );

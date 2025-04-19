@@ -10,6 +10,9 @@ import { Coins, Energy, HealthIcon, Sanity } from "@/assets/icons/SVGIcons";
 import { useRootStore } from "@/hooks/stores";
 import { useAcceleratedAction } from "@/hooks/generic";
 import { useStyles } from "@/hooks/styles";
+import { Image } from "expo-image";
+import { LaborIcons } from "@/utility/functions/cardIconMappings";
+import { useScaling } from "@/hooks/scaling";
 
 interface LaborTaskProps {
   reward: number;
@@ -43,7 +46,6 @@ const LaborTask = observer(
   }: LaborTaskProps) => {
     const root = useRootStore();
     const { playerState, uiStore } = root;
-    const isDark = uiStore.colorScheme === "dark";
     const styles = useStyles();
 
     const { start: handlePressIn, stop: handlePressOut } = useAcceleratedAction(
@@ -102,15 +104,16 @@ const LaborTask = observer(
     ]);
 
     return (
-      <ThemedCard>
+      <ThemedCard iconSource={LaborIcons[title]}>
         <View style={styles.rowBetween}>
           <Text style={styles.cardTitle}>
             {title}{" "}
             {playerState && numberToRoman(playerState.getJobRank(title))}
           </Text>
-          <View style={styles.costContainer}>
+
+          <View style={{ width: "33%", marginTop: 8, marginBottom: -8 }}>
             <View style={styles.costRow}>
-              <Text style={{ color: isDark ? "#fafafa" : "#09090b" }}>
+              <Text style={{ color: "#fafafa" }}>
                 {playerState?.getRewardValue(title, reward)}
               </Text>
               <Coins
@@ -120,9 +123,7 @@ const LaborTask = observer(
               />
             </View>
             <View style={styles.costRow}>
-              <Text style={{ color: isDark ? "#fafafa" : "#09090b" }}>
-                -{cost.mana}
-              </Text>
+              <Text style={{ color: "#fafafa" }}>-{cost.mana}</Text>
               <Energy
                 width={uiStore.iconSizeSmall}
                 height={uiStore.iconSizeSmall}
@@ -131,9 +132,7 @@ const LaborTask = observer(
             </View>
             {!!cost.health && (
               <View style={styles.costRow}>
-                <Text style={{ color: isDark ? "#fafafa" : "#09090b" }}>
-                  -{cost.health}
-                </Text>
+                <Text style={{ color: "#fafafa" }}>-{cost.health}</Text>
                 <HealthIcon
                   width={uiStore.iconSizeSmall}
                   height={uiStore.iconSizeSmall}
@@ -143,9 +142,7 @@ const LaborTask = observer(
             )}
             {!!cost.sanity && (
               <View style={styles.costRow}>
-                <Text style={{ color: isDark ? "#fafafa" : "#09090b" }}>
-                  -{cost.sanity}
-                </Text>
+                <Text style={{ color: "#fafafa" }}>-{cost.sanity}</Text>
                 <Sanity
                   width={uiStore.iconSizeSmall}
                   height={uiStore.iconSizeSmall}
