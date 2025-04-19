@@ -9,9 +9,7 @@ import { useRootStore } from "@/hooks/stores";
 import { AccelerationCurves } from "@/utility/functions/misc";
 import { useAcceleratedAction } from "@/hooks/generic";
 import { useStyles } from "@/hooks/styles";
-import { Image } from "expo-image";
 import { MedicalIcons } from "@/utility/functions/cardIconMappings";
-import { useScaling } from "@/hooks/scaling";
 
 interface MedicalOptionProps {
   title: string;
@@ -49,32 +47,26 @@ const MedicalOption = observer(
       return false;
     }, [healthRestore, sanityRestore, manaRestore, removeDebuffs]);
 
-    const { start, stop } = useAcceleratedAction(
-      () => null, // Return null to indicate unlimited mode
-      {
-        minHoldTime: 350,
-        maxSpeed: 5,
-        accelerationCurve: AccelerationCurves.linear,
-        action: visit,
-        minActionAmount: 1,
-        maxActionAmount: 50,
-        debounceTime: 15,
-      },
-    );
+    const { start, stop } = useAcceleratedAction(() => null, {
+      minHoldTime: 350,
+      maxSpeed: 5,
+      accelerationCurve: AccelerationCurves.linear,
+      action: visit,
+      minActionAmount: 1,
+      maxActionAmount: 50,
+      debounceTime: 15,
+    });
 
     function visit() {
-      if (focused) {
-        playerState?.getMedicalService(
-          cost,
-          healthRestore == "fill" ? playerState.maxHealth : healthRestore,
-          sanityRestore == "fill" ? playerState.maxSanity! : sanityRestore,
-          manaRestore == "fill" ? playerState.maxMana : manaRestore,
-          removeDebuffs == "all"
-            ? playerState.conditions.length
-            : removeDebuffs,
-        );
-        root.gameTick();
-      }
+      if (!focused || getDisabled.disabled) return;
+
+      playerState?.getMedicalService(
+        cost,
+        healthRestore == "fill" ? playerState.maxHealth : healthRestore,
+        sanityRestore == "fill" ? playerState.maxSanity! : sanityRestore,
+        manaRestore == "fill" ? playerState.maxMana : manaRestore,
+        removeDebuffs == "all" ? playerState.conditions.length : removeDebuffs,
+      );
     }
 
     const getDisabled = useMemo(() => {

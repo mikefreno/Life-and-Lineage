@@ -514,7 +514,7 @@ export class Character extends Being {
       ...getNPCBaseCombatStats(),
     });
 
-    this.root.characterStore.saveCharacter(this);
+    this.root.characterStore._characterSave(this);
     this.root.characterStore.addCharacter(baby);
     this.addChild(baby);
     father.addChild(baby);
@@ -2066,16 +2066,32 @@ export class PlayerCharacter extends Character {
     if (cost <= this.gold) {
       this.gold -= cost;
       if (healthRestore) {
-        this.restoreHealth(healthRestore);
+        const res = this.restoreHealth(healthRestore);
+        if (res > 0) {
+          this.gold -= cost;
+          this.root.gameTick();
+        }
       }
       if (sanityRestore) {
-        this.restoreSanity(sanityRestore);
+        const res = this.restoreSanity(sanityRestore);
+        if (res > 0) {
+          this.gold -= cost;
+          this.root.gameTick();
+        }
       }
       if (manaRestore) {
-        this.restoreMana(manaRestore);
+        const res = this.restoreMana(manaRestore);
+        if (res > 0) {
+          this.gold -= cost;
+          this.root.gameTick();
+        }
       }
       if (removeDebuffs) {
-        this.removeDebuffs(removeDebuffs);
+        const res = this.removeDebuffs(removeDebuffs);
+        if (res > 0) {
+          this.gold -= cost;
+          this.root.gameTick();
+        }
       }
     }
   }

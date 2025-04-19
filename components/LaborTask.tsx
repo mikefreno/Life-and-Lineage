@@ -10,9 +10,7 @@ import { Coins, Energy, HealthIcon, Sanity } from "@/assets/icons/SVGIcons";
 import { useRootStore } from "@/hooks/stores";
 import { useAcceleratedAction } from "@/hooks/generic";
 import { useStyles } from "@/hooks/styles";
-import { Image } from "expo-image";
 import { LaborIcons } from "@/utility/functions/cardIconMappings";
-import { useScaling } from "@/hooks/scaling";
 
 interface LaborTaskProps {
   reward: number;
@@ -70,7 +68,7 @@ const LaborTask = observer(
         goldReward: playerState.getRewardValue(title, reward) ?? reward,
       });
 
-      if (!laborResult) return; // Labor couldn't be performed
+      if (!laborResult) return;
 
       if (playerState.getJobExperience(title) === 0) {
         vibration({ style: "success", essential: true });
@@ -89,7 +87,7 @@ const LaborTask = observer(
       if (playerState.currentMana < cost.mana) {
         return { disabled: true, message: "Low Mana" };
       }
-      if (cost.sanity && playerState.currentSanity <= cost.sanity) {
+      if (cost.sanity && playerState.currentSanity! <= cost.sanity) {
         return { disabled: true, message: "Low Sanity" };
       }
       return { disabled: false, message: "" };
@@ -104,7 +102,7 @@ const LaborTask = observer(
     ]);
 
     return (
-      <ThemedCard iconSource={LaborIcons[title]}>
+      <ThemedCard iconSource={LaborIcons[title]} iconDarkening={0.1}>
         <View style={styles.rowBetween}>
           <Text style={styles.cardTitle}>
             {title}{" "}

@@ -395,6 +395,9 @@ export class Being {
   }
 
   public restoreHealth(amount: number) {
+    if (this.currentHealth === this.maxHealth) {
+      return 0;
+    }
     if (this.currentHealth + amount < this.maxHealth) {
       this.currentHealth += amount;
       return amount;
@@ -481,11 +484,15 @@ export class Being {
     }
   }
 
-  public restoreMana(amount: number) {
+  public restoreMana(amount: number): number {
+    const initialMana = this.currentMana;
     if (this.currentMana + amount < this.maxMana) {
       this.currentMana += amount;
+      return amount;
     } else {
+      const restored = this.maxMana - initialMana;
       this.currentMana = this.maxMana;
+      return restored;
     }
   }
 
@@ -540,12 +547,17 @@ export class Being {
     return this.currentSanity;
   }
 
-  public restoreSanity(amount: number) {
-    if (this.currentSanity === null || !this.maxSanity) return;
+  public restoreSanity(amount: number): number {
+    if (this.currentSanity === null || !this.maxSanity) return 0;
+
+    const initialSanity = this.currentSanity;
     if (this.currentSanity + amount < this.maxSanity) {
       this.currentSanity += amount;
+      return amount;
     } else {
+      const restored = this.maxSanity - initialSanity;
       this.currentSanity = this.maxSanity;
+      return restored;
     }
   }
 
@@ -1007,15 +1019,19 @@ export class Being {
     );
   }
 
-  public removeDebuffs(amount: number) {
+  public removeDebuffs(amount: number): number {
     const debuffArray = this.conditions.filter(
       (condition) =>
         condition.style == "debuff" && condition.placedby !== "age",
     );
+    const initialLength = debuffArray.length;
+
     for (let i = 0; i < amount && debuffArray.length > 0; i++) {
       debuffArray.shift();
     }
     this.conditions = debuffArray;
+
+    return initialLength - debuffArray.length;
   }
 
   /**

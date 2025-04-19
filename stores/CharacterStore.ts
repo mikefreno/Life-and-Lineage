@@ -95,7 +95,7 @@ export class CharacterStore {
   }
 
   addCharacter(character: Character) {
-    this.characterSave(character);
+    this._characterSave(character);
     this.characters.push(character);
   }
 
@@ -151,7 +151,7 @@ export class CharacterStore {
       ...getNPCBaseCombatStats(),
     });
     this.independentChildren.push(child);
-    this.characterSave(child);
+    this._characterSave(child);
   }
 
   private removeIndependentChild({
@@ -212,7 +212,7 @@ export class CharacterStore {
     return { characters, independentChildren };
   }
 
-  private characterSave = (character: Character) => {
+  _characterSave = (character: Character) => {
     if (character.id === this.root.playerState?.id) {
       return;
     }
@@ -230,7 +230,7 @@ export class CharacterStore {
     }
   };
 
-  public saveCharacter = throttle(this.characterSave, 500);
+  public saveCharacter = throttle(this._characterSave, 500);
 
   private saveCharacterIds = () => {
     const characterIds = this.characters.map((c) => c.id);

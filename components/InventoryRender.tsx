@@ -462,7 +462,7 @@ const InventoryRender = observer(
           bounces={false}
           overScrollMode="never"
           collapsable={false}
-          scrollIndicatorInsets={{ top: 0, left: 10, bottom: 0, right: 10 }}
+          scrollIndicatorInsets={{ top: 0, left: 40, bottom: 0, right: 40 }}
         >
           {/* Regular Inventory Panel */}
           <View

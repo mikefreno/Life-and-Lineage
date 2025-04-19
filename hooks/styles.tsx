@@ -229,7 +229,6 @@ export const useStyles = () => {
       left: "10%",
       width: "80%",
       height: "80%",
-      backgroundColor: "rgba(0, 0, 0, 0.35)",
       borderRadius: 4,
     },
     // ---- New Game ---- //

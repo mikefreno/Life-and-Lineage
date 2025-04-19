@@ -24,7 +24,6 @@ const OptionsLayout = observer(() => {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[uiStore.colorScheme].tint,
-
         tabBarLabel: (props) => (
           <RNText
             style={{

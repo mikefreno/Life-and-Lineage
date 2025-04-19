@@ -27,6 +27,7 @@ import { jsonServiceStore } from "./SingletonSource";
 import { PVPStore } from "./PVPStore";
 import * as StoreReview from "expo-store-review";
 import { NewFeatureNotifier } from "./NewFeatureNotifier";
+import { ThemedScrollView } from "@/components/Themed";
 
 export class RootStore {
   playerState: PlayerCharacter | null;
@@ -45,8 +46,8 @@ export class RootStore {
   iapStore: IAPStore;
   JSONServiceStore: JSONServiceStore;
   pvpStore: PVPStore;
-
   newFeatureNotifier: NewFeatureNotifier | undefined;
+  ticker = 0;
 
   constructed: boolean = false;
   atDeathScreen: boolean = false;
@@ -55,10 +56,9 @@ export class RootStore {
 
   haveAskedForReview: boolean = false;
 
-  includeDevAttacks: boolean = false;
-
   showReachedEndOfCompletedDungeonsMessage: boolean = false;
 
+  includeDevAttacks: boolean = false;
   devActions: {
     action: (value: number) => void;
     name: string;
@@ -140,6 +140,10 @@ export class RootStore {
       showEndOfCompletedDungeonsMessage: action,
       closeReachedEndOfCompletedDungeonsMessage: action,
       setPathname: action,
+      ticker: observable,
+      gameTick: action,
+      tickerReset: action,
+
       hitDeathScreen: action,
       clearDeathScreen: action,
       addDevAction: action,
@@ -177,7 +181,12 @@ export class RootStore {
     );
   }
 
+  tickerReset() {
+    this.ticker = 0;
+  }
+
   gameTick() {
+    this.ticker++;
     this.time.tick();
     if (!this.playerState) throw new Error("Missing player in root!");
 

@@ -10,6 +10,7 @@ interface ThemedCard {
   style?: ViewStyle;
   cardStyle?: ViewStyle;
   iconSource?: any;
+  iconDarkening?: number;
 }
 
 export default function ThemedCard({
@@ -17,6 +18,7 @@ export default function ThemedCard({
   style,
   cardStyle,
   iconSource,
+  iconDarkening,
 }: ThemedCard) {
   const styles = useStyles();
   const { getNormalizedSize } = useScaling();
@@ -34,9 +36,18 @@ export default function ThemedCard({
             <Image
               source={iconSource}
               style={styles.laborIcon}
-              blurRadius={1}
+              blurRadius={0.5}
             />
-            <View style={styles.imageOverlay} />
+            <View
+              style={[
+                styles.imageOverlay,
+                {
+                  backgroundColor: `rgba(0, 0, 0, ${
+                    iconDarkening ? iconDarkening : 0.35
+                  })`,
+                },
+              ]}
+            />
           </View>
         ) : null}
         {children}

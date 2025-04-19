@@ -37,8 +37,13 @@ export class NewFeatureNotifier {
       : lastSeenAppVersion ??
         (this.root.playerState ? "1.0.4" : this.currentAppVersion);
 
-    this.handleModalClose = this.handleModalClose.bind(this);
-    this.serialize = this.serialize.bind(this);
+    if (
+      !this.isModalVisible &&
+      (this.lastSeenAppVersion !== this.currentAppVersion ||
+        !this.root.playerState)
+    ) {
+      this.serialize();
+    }
 
     makeObservable(this, {
       getNotified: observable,
@@ -122,6 +127,7 @@ export class NewFeatureNotifier {
   get isModalVisible() {
     return (
       !this.shownCurrentMessage &&
+      !this.root.dungeonStore.isInDungeon &&
       this.getNotified &&
       this.messages.length > 0 &&
       this.lastSeenAppVersion !== this.currentAppVersion

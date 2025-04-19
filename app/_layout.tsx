@@ -43,8 +43,8 @@ import { HeaderBackButton } from "@react-navigation/elements";
 import { useVibration } from "@/hooks/generic";
 import { AudioToggle } from "@/components/AudioToggle";
 import { BirthAnnouncementModal } from "@/components/BirthAnnouncementModal";
-import { NewFeatureNotifier } from "@/stores/NewFeatureNotifier";
 import NewFeaturesModal from "@/components/NewFeaturesModal";
+import { GameTickIndicator } from "@/components/GameTickIndicator";
 
 global.atob = decode;
 
@@ -61,6 +61,15 @@ export const tabRouteIndexing = [
   "/shops",
   "/medical",
   "/dungeon",
+];
+
+export const optionRouteIndexing = [
+  "/Options/app",
+  "/Options/game",
+  "/Options/audio",
+  "/Options/Codex",
+  //"/options/pvp",
+  "/Options/iaps",
 ];
 
 configureReanimatedLogger({
@@ -253,9 +262,11 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   }, []);
 
   useEffect(() => {
-    setTimeout(() => {
+    if (pathname.includes("Options")) {
+      rootStore.setPathname(pathname);
+    } else {
       rootStore.setPathname(pathname.toLowerCase());
-    }, SCREEN_TRANSITION_TIMING);
+    }
   }, [pathname]);
 
   return (
@@ -264,6 +275,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
         <ThemeProvider
           value={uiStore.colorScheme === "dark" ? DarkTheme : LightTheme}
         >
+          <GameTickIndicator />
           <SystemBars
             style={uiStore.colorScheme == "dark" ? "light" : "dark"}
           />
@@ -316,6 +328,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
               name="Options"
               options={{
                 animation: uiStore.reduceMotion ? "fade" : "slide_from_left",
+                gestureEnabled: false,
                 presentation: "card",
                 headerBackButtonDisplayMode: "minimal",
                 headerBackButtonMenuEnabled: false,
@@ -400,6 +413,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
               name="Education"
               options={{
                 animation: uiStore.reduceMotion ? "fade" : "slide_from_left",
+                fullScreenGestureEnabled: false,
                 headerBackButtonMenuEnabled: false,
                 headerBackButtonDisplayMode: "minimal",
                 headerTransparent: true,

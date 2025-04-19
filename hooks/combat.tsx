@@ -335,7 +335,6 @@ export const useCombatActions = () => {
             });
             if (res.use.debuffs) {
               res.use.debuffs.forEach((debuff: Condition) => {
-                console.log(debuff);
                 res.target.addCondition(debuff);
               });
             }

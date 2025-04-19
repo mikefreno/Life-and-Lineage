@@ -1,8 +1,8 @@
-import { tabRouteIndexing } from "@/app/_layout";
+import { tabRouteIndexing, optionRouteIndexing } from "@/app/_layout";
 import { useVibration } from "@/hooks/generic";
 import { useRootStore } from "@/hooks/stores";
-import { RelativePathString, useRouter } from "expo-router";
-import { type ReactNode } from "react";
+import { RelativePathString, usePathname, useRouter } from "expo-router";
+import { useMemo, type ReactNode } from "react";
 import { Platform } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -17,37 +17,52 @@ export default function PlatformDependantGestureWrapper({
   children: ReactNode;
 }) {
   const vibration = useVibration();
-  const rootStore = useRootStore();
   const router = useRouter();
+  const pathname = usePathname();
+
+  const correctRouteSet = useMemo(() => {
+    if (pathname.includes("Options")) {
+      return optionRouteIndexing;
+    }
+    return tabRouteIndexing;
+  }, [pathname]);
 
   const navigateToLeftTab = () => {
-    const currentIndex = tabRouteIndexing.indexOf(rootStore.pathname ?? "");
+    if (pathname == "/Education") {
+      router.back();
+      return;
+    }
+    const currentIndex = correctRouteSet.indexOf(pathname ?? "");
     if (currentIndex === -1) {
       return;
     }
     let leftIdx: number;
     if (currentIndex === 0) {
-      leftIdx = tabRouteIndexing.length - 1;
+      leftIdx = correctRouteSet.length - 1;
     } else {
       leftIdx = currentIndex - 1;
     }
-    const newTabString = tabRouteIndexing[leftIdx];
+    const newTabString = correctRouteSet[leftIdx];
     router.push(newTabString as RelativePathString);
     vibration({ style: "light" });
   };
 
   const navigateToRightTab = () => {
-    const currentIndex = tabRouteIndexing.indexOf(rootStore.pathname ?? "");
+    if (pathname == "/Education") {
+      router.back();
+      return;
+    }
+    const currentIndex = correctRouteSet.indexOf(pathname ?? "");
     if (currentIndex === -1) {
       return;
     }
     let rightIdx: number;
-    if (currentIndex === tabRouteIndexing.length - 1) {
+    if (currentIndex === correctRouteSet.length - 1) {
       rightIdx = 0;
     } else {
       rightIdx = currentIndex + 1;
     }
-    const newTabString = tabRouteIndexing[rightIdx];
+    const newTabString = correctRouteSet[rightIdx];
     router.push(newTabString as RelativePathString);
     vibration({ style: "light" });
   };

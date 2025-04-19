@@ -113,11 +113,14 @@ const FeatureUpdateModal = observer(() => {
           {page.body}
         </Text>
         {page.link && (
-          <GenericFlatButton onPress={() => router.push(page.link.path)}>
+          <GenericFlatButton
+            style={[tw.mt4, tw.mb2]}
+            onPress={() => router.push(page.link.path)}
+          >
             {page.link.string}
           </GenericFlatButton>
         )}
-        <GenericRaisedButton onPress={handleNext} style={tw.mt4}>
+        <GenericRaisedButton onPress={handleNext}>
           {index < total - 1 ? "Next" : "Acknowledge Knowledge"}
         </GenericRaisedButton>
       </>
