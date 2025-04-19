@@ -540,11 +540,11 @@
       "physical": 14
     },
     "attackStrings": [
-      "headbutt",
+      "pommel strike",
       "heavy swing"
     ],
     "animationStrings": {
-      "headbutt": "attack_1",
+      "pommel strike": "attack_1",
       "heavy swing": "attack_1"
     },
     "drops": [

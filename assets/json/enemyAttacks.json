@@ -439,6 +439,22 @@
     ]
   },
   {
+    "name": "pommel strike",
+    "manaCost": 10,
+    "targets": "single",
+    "baseHitChance": 0.85,
+    "damageTable": {
+      "raw": 2,
+      "physical": 4
+    },
+    "debuffNames": [
+      {
+        "name": "stun",
+        "chance": 0.20
+      }
+    ]
+  },
+  {
     "name": "punch",
     "manaCost": 5,
     "targets": "single",
