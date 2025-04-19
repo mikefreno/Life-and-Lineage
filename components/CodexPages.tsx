@@ -741,6 +741,10 @@ export function TimeCodex() {
           collecting from an investment or leaving a dungeon.
         </Text>
         <Text style={styles["text-lg"]}>
+          {"    "}A time indicator, that appears in the top left of the screen
+          shows the number of weeks passed by the current action.
+        </Text>
+        <Text style={styles["text-lg"]}>
           {"    "}
           Starting at the age 45, the
           <Link href="/Options/Codex/Player" style={{ color: "#3b82f6" }}>
