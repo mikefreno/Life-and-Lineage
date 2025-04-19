@@ -34,7 +34,7 @@ export default function ThemedCard({
             <Image
               source={iconSource}
               style={styles.laborIcon}
-              blurRadius={4}
+              blurRadius={1}
             />
             <View style={styles.imageOverlay} />
           </View>
