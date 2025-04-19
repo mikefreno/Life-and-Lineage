@@ -1,11 +1,12 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useRef } from "react";
-import { Animated, StyleSheet } from "react-native";
+import { Animated, Pressable, StyleSheet } from "react-native";
 import { Text } from "@/components/Themed";
 import Colors from "@/constants/Colors";
 import { useRootStore } from "@/hooks/stores";
 import { ClockIcon } from "@/assets/icons/SVGIcons";
 import { useStyles } from "@/hooks/styles";
+import { useRouter } from "expo-router";
 
 export const GameTickIndicator = observer(() => {
   const rootStore = useRootStore();
@@ -13,6 +14,7 @@ export const GameTickIndicator = observer(() => {
   const timerRef = useRef<NodeJS.Timeout>();
   const lastTickerValue = useRef(0);
   const styles = useStyles();
+  const router = useRouter();
 
   useEffect(() => {
     if (rootStore.ticker === lastTickerValue.current) {
@@ -56,18 +58,38 @@ export const GameTickIndicator = observer(() => {
       style={[
         localStyles.container,
         {
+          backgroundColor: rootStore.uiStore.isDark
+            ? Colors.light.background
+            : Colors.dark.background,
           transform: [{ translateX: slideAnim }],
         },
       ]}
     >
-      <ClockIcon
-        color={Colors.dark.text}
-        width={rootStore.uiStore.iconSizeXL}
-        height={rootStore.uiStore.iconSizeXL}
-      />
-      <Text style={[localStyles.text, styles["text-2xl"], styles.pl2]}>
-        {rootStore.ticker - lastTickerValue.current}
-      </Text>
+      <Pressable
+        style={{ flexDirection: "row" }}
+        onPress={() => router.push("/Options/Codex/Time")}
+      >
+        <ClockIcon
+          color={
+            rootStore.uiStore.isDark ? Colors.light.text : Colors.dark.text
+          }
+          width={rootStore.uiStore.iconSizeXL}
+          height={rootStore.uiStore.iconSizeXL}
+        />
+        <Text
+          style={[
+            styles["text-2xl"],
+            styles.pl2,
+            {
+              color: rootStore.uiStore.isDark
+                ? Colors.light.text
+                : Colors.dark.text,
+            },
+          ]}
+        >
+          {rootStore.ticker - lastTickerValue.current}
+        </Text>
+      </Pressable>
     </Animated.View>
   );
 });
@@ -75,10 +97,8 @@ export const GameTickIndicator = observer(() => {
 const localStyles = StyleSheet.create({
   container: {
     position: "absolute",
-    flexDirection: "row",
     left: 0,
     top: "15%",
-    backgroundColor: Colors.dark.background,
     padding: 10,
     borderTopRightRadius: 8,
     borderBottomRightRadius: 8,
@@ -91,8 +111,5 @@ const localStyles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
     zIndex: 1000,
-  },
-  text: {
-    color: Colors.dark.text,
   },
 });
