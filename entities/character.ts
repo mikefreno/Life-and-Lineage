@@ -648,7 +648,7 @@ export class PlayerCharacter extends Character {
     this.knownSpells = knownSpells ?? [];
 
     this.baseInventory = baseInventory ?? [];
-    this.keyItems = testKeyItems(this.root);
+    this.keyItems = keyItems ?? [];
 
     this.investments = investments ?? [];
     this.availableRespecs = availableRespecs ?? 0;

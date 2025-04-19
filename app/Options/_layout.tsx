@@ -129,7 +129,6 @@ const OptionsLayout = observer(() => {
       <Tabs.Screen
         name="Codex/index"
         options={{
-          href: __DEV__ ? undefined : null,
           headerShown: false,
           title: "Codex",
           tabBarIcon: ({ color }) => (
