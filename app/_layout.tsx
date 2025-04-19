@@ -43,6 +43,7 @@ import { HeaderBackButton } from "@react-navigation/elements";
 import { useVibration } from "@/hooks/generic";
 import { AudioToggle } from "@/components/AudioToggle";
 import { BirthAnnouncementModal } from "@/components/BirthAnnouncementModal";
+import { NewFeatureNotifier } from "@/stores/NewFeatureNotifier";
 
 global.atob = decode;
 
@@ -144,7 +145,6 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
     playerState,
     dungeonStore,
     uiStore,
-    shopsStore,
     audioStore,
     showReachedEndOfCompletedDungeonsMessage,
     closeReachedEndOfCompletedDungeonsMessage,
@@ -266,6 +266,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
           <SystemBars
             style={uiStore.colorScheme == "dark" ? "light" : "dark"}
           />
+          <NewFeatureNotifier root={rootStore} />
           <ProjectedImage />
           <FleeModal />
           <BirthAnnouncementModal />
@@ -291,8 +292,8 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
           )}
           <Stack
             screenOptions={{
-              animation: uiStore.reduceMotion ? "slide_from_bottom" : undefined,
-              animationDuration: 500,
+              animation: uiStore.reduceMotion ? "fade" : undefined,
+              animationDuration: SCREEN_TRANSITION_TIMING,
               fullScreenGestureEnabled: true,
             }}
           >
@@ -301,7 +302,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
               options={{
                 headerShown: false,
                 presentation: "card",
-                animation: !playerState ? "fade" : undefined,
+                animation: !playerState ? "fade" : "default",
               }}
             />
             <Stack.Screen
@@ -313,6 +314,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
             <Stack.Screen
               name="Options"
               options={{
+                animation: uiStore.reduceMotion ? "fade" : "slide_from_left",
                 presentation: "card",
                 headerBackButtonDisplayMode: "minimal",
                 headerBackButtonMenuEnabled: false,
@@ -396,6 +398,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
             <Stack.Screen
               name="Education"
               options={{
+                animation: uiStore.reduceMotion ? "fade" : "slide_from_left",
                 headerBackButtonMenuEnabled: false,
                 headerBackButtonDisplayMode: "minimal",
                 headerTransparent: true,
@@ -470,6 +473,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
             <Stack.Screen
               name="PVPArena"
               options={{
+                animation: uiStore.reduceMotion ? "fade" : "slide_from_left",
                 headerTitleStyle: {
                   fontFamily: "PixelifySans",
                   fontSize: getNormalizedSize(22),
@@ -558,6 +562,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
             <Stack.Screen
               name="DeathScreen"
               options={{
+                animation: uiStore.reduceMotion ? "fade" : "default",
                 title: "You Died",
                 headerBackButtonDisplayMode: "minimal",
                 headerBackButtonMenuEnabled: false,

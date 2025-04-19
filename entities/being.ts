@@ -288,32 +288,37 @@ export class Being {
   }
 
   //----------------------------------PlayerCharacter Specific----------------------------------//
-  get equipmentStats() {
-    if (!this.equipment) return;
+  get equipmentStats(): Map<Modifier, number> {
+    const aggregatedStats = new Map<Modifier, number>();
 
-    const stats = new Map<Modifier, number>();
-
-    for (const [_, item] of Object.entries(this.equipment)) {
-      if (item && "length" in item) {
-        if (this.equipment.mainHand.itemClass === ItemClassType.Bow) {
-          const itemStats = item[0]?.stats;
-          if (!itemStats || !item[0].playerHasRequirements) continue;
-
-          itemStats.forEach((value, key) => {
-            stats.set(key, (stats.get(key) ?? 0) + value);
-          });
-        }
-      } else {
-        const itemStats = item?.stats;
-        if (!itemStats || !item.playerHasRequirements) continue;
-
-        itemStats.forEach((value, key) => {
-          stats.set(key, (stats.get(key) ?? 0) + value);
-        });
-      }
+    if (!this.equipment) {
+      return aggregatedStats;
     }
 
-    return stats;
+    const addStatsFromItem = (item: Item | null) => {
+      if (item?.stats && item.playerHasRequirements) {
+        item.stats.forEach((value, key) => {
+          aggregatedStats.set(key, (aggregatedStats.get(key) ?? 0) + value);
+        });
+      }
+    };
+
+    addStatsFromItem(this.equipment.mainHand);
+    addStatsFromItem(this.equipment.offHand);
+    addStatsFromItem(this.equipment.head);
+    addStatsFromItem(this.equipment.body);
+
+    // --- Quiver Handling ---
+    const mainHand = this.equipment.mainHand;
+    const quiver = this.equipment.quiver;
+    if (
+      mainHand?.itemClass === ItemClassType.Bow &&
+      quiver &&
+      quiver.length > 0
+    ) {
+      addStatsFromItem(quiver[0]);
+    }
+    return aggregatedStats;
   }
 
   //----------------------------------Health----------------------------------//
@@ -1307,9 +1312,9 @@ export class Being {
           : this.physicalDamageNoWeapon;
 
         return (
-          (baseDamage + attackDamage) * // Add these together first
-          this.attackPower * // Then multiply by attack power
-          (1 - (target ? target.physicalDamageReduction : 0)) // Finally apply reduction
+          (baseDamage + attackDamage) *
+          this.attackPower *
+          (1 - (target ? target.physicalDamageReduction : 0))
         );
       case DamageType.FIRE:
         return (

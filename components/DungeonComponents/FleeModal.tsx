@@ -53,6 +53,7 @@ const FleeModal = observer(() => {
     try {
       uiStore.setTotalLoadingSteps(5);
       rootStore.gameTick();
+      uiStore.incrementLoadingStep();
       await wait(150);
 
       vibration({ style: "light" });

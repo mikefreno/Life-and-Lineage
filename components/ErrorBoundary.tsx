@@ -1,4 +1,4 @@
-import { Component, useEffect } from "react";
+import { Component } from "react";
 import { Text } from "@/components/Themed";
 import { ScrollView, View } from "react-native";
 import D20DieAnimation from "@/components/DieRollAnim";
@@ -7,11 +7,7 @@ import { useRootStore } from "@/hooks/stores";
 import { reloadAppAsync } from "expo";
 import React, { ReactNode, useState } from "react";
 import * as Sentry from "@sentry/react-native";
-import {
-  checkForUpdateAsync,
-  fetchUpdateAsync,
-  reloadAsync,
-} from "expo-updates";
+import { fetchUpdateAsync, reloadAsync } from "expo-updates";
 import GenericModal from "./GenericModal";
 import { AnimatedLoadingText } from "./AnimatedLoadingText";
 
@@ -46,7 +42,6 @@ export class ErrorBoundary extends Component<
       componentStack: errorInfo.componentStack,
     };
 
-    // Log error details to Sentry with extra context
     Sentry.captureException(error, { extra: extras });
 
     __DEV__ && console.error("Error caught:", error, errorInfo.componentStack);

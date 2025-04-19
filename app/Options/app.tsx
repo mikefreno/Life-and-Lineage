@@ -23,7 +23,14 @@ const vibrationOptions = ["full", "minimal", "none"];
 
 export const AppSettings = observer(() => {
   let root = useRootStore();
-  const { playerState, uiStore, authStore, saveStore, iapStore } = root;
+  const {
+    playerState,
+    uiStore,
+    authStore,
+    saveStore,
+    iapStore,
+    newFeatureNotifier,
+  } = root;
   const isDark = uiStore.colorScheme === "dark";
   const [showRemoteSaveWindow, setShowRemoteSaveWindow] =
     useState<boolean>(false);
@@ -408,6 +415,47 @@ export const AppSettings = observer(() => {
               <Text style={styles["text-2xl"]}>Off</Text>
             </Pressable>
           </View>
+          {newFeatureNotifier && (
+            <>
+              <GenericStrikeAround>New Feature Notifier</GenericStrikeAround>
+              <View style={styles.optionContainer}>
+                <Pressable
+                  style={styles.optionRow}
+                  onPress={() => newFeatureNotifier.setGetNotified(true)}
+                >
+                  <View
+                    style={[
+                      styles.optionCircle,
+                      newFeatureNotifier.getNotified && {
+                        backgroundColor:
+                          uiStore.colorScheme === "dark"
+                            ? "#2563eb"
+                            : "#3b82f6",
+                      },
+                    ]}
+                  />
+                  <Text style={styles["text-2xl"]}>On</Text>
+                </Pressable>
+                <Pressable
+                  style={styles.optionRow}
+                  onPress={() => newFeatureNotifier.setGetNotified(false)}
+                >
+                  <View
+                    style={[
+                      styles.optionCircle,
+                      !newFeatureNotifier.getNotified && {
+                        backgroundColor:
+                          uiStore.colorScheme === "dark"
+                            ? "#2563eb"
+                            : "#3b82f6",
+                      },
+                    ]}
+                  />
+                  <Text style={styles["text-2xl"]}>Off</Text>
+                </Pressable>
+              </View>
+            </>
+          )}
         </View>
         <Pressable
           onPress={() => {

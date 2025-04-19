@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
 import { Href, Stack, useRouter, useLocalSearchParams } from "expo-router";
-import { View } from "react-native";
 import Colors from "@/constants/Colors";
 import {
   CombatCodex,
@@ -14,6 +13,7 @@ import {
   ConditionsCodex,
   InvestmentsCodex,
   PvPCodex,
+  StatsCondex,
 } from "@/components/CodexPages";
 import {
   AirCodex,
@@ -34,7 +34,6 @@ import {
   SummoningCodex,
   VengeanceCodex,
   WaterCodex,
-  DebilitationCodex,
 } from "@/components/CodexSecondaries";
 import { toTitleCase } from "@/utility/functions/misc";
 import { useEffect, useState } from "react";
@@ -42,6 +41,7 @@ import { useRootStore } from "@/hooks/stores";
 import { useStyles } from "@/hooks/styles";
 import { observer } from "mobx-react-lite";
 import { HeaderBackButton } from "@react-navigation/elements";
+import { ScrollView } from "react-native-gesture-handler";
 
 const CategoryMap: { [key: string]: React.JSX.Element } = {
   Combat: <CombatCodex />,
@@ -54,6 +54,7 @@ const CategoryMap: { [key: string]: React.JSX.Element } = {
   Relationships: <RelationshipsCodex />,
   Time: <TimeCodex />,
   Investments: <InvestmentsCodex />,
+  Stats: <StatsCondex />,
 };
 
 const SecondaryMap: { [key: string]: React.JSX.Element } = {
@@ -75,7 +76,6 @@ const SecondaryMap: { [key: string]: React.JSX.Element } = {
   Assassination: <AssassinationCodex />,
   "Beast Mastery": <BeastMasteryCodex />,
   Arcane: <ArcaneCodex />,
-  Debilitation: <DebilitationCodex />,
 };
 
 const CodexInfo = observer(() => {
@@ -145,13 +145,19 @@ const CodexInfo = observer(() => {
         }}
       />
       {secondary ? (
-        <View style={codexPageTopStyling}>
+        <ScrollView
+          style={codexPageTopStyling}
+          contentContainerStyle={[styles.mx2, styles.pb8]}
+        >
           {SecondaryMap[toTitleCase(secondary)]}
-        </View>
+        </ScrollView>
       ) : (
-        <View style={codexPageTopStyling}>
+        <ScrollView
+          style={codexPageTopStyling}
+          contentContainerStyle={[styles.mx2, styles.pb8]}
+        >
           {CategoryMap[toTitleCase(category)]}
-        </View>
+        </ScrollView>
       )}
     </>
   );

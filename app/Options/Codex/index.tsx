@@ -13,13 +13,16 @@ const categories = [
   "Time",
   "Player",
   "Combat",
+  "Stats",
   "Magic",
   "Conditions",
   "Dungeon",
   "Investments",
   "Gear",
   "Labor",
-  "Relationships",
+  //"Relationships",
+  //"Shops",
+  //"PvP"
 ];
 
 const Codex = observer(() => {

@@ -308,11 +308,3 @@ export const ArcaneCodex = () => (
       .filter((spell) => spell.element === "arcane")}
   />
 );
-
-export const DebilitationCodex = () => {
-  return <View></View>;
-};
-
-export const SpecialEncounters = () => {
-  return <View></View>;
-};

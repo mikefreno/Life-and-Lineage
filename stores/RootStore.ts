@@ -26,6 +26,7 @@ import { JSONServiceStore } from "./JSONServiceStore";
 import { jsonServiceStore } from "./SingletonSource";
 import { PVPStore } from "./PVPStore";
 import * as StoreReview from "expo-store-review";
+import { NewFeatureNotifier } from "./NewFeatureNotifier";
 
 export class RootStore {
   playerState: PlayerCharacter | null;
@@ -44,6 +45,8 @@ export class RootStore {
   iapStore: IAPStore;
   JSONServiceStore: JSONServiceStore;
   pvpStore: PVPStore;
+
+  newFeatureNotifier: NewFeatureNotifier | undefined;
 
   constructed: boolean = false;
   atDeathScreen: boolean = false;
@@ -164,6 +167,10 @@ export class RootStore {
         }
       },
     );
+  }
+
+  setNewFeatureNotifier(arg0: NewFeatureNotifier) {
+    this.newFeatureNotifier = arg0;
   }
 
   setPathname(pathname: string) {

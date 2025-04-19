@@ -46,7 +46,7 @@ export const LOADING_TIPS: string[] = [
 
 export const BASE_WIDTH = 400;
 
-export const SCREEN_TRANSITION_TIMING = 250;
+export const SCREEN_TRANSITION_TIMING = 500;
 
 export const TABS_PADDING = 8;
 

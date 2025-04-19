@@ -28,7 +28,6 @@ import {
   NecromancerPaywall,
   RangerPaywall,
 } from "@/components/IAPPaywalls";
-import { PlayerCodex } from "@/components/CodexPages";
 
 const SetClassScreen = observer(() => {
   const vibration = useVibration();
@@ -149,7 +148,7 @@ const SetClassScreen = observer(() => {
         }}
         pageTwo={{
           title: "A quick note from the dev...",
-          body: "Thanks for trying out Lineage! The game is not yet fully complete, with PvP, and Codex(meta information of the game, for instance how the damage system works) currently being implemented.",
+          body: "Thanks for trying out Lineage! The game is not yet fully complete, such as PvP currently being implemented.",
         }}
         pageThree={{
           title: "A (quick) note from the dev...",
