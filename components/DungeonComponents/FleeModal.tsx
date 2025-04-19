@@ -81,7 +81,9 @@ const FleeModal = observer(() => {
           .then(() => uiStore.incrementLoadingStep());
       }
       uiStore.incrementLoadingStep();
-      rootStore.gameTick();
+      wait(150).then(() => {
+        rootStore.gameTick();
+      });
     } catch (error) {
       console.error("Error during successful flee:", error);
       uiStore.completeLoading();
