@@ -14,7 +14,7 @@ import { wait } from "@/utility/functions/misc";
 export type NewFeaturePage = {
   title: string;
   body: string;
-  link: { path: RelativePathString | ExternalPathString; string: string };
+  link?: { path: RelativePathString | ExternalPathString; string: string };
 };
 
 export class NewFeatureNotifier {
@@ -81,6 +81,10 @@ export class NewFeatureNotifier {
         title: "The Codex is Here!",
         body: "It contains all sorts of information about how the game works, so if are into that kinda thing, or need help, you can find it within the options screen.",
         link: { path: "/Options/Codex", string: "Check it out" },
+      });
+      messages.push({
+        title: "Time Indication",
+        body: "A time change indication was added, indicating the number of weeks the game clock has moved ahead every time it happens.",
       });
     }
 

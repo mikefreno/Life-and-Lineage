@@ -135,12 +135,6 @@ const FeatureUpdateModal = observer(() => {
       backFunction={handleClose}
       accessibilityLabel="New Features Announced"
     >
-      <Pressable
-        onPress={handleClose}
-        style={[styles.closeButton, { right: 4, zIndex: 9999 }]}
-      >
-        <Text style={styles["text-4xl"]}>x</Text>
-      </Pressable>
       {renderPageContent(
         currentPageContent,
         currentPageIndex,

@@ -65,7 +65,7 @@ export const GameTickIndicator = observer(() => {
         width={rootStore.uiStore.iconSizeXL}
         height={rootStore.uiStore.iconSizeXL}
       />
-      <Text style={[localStyles.text, styles["text-2xl"]]}>
+      <Text style={[localStyles.text, styles["text-2xl"], styles.pl2]}>
         {rootStore.ticker - lastTickerValue.current}
       </Text>
     </Animated.View>
