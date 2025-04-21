@@ -3,7 +3,7 @@
     "name": "throw shuriken",
     "element": "assassination",
     "proficiencyNeeded": "novice",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "manaCost": 10,
     "damageTable": {
@@ -26,7 +26,7 @@
     "name": "poison blade",
     "element": "assassination",
     "proficiencyNeeded": "novice",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "usesWeapon": "melee",
     "manaCost": 15,
@@ -52,7 +52,7 @@
     "name": "quick strike",
     "element": "assassination",
     "proficiencyNeeded": "novice",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "usesWeapon": "melee",
     "manaCost": 10,
@@ -74,7 +74,7 @@
   {
     "name": "below the belt",
     "element": "assassination",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 20,
@@ -96,7 +96,7 @@
   {
     "name": "dual slice",
     "element": "assassination",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "usesWeapon": "melee",
     "proficiencyNeeded": "apprentice",
@@ -119,7 +119,7 @@
   {
     "name": "shadow cover",
     "element": "assassination",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "proficiencyNeeded": "adept",
     "manaCost": 50,
@@ -135,7 +135,7 @@
   {
     "name": "backstab",
     "element": "assassination",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "usesWeapon": "melee",
     "proficiencyNeeded": "adept",
@@ -156,7 +156,7 @@
   {
     "name": "venomous strike",
     "element": "assassination",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "usesWeapon": "melee",
     "proficiencyNeeded": "adept",
@@ -180,7 +180,7 @@
   {
     "name": "dance of daggers",
     "element": "assassination",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "usesWeapon": "melee",
     "proficiencyNeeded": "expert",
@@ -197,7 +197,7 @@
   {
     "name": "garrote",
     "element": "assassination",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "usesWeapon": "melee",
     "proficiencyNeeded": "expert",
@@ -224,7 +224,7 @@
   {
     "name": "shadow step",
     "element": "assassination",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "proficiencyNeeded": "master",
     "manaCost": 250,
@@ -243,7 +243,7 @@
   {
     "name": "blade fan",
     "element": "assassination",
-    "target": "area",
+    "targets": "area",
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 400,
@@ -265,7 +265,7 @@
   {
     "name": "finalé",
     "element": "assassination",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "usesWeapon": "melee",
     "proficiencyNeeded": "legend",
@@ -286,7 +286,7 @@
   {
     "name": "call raven",
     "element": "beastMastery",
-    "target": "self",
+    "targets": "self",
     "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 10,
@@ -295,7 +295,7 @@
   {
     "name": "call wolf",
     "element": "beastMastery",
-    "target": "self",
+    "targets": "self",
     "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 15,
@@ -304,7 +304,7 @@
   {
     "name": "animal instinct",
     "element": "beastMastery",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "proficiencyNeeded": "novice",
     "manaCost": 20,
@@ -319,7 +319,7 @@
   {
     "name": "rat trap",
     "element": "beastMastery",
-    "target": "area",
+    "targets": "area",
     "type": "offense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 20,
@@ -330,7 +330,7 @@
   {
     "name": "beast bond",
     "element": "beastMastery",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 35,
@@ -341,7 +341,7 @@
   {
     "name": "call bear",
     "element": "beastMastery",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 50,
@@ -350,7 +350,7 @@
   {
     "name": "bear trap",
     "element": "beastMastery",
-    "target": "area",
+    "targets": "area",
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 100,
@@ -361,7 +361,7 @@
   {
     "name": "call dragon welp",
     "element": "beastMastery",
-    "target": "self",
+    "targets": "self",
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 125,
@@ -370,7 +370,7 @@
   {
     "name": "beastial fury",
     "element": "beastMastery",
-    "target": "self",
+    "targets": "self",
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 75,
@@ -381,7 +381,7 @@
   {
     "name": "dragon trap",
     "element": "beastMastery",
-    "target": "area",
+    "targets": "area",
     "type": "offense",
     "proficiencyNeeded": "expert",
     "manaCost": 200,
@@ -392,7 +392,7 @@
   {
     "name": "call griffon",
     "element": "beastMastery",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "proficiencyNeeded": "master",
     "manaCost": 200,
@@ -401,7 +401,7 @@
   {
     "name": "entangle",
     "element": "beastMastery",
-    "target": "area",
+    "targets": "area",
     "type": "offense",
     "proficiencyNeeded": "master",
     "manaCost": 300,
@@ -419,7 +419,7 @@
   {
     "name": "call dragon",
     "element": "beastMastery",
-    "target": "self",
+    "targets": "self",
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 600,
@@ -428,7 +428,7 @@
   {
     "name": "arcane shot",
     "element": "arcane",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "usesWeapon": "bow",
     "proficiencyNeeded": "novice",
@@ -448,7 +448,7 @@
   {
     "name": "enchanted quiver",
     "element": "arcane",
-    "target": "self",
+    "targets": "self",
     "type": "offense",
     "usesWeapon": "bow",
     "proficiencyNeeded": "apprentice",
@@ -465,7 +465,7 @@
   {
     "name": "arcane arrow",
     "element": "arcane",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "usesWeapon": "bow",
     "proficiencyNeeded": "apprentice",
@@ -485,7 +485,7 @@
   {
     "name": "seeking arrow",
     "element": "arcane",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "usesWeapon": "bow",
     "proficiencyNeeded": "adept",
@@ -505,7 +505,7 @@
   {
     "name": "arcane missiles",
     "element": "arcane",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "usesWeapon": "bow",
     "proficiencyNeeded": "master",
@@ -528,7 +528,7 @@
   {
     "name": "moon call",
     "element": "arcane",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "proficiencyNeeded": "master",
     "manaCost": 125,
@@ -545,7 +545,7 @@
   {
     "name": "torrent",
     "element": "arcane",
-    "target": "area",
+    "targets": "area",
     "type": "offense",
     "usesWeapon": "bow",
     "proficiencyNeeded": "legend",
@@ -565,7 +565,7 @@
   {
     "name": "moon fire",
     "element": "arcane",
-    "target": "area",
+    "targets": "area",
     "type": "offense",
     "proficiencyNeeded": "legend",
     "duration": 5,

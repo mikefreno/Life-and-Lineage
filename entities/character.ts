@@ -2064,7 +2064,6 @@ export class PlayerCharacter extends Character {
   ) {
     this.clearMinions();
     if (cost <= this.gold) {
-      this.gold -= cost;
       if (healthRestore) {
         const res = this.restoreHealth(healthRestore);
         if (res > 0) {

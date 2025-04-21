@@ -3,7 +3,7 @@
     "name": "fire bolt",
     "element": "fire",
     "proficiencyNeeded": "novice",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "manaCost": 10,
     "damageTable": {
@@ -26,7 +26,7 @@
   {
     "name": "catch flame",
     "element": "fire",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 20,
@@ -49,7 +49,7 @@
   {
     "name": "scorch",
     "element": "fire",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 50,
@@ -72,7 +72,7 @@
   {
     "name": "fireball",
     "element": "fire",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 75,
@@ -96,7 +96,7 @@
   {
     "name": "fire wall",
     "element": "fire",
-    "target": "area",
+    "targets": "area",
     "type": "defense",
     "proficiencyNeeded": "expert",
     "manaCost": 100,
@@ -120,7 +120,7 @@
   {
     "name": "rain fire",
     "element": "fire",
-    "target": "area",
+    "targets": "area",
     "type": "offense",
     "proficiencyNeeded": "master",
     "manaCost": 250,
@@ -143,7 +143,7 @@
   {
     "name": "dragons breath",
     "element": "fire",
-    "target": "area",
+    "targets": "area",
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 600,
@@ -166,7 +166,7 @@
   {
     "name": "sunbeam",
     "element": "fire",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 800,
@@ -189,7 +189,7 @@
   {
     "name": "frost",
     "element": "water",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 10,
@@ -212,7 +212,7 @@
   {
     "name": "water whip",
     "element": "water",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 20,
@@ -229,7 +229,7 @@
   {
     "name": "soothing waters",
     "element": "water",
-    "target": "single",
+    "targets": "single",
     "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 50,
@@ -245,7 +245,7 @@
   {
     "name": "cone of cold",
     "element": "water",
-    "target": "area",
+    "targets": "area",
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 100,
@@ -271,7 +271,7 @@
   {
     "name": "steam blast",
     "element": "water",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 125,
@@ -296,7 +296,7 @@
   {
     "name": "ice spike",
     "element": "water",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "proficiencyNeeded": "expert",
     "manaCost": 200,
@@ -328,7 +328,7 @@
     "name": "healing rain",
     "element": "water",
     "proficiencyNeeded": "master",
-    "target": "area",
+    "targets": "area",
     "type": "defense",
     "manaCost": 200,
     "buffNames": [
@@ -344,7 +344,7 @@
   {
     "name": "orb of cold",
     "element": "water",
-    "target": "area",
+    "targets": "area",
     "type": "offense",
     "proficiencyNeeded": "master",
     "manaCost": 300,
@@ -369,7 +369,7 @@
   {
     "name": "torrent",
     "element": "water",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 600,
@@ -385,7 +385,7 @@
   {
     "name": "spike field",
     "element": "water",
-    "target": "area",
+    "targets": "area",
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 700,
@@ -422,7 +422,7 @@
   {
     "name": "air burst",
     "element": "air",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 15,
@@ -439,7 +439,7 @@
   {
     "name": "sparks",
     "element": "air",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 25,
@@ -462,7 +462,7 @@
   {
     "name": "lightning",
     "element": "air",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 75,
@@ -488,7 +488,7 @@
   {
     "name": "thunder clap",
     "element": "air",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "proficiencyNeeded": "expert",
     "manaCost": 75,
@@ -515,7 +515,7 @@
   {
     "name": "chain lightning",
     "element": "air",
-    "target": "area",
+    "targets": "area",
     "type": "offense",
     "proficiencyNeeded": "expert",
     "manaCost": 105,
@@ -542,7 +542,7 @@
   {
     "name": "wind blades",
     "element": "air",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "proficiencyNeeded": "master",
     "manaCost": 100,
@@ -569,7 +569,7 @@
   {
     "name": "surrounding gale",
     "element": "air",
-    "target": "single",
+    "targets": "single",
     "type": "defense",
     "proficiencyNeeded": "master",
     "manaCost": 125,
@@ -587,7 +587,7 @@
   {
     "name": "tornado",
     "element": "air",
-    "target": "area",
+    "targets": "area",
     "type": "offense",
     "proficiencyNeeded": "legend",
     "maxTurnsActive": 3,
@@ -605,7 +605,7 @@
   {
     "name": "suffocate",
     "element": "air",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "proficiencyNeeded": "legend",
     "maxTurnsActive": 5,
@@ -629,7 +629,7 @@
   {
     "name": "rock toss",
     "element": "earth",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 10,
@@ -652,7 +652,7 @@
   {
     "name": "stone hands",
     "element": "earth",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 20,
@@ -668,7 +668,7 @@
   {
     "name": "stone salvo",
     "element": "earth",
-    "target": "area",
+    "targets": "area",
     "type": "offense",
     "proficiencyNeeded": "adept",
     "maxTurnsActive": 3,
@@ -692,7 +692,7 @@
   {
     "name": "rock armor",
     "element": "earth",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "proficiencyNeeded": "adept",
     "manaCost": 60,
@@ -707,7 +707,7 @@
   {
     "name": "stalactite storm",
     "element": "earth",
-    "target": "area",
+    "targets": "area",
     "type": "offense",
     "proficiencyNeeded": "expert",
     "manaCost": 120,
@@ -725,7 +725,7 @@
   {
     "name": "rock wall",
     "element": "earth",
-    "target": "area",
+    "targets": "area",
     "type": "defense",
     "proficiencyNeeded": "master",
     "maxTurnsActive": 5,
@@ -742,7 +742,7 @@
   {
     "name": "earthquake",
     "element": "earth",
-    "target": "area",
+    "targets": "area",
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 650,
@@ -769,7 +769,7 @@
   {
     "name": "collider",
     "element": "earth",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 1200,

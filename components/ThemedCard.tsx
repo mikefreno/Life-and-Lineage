@@ -1,9 +1,10 @@
 import { type ReactNode } from "react";
-import { ViewStyle, View } from "react-native";
+import { ViewStyle, View, Platform } from "react-native";
 import { useStyles } from "@/hooks/styles";
 import { ThemedView } from "@/components/Themed";
 import { useScaling } from "@/hooks/scaling";
 import { Image } from "expo-image";
+import { useRootStore } from "@/hooks/stores";
 
 interface ThemedCard {
   children?: ReactNode;
@@ -22,14 +23,21 @@ export default function ThemedCard({
 }: ThemedCard) {
   const styles = useStyles();
   const { getNormalizedSize } = useScaling();
+  const { uiStore } = useRootStore();
 
   return (
-    <View style={{ margin: getNormalizedSize(6), borderRadius: 12, ...style }}>
+    <View
+      style={{
+        margin: getNormalizedSize(6),
+        borderRadius: 12,
+        ...style,
+        shadowColor: uiStore.colorScheme === "dark" ? "#fff" : "#000",
+        shadowOffset: { width: 0, height: 2 } as const,
+        shadowOpacity: Platform.OS === "android" ? 0.9 : 0.2,
+      }}
+    >
       <ThemedView
-        style={[
-          styles.themedCard,
-          { ...cardStyle, overflow: "hidden", borderRadius: 12 },
-        ]}
+        style={[styles.themedCard, { ...cardStyle, borderRadius: 12 }]}
       >
         {iconSource ? (
           <View style={styles.imageContainer}>

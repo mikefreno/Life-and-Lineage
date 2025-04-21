@@ -2,7 +2,7 @@
   "expo": {
     "name": "Lineage",
     "slug": "life-and-lineage",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "orientation": "default",
     "icon": "assets/images/icon.png",
     "scheme": "lineageapp",
@@ -17,7 +17,7 @@
       "usesAppleSignIn": true,
       "supportsTablet": true,
       "bundleIdentifier": "com.mikefrenodev.lineage",
-      "buildNumber": "8",
+      "buildNumber": "0",
       "entitlements": {
         "com.apple.developer.networking.wifi-info": true,
         "aps-environment": "development"
@@ -33,7 +33,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.mikefrenodev.lineage",
-      "versionCode": 0,
+      "versionCode": 1,
       "googleServicesFile": "./google-services.json",
       "playStoreUrl": ""
     },
@@ -111,3 +111,4 @@
     }
   }
 }
+

@@ -32,10 +32,9 @@ export class NewFeatureNotifier {
     this.getNotified = getNotified;
     this.currentAppVersion = Constants.expoConfig?.version!;
 
-    this.lastSeenAppVersion = __DEV__
-      ? "1.0.4"
-      : lastSeenAppVersion ??
-        (this.root.playerState ? "1.0.4" : this.currentAppVersion);
+    this.lastSeenAppVersion =
+      lastSeenAppVersion ??
+      (this.root.playerState ? "1.1.0" : this.currentAppVersion);
 
     if (
       !this.isModalVisible &&

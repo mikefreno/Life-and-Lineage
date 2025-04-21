@@ -29,7 +29,7 @@ interface AttackOption {
   name: string;
   manaCost?: number;
   baseHitChance?: number;
-  targets?: "single" | "dual" | "area"; // area hits all, dual hits two, single one
+  targets?: "single" | "dual" | "area" | "self"; // area hits all, dual hits two, single one
   damageTable: { [key: string]: number | undefined };
   selfDamageTable?: { [key: string]: number | undefined };
   sanityDamage?: number;
@@ -82,7 +82,7 @@ export class Attack {
 
   readonly manaCost: number;
 
-  readonly targets: "single" | "dual" | "area";
+  readonly targets: "single" | "dual" | "area" | "self";
 
   readonly baseHitChance: number;
 

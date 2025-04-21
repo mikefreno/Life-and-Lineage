@@ -2,7 +2,7 @@
   {
     "name": "flash heal",
     "element": "holy",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "proficiencyNeeded": "novice",
     "manaCost": 25,
@@ -18,7 +18,7 @@
   {
     "name": "minor blessing",
     "element": "holy",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "proficiencyNeeded": "novice",
     "manaCost": 15,
@@ -34,7 +34,7 @@
   {
     "name": "holy light",
     "element": "holy",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 20,
@@ -55,7 +55,7 @@
   {
     "name": "rejuvenating light",
     "element": "holy",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 20,
@@ -70,7 +70,7 @@
   {
     "name": "turn undead",
     "element": "holy",
-    "target": "area",
+    "targets": "area",
     "type": "offense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 50,
@@ -92,7 +92,7 @@
   {
     "name": "cleansing light",
     "element": "holy",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 40,
@@ -110,7 +110,7 @@
   {
     "name": "delayed heal",
     "element": "holy",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "proficiencyNeeded": "adept",
     "manaCost": 75,
@@ -126,7 +126,7 @@
   {
     "name": "moderate heal",
     "element": "holy",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "proficiencyNeeded": "adept",
     "manaCost": 75,
@@ -142,7 +142,7 @@
   {
     "name": "holy nova",
     "element": "holy",
-    "target": "area",
+    "targets": "area",
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 85,
@@ -167,7 +167,7 @@
   {
     "name": "revoke undead",
     "element": "holy",
-    "target": "area",
+    "targets": "area",
     "type": "offense",
     "proficiencyNeeded": "expert",
     "manaCost": 100,
@@ -189,7 +189,7 @@
   {
     "name": "great rejuvenating light",
     "element": "holy",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "proficiencyNeeded": "expert",
     "manaCost": 200,
@@ -204,7 +204,7 @@
   {
     "name": "overwhelming glow",
     "element": "holy",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "proficiencyNeeded": "master",
     "manaCost": 200,
@@ -223,7 +223,7 @@
   {
     "name": "unending cure",
     "element": "holy",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "proficiencyNeeded": "legend",
     "manaCost": 250,
@@ -243,7 +243,7 @@
   {
     "name": "judgment",
     "element": "vengeance",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "usesWeapon": "melee",
     "proficiencyNeeded": "novice",
@@ -261,7 +261,7 @@
   {
     "name": "righteous fury",
     "element": "vengeance",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 15,
@@ -277,7 +277,7 @@
   {
     "name": "holy bolt",
     "element": "vengeance",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 20,
@@ -295,7 +295,7 @@
   {
     "name": "holy strike",
     "element": "vengeance",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "usesWeapon": "melee",
     "proficiencyNeeded": "apprentice",
@@ -318,7 +318,7 @@
   {
     "name": "righteous blow",
     "element": "vengeance",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "usesWeapon": "melee",
     "proficiencyNeeded": "apprentice",
@@ -341,7 +341,7 @@
   {
     "name": "consecrated blade",
     "element": "vengeance",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "usesWeapon": "melee",
     "proficiencyNeeded": "adept",
@@ -361,7 +361,7 @@
   {
     "name": "holy wrath",
     "element": "vengeance",
-    "target": "area",
+    "targets": "area",
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 65,
@@ -383,7 +383,7 @@
   {
     "name": "smite",
     "element": "vengeance",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "usesWeapon": "melee",
     "proficiencyNeeded": "expert",
@@ -406,7 +406,7 @@
   {
     "name": "holy nova",
     "element": "vengeance",
-    "target": "area",
+    "targets": "area",
     "type": "offense",
     "proficiencyNeeded": "master",
     "manaCost": 150,
@@ -425,7 +425,7 @@
   {
     "name": "righteous condemnation",
     "element": "vengeance",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "usesWeapon": "melee",
     "proficiencyNeeded": "master",
@@ -452,7 +452,7 @@
   {
     "name": "divine judgment",
     "element": "vengeance",
-    "target": "single",
+    "targets": "single",
     "type": "offense",
     "usesWeapon": "melee",
     "proficiencyNeeded": "legend",
@@ -475,7 +475,7 @@
   {
     "name": "holy cataclysm",
     "element": "vengeance",
-    "target": "area",
+    "targets": "area",
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 300,
@@ -500,7 +500,7 @@
   {
     "name": "blessed guard",
     "element": "protection",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "usesWeapon": "shield",
     "proficiencyNeeded": "novice",
@@ -517,7 +517,7 @@
   {
     "name": "protection aura",
     "element": "protection",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "proficiencyNeeded": "novice",
     "manaCost": 25,
@@ -532,7 +532,7 @@
   {
     "name": "divine fortitude",
     "element": "protection",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "proficiencyNeeded": "novice",
     "manaCost": 20,
@@ -548,7 +548,7 @@
   {
     "name": "reflective bulwark",
     "element": "protection",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "usesWeapon": "shield",
     "proficiencyNeeded": "apprentice",
@@ -565,7 +565,7 @@
   {
     "name": "readied guard",
     "element": "protection",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "usesWeapon": "shield",
     "proficiencyNeeded": "apprentice",
@@ -582,7 +582,7 @@
   {
     "name": "holy ward",
     "element": "protection",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 45,
@@ -598,7 +598,7 @@
   {
     "name": "blessed shield",
     "element": "protection",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "usesWeapon": "shield",
     "proficiencyNeeded": "adept",
@@ -615,7 +615,7 @@
   {
     "name": "divine resilience",
     "element": "protection",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "proficiencyNeeded": "adept",
     "manaCost": 70,
@@ -632,7 +632,7 @@
   {
     "name": "divine intervention",
     "element": "protection",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "usesWeapon": "shield",
     "proficiencyNeeded": "expert",
@@ -650,7 +650,7 @@
   {
     "name": "holy sanctuary",
     "element": "protection",
-    "target": "area",
+    "targets": "area",
     "type": "defense",
     "proficiencyNeeded": "expert",
     "manaCost": 125,
@@ -670,7 +670,7 @@
   {
     "name": "holy barrier",
     "element": "protection",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "usesWeapon": "shield",
     "proficiencyNeeded": "master",
@@ -688,7 +688,7 @@
   {
     "name": "aegis of light",
     "element": "protection",
-    "target": "self",
+    "targets": "self",
     "type": "defense",
     "usesWeapon": "shield",
     "proficiencyNeeded": "legend",

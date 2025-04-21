@@ -144,11 +144,13 @@ const BattleTab = observer(
     const attackHandler = (attack: Attack) => {
       if (enemyStore.enemies.length > 0) {
         vibration({ style: "light" });
+        //TODO: do negative check for if the attack is self-targeting
 
         const possibleTargets = enemyStore.allBeings;
 
         const attackHitsAllTargets =
           attack.targets === "area" ||
+          attack.targets === "self" ||
           (attack.targets === "dual" && possibleTargets.length <= 2) ||
           (attack.targets === "single" && possibleTargets.length === 1);
 
