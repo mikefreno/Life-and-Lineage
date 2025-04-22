@@ -63,7 +63,8 @@
     "react-native-web": "~0.19.6",
     "react-native-webview": "13.12.5",
     "expo-store-review": "~8.0.1",
-    "expo-system-ui": "~4.0.9"
+    "expo-system-ui": "~4.0.9",
+    "jest-expo": "~52.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

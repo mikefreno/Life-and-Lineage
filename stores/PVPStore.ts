@@ -3,7 +3,8 @@ import { RootStore } from "./RootStore";
 import { API_BASE_URL } from "@/config/config";
 import { storage } from "@/utility/functions/storage";
 import { action, computed, makeObservable, observable, reaction } from "mobx";
-import * as Crypto from "expo-crypto";
+import { getUniqueIdSync } from "react-native-device-info";
+import { stringify } from "flatted";
 
 export class PVPStore {
   root: RootStore;
@@ -18,13 +19,11 @@ export class PVPStore {
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
-    const { linkID, expoPushToken, notificationsEnabled, pvpName } =
-      this.hydrate();
+    const { linkID, expoPushToken, notificationsEnabled } = this.hydrate();
 
-    this.linkID = linkID ?? Crypto.randomUUID(); // need a better solution
+    this.linkID = linkID ?? getUniqueIdSync();
     this.expoPushToken = expoPushToken;
     this.notificationsEnabled = notificationsEnabled;
-    this.pvpName = pvpName ?? this.root.playerState?.fullName;
 
     makeObservable(this, {
       availableOpponents: observable,
@@ -80,10 +79,11 @@ export class PVPStore {
         body: JSON.stringify({
           character: {
             ...asAI,
-            resistanceTable: JSON.stringify(asAI.resistanceTable),
-            damageTable: JSON.stringify(asAI.damageTable),
-            attackStrings: JSON.stringify(asAI.attackStrings),
-            knownSpells: JSON.stringify(asAI.knownSpells),
+            resistanceTable: stringify(asAI.resistanceTable),
+            damageTable: stringify(asAI.damageTable),
+            attackStrings: stringify(asAI.attackStrings),
+            knownSpells: stringify(asAI.knownSpells),
+            threatTable: undefined,
             root: undefined,
             currentHealth: undefined,
             currentMana: undefined,
@@ -93,10 +93,12 @@ export class PVPStore {
             minions: undefined,
             rangerPet: undefined,
           },
-          linkID: this.linkID,
-          pushToken: this.expoPushToken,
+          linkID: this.linkID ?? null,
+          pushToken: this.expoPushToken ?? null,
+          pushCurrentlyEnabled: this.notificationsEnabled,
         }),
       });
+      console.log(await res.json());
       this.persist(); // make sure we have id stored, so we can link
     }
   }
@@ -135,9 +137,6 @@ export class PVPStore {
     if (this.linkID) {
       storage.set("linkID", this.linkID);
     }
-    if (this.pvpName) {
-      storage.set("pvpName", this.pvpName);
-    }
   }
 
   hydrate() {
@@ -146,8 +145,7 @@ export class PVPStore {
 
     const expoPushToken = storage.getString("expoPushToken");
     const linkID = storage.getString("linkID");
-    const pvpName = storage.getString("pvpName");
 
-    return { notificationsEnabled, expoPushToken, linkID, pvpName };
+    return { notificationsEnabled, expoPushToken, linkID };
   }
 }

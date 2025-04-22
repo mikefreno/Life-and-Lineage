@@ -8,7 +8,7 @@ import {
   stringToModifier,
 } from "@/utility/types";
 import { Attack } from "@/entities/attack";
-import { action, computed, makeObservable, observable, reaction } from "mobx";
+import { action, computed, makeObservable, observable } from "mobx";
 import { Condition } from "@/entities/conditions";
 import { toTitleCase, wait } from "@/utility/functions/misc";
 import type { RootStore } from "@/stores/RootStore";
@@ -112,7 +112,7 @@ export class Item {
       itemClass !== ItemClassType.Arrow &&
       name.toLowerCase() !== "unarmored"
     ) {
-      if (prefix || suffix || rarity !== null || rarity !== undefined) {
+      if (prefix || suffix || (rarity !== null && rarity !== undefined)) {
         this.rarity = rarity ?? Rarity.NORMAL;
         this.prefix = prefix ?? null;
         this.suffix = suffix ?? null;

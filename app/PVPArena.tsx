@@ -12,7 +12,7 @@ import { toTitleCase, wait } from "@/utility/functions/misc";
 import { PvPRewardIcons } from "@/utility/pvp";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { observer } from "mobx-react-lite";
-import React, { useRef } from "react";
+import React from "react";
 import { useEffect, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { API_BASE_URL } from "@/config/config";
@@ -21,14 +21,6 @@ import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import { isEmulatorSync } from "react-native-device-info";
 import { fetch } from "expo/fetch";
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: true,
-  }),
-});
 
 async function registerForPushNotificationsAsync() {
   if (Platform.OS === "android") {
@@ -74,43 +66,13 @@ const PVPArena = observer(() => {
   const vibration = useVibration();
   const [expoPushToken, setExpoPushToken] = useState("");
   const [sentToken, setSentToken] = useState(false);
-  const [_, setNotification] = useState<Notifications.Notification | undefined>(
-    undefined,
-  );
-  const notificationListener = useRef<Notifications.EventSubscription>();
-  const responseListener = useRef<Notifications.EventSubscription>();
 
-  // TODO: Move logic. The init request needs to be here, but the listeners need to be at root.
   useEffect(() => {
-    const notificationFlow = () => {
-      wait(500).then(() => {
-        registerForPushNotificationsAsync()
-          .then((token) => setExpoPushToken(token ?? ""))
-          .catch((error: any) => setExpoPushToken(`${error}`));
-
-        notificationListener.current =
-          Notifications.addNotificationReceivedListener((notification) => {
-            setNotification(notification);
-          });
-
-        responseListener.current =
-          Notifications.addNotificationResponseReceivedListener(
-            (response) => {},
-          );
-
-        return () => {
-          notificationListener.current &&
-            Notifications.removeNotificationSubscription(
-              notificationListener.current,
-            );
-          responseListener.current &&
-            Notifications.removeNotificationSubscription(
-              responseListener.current,
-            );
-        };
-      });
-    };
-    notificationFlow();
+    wait(500).then(() => {
+      registerForPushNotificationsAsync()
+        .then((token) => setExpoPushToken(token ?? ""))
+        .catch((error: any) => setExpoPushToken(`${error}`));
+    });
   }, []);
 
   useEffect(() => {
@@ -137,7 +99,11 @@ const PVPArena = observer(() => {
         isVisibleCondition={showPvPInfoModal}
         backFunction={() => setShowPvPInfoModal(false)}
       >
-        <View></View>
+        <View>
+          <Text>
+            Here you can engage with fights against the ghosts of other players
+          </Text>
+        </View>
       </GenericModal>
       <View
         style={{

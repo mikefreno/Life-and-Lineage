@@ -1,6 +1,6 @@
 import { useFonts } from "expo-font";
 import { Stack, usePathname, useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { Platform, Pressable, View, StyleSheet, UIManager } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
@@ -88,6 +88,15 @@ SplashScreen.setOptions({
   fade: Platform.OS === "ios",
 });
 
+import * as Notifications from "expo-notifications";
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: true,
+  }),
+});
+
 Sentry.init({
   dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
   //@ts-ignore
@@ -173,6 +182,12 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   const pathname = usePathname();
   const { getNormalizedSize } = useScaling();
 
+  const [_, setNotification] = useState<Notifications.Notification | undefined>(
+    undefined,
+  );
+  const notificationListener = useRef<Notifications.EventSubscription>();
+  const responseListener = useRef<Notifications.EventSubscription>();
+
   const handleRouting = (
     playerState: PlayerCharacter | null,
     rootStore: RootStore,
@@ -208,6 +223,25 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
 
     uiStore.markStoreAsLoaded("routing");
   };
+
+  useEffect(() => {
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
+        setNotification(notification);
+      });
+
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {});
+
+    return () => {
+      notificationListener.current &&
+        Notifications.removeNotificationSubscription(
+          notificationListener.current,
+        );
+      responseListener.current &&
+        Notifications.removeNotificationSubscription(responseListener.current);
+    };
+  }, []);
 
   useEffect(() => {
     const initializePurchases = async () => {};

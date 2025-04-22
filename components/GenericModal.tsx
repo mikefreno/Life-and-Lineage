@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   type AccessibilityRole,
   DimensionValue,
@@ -13,6 +13,7 @@ import { useRootStore } from "@/hooks/stores";
 import { useStyles } from "@/hooks/styles";
 import { observer } from "mobx-react-lite";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { wait } from "@/utility/functions/misc";
 
 interface GenericModalProps {
   isVisibleCondition: boolean;
@@ -68,6 +69,7 @@ const GenericModal = observer(
     let { modalShowing, colorScheme } = uiStore;
     const styles = useStyles();
     const insets = useSafeAreaInsets();
+    const [showContent, setShowContent] = useState<boolean>(isVisibleCondition);
 
     useEffect(() => {
       if (
@@ -77,6 +79,14 @@ const GenericModal = observer(
         modalShowing = true;
       }
     }, [isVisibleCondition, root.atDeathScreen, root.startingNewGame]);
+
+    useEffect(() => {
+      if (isVisibleCondition) {
+        setShowContent(true);
+      } else {
+        wait(300).then(() => setShowContent(false));
+      }
+    }, [isVisibleCondition]);
 
     return (
       <Modal
@@ -106,31 +116,35 @@ const GenericModal = observer(
         style={[style]}
         {...props}
       >
-        <ThemedView
-          style={[
-            {
-              maxHeight: uiStore.dimensions.height - insets.top - insets.bottom,
-              ...styles.modalContent,
-              width: size ? `${size}%` : "83.3333%",
-            },
-            props.innerStyle,
-          ]}
-        >
-          <ScrollView
-            style={{
-              maxHeight: uiStore.dimensions.height - insets.top - insets.bottom,
-            }}
-            contentContainerStyle={{
-              flexGrow: 1,
-              paddingVertical: noPad ? 0 : 16,
-              paddingHorizontal: noPad ? 0 : "2%",
-            }}
-            showsVerticalScrollIndicator={false}
-            scrollEnabled={scrollEnabled}
+        {showContent && (
+          <ThemedView
+            style={[
+              {
+                maxHeight:
+                  uiStore.dimensions.height - insets.top - insets.bottom,
+                ...styles.modalContent,
+                width: size ? `${size}%` : "83.3333%",
+              },
+              props.innerStyle,
+            ]}
           >
-            {children}
-          </ScrollView>
-        </ThemedView>
+            <ScrollView
+              style={{
+                maxHeight:
+                  uiStore.dimensions.height - insets.top - insets.bottom,
+              }}
+              contentContainerStyle={{
+                flexGrow: 1,
+                paddingVertical: noPad ? 0 : 16,
+                paddingHorizontal: noPad ? 0 : "2%",
+              }}
+              showsVerticalScrollIndicator={false}
+              scrollEnabled={scrollEnabled}
+            >
+              {children}
+            </ScrollView>
+          </ThemedView>
+        )}
       </Modal>
     );
   },

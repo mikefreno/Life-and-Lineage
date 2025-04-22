@@ -600,6 +600,7 @@ export class PlayerCharacter extends Character {
   keyItems: Item[];
 
   investments: Investment[];
+  pvpName: string;
 
   constructor({
     playerClass,
@@ -617,6 +618,7 @@ export class PlayerCharacter extends Character {
     keyItems,
     jobs,
     availableRespecs,
+    pvpName,
     ...props
   }: PlayerCharacterOptions) {
     super({
@@ -652,6 +654,8 @@ export class PlayerCharacter extends Character {
 
     this.investments = investments ?? [];
     this.availableRespecs = availableRespecs ?? 0;
+
+    this.pvpName = pvpName ?? this.fullName;
 
     __DEV__ && this.setupDevActions();
 

@@ -108,7 +108,7 @@ export class AIPlayerCharacter {
 
   static create(player: PlayerCharacter) {
     const resistanceTable: Record<DamageType, number> = {
-      [DamageType.PHYSICAL]: player.getPhysicalDamageReduction(),
+      [DamageType.PHYSICAL]: player.physicalDamageReduction,
       [DamageType.FIRE]: player.fireResistance,
       [DamageType.COLD]: player.coldResistance,
       [DamageType.LIGHTNING]: player.lightningResistance,
@@ -132,7 +132,7 @@ export class AIPlayerCharacter {
     return new AIPlayerCharacter({
       root: player.root,
       playerClass: player.playerClass,
-      name: player.pvpName ?? player.fullName,
+      name: player.pvpName,
       maxHealth: player.nonConditionalMaxHealth,
       maxSanity: player.nonConditionalMaxSanity ?? player.baseSanity ?? 50,
       maxMana: player.nonConditionalMaxMana,

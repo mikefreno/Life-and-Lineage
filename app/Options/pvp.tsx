@@ -84,7 +84,7 @@ const PVPOptions = observer(() => {
               onPress={() =>
                 runInAction(() => {
                   if (playerState) {
-                    pvpStore.pvpName = pvpNameInput;
+                    playerState.pvpName = pvpNameInput;
                   }
                 })
               }
