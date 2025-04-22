@@ -3,11 +3,11 @@
     "name": "Goblin Totem",
     "baseValue": 5000,
     "icon": "Goblin_Staff",
+    "slot": "one-hand",
     "attacks": [
       "bonk",
       "spark"
     ],
-    "slot": "one-hand",
     "stats": {
       "physicalDamage": 8.0
     }

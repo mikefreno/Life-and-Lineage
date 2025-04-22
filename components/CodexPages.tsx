@@ -221,10 +221,10 @@ export function GearCodex() {
 export function LaborCodex() {
   const styles = useStyles();
   const images = [
-    require("../assets/images/codex/Labors.jpeg"),
-    require("../assets/images/codex/LaborsRejection.jpeg"),
-    require("../assets/images/codex/QualificationsButton.jpeg"),
-    require("../assets/images/codex/Qualifications.jpeg"),
+    require("@/assets/images/codex/Labors.jpeg"),
+    require("@/assets/images/codex/LaborsRejection.jpeg"),
+    require("@/assets/images/codex/QualificationsButton.jpeg"),
+    require("@/assets/images/codex/Qualifications.jpeg"),
   ];
   return (
     <View>
@@ -698,21 +698,9 @@ export function PlayerCodex() {
 }
 
 export function RelationshipsCodex() {
-  const images = [
-    require("@/assets/images/codex/RelationshipsButton.jpeg"),
-    require("@/assets/images/codex/Relationships.png"),
-    require("@/assets/images/codex/RelationshipActions.png"),
-  ];
-  const images2 = [
-    require("@/assets/images/codex/ActivitiesButton.jpeg"),
-    require("@/assets/images/codex/Activities.jpeg"),
-  ];
-
   return (
     <View>
-      <GenericCarousel images={images} />
       <Text>You can meet new people through various activities</Text>
-      <GenericCarousel images={images2} />
     </View>
   );
 }

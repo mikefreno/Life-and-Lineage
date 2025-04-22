@@ -1854,15 +1854,27 @@ export class PlayerCharacter extends Character {
 
   //----------------------------------Physical Combat----------------------------------//
   get weaponAttacks() {
-    const attacks = [
-      ...(this.equipment?.mainHand.attachedAttacks ?? []),
-      ...(this.equipment?.offHand?.attachedAttacks ?? []),
+    const mainAttacks = this.equipment?.mainHand?.attachedAttacks ?? [];
+    const offAttacks = this.equipment?.offHand?.attachedAttacks ?? [];
+    const mainSpells = this.equipment?.mainHand?.providedSpells ?? [];
+    const offSpells = this.equipment?.offHand?.providedSpells ?? [];
+
+    const allIdentifiers = [
+      ...mainAttacks,
+      ...offAttacks,
+      ...mainSpells,
+      ...offSpells,
     ];
-    const spells = [
-      ...(this.equipment?.mainHand.providedSpells ?? []),
-      ...(this.equipment?.offHand?.providedSpells ?? []),
-    ];
-    return [...attacks, ...spells];
+    const seenNames: string[] = [];
+    const unique: Attack[] = [];
+    for (const att of allIdentifiers) {
+      if (!seenNames.includes(att.name)) {
+        seenNames.push(att.name);
+        unique.push(att);
+      }
+    }
+
+    return unique;
   }
 
   public useArrow() {

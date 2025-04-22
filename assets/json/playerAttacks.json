@@ -41,6 +41,20 @@
     }
   },
   {
+    "name": "spark",
+    "targets": "single",
+    "baseHitChance": 0.85,
+    "damageTable": {
+      "lightning": 2
+    },
+    "debuffNames": [
+      {
+        "name": "shocked",
+        "chance": 0.15
+      }
+    ]
+  },
+  {
     "name": "torch stab",
     "targets": "single",
     "baseHitChance": 0.95,
@@ -114,7 +128,30 @@
     "name": "cast",
     "targets": "single",
     "baseHitChance": 1.0,
-    "damageMult": 1.0
+    "damageTable": {},
+    "animation": {
+      "sprite": "puft",
+      "style": "static",
+      "position": "enemy",
+      "scale": 0.3
+    }
+  },
+  {
+    "name": "bonk",
+    "targets": "single",
+    "baseHitChance": 0.95,
+    "damageTable": {},
+    "debuffNames": [
+      {
+        "name": "stun",
+        "chance": 0.05
+      }
+    ],
+    "animation": {
+      "sprite": "crowning",
+      "style": "static",
+      "position": "enemy"
+    }
   },
   {
     "name": "shoot",

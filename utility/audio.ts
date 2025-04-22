@@ -12,18 +12,13 @@ export const TrackMap = {
   ASunlessPassageIII: require("@/assets/SoundTrack/ASunlessPassageIII.m4a"),
   Battlefield: require("@/assets/SoundTrack/Battlefield(loop)(130).m4a"),
   Campfire: require("@/assets/SoundTrack/Campfire.m4a"),
-  ChasmRuins: require("@/assets/SoundTrack/ChasmRuins.m4a"),
   Cursed: require("@/assets/SoundTrack/Cursed.m4a"),
   DreamsOfBeltane: require("@/assets/SoundTrack/DreamsOfBeltane.m4a"),
   ExploringTheDungeonI: require("@/assets/SoundTrack/ExploringTheDungeonI.m4a"),
-  ExploringTheDungeonII: require("@/assets/SoundTrack/ExploringTheDungeonII.m4a"),
   FinalBattle: require("@/assets/SoundTrack/FinalBattle.m4a"),
   IronWorks: require("@/assets/SoundTrack/Ironworks.m4a"),
   Nocturne: require("@/assets/SoundTrack/Nocturne.m4a"),
-  PianoInterludeI: require("@/assets/SoundTrack/PianoInterludeI.m4a"),
   PianoInterludeII: require("@/assets/SoundTrack/PianoInterludeII.m4a"),
-  PianoInterludeIII: require("@/assets/SoundTrack/PianoInterludeIII.m4a"),
-  TalesInTheDark: require("@/assets/SoundTrack/TalesInTheDark.m4a"),
   TheAncientForest: require("@/assets/SoundTrack/TheAncientForest.m4a"),
   TheDepthsOfEarth: require("@/assets/SoundTrack/TheDepthsOfEarth.m4a"),
   TheOldAlley: require("@/assets/SoundTrack/TheOldAlley.m4a"),
@@ -58,9 +53,7 @@ export const GeneralSoundTrack = [
   "Campfire",
   "DreamsOfBeltane",
   "Nocturne",
-  "PianoInterludeI",
   "PianoInterludeII",
-  "PianoInterludeIII",
   "TheOldAlley",
 ] as const;
 
@@ -69,7 +62,7 @@ export const DungeonSoundTrack: Record<string, DungeonTrackDef | undefined> = {
     general: ["DreamsOfBeltane"],
   },
   "nearby cave": {
-    general: ["ExploringTheDungeonI", "ExploringTheDungeonII", "Cursed"],
+    general: ["ExploringTheDungeonI", "Cursed"],
     finalBossTrack: "FinalBattle",
   },
   "goblin cave": {
@@ -80,7 +73,7 @@ export const DungeonSoundTrack: Record<string, DungeonTrackDef | undefined> = {
     finalBossTrack: "WieldingSword",
   },
   "frost spire fortress": {
-    general: ["AcrossTheMarsh", "ChasmRuins"],
+    general: ["AcrossTheMarsh"],
     finalBossTrack: "Battlefield",
   },
   infestation: {
@@ -88,7 +81,7 @@ export const DungeonSoundTrack: Record<string, DungeonTrackDef | undefined> = {
     finalBossTrack: "Cursed",
   },
   "dark forest": { general: ["TheDepthsOfEarth", "TheAncientForest"] },
-  "ancient arena": { general: ["TalesInTheDark", "TheDepthsOfEarth"] },
+  "ancient arena": { general: ["TheDepthsOfEarth"] },
   ///----TODO-----//
   "crystal labyrinthine - first excavation": undefined,
   "crystal labyrinthine - second excavation": undefined,

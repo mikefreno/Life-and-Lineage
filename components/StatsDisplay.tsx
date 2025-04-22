@@ -815,7 +815,7 @@ export const StatsDisplay = observer(
             {playerState &&
               firstItem.attachedAttacks.map((attack) => (
                 <View key={`${firstItem.id}-${attack.name}`}>
-                  {attack.AttackRender(styles)}
+                  {attack.AttackRender(styles, firstItem)}
                 </View>
               ))}
           </View>

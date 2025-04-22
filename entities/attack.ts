@@ -24,6 +24,7 @@ import { Being } from "@/entities/being";
 import { useStyles } from "@/hooks/styles";
 import AttackDetails from "@/components/AttackDetails";
 import { AnimationOptions } from "@/utility/animation/enemy";
+import { Item } from "./item";
 
 interface AttackOption {
   name: string;
@@ -278,6 +279,15 @@ export class Attack {
       baseDamageMap: this.damageTable,
       isSpell: this.element !== null,
       usesWeapon: this.element == null || this.usesWeapon !== null,
+    });
+  }
+
+  public displayDamageNonEquipedItem(item: Item) {
+    return this.user.calculateAttackDamage({
+      baseDamageMap: this.damageTable,
+      isSpell: this.element !== null,
+      usesWeapon: this.element == null || this.usesWeapon !== null,
+      item,
     });
   }
 
@@ -737,7 +747,16 @@ export class Attack {
     });
   }
 
-  public AttackRender(styles: ReturnType<typeof useStyles>) {
+  public AttackRender(styles: ReturnType<typeof useStyles>, item?: Item) {
+    if (item) {
+      return AttackDetails({
+        styles,
+        attack: this,
+        baseDamage: statRounding(
+          this.displayDamageNonEquipedItem(item).cumulativeDamage,
+        ),
+      });
+    }
     return AttackDetails({
       styles,
       attack: this,

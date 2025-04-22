@@ -826,6 +826,7 @@ export class Being {
     multiplierModifier: Modifier,
     base: number,
     usesWeapon?: boolean,
+    forceItem?: Item,
   ): number {
     let baseDamage = base;
     let addedDamage = 0;
@@ -838,11 +839,24 @@ export class Being {
             ? item[0].stats?.get(baseDamageModifier) ?? 0 // the base damage of an item is not added for spells that do not use weapons
             : 0;
         } else if (item && item.stats) {
-          baseDamage += usesWeapon
-            ? item.stats.get(baseDamageModifier) ?? 0
-            : 0; // the base damage of an item is not added for spells that do not use weapons
-          addedDamage += item.stats.get(addedDamageModifier) || 0;
-          multiplier += item.stats.get(multiplierModifier) || 0;
+          if (forceItem && item.equals(this.equipment.mainHand)) {
+            baseDamage += forceItem.stats?.get(baseDamageModifier) ?? 0;
+            addedDamage += forceItem.stats?.get(addedDamageModifier) || 0;
+            multiplier += forceItem.stats?.get(multiplierModifier) || 0;
+          } else if (
+            forceItem &&
+            forceItem?.slot == "two-hand" &&
+            this.equipment.offHand &&
+            item.equals(this.equipment.offHand)
+          ) {
+            //skip it, included in main hand calc
+          } else {
+            baseDamage += usesWeapon
+              ? item.stats.get(baseDamageModifier) ?? 0
+              : 0; // the base damage of an item is not added for spells that do not use weapons
+            addedDamage += item.stats.get(addedDamageModifier) || 0;
+            multiplier += item.stats.get(multiplierModifier) || 0;
+          }
         }
       }
     }
@@ -989,6 +1003,82 @@ export class Being {
       Modifier.MagicDamageMultiplier,
       this.baseDamageTable[DamageType.MAGIC] ?? 0,
       false,
+    );
+  }
+  public physicalDamageForceItem(item: Item): number {
+    return this.calculateTotalDamage(
+      Modifier.PhysicalDamage,
+      Modifier.PhysicalDamageAdded,
+      Modifier.PhysicalDamageMultiplier,
+      this.baseDamageTable[DamageType.PHYSICAL] ?? 0,
+      true,
+      item,
+    );
+  }
+
+  public fireDamageForceItem(item: Item): number {
+    return this.calculateTotalDamage(
+      Modifier.FireDamage,
+      Modifier.FireDamageAdded,
+      Modifier.FireDamageMultiplier,
+      this.baseDamageTable[DamageType.FIRE] ?? 0,
+      true,
+      item,
+    );
+  }
+
+  public coldDamageForceItem(item: Item): number {
+    return this.calculateTotalDamage(
+      Modifier.ColdDamage,
+      Modifier.ColdDamageAdded,
+      Modifier.ColdDamageMultiplier,
+      this.baseDamageTable[DamageType.COLD] ?? 0,
+      true,
+      item,
+    );
+  }
+
+  public lightningForceItem(item: Item): number {
+    return this.calculateTotalDamage(
+      Modifier.LightningDamage,
+      Modifier.LightningDamageAdded,
+      Modifier.LightningDamageMultiplier,
+      this.baseDamageTable[DamageType.LIGHTNING] ?? 0,
+      true,
+      item,
+    );
+  }
+
+  public poisonDamageForceItem(item: Item): number {
+    return this.calculateTotalDamage(
+      Modifier.PoisonDamage,
+      Modifier.PoisonDamageAdded,
+      Modifier.PoisonDamageMultiplier,
+      this.baseDamageTable[DamageType.POISON] ?? 0,
+      true,
+      item,
+    );
+  }
+
+  public holyDamageForceItem(item: Item): number {
+    return this.calculateTotalDamage(
+      Modifier.HolyDamage,
+      Modifier.HolyDamageAdded,
+      Modifier.HolyDamageMultiplier,
+      this.baseDamageTable[DamageType.HOLY] ?? 0,
+      true,
+      item,
+    );
+  }
+
+  public magicDamageForceItem(item: Item): number {
+    return this.calculateTotalDamage(
+      Modifier.MagicDamage,
+      Modifier.MagicDamageAdded,
+      Modifier.MagicDamageMultiplier,
+      this.baseDamageTable[DamageType.MAGIC] ?? 0,
+      true,
+      item,
     );
   }
 
@@ -1320,30 +1410,42 @@ export class Being {
     isSpell: boolean,
     usesWeapon: boolean,
     target?: Being,
+    item?: Item,
   ) {
     switch (type) {
       case DamageType.PHYSICAL:
-        const baseDamage = usesWeapon
-          ? this.physicalDamage
-          : this.physicalDamageNoWeapon;
-
-        return (
-          (baseDamage + attackDamage) *
-          this.attackPower *
-          (1 - (target ? target.physicalDamageReduction : 0))
-        );
+        return this.damageTypeCalc({
+          userWeaponDependantDamage: item
+            ? this.physicalDamageForceItem(item)
+            : usesWeapon
+            ? this.physicalDamage
+            : this.physicalDamageNoWeapon,
+          userWeaponIndependantDamageModifier: this.attackPower,
+          attackIntrensicDamage: attackDamage,
+          targetResistanceModifier: target?.physicalDamageReduction ?? 0,
+        });
       case DamageType.FIRE:
-        return (
-          (usesWeapon ? this.fireDamage : this.fireDamageNoWeapon) *
-            this.magicPower +
-          attackDamage
-        );
+        return this.damageTypeCalc({
+          userWeaponDependantDamage: item
+            ? this.fireDamageForceItem(item)
+            : usesWeapon
+            ? this.fireDamage
+            : this.fireDamageNoWeapon,
+          userWeaponIndependantDamageModifier: this.magicPower,
+          attackIntrensicDamage: attackDamage,
+          targetResistanceModifier: target?.fireResistance ?? 0,
+        });
       case DamageType.COLD:
-        return (
-          (usesWeapon ? this.coldDamage : this.coldDamageNoWeapon) *
-            this.magicPower +
-          attackDamage
-        );
+        return this.damageTypeCalc({
+          userWeaponDependantDamage: item
+            ? this.coldDamageForceItem(item)
+            : usesWeapon
+            ? this.coldDamage
+            : this.coldDamageNoWeapon,
+          userWeaponIndependantDamageModifier: this.magicPower,
+          attackIntrensicDamage: attackDamage,
+          targetResistanceModifier: target?.coldResistance ?? 0,
+        });
       case DamageType.LIGHTNING:
         return this.damageTypeCalc({
           userWeaponDependantDamage: usesWeapon
@@ -1403,10 +1505,9 @@ export class Being {
     targetResistanceModifier: number;
   }) {
     return (
-      userWeaponDependantDamage +
-      userWeaponIndependantDamageModifier *
-        attackIntrensicDamage *
-        (1 - targetResistanceModifier)
+      (userWeaponDependantDamage * userWeaponIndependantDamageModifier +
+        attackIntrensicDamage) *
+      (1 - targetResistanceModifier)
     );
   }
 
@@ -1415,11 +1516,13 @@ export class Being {
     isSpell,
     usesWeapon,
     target,
+    item,
   }: {
     baseDamageMap: { [key in DamageType]?: number } | null;
     isSpell: boolean;
     usesWeapon: boolean;
     target?: Being;
+    item?: Item;
   }) {
     let cumulativeDamage = 0;
     const { damageFlat, damageMult } = getConditionEffectsOnAttacks({
@@ -1467,6 +1570,7 @@ export class Being {
           isSpell,
           usesWeapon,
           target,
+          item,
         ) *
           damageMult +
         damageFlat;

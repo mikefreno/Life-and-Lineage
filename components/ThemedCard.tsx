@@ -37,7 +37,10 @@ export default function ThemedCard({
       }}
     >
       <ThemedView
-        style={[styles.themedCard, { ...cardStyle, borderRadius: 12 }]}
+        style={[
+          styles.themedCard,
+          { ...cardStyle, borderRadius: 12, overflow: "hidden" },
+        ]}
       >
         {iconSource ? (
           <View style={styles.imageContainer}>

@@ -39,11 +39,13 @@ export const useStyles = () => {
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    shadowColor: uiStore.colorScheme === "dark" ? "#fff" : "#000",
+    shadowColor:
+      platform !== "android" && uiStore.colorScheme === "dark"
+        ? "#fff"
+        : "#000",
     shadowOffset: { width: 0, height: 2 } as const,
     shadowOpacity: platform === "android" ? 0.9 : 0.2,
     shadowRadius: 1.5,
-    elevation: 3,
     backgroundColor: theme.background,
     borderWidth: 1,
     borderColor: "#71717a",
@@ -220,6 +222,7 @@ export const useStyles = () => {
       overflow: "hidden",
     },
     laborIcon: {
+      borderRadius: 12,
       height: "100%",
       width: "100%",
     },
