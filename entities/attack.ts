@@ -580,9 +580,11 @@ export class Attack {
       use: PerTargetUse;
     }[] = [];
 
-    for (const target of targets) {
-      const use = this._internalUse(target);
-      allTargetResult.push({ target, use });
+    if (this.targets !== "self") {
+      for (const target of targets) {
+        const use = this._internalUse(target);
+        allTargetResult.push({ target, use });
+      }
     }
 
     //end check for multi-turn attacks

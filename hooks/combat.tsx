@@ -11,7 +11,7 @@ import { AnimationOptions } from "@/utility/animation/enemy";
 import { type Condition } from "@/entities/conditions";
 import { Being } from "@/entities/being";
 import { Vector2 } from "@/utility/Vec2";
-import { Target } from "@expo/config-plugins/build/ios";
+import { runInAction } from "mobx";
 
 const attackHandler = ({
   attackResults,
@@ -133,123 +133,128 @@ export const useEnemyManagement = () => {
     });
   };
 
-  const enemyTurn = useCallback(() => {
-    enemyStore.enemies.forEach((enemy, index) => {
-      wait(1000 * index).then(() => {
-        if (!enemyDeathHandler(enemy)) {
-          const enemyAttackRes = (enemy as Enemy).takeTurn({
-            player: playerState!,
-          });
-          const animStore = enemyStore.getAnimationStore(enemy.id);
-          let animationForAttack: AnimationOptions = "attack_1";
-          if (enemyAttackRes.attack && enemyAttackRes.attack.name) {
-            animationForAttack =
-              (enemyAttackRes.attack.animation as AnimationOptions | null) ??
-              "attack_1";
-          }
-
-          if (enemyAttackRes.selfDamage != 0) {
-            enemy?.damageHealth({
-              damage: enemyAttackRes.selfDamage,
-              attackerId: enemy.id,
+  const enemyTurn = useCallback(
+    ({ clearanceCallback }: { clearanceCallback: () => void }) => {
+      enemyStore.enemies.forEach((enemy, index) => {
+        wait(1000 * index).then(() => {
+          if (!enemyDeathHandler(enemy)) {
+            const enemyAttackRes = (enemy as Enemy).takeTurn({
+              player: playerState!,
             });
-          }
+            const animStore = enemyStore.getAnimationStore(enemy.id);
+            let animationForAttack: AnimationOptions = "attack_1";
+            if (enemyAttackRes.attack && enemyAttackRes.attack.name) {
+              animationForAttack =
+                (enemyAttackRes.attack.animation as AnimationOptions | null) ??
+                "attack_1";
+            }
 
-          setTimeout(
-            () => {
-              attackHandler({ attackResults: enemyAttackRes, user: enemy });
-              setTimeout(
-                () => enemy.endTurn(),
-                animStore?.movementDuration ?? 1000,
-              );
-            },
-            animStore?.movementDuration ?? 1000,
-          );
+            clearanceCallback();
 
-          //Indicates an attack took place (could be a miss!) (Null indicates a failure - either had an execution condition or was stunned)
-          if (enemyAttackRes.targetResults) {
-            let potentialPoisonHeal = 0;
-            for (const res of enemyAttackRes.targetResults) {
-              switch (res.use.result) {
-                case AttackUse.success:
-                  setTimeout(
-                    () => {
-                      if (res.target.id === playerState?.id) {
-                        if (
-                          (res.use.damages?.total ?? 0) >=
-                            res.target.maxHealth &&
-                          dungeonStore.screenShaker
-                        ) {
-                          dungeonStore.screenShaker(300);
-                        } else if (
-                          (res.use.damages?.total ?? 0) >=
-                            res.target.maxHealth / 2 &&
-                          dungeonStore.screenShaker
-                        ) {
-                          dungeonStore.screenShaker(150);
+            if (enemyAttackRes.selfDamage != 0) {
+              enemy?.damageHealth({
+                damage: enemyAttackRes.selfDamage,
+                attackerId: enemy.id,
+              });
+            }
+
+            setTimeout(
+              () => {
+                attackHandler({ attackResults: enemyAttackRes, user: enemy });
+                setTimeout(
+                  () => enemy.endTurn(),
+                  animStore?.movementDuration ?? 1000,
+                );
+              },
+              animStore?.movementDuration ?? 1000,
+            );
+
+            //Indicates an attack took place (could be a miss!) (Null indicates a failure - either had an execution condition or was stunned)
+            if (enemyAttackRes.targetResults) {
+              let potentialPoisonHeal = 0;
+              for (const res of enemyAttackRes.targetResults) {
+                switch (res.use.result) {
+                  case AttackUse.success:
+                    setTimeout(
+                      () => {
+                        if (res.target.id === playerState?.id) {
+                          if (
+                            (res.use.damages?.total ?? 0) >=
+                              res.target.maxHealth &&
+                            dungeonStore.screenShaker
+                          ) {
+                            dungeonStore.screenShaker(300);
+                          } else if (
+                            (res.use.damages?.total ?? 0) >=
+                              res.target.maxHealth / 2 &&
+                            dungeonStore.screenShaker
+                          ) {
+                            dungeonStore.screenShaker(150);
+                          }
                         }
-                      }
-                    },
-                    animStore?.movementDuration ?? 1000,
-                  );
-                  potentialPoisonHeal += res.use.damages?.poison ?? 0;
-                  enemy.restoreHealth(res.use.healed ?? 0);
-                  animStore?.addToAnimationQueue(
-                    animStore.getAttackQueue(
-                      (enemyAttackRes.attack
-                        ?.animation as AnimationOptions | null) ?? "attack_1",
-                    ),
-                  );
-                  break;
-                case AttackUse.miss:
-                  animStore?.addToAnimationQueue(
-                    animStore.getAttackQueue(
-                      (enemyAttackRes.attack
-                        ?.animation as AnimationOptions | null) ?? "attack_1",
-                    ),
-                  );
-                  break;
-                case AttackUse.block:
-                  animStore?.addToAnimationQueue(
-                    animStore.getAttackQueue(
-                      (enemyAttackRes.attack
-                        ?.animation as AnimationOptions | null) ?? "attack_1",
-                    ),
-                  );
+                      },
+                      animStore?.movementDuration ?? 1000,
+                    );
+                    potentialPoisonHeal += res.use.damages?.poison ?? 0;
+                    enemy.restoreHealth(res.use.healed ?? 0);
+                    animStore?.addToAnimationQueue(
+                      animStore.getAttackQueue(
+                        (enemyAttackRes.attack
+                          ?.animation as AnimationOptions | null) ?? "attack_1",
+                      ),
+                    );
+                    break;
+                  case AttackUse.miss:
+                    animStore?.addToAnimationQueue(
+                      animStore.getAttackQueue(
+                        (enemyAttackRes.attack
+                          ?.animation as AnimationOptions | null) ?? "attack_1",
+                      ),
+                    );
+                    break;
+                  case AttackUse.block:
+                    animStore?.addToAnimationQueue(
+                      animStore.getAttackQueue(
+                        (enemyAttackRes.attack
+                          ?.animation as AnimationOptions | null) ?? "attack_1",
+                      ),
+                    );
 
-                  break;
-                case AttackUse.stunned:
-                  animStore?.setTextString("STUNNED!");
-                  break;
-                case AttackUse.lowMana:
-                  animStore?.setTextString(
-                    (enemy as Enemy | Character).nameReference !==
-                      "training dummy"
-                      ? "EXHAUSTED!"
-                      : "*STARE*",
-                  );
-                  break;
+                    break;
+                  case AttackUse.stunned:
+                    animStore?.setTextString("STUNNED!");
+                    break;
+                  case AttackUse.lowMana:
+                    animStore?.setTextString(
+                      (enemy as Enemy | Character).nameReference !==
+                        "training dummy"
+                        ? "EXHAUSTED!"
+                        : "*STARE*",
+                    );
+                    break;
+                }
+              }
+              if (enemy.healsFromPoison) {
+                enemy.restoreHealth(potentialPoisonHeal);
               }
             }
-            if (enemy.healsFromPoison) {
-              enemy.restoreHealth(potentialPoisonHeal);
+
+            dungeonStore.addLog(enemyAttackRes.log);
+
+            if (enemy instanceof Enemy) {
+              enemy.checkPhaseTransitions();
             }
+            enemyMinionsTurn(enemy.minions, enemy, playerState!);
+
+            setTimeout(() => {
+              enemyDeathHandler(enemy);
+            }, 1000);
           }
-
-          dungeonStore.addLog(enemyAttackRes.log);
-
-          if (enemy instanceof Enemy) {
-            enemy.checkPhaseTransitions();
-          }
-          enemyMinionsTurn(enemy.minions, enemy, playerState!);
-
-          setTimeout(() => {
-            enemyDeathHandler(enemy);
-          }, 1000);
-        }
+        });
       });
-    });
-  }, [enemyStore.enemies, playerState, enemyDeathHandler]);
+    },
+    [enemyStore.enemies, playerState, enemyDeathHandler],
+  );
 
   return { enemyTurn, enemyMinionsTurn, enemyDeathHandler };
 };
@@ -370,14 +375,20 @@ export const useCombatActions = () => {
   const pass = useCallback(
     ({ voluntary = false }: { voluntary?: boolean }) => {
       if (!playerState || !isFocused) return;
-      playerAnimationStore.setPassed(true);
+      runInAction(() => (playerAnimationStore.playerTurnOngoing = true));
 
       playerState.pass({ voluntary });
       dungeonStore.addLog("You passed!");
 
+      const clearanceCallback = () => {
+        if (playerAnimationStore.playerTurnOngoing) {
+          runInAction(() => (playerAnimationStore.playerTurnOngoing = false));
+        }
+      };
+
       playerMinionsTurn(() => {
         setTimeout(() => {
-          enemyTurn();
+          enemyTurn({ clearanceCallback });
         }, 750);
       });
     },
@@ -417,11 +428,19 @@ export const useCombatActions = () => {
           }
         });
 
+        const clearanceCallback = () => {
+          if (playerAnimationStore.playerTurnOngoing) {
+            runInAction(() => (playerAnimationStore.playerTurnOngoing = false));
+          }
+        };
+
         setTimeout(() => {
           playerMinionsTurn(() => {
             setTimeout(() => {
               if (enemyStore.enemies.length > 0) {
-                enemyTurn();
+                enemyTurn({ clearanceCallback });
+              } else {
+                clearanceCallback();
               }
             }, playerState.minionsAndPets.length * 1000);
           });

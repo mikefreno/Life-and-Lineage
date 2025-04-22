@@ -26,7 +26,8 @@ export class PlayerAnimationStore {
 
   textString: string | undefined = undefined;
 
-  usedPass: boolean = false;
+  playerTurnOngoing = false;
+  playerTurnOngoingTimeout: NodeJS.Timeout | undefined;
 
   playerOrigin: Vector2;
 
@@ -42,7 +43,6 @@ export class PlayerAnimationStore {
       animationSet: observable,
       playerOrigin: observable,
       textString: observable,
-      usedPass: observable,
       animationPromiseResolver: observable,
       refiringAnimationSets: observable,
       targetPoint: observable,
@@ -51,9 +51,8 @@ export class PlayerAnimationStore {
       setAnimation: action,
       clearAnimation: action,
       setTextString: action,
-      setPassed: action,
 
-      playerTurnOngoing: computed,
+      playerTurnOngoing: observable,
     });
 
     reaction(
@@ -64,18 +63,6 @@ export class PlayerAnimationStore {
             () => runInAction(() => (this.textString = undefined)),
             PLAYER_TEXT_STRING_DURATION,
           );
-        }
-      },
-    );
-    reaction(
-      () => this.usedPass,
-      () => {
-        if (this.usedPass) {
-          setTimeout(() => {
-            if (this.usedPass) {
-              this.setPassed(false);
-            }
-          }, 1000);
         }
       },
     );
@@ -91,23 +78,22 @@ export class PlayerAnimationStore {
             })),
         ),
     );
-  }
-
-  setPassed(state: boolean) {
-    this.usedPass = state;
+    reaction(
+      () => this.animationSet,
+      () => {
+        if (this.animationSet) {
+          this.playerTurnOngoing = true;
+        }
+      },
+    );
   }
 
   setTextString(message: string) {
     this.textString = message;
   }
 
-  get playerTurnOngoing() {
-    return !!this.animationSet || this.usedPass;
-  }
-
   safetyClear() {
     this.animationSet = null;
-    this.usedPass = false;
   }
 
   setAnimation({
