@@ -22,6 +22,7 @@ export interface AIPlayerCharacterInterface {
   damageTable: { [key in DamageType]?: number };
   attackStrings: string[];
   knownSpells: string[];
+  linkID: string;
   winCount: number;
   lossCount: number;
 }
@@ -61,6 +62,7 @@ export class AIPlayerCharacter {
   minions: Minion[];
   rangerPet: Minion | null;
   blessing: Element;
+  linkID: string;
 
   constructor({
     root,
@@ -78,6 +80,7 @@ export class AIPlayerCharacter {
     damageTable,
     attackStrings,
     knownSpells,
+    linkID,
     winCount,
     lossCount,
   }: AIPlayerCharacterInterface) {
@@ -125,7 +128,7 @@ export class AIPlayerCharacter {
     return Math.min(3, Math.max(1, ratio));
   }
 
-  static create(player: PlayerCharacter) {
+  static create(player: PlayerCharacter, linkID: string) {
     const resistanceTable: Record<DamageType, number> = {
       [DamageType.PHYSICAL]: player.physicalDamageReduction,
       [DamageType.FIRE]: player.fireResistance,
@@ -151,6 +154,7 @@ export class AIPlayerCharacter {
     return new AIPlayerCharacter({
       root: player.root,
       playerClass: player.playerClass,
+      blessing: player.blessing,
       name: player.pvpName,
       maxHealth: player.nonConditionalMaxHealth,
       maxSanity: player.nonConditionalMaxSanity ?? player.baseSanity ?? 50,
@@ -163,6 +167,7 @@ export class AIPlayerCharacter {
       damageTable,
       attackStrings: player.attackStrings,
       knownSpells: player.knownSpells,
+      linkID,
       winCount: 0,
       lossCount: 0,
     });

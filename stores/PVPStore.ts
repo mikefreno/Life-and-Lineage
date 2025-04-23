@@ -15,7 +15,7 @@ import { parse, stringify } from "flatted";
 
 export class PVPStore {
   root: RootStore;
-  linkID: string | undefined = undefined;
+  linkID: string;
   availableOpponents: AIPlayerCharacter[] = [];
   chosenOpponent: AIPlayerCharacter | undefined = undefined;
   notificationsEnabled = true;
@@ -93,9 +93,16 @@ export class PVPStore {
     this.expoPushToken = expoPushToken;
   }
 
+  async sendUpdate({ winner, loser }: { winner: string; loser: string }) {
+    await fetch(`${API_BASE_URL}/pvp/battle_result`, {
+      method: "POST",
+      body: JSON.stringify({ winnerLinkID: winner, loserLinkID: loser }),
+    });
+  }
+
   async sendPlayerToAPI() {
     if (this.root.playerState) {
-      const asAI = AIPlayerCharacter.create(this.root.playerState);
+      const asAI = AIPlayerCharacter.create(this.root.playerState, this.linkID);
       this.root.uiStore.incrementLoadingStep();
       const res = await fetch(`${API_BASE_URL}/pvp`, {
         method: "POST",
