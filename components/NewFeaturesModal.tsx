@@ -100,7 +100,9 @@ const FeatureUpdateModal = observer(() => {
 
           <View style={{ width: tw_base[6], alignItems: "flex-end" }}>
             {total > 1 ? (
-              <Text style={[styles["text-md"], { color: theme.dimmed }]}>
+              <Text
+                style={[styles["text-md"], { color: theme.text, opacity: 0.9 }]}
+              >
                 {index + 1}/{total}
               </Text>
             ) : (

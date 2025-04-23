@@ -1,13 +1,14 @@
-import { DamageType, PlayerClassOptions } from "@/utility/types";
+import { DamageType, Element, PlayerClassOptions } from "@/utility/types";
 import { Condition } from "./conditions";
 import { ThreatTable } from "./threatTable";
 import { RootStore } from "@/stores/RootStore";
 import { Minion } from "./creatures";
-import { makeObservable, observable } from "mobx";
+import { computed, makeObservable, observable } from "mobx";
 import { PlayerCharacter } from "./character";
 
 export interface AIPlayerCharacterInterface {
   root: RootStore;
+  blessing: Element;
   playerClass: PlayerClassOptions;
   name: string;
   maxHealth: number;
@@ -21,10 +22,12 @@ export interface AIPlayerCharacterInterface {
   damageTable: { [key in DamageType]?: number };
   attackStrings: string[];
   knownSpells: string[];
+  winCount: number;
+  lossCount: number;
 }
 
 /**
- * This class is used for PVP
+ * This class is used for PvP
  */
 export class AIPlayerCharacter {
   root: RootStore;
@@ -52,13 +55,17 @@ export class AIPlayerCharacter {
 
   conditions: Condition[];
   activeAuraConditionIds: { attackName: string; conditionIDs: string[] }[];
+  winCount: number;
+  lossCount: number;
 
   minions: Minion[];
   rangerPet: Minion | null;
+  blessing: Element;
 
   constructor({
     root,
     playerClass,
+    blessing,
     name,
     maxHealth,
     maxSanity,
@@ -71,9 +78,12 @@ export class AIPlayerCharacter {
     damageTable,
     attackStrings,
     knownSpells,
+    winCount,
+    lossCount,
   }: AIPlayerCharacterInterface) {
     this.root = root;
     this.playerClass = playerClass;
+    this.blessing = blessing;
     this.name = name;
     this.currentHealth = maxHealth;
     this.maxHealth = maxHealth;
@@ -95,6 +105,9 @@ export class AIPlayerCharacter {
     this.activeAuraConditionIds = [];
     this.rangerPet = null;
 
+    this.winCount = winCount;
+    this.lossCount = lossCount;
+
     makeObservable(this, {
       currentHealth: observable,
       currentMana: observable,
@@ -103,7 +116,13 @@ export class AIPlayerCharacter {
       activeAuraConditionIds: observable,
       minions: observable,
       rangerPet: observable,
+      rewardValue: computed,
     });
+  }
+
+  get rewardValue() {
+    const ratio = this.winCount / Math.max(this.lossCount, 1);
+    return Math.min(3, Math.max(1, ratio));
   }
 
   static create(player: PlayerCharacter) {
@@ -144,6 +163,8 @@ export class AIPlayerCharacter {
       damageTable,
       attackStrings: player.attackStrings,
       knownSpells: player.knownSpells,
+      winCount: 0,
+      lossCount: 0,
     });
   }
 }

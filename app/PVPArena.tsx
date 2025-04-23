@@ -1,4 +1,3 @@
-import GenericModal from "@/components/GenericModal";
 import GenericRaisedButton from "@/components/GenericRaisedButton";
 import GenericStrikeAround from "@/components/GenericStrikeAround";
 import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
@@ -21,6 +20,10 @@ import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import { isEmulatorSync } from "react-native-device-info";
 import { fetch } from "expo/fetch";
+import { useRouter } from "expo-router";
+import PagedContentModal from "@/components/PagedContentModal";
+import Colors from "@/constants/Colors";
+import BlessingDisplay from "@/components/BlessingsDisplay";
 
 async function registerForPushNotificationsAsync() {
   if (Platform.OS === "android") {
@@ -66,6 +69,7 @@ const PVPArena = observer(() => {
   const vibration = useVibration();
   const [expoPushToken, setExpoPushToken] = useState("");
   const [sentToken, setSentToken] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     wait(500).then(() => {
@@ -90,21 +94,43 @@ const PVPArena = observer(() => {
   }, [expoPushToken]);
 
   useEffect(() => {
-    pvpStore.sendPlayerToAPI();
+    const retrieveData = async () => {
+      await Promise.all([
+        pvpStore.sendPlayerToAPI(),
+        pvpStore.retrieveOpponents(),
+      ]).catch((e) => {
+        __DEV__ && console.error(e);
+        //TODO: Add ui notification
+        router.back();
+      });
+    };
+    retrieveData();
   }, []);
 
   return (
     <>
-      <GenericModal
-        isVisibleCondition={showPvPInfoModal}
-        backFunction={() => setShowPvPInfoModal(false)}
-      >
-        <View>
-          <Text>
-            Here you can engage with fights against the ghosts of other players
-          </Text>
-        </View>
-      </GenericModal>
+      <PagedContentModal
+        pages={[
+          {
+            title: "What is this?",
+            body: "Here you can engage with fights against the ghosts of other players.",
+          },
+          {
+            title: "Fight to the (near) death",
+            body: "You will not die here, but you might get very close...",
+          },
+          {
+            title: "Earn Blood Tokens",
+            body: "Defeat player and earn Blood Tokens. Players with greater win/loss ratios give greater rewards.",
+          },
+          {
+            title: "Get rewarding rewards",
+            body: "Spend Blood Tokens on valuable rewards. You can earn the ability to redistribute your attribute points and even a potion to reduce your character's age!",
+          },
+        ]}
+        isVisible={showPvPInfoModal}
+        handleClose={() => setShowPvPInfoModal(false)}
+      />
       <View
         style={{
           flex: 1,
@@ -138,7 +164,41 @@ const PVPArena = observer(() => {
             }}
           >
             {pvpStore.availableOpponents.map((opp, index) => (
-              <ThemedCard key={`${opp.name}-${index}`}></ThemedCard>
+              <ThemedCard
+                key={`${opp.name}-${index}`}
+                cardStyle={{
+                  height: "100%",
+                  justifyContent: "space-between",
+                  width: uiStore.dimensions.lesser / 2,
+                  marginHorizontal: 8,
+                }}
+              >
+                <View>
+                  <View>
+                    <Text style={[styles.textCenter, styles["text-xl"]]}>
+                      {opp.name}
+                    </Text>
+                    <Text style={[styles.textCenter]}>
+                      {toTitleCase(opp.playerClass)}
+                    </Text>
+                  </View>
+                  <View style={{ marginHorizontal: "auto", marginVertical: 4 }}>
+                    <BlessingDisplay
+                      blessing={opp.blessing}
+                      colorScheme={uiStore.colorScheme}
+                    />
+                  </View>
+                  <Text>
+                    Wins: {opp.winCount} | Losses: {opp.lossCount}
+                  </Text>
+                  <Text>Reward For Winning: {opp.rewardValue}</Text>
+                  <GenericRaisedButton
+                    backgroundColor={Colors[uiStore.colorScheme].error}
+                  >
+                    FIGHT!
+                  </GenericRaisedButton>
+                </View>
+              </ThemedCard>
             ))}
           </ScrollView>
         </View>

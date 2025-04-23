@@ -448,7 +448,9 @@ const TabLayout = observer(() => {
                       onPress={() => {
                         if (pvpStore.playerCanEngageInPvP || __DEV__) {
                           vibration({ style: "light" });
+                          uiStore.setTotalLoadingSteps(6);
                           router.replace("/PVPArena");
+                          uiStore.incrementLoadingStep();
                         } else {
                           setShowPVPInfoModal(true);
                         }

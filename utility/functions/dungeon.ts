@@ -1,6 +1,6 @@
-import { PlayerCharacter } from "../../entities/character";
-import { SpecialEncounter } from "../../entities/dungeon";
-import { DungeonStore } from "../../stores/DungeonStore";
+import { PlayerCharacter } from "@/entities/character";
+import { SpecialEncounter } from "@/entities/dungeon";
+import { DungeonStore } from "@/stores/DungeonStore";
 
 export const calculateFleeChance = (
   dexterity: number,
