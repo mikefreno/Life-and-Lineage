@@ -1517,12 +1517,14 @@ export class Being {
     usesWeapon,
     target,
     item,
+    selfTargeting,
   }: {
     baseDamageMap: { [key in DamageType]?: number } | null;
     isSpell: boolean;
     usesWeapon: boolean;
     target?: Being;
     item?: Item;
+    selfTargeting: boolean;
   }) {
     let cumulativeDamage = 0;
     const { damageFlat, damageMult } = getConditionEffectsOnAttacks({
@@ -1559,6 +1561,16 @@ export class Being {
         : 0,
       [DamageType.RAW]: baseDamageMap ? baseDamageMap[DamageType.RAW] ?? 0 : 0,
     };
+    if (selfTargeting && damageMap[DamageType.RAW] < 0) {
+      const val = this.damageTypeCalc({
+        userWeaponIndependantDamageModifier: this.magicPower,
+        attackIntrensicDamage: damageMap[DamageType.RAW],
+        targetResistanceModifier: 0,
+      });
+      damageMap[DamageType.RAW] = val;
+      cumulativeDamage += val;
+      return { cumulativeDamage, damageMap };
+    }
 
     Object.entries(damageMap).forEach(([typeKey, amount]) => {
       const damageType = parseInt(typeKey) as DamageType;

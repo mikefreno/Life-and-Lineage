@@ -97,7 +97,7 @@ const FleeModal = observer(() => {
       dungeonStore.addLog("You failed to flee!");
 
       playerMinionsTurn(() => {
-        enemyTurn();
+        enemyTurn({ clearanceCallback: () => null });
       });
     } catch (error) {
       console.error("Error during failed flee:", error);

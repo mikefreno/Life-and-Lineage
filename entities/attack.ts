@@ -279,6 +279,7 @@ export class Attack {
       baseDamageMap: this.damageTable,
       isSpell: this.element !== null,
       usesWeapon: this.element == null || this.usesWeapon !== null,
+      selfTargeting: this.targets === "self",
     });
   }
 
@@ -288,6 +289,7 @@ export class Attack {
       isSpell: this.element !== null,
       usesWeapon: this.element == null || this.usesWeapon !== null,
       item,
+      selfTargeting: this.targets === "self",
     });
   }
 
@@ -297,6 +299,7 @@ export class Attack {
       isSpell: this.element != null,
       usesWeapon: this.element == null || this.usesWeapon !== null,
       target: this.user,
+      selfTargeting: this.targets === "self",
     });
   }
 
@@ -306,6 +309,7 @@ export class Attack {
       isSpell: this.element !== null,
       usesWeapon: this.element == null || this.usesWeapon !== null,
       target: target,
+      selfTargeting: this.targets === "self",
     });
   }
 

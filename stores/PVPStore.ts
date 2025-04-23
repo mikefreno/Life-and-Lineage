@@ -83,7 +83,6 @@ export class PVPStore {
     );
     if (arena) {
       if (this.root.authStore.isConnected) {
-        return !arena.levels.some((level) => !!level.unlocked);
       }
     }
     return false;
