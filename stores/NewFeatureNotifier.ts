@@ -87,13 +87,28 @@ export class NewFeatureNotifier {
       });
     }
 
-    // --- Features added in v1.1.0 ---
-    // if (lastVersion < "1.0.6") {
-    //     messages.push({ title: "New Feature X", body: "Details about X..." });
-    //     messages.push({ title: "Another Feature Y", body: "Details about Y..." });
-    // }
-
-    // --- Add blocks for future versions below ---
+    if (compareVersions(this.lastSeenAppVersion, "1.1.3") < 0) {
+      let pointsToGive = 0;
+      this.root.dungeonStore.dungeonInstances.forEach((inst) =>
+        inst.levels.forEach((level) => {
+          if (level.bossDefeated) {
+            pointsToGive += 2;
+          }
+        }),
+      );
+      this.root.playerState?.addSkillPoint({ amount: pointsToGive });
+      this.root.dungeonStore.dungeonInstances.forEach((inst) => {
+        if (inst.name === "bandit hideout" || inst.name === "goblin cave") {
+          if (!inst.levels.some((level) => level.bossDefeated)) {
+            this.root.dungeonStore.openNextDungeonLevel(inst);
+          }
+        }
+      });
+      messages.push({
+        title: "Player Power Update",
+        body: "The player's damage scaling from Strength/Dexterity/Intelligence has been increased significantly. Additionally, the skill point reward for boss kills has been increased from 3->5. You have been been credited the difference for any previously defeated boss.",
+      });
+    }
 
     return messages;
   }

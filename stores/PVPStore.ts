@@ -40,10 +40,11 @@ export class PVPStore {
       tokenRedemptionCount,
     } = this.hydrate();
 
-    this.linkID = linkID ?? getUniqueIdSync();
+    this.linkID = getUniqueIdSync();
     this.expoPushToken = expoPushToken;
     this.notificationsEnabled = notificationsEnabled;
     this.tokenRedemptionCount = tokenRedemptionCount ?? 0;
+    this.persist();
 
     makeObservable(this, {
       availableOpponents: observable,

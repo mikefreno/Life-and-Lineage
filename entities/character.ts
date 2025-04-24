@@ -940,7 +940,7 @@ export class PlayerCharacter extends Character {
   }
   //----------------------------------Stats----------------------------------//
   public bossDefeated() {
-    this.addSkillPoint({ amount: 3 });
+    this.addSkillPoint({ amount: 5 });
   }
 
   /**

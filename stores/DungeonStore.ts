@@ -487,9 +487,12 @@ export class DungeonStore {
       });
       unlockObjects.forEach((obj) => {
         if (obj.isComplete) {
-          const inst = DungeonInstance.fromJSON(obj);
-          this.dungeonInstances.push(inst);
-          _dungeonInstanceSave(inst);
+          const names = this.dungeonInstances.map((inst) => inst.name);
+          if (!names.includes(obj.name)) {
+            const inst = DungeonInstance.fromJSON(obj);
+            this.dungeonInstances.push(inst);
+            _dungeonInstanceSave(inst);
+          }
         } else {
           this.root.showEndOfCompletedDungeonsMessage();
         }

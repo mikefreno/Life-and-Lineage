@@ -593,6 +593,6 @@ export function itemList(
     case ItemClassType.StoryItem:
       return jsonServiceStore.readJsonFileSync("storyItems");
     default:
-      throw new Error("invalid itemType");
+      throw new Error(`invalid itemType ${itemType}`);
   }
 }

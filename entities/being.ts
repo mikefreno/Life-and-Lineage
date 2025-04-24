@@ -596,12 +596,12 @@ export class Being {
 
     let strengthContribution = 0;
     if (this.totalStrength <= 50) {
-      strengthContribution = this.totalStrength * 0.01;
+      strengthContribution = this.totalStrength * 0.02;
     } else {
-      const firstTier = 50 * 0.01;
+      const firstTier = 50 * 0.02;
       const additionalPoints = this.totalStrength - 50;
       const diminishedValue =
-        (0.01 * additionalPoints) / (1 + Math.log1p(additionalPoints / 50));
+        (0.02 * additionalPoints) / (1 + Math.log1p(additionalPoints / 50));
       strengthContribution = firstTier + diminishedValue;
     }
 
@@ -609,10 +609,10 @@ export class Being {
     if (this.totalDexterity <= 50) {
       dexterityContribution = this.totalDexterity * 0.005;
     } else {
-      const firstTier = 50 * 0.005;
+      const firstTier = 50 * 0.01;
       const additionalPoints = this.totalStrength - 50;
       const diminishedValue =
-        (0.005 * additionalPoints) / (1 + Math.log1p(additionalPoints / 50));
+        (0.01 * additionalPoints) / (1 + Math.log1p(additionalPoints / 50));
       dexterityContribution = firstTier + diminishedValue;
     }
 
@@ -646,12 +646,12 @@ export class Being {
 
     let intelligenceContribution = 0;
     if (this.totalIntelligence <= 50) {
-      intelligenceContribution = this.totalIntelligence * 0.01;
+      intelligenceContribution = this.totalIntelligence * 0.02;
     } else {
-      const firstTier = 50 * 0.01;
+      const firstTier = 50 * 0.02;
       const additionalPoints = this.totalIntelligence - 50;
       const diminishedValue =
-        (0.01 * additionalPoints) / (1 + Math.log1p(additionalPoints / 50));
+        (0.02 * additionalPoints) / (1 + Math.log1p(additionalPoints / 50));
       intelligenceContribution = firstTier + diminishedValue;
     }
     return baseMultiplier + intelligenceContribution;
@@ -1562,11 +1562,7 @@ export class Being {
       [DamageType.RAW]: baseDamageMap ? baseDamageMap[DamageType.RAW] ?? 0 : 0,
     };
     if (selfTargeting && damageMap[DamageType.RAW] < 0) {
-      const val = this.damageTypeCalc({
-        userWeaponIndependantDamageModifier: this.magicPower,
-        attackIntrensicDamage: damageMap[DamageType.RAW],
-        targetResistanceModifier: 0,
-      });
+      const val = damageMap[DamageType.RAW] * this.magicPower;
       damageMap[DamageType.RAW] = val;
       cumulativeDamage += val;
       return { cumulativeDamage, damageMap };

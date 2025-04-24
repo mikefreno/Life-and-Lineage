@@ -412,7 +412,7 @@
       }
     ],
     "unlocks": [
-      "rogue magi fortress"
+      "frost spire fortress"
     ]
   },
   {
@@ -552,7 +552,8 @@
       }
     ],
     "unlocks": [
-      "infested mine"
+      "infestation",
+      "ancient arena"
     ]
   },
   {

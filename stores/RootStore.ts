@@ -27,7 +27,6 @@ import { jsonServiceStore } from "./SingletonSource";
 import { PVPStore } from "./PVPStore";
 import * as StoreReview from "expo-store-review";
 import { NewFeatureNotifier } from "./NewFeatureNotifier";
-import { ThemedScrollView } from "@/components/Themed";
 
 export class RootStore {
   playerState: PlayerCharacter | null;
@@ -204,7 +203,7 @@ export class RootStore {
     for (const inst of this.dungeonStore.dungeonInstances) {
       for (const level of inst.levels) {
         if (level.bossDefeated) {
-          points += 3;
+          points += 5;
         }
       }
     }
