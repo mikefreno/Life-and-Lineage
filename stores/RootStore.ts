@@ -27,6 +27,7 @@ import { jsonServiceStore } from "./SingletonSource";
 import { PVPStore } from "./PVPStore";
 import * as StoreReview from "expo-store-review";
 import { NewFeatureNotifier } from "./NewFeatureNotifier";
+import { Analytics } from "./Analytics";
 
 export class RootStore {
   playerState: PlayerCharacter | null;
@@ -45,7 +46,9 @@ export class RootStore {
   iapStore: IAPStore;
   JSONServiceStore: JSONServiceStore;
   pvpStore: PVPStore;
-  newFeatureNotifier: NewFeatureNotifier | undefined;
+  newFeatureNotifier: NewFeatureNotifier;
+  analytics: Analytics;
+
   ticker = 0;
 
   constructed: boolean = false;
@@ -121,6 +124,7 @@ export class RootStore {
 
     this.pvpStore = new PVPStore({ root: this });
     this.newFeatureNotifier = new NewFeatureNotifier({ root: this });
+    this.analytics = new Analytics({ root: this });
 
     this.constructed = true;
     this.audioStore.initializeReactions();

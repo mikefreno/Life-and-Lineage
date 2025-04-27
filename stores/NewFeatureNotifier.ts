@@ -1,15 +1,8 @@
 import { storage } from "@/utility/functions/storage";
 import Constants from "expo-constants";
 import { RootStore } from "./RootStore";
-import {
-  action,
-  computed,
-  makeObservable,
-  observable,
-  runInAction,
-} from "mobx";
+import { action, computed, makeObservable, observable } from "mobx";
 import { ExternalPathString, RelativePathString } from "expo-router";
-import { wait } from "@/utility/functions/misc";
 
 export type NewFeaturePage = {
   title: string;
@@ -23,6 +16,7 @@ export class NewFeatureNotifier {
   currentAppVersion: string;
   shownCurrentMessage = false;
   getNotified: boolean;
+  isModalVisible = false;
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
@@ -36,20 +30,12 @@ export class NewFeatureNotifier {
       lastSeenAppVersion ??
       (this.root.playerState ? "1.1.0" : this.currentAppVersion);
 
-    if (
-      !this.isModalVisible &&
-      (this.lastSeenAppVersion !== this.currentAppVersion ||
-        !this.root.playerState)
-    ) {
-      this.serialize();
-    }
-
     makeObservable(this, {
       getNotified: observable,
       shownCurrentMessage: observable,
       lastSeenAppVersion: observable,
 
-      isModalVisible: computed,
+      isModalVisible: observable,
       messages: computed,
 
       setGetNotified: action,
@@ -65,7 +51,11 @@ export class NewFeatureNotifier {
   }
 
   get messages(): NewFeaturePage[] {
-    if (this.lastSeenAppVersion === this.currentAppVersion) {
+    if (
+      this.lastSeenAppVersion === this.currentAppVersion ||
+      !this.getNotified
+    ) {
+      this.serialize();
       return [];
     }
 
@@ -97,24 +87,35 @@ export class NewFeatureNotifier {
         }),
       );
       this.root.playerState?.addSkillPoint({ amount: pointsToGive });
-      this.root.dungeonStore.dungeonInstances.forEach((inst) => {
-        if (inst.name === "bandit hideout" || inst.name === "goblin cave") {
-          if (!inst.levels.some((level) => level.bossDefeated)) {
-            this.root.dungeonStore.openNextDungeonLevel(inst);
-          }
-        }
-      });
+
       messages.push({
         title: "Player Power Update",
         body: "The player's damage scaling from Strength/Dexterity/Intelligence has been increased significantly. Additionally, the skill point reward for boss kills has been increased from 3->5. You have been been credited the difference for any previously defeated boss.",
       });
     }
 
+    if (compareVersions(this.lastSeenAppVersion, "1.1.4") < 0) {
+      this.root.dungeonStore.dungeonInstances.forEach((inst) => {
+        if (inst.name === "bandit hideout" || inst.name === "goblin cave") {
+          if (inst.levels.every((level) => level.bossDefeated)) {
+            console.log("all cleared");
+            this.root.dungeonStore.openNextDungeonLevel(inst);
+          } else {
+            console.log("no unlocks");
+          }
+        }
+      });
+    }
+
+    this.isModalVisible = true;
+    this.serialize();
     return messages;
   }
 
   handleModalClose() {
     this.shownCurrentMessage = true;
+    this.isModalVisible = false;
+    this.lastSeenAppVersion = this.currentAppVersion;
     this.serialize();
   }
 
@@ -134,28 +135,14 @@ export class NewFeatureNotifier {
     try {
       storage.set("lastSeenAppVersion", this.currentAppVersion);
       storage.set("getNewFeatureNotified", this.getNotified);
-      wait(500).then(() => {
-        runInAction(() => (this.lastSeenAppVersion = this.currentAppVersion));
-      }); // Give time for modal to clear view
     } catch (error) {
       console.error("Failed to serialize NewFeatureNotifier state:", error);
     }
-  }
-
-  get isModalVisible() {
-    return (
-      !this.shownCurrentMessage &&
-      !this.root.dungeonStore.isInDungeon &&
-      this.getNotified &&
-      this.messages.length > 0 &&
-      this.lastSeenAppVersion !== this.currentAppVersion
-    );
   }
 }
 /**
  * Compares two semantic version strings (e.g., "1.0.1", "1.10.0").
  * Handles Major.Minor.Patch components.
- * Ignores pre-release tags or build metadata for simplicity in this context.
  *
  * @param v1 First version string.
  * @param v2 Second version string.
@@ -175,6 +162,8 @@ export const compareVersions = (
 
   const len = Math.max(parts1.length, parts2.length);
 
+  console.log(parts1);
+  console.log(parts2);
   for (let i = 0; i < len; i++) {
     const p1 = parts1[i] || 0; // Default to 0 if part is missing
     const p2 = parts2[i] || 0; // Default to 0 if part is missing

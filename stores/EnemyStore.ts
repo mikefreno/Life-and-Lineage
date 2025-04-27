@@ -325,7 +325,7 @@ export default class EnemyStore {
     try {
       storage.set(
         `enemy_${enemy?.id}`,
-        stringify({ ...enemy, enemyStore: null }),
+        stringify({ ...enemy, root: null, enemyStore: null }),
       );
     } catch (e) {
       __DEV__ && console.error(e);

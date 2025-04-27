@@ -58,15 +58,15 @@ export const useStyles = () => {
     },
     "text-sm": {
       fontSize: getNormalizedFontSize(12),
-      lineHeight: getNormalizedLineSize(16),
+      lineHeight: getNormalizedLineSize(14),
     },
     "text-md": {
       fontSize: getNormalizedFontSize(14),
-      lineHeight: getNormalizedLineSize(18),
+      lineHeight: getNormalizedLineSize(16),
     },
     "text-lg": {
       fontSize: getNormalizedFontSize(18),
-      lineHeight: getNormalizedLineSize(22),
+      lineHeight: getNormalizedLineSize(20),
     },
     "text-xl": {
       fontSize: getNormalizedFontSize(20),

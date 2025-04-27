@@ -24,6 +24,7 @@ import { useRouter } from "expo-router";
 import PagedContentModal from "@/components/PagedContentModal";
 import Colors from "@/constants/Colors";
 import BlessingDisplay from "@/components/BlessingsDisplay";
+import { useScaling } from "@/hooks/scaling";
 
 async function registerForPushNotificationsAsync() {
   if (Platform.OS === "android") {
@@ -70,6 +71,7 @@ const PVPArena = observer(() => {
   const [expoPushToken, setExpoPushToken] = useState("");
   const [sentToken, setSentToken] = useState(false);
   const router = useRouter();
+  const { getNormalizedLineSize } = useScaling();
 
   useEffect(() => {
     wait(500).then(() => {
@@ -134,6 +136,7 @@ const PVPArena = observer(() => {
       <View
         style={{
           flex: 1,
+          flexDirection: uiStore.isLandscape ? "row" : "column",
           paddingBottom: uiStore.playerStatusHeightSecondary,
           paddingTop: uiStore.headerHeight,
         }}
@@ -141,7 +144,12 @@ const PVPArena = observer(() => {
         <View style={{ flex: 1 }}>
           <GenericStrikeAround>Available Battles</GenericStrikeAround>
           <Pressable
-            style={{ marginLeft: 4 }}
+            style={{
+              marginLeft: 4,
+              position: "absolute",
+              zIndex: 50,
+              marginTop: uiStore.dimensions.greater / 48,
+            }}
             onPress={() => {
               vibration({ style: "light" });
               setShowPvPInfoModal(true);
@@ -173,7 +181,12 @@ const PVPArena = observer(() => {
                   marginHorizontal: 8,
                 }}
               >
-                <View>
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: "space-between",
+                  }}
+                >
                   <View>
                     <Text style={[styles.textCenter, styles["text-xl"]]}>
                       {opp.name}
@@ -188,22 +201,41 @@ const PVPArena = observer(() => {
                       colorScheme={uiStore.colorScheme}
                     />
                   </View>
-                  <Text>
-                    Wins: {opp.winCount} | Losses: {opp.lossCount}
-                  </Text>
-                  <Text>Reward For Winning: {opp.rewardValue}</Text>
-                  <GenericRaisedButton
-                    backgroundColor={Colors[uiStore.colorScheme].error}
-                  >
-                    FIGHT!
-                  </GenericRaisedButton>
+                  <View>
+                    <Text>
+                      Wins: {opp.winCount} | Losses: {opp.lossCount}
+                    </Text>
+                    <Text>Reward For Winning: {opp.rewardValue}</Text>
+                  </View>
                 </View>
+                <GenericRaisedButton
+                  backgroundColor={Colors[uiStore.colorScheme].error}
+                >
+                  FIGHT!
+                </GenericRaisedButton>
               </ThemedCard>
             ))}
           </ScrollView>
         </View>
+        {uiStore.isLandscape && (
+          <View
+            style={{
+              position: "absolute",
+              left: uiStore.dimensions.width / 2,
+              height:
+                uiStore.dimensions.height -
+                uiStore.headerHeight -
+                uiStore.playerStatusHeightSecondary -
+                getNormalizedLineSize(20),
+              backgroundColor: Colors[uiStore.colorScheme].border,
+              zIndex: 50,
+              top: uiStore.headerHeight + getNormalizedLineSize(18),
+              borderWidth: 0.5,
+            }}
+          />
+        )}
         <View style={{ flex: 1 }}>
-          <GenericStrikeAround>Rewards Option</GenericStrikeAround>
+          <GenericStrikeAround>Reward Options</GenericStrikeAround>
           <ScrollView
             horizontal
             contentContainerStyle={{
@@ -238,25 +270,23 @@ const PVPArena = observer(() => {
                   <View style={{ marginHorizontal: "auto" }}>
                     <PvPRewardIcons
                       icon={pvpReward.icon}
-                      size={uiStore.dimensions.lesser * 0.3}
+                      size={uiStore.dimensions.lesser * 0.2}
                       colorScheme={uiStore.colorScheme}
                     />
                   </View>
                   <Text style={{ textAlign: "center" }}>
                     {pvpReward.description}
                   </Text>
-                  <View>
-                    <Text style={[styles["text-2xl"], { textAlign: "center" }]}>
-                      Cost: {pvpReward.price}
-                    </Text>
-                    <GenericRaisedButton>Purchase</GenericRaisedButton>
-                  </View>
+                  <Text style={[styles["text-2xl"], { textAlign: "center" }]}>
+                    Cost: {pvpReward.price}
+                  </Text>
+                  <GenericRaisedButton>Purchase</GenericRaisedButton>
                 </ThemedCard>
               ))}
           </ScrollView>
         </View>
-        <PlayerStatusForSecondary />
       </View>
+      <PlayerStatusForSecondary />
     </>
   );
 });

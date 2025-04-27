@@ -106,7 +106,7 @@ export default class UIStore {
   iconSizeXL = baseNormalize(28);
   tabHeightBase = baseNormalize(28);
 
-  expansionPadding = baseNormalize(24);
+  expansionPadding = baseNormalizeLineHeight(18) + 4;
   iconSizeLarge = baseNormalize(22);
   iconSizeSmall = baseNormalize(16);
 

@@ -19,6 +19,7 @@ import AnimatedButtonText from "@/components/AnimatedButtonText";
 import { Text } from "@/components/Themed";
 import { useStyles } from "@/hooks/styles";
 import { useScaling } from "@/hooks/scaling";
+import Colors from "@/constants/Colors";
 
 interface GenericRaisedButtonProps {
   ref?: React.RefObject<any>;
@@ -134,6 +135,8 @@ const GenericRaisedButton = ({
     const baseStyle = {
       shadowColor: uiStore.colorScheme === "light" ? "black" : "white",
       elevation: 2,
+      borderColor: `${Colors[uiStore.colorScheme].border}50`,
+      borderWidth: 1,
       backgroundColor:
         backgroundColor ||
         (uiStore.colorScheme === "light" ? "white" : "#71717a"),

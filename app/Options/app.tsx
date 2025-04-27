@@ -29,6 +29,7 @@ export const AppSettings = observer(() => {
     authStore,
     saveStore,
     iapStore,
+    analytics,
     newFeatureNotifier,
   } = root;
   const isDark = uiStore.colorScheme === "dark";
@@ -334,7 +335,6 @@ export const AppSettings = observer(() => {
               Your account has been successfully deleted.
             </Text>
           )}
-
           <GenericStrikeAround>Select Color Theme</GenericStrikeAround>
           <View style={styles.optionContainer}>
             {themeOptions.map((item, index) => (
@@ -381,7 +381,6 @@ export const AppSettings = observer(() => {
               </Pressable>
             ))}
           </View>
-
           <GenericStrikeAround>Reduce Motion</GenericStrikeAround>
           <View style={styles.optionContainer}>
             <Pressable
@@ -415,47 +414,75 @@ export const AppSettings = observer(() => {
               <Text style={styles["text-2xl"]}>Off</Text>
             </Pressable>
           </View>
-          {newFeatureNotifier && (
-            <>
-              <GenericStrikeAround>New Feature Notifier</GenericStrikeAround>
-              <View style={styles.optionContainer}>
-                <Pressable
-                  style={styles.optionRow}
-                  onPress={() => newFeatureNotifier.setGetNotified(true)}
-                >
-                  <View
-                    style={[
-                      styles.optionCircle,
-                      newFeatureNotifier.getNotified && {
-                        backgroundColor:
-                          uiStore.colorScheme === "dark"
-                            ? "#2563eb"
-                            : "#3b82f6",
-                      },
-                    ]}
-                  />
-                  <Text style={styles["text-2xl"]}>On</Text>
-                </Pressable>
-                <Pressable
-                  style={styles.optionRow}
-                  onPress={() => newFeatureNotifier.setGetNotified(false)}
-                >
-                  <View
-                    style={[
-                      styles.optionCircle,
-                      !newFeatureNotifier.getNotified && {
-                        backgroundColor:
-                          uiStore.colorScheme === "dark"
-                            ? "#2563eb"
-                            : "#3b82f6",
-                      },
-                    ]}
-                  />
-                  <Text style={styles["text-2xl"]}>Off</Text>
-                </Pressable>
-              </View>
-            </>
-          )}
+          <GenericStrikeAround>New Feature Notifier</GenericStrikeAround>
+          <View style={styles.optionContainer}>
+            <Pressable
+              style={styles.optionRow}
+              onPress={() => newFeatureNotifier.setGetNotified(true)}
+            >
+              <View
+                style={[
+                  styles.optionCircle,
+                  newFeatureNotifier.getNotified && {
+                    backgroundColor:
+                      uiStore.colorScheme === "dark" ? "#2563eb" : "#3b82f6",
+                  },
+                ]}
+              />
+              <Text style={styles["text-2xl"]}>On</Text>
+            </Pressable>
+            <Pressable
+              style={styles.optionRow}
+              onPress={() => newFeatureNotifier.setGetNotified(false)}
+            >
+              <View
+                style={[
+                  styles.optionCircle,
+                  !newFeatureNotifier.getNotified && {
+                    backgroundColor:
+                      uiStore.colorScheme === "dark" ? "#2563eb" : "#3b82f6",
+                  },
+                ]}
+              />
+              <Text style={styles["text-2xl"]}>Off</Text>
+            </Pressable>
+          </View>
+          <GenericStrikeAround>Progression Analytics</GenericStrikeAround>
+          <Text style={{ textAlign: "center" }}>
+            (sends data on game progress)
+          </Text>
+          <View style={styles.optionContainer}>
+            <Pressable
+              style={styles.optionRow}
+              onPress={() => analytics.setOptOut(false)}
+            >
+              <View
+                style={[
+                  styles.optionCircle,
+                  !analytics.optedOut && {
+                    backgroundColor:
+                      uiStore.colorScheme === "dark" ? "#2563eb" : "#3b82f6",
+                  },
+                ]}
+              />
+              <Text style={styles["text-2xl"]}>On</Text>
+            </Pressable>
+            <Pressable
+              style={styles.optionRow}
+              onPress={() => analytics.setOptOut(true)}
+            >
+              <View
+                style={[
+                  styles.optionCircle,
+                  analytics.optedOut && {
+                    backgroundColor:
+                      uiStore.colorScheme === "dark" ? "#2563eb" : "#3b82f6",
+                  },
+                ]}
+              />
+              <Text style={styles["text-2xl"]}>Off</Text>
+            </Pressable>
+          </View>
         </View>
         <Pressable
           onPress={() => {

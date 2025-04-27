@@ -120,7 +120,6 @@ const PlayerStatusForHome = observer(() => {
                 height: expandedSectionHeight,
                 marginHorizontal: "auto",
                 ...styles.rowCenter,
-                paddingTop: 2,
               }}
             >
               {!coinsHidden && (

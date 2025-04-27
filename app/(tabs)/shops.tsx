@@ -14,6 +14,7 @@ import { useRootStore } from "@/hooks/stores";
 import { type Shop } from "@/entities/shop";
 import { shopColors } from "@/constants/Colors";
 import { useStyles } from "@/hooks/styles";
+import GenericRaisedButton from "@/components/GenericRaisedButton";
 
 const ShopsScreen = observer(() => {
   const vibration = useVibration();
@@ -91,38 +92,27 @@ const ShopsScreen = observer(() => {
             </Text>
           </View>
 
-          <Pressable
-            style={{
-              marginHorizontal: "auto",
-              justifyContent: "flex-end",
-            }}
+          <GenericRaisedButton
+            textColor={colors.text}
+            backgroundColor={colors.border}
+            textSize={"lg"}
+            buttonStyle={[
+              {
+                ...styles.enterButtonInner,
+                shadowColor: colors.border,
+                elevation: 2,
+                shadowOpacity: 0.5,
+                shadowRadius: 5,
+              },
+            ]}
             onPress={() => {
               vibration({ style: "light" });
               shopsStore.setCurrentShop(shop);
               router.push(`/ShopInterior`);
             }}
           >
-            {({ pressed }) => (
-              <View
-                style={[
-                  {
-                    ...styles.enterButtonInner,
-                    shadowColor: colors.border,
-                    elevation: 2,
-                    backgroundColor: colors.border,
-                    shadowOpacity: 0.5,
-                    shadowRadius: 5,
-                    opacity: pressed ? 0.5 : 1,
-                    transform: [{ scale: pressed ? 0.95 : 1 }],
-                  },
-                ]}
-              >
-                <Text style={[styles["text-lg"], { color: colors.text }]}>
-                  Enter
-                </Text>
-              </View>
-            )}
-          </Pressable>
+            Enter
+          </GenericRaisedButton>
         </View>
       </View>
     );

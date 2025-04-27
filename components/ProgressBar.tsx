@@ -42,7 +42,6 @@ const ProgressBar = ({
   containerStyle = undefined,
 }: ProgressBarProps) => {
   const width = useSharedValue(0);
-  const styles = useStyles();
   const isFirstRender = useRef(true);
   const { getNormalizedLineSize } = useScaling();
 
@@ -109,7 +108,6 @@ const ProgressBar = ({
               style={{
                 marginTop: borderColor ? -2 : -1,
                 color: textColor,
-                ...styles["text-sm"],
               }}
             >
               {value}
